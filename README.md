@@ -16,7 +16,7 @@
     <a href="https://github.com/php-type-language/mapper/actions"><img src="https://github.com/php-type-language/mapper/workflows/tests/badge.svg"></a>
 </p>
 
-Kernel implementation for type mapper.
+The PHP kernel implementation for Type Language Mapper.
 
 ## Resources
 
