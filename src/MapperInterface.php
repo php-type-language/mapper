@@ -12,7 +12,7 @@ use TypeLang\Mapper\Exception\MapperExceptionInterface;
  *
  * @psalm-suppress UndefinedAttributeClass
  */
-interface RegistryInterface
+interface MapperInterface
 {
     /**
      * Returns object of type {@see T} by the given non-empty string.

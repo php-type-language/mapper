@@ -20,12 +20,12 @@ use TypeLang\Parser\ParserInterface;
 /**
  * @template T of object
  *
- * @template-implements RegistryInterface<T>
+ * @template-implements MapperInterface<T>
  * @template-implements TypeFactoryInterface<T>
  *
  * @psalm-suppress UndefinedAttributeClass
  */
-class Mapper implements RegistryInterface, TypeFactoryInterface
+class Mapper implements MapperInterface, TypeFactoryInterface
 {
     /**
      * @var Repository<T>
@@ -76,6 +76,9 @@ class Mapper implements RegistryInterface, TypeFactoryInterface
         throw TypeNotFoundException::fromNonParsableType($node::class);
     }
 
+    /**
+     * @throws TypeException
+     */
     public function parse(#[Language('PHP')] string $type): NodeInterface
     {
         try {
