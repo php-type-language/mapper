@@ -10,6 +10,7 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\Registry;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
@@ -66,10 +67,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     private function getType(mixed $value, ?string $type): TypeInterface
     {
-        // @phpstan-ignore-next-line : False-positive, the "get_debug_type" method returns a non-empty string
-        $statement = $this->types->parse($type ?? \get_debug_type($value));
+        if ($type === null) {
+            // @phpstan-ignore-next-line : False-positive, the "get_debug_type" method returns a non-empty string
+            return $this->types->get(new NamedTypeNode(\get_debug_type($value)));
+        }
 
-        return $this->types->get($statement);
+        return $this->types->get($this->types->parse($type));
     }
 
     /**
