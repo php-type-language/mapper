@@ -59,6 +59,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @param non-empty-string|null $type
+     *
      * @return TypeInterface<mixed, mixed>
      * @throws TypeNotCreatableException
      * @throws TypeNotFoundException

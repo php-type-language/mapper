@@ -69,7 +69,8 @@ final class DateTimeType implements TypeInterface
             if ($result instanceof \DateTimeInterface) {
                 return $result;
             }
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         throw InvalidValueException::becauseInvalidValue(
             context: $context,

@@ -42,7 +42,6 @@ abstract class ParameterMetadata
 
     /**
      * @param \ReflectionClass<object> $class
-     * @return \InvalidArgumentException
      */
     private function invalidReflectionClassException(\ReflectionClass $class): \InvalidArgumentException
     {

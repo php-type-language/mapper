@@ -31,6 +31,7 @@ final class IntType extends NonDirectionalType
 
     /**
      * @param non-empty-string $name
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(

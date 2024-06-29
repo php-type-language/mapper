@@ -37,6 +37,7 @@ final class PropertyMetadata extends Metadata
      * @api
      *
      * @param \ReflectionClass<object> $class
+     *
      * @throws \ReflectionException
      */
     public function getReflection(\ReflectionClass $class): \ReflectionProperty

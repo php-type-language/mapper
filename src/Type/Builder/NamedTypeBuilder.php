@@ -113,6 +113,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
     /**
      * @param TypeMetadata<TypeInterface<TInput, TOutput>> $metadata
+     *
      * @return iterable<array-key, mixed>
      * @throws MissingTemplateArgumentsException
      * @throws TemplateArgumentsHintNotSupportedException

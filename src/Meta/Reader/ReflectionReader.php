@@ -50,6 +50,7 @@ final class ReflectionReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @throws ReaderExceptionInterface
      */
     private function getPropertyMetadataForContext(

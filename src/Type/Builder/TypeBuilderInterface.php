@@ -8,7 +8,6 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-
 interface TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool;

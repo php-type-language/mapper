@@ -21,6 +21,7 @@ abstract class CachedReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @return non-empty-string
      */
     protected function getKey(\ReflectionClass $class): string
@@ -32,6 +33,7 @@ abstract class CachedReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @return non-empty-string
      */
     protected static function getKeyValue(\ReflectionClass $class): string
