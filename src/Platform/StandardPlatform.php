@@ -47,7 +47,7 @@ class StandardPlatform implements PlatformInterface
         // @phpstan-ignore-next-line : Allow non-resolvable types
         yield new NamedTypeBuilder('list', Type\ListType::class);
         // @phpstan-ignore-next-line : Allow non-resolvable types
-        yield new NamedTypeBuilder('array', Type\ListType::class);
+        yield new NamedTypeBuilder('array', Type\ArrayType::class);
         yield new ObjectNamedTypeBuilder(\DateTime::class, Type\DateTimeType::class);
         yield new ObjectNamedTypeBuilder(\DateTimeImmutable::class, Type\DateTimeType::class);
         yield new ObjectNamedTypeBuilder(\UnitEnum::class, Type\BackedEnumType::class);

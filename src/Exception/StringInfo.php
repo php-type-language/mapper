@@ -85,8 +85,6 @@ final class StringInfo
     }
 
     /**
-     * @param non-empty-string $value
-     *
      * @return non-empty-string
      */
     public static function quoted(string $value): string

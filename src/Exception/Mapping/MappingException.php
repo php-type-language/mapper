@@ -87,7 +87,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
     {
         return [
             'expected' => $this->expectedType,
-            'path' => ($path = $this->getPathAsString()) === '' ? 'root' : StringInfo::quoted($path),
+            'path' => StringInfo::quoted($this->getPathAsString()),
         ];
     }
 
@@ -113,7 +113,13 @@ abstract class MappingException extends \RuntimeException implements MappingExce
 
     public function getPathAsString(): string
     {
-        return \implode('.', $this->getPath());
+        $result = '$.';
+
+        foreach ($this->getPath() as $segment) {
+            $result .= \is_string($segment) ? "$segment." : "[$segment].";
+        }
+
+        return \rtrim($result, '.');
     }
 
     public function getExpectedType(): TypeStatement
