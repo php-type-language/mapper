@@ -15,6 +15,8 @@ final class StringType extends NonDirectionalType
 {
     /**
      * Converts incoming value to the string (in case of strict types is disabled).
+     *
+     * @throws InvalidValueException
      */
     protected function format(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
@@ -50,6 +52,7 @@ final class StringType extends NonDirectionalType
             \is_object($value) => $value,
             $value === true => '1',
             $value === false => '0',
+            // @phpstan-ignore-next-line : Any other type can be converted to string
             default => (string) $value,
         };
     }

@@ -12,7 +12,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
  * @template T of object
- * @template-implements TypeInterface<T, object|array>
+ * @template-implements TypeInterface<T, object|array<non-empty-string, mixed>>
  */
 final class ObjectType implements TypeInterface
 {
@@ -23,6 +23,10 @@ final class ObjectType implements TypeInterface
         private readonly ClassMetadata $metadata,
     ) {}
 
+    /**
+     * @throws InvalidValueException
+     * @throws \ReflectionException
+     */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): object|array
     {
         $className = $this->metadata->getName();
@@ -38,6 +42,11 @@ final class ObjectType implements TypeInterface
         return $this->normalizeObject($value, $types, $context);
     }
 
+    /**
+     * @param T $object
+     * @return object|array<non-empty-string, mixed>
+     * @throws \ReflectionException
+     */
     private function normalizeObject(object $object, RegistryInterface $types, LocalContext $context): object|array
     {
         $result = [];
@@ -74,7 +83,12 @@ final class ObjectType implements TypeInterface
         return $property->getValue($object);
     }
 
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    /**
+     * @throws InvalidValueException
+     * @throws MissingRequiredFieldException
+     * @throws \ReflectionException
+     */
+    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): object
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -91,7 +105,13 @@ final class ObjectType implements TypeInterface
         return $this->denormalizeObject($value, $types, $context);
     }
 
-    private function denormalizeObject(array $value, RegistryInterface $types, LocalContext $context): mixed
+    /**
+     * @param array<array-key, mixed> $value
+     * @return T
+     * @throws MissingRequiredFieldException
+     * @throws \ReflectionException
+     */
+    private function denormalizeObject(array $value, RegistryInterface $types, LocalContext $context): object
     {
         $object = $this->newInstance();
         $reflection = $this->metadata->getReflection();

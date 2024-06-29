@@ -12,7 +12,7 @@ class MissingTemplateArgumentsException extends TemplateArgumentsException
      * @param non-empty-string $type
      * @param int<0, max> $passed
      * @param int<0, max> $expectedMin
-     * @param int<0, max>|null $expectedMax
+     * @param int<0, max> $expectedMax
      */
     public static function fromTemplateArgumentsCount(
         string $type,

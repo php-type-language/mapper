@@ -31,12 +31,16 @@ final class InvalidValueException extends MappingException implements ValueMappi
         );
     }
 
+    /**
+     * @param TypeStatement|non-empty-string $expectedType
+     */
     public static function becauseInvalidValue(
         LocalContext $context,
         TypeStatement|string $expectedType,
         mixed $actualValue,
         ?TypeStatement $actualType = null,
     ): self {
+        // @phpstan-ignore-next-line : False-positive, the "get_debug_type" always returns non-empty-string
         $actualType ??= new NamedTypeNode(\get_debug_type($actualValue));
 
         if (\is_string($expectedType)) {
