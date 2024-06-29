@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type;
+namespace TypeLang\Mapper\Type;
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Exception\Mapping\InvalidValueException;
-use Serafim\Mapper\Exception\StringInfo;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\Attribute\TargetTemplateArgument;
-use Serafim\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\StringInfo;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;

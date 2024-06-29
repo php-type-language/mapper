@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception\Mapping;
+namespace TypeLang\Mapper\Exception\Mapping;
 
 interface FieldMappingExceptionInterface extends MappingExceptionInterface
 {

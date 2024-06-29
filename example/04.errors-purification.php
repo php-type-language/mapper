@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Serafim\Mapper\Attribute\MapProperty;
-use Serafim\Mapper\Exception\Mapping\MappingException;
-use Serafim\Mapper\Mapper;
+use TypeLang\Mapper\Attribute\MapProperty;
+use TypeLang\Mapper\Exception\Mapping\MappingException;
+use TypeLang\Mapper\Mapper;
 use TypeLang\Parser\Node\Name;
 
 require __DIR__ . '/../vendor/autoload.php';

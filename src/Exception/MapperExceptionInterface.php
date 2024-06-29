@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception;
+namespace TypeLang\Mapper\Exception;
 
 interface MapperExceptionInterface extends \Throwable {}

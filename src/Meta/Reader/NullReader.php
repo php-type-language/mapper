@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Meta\Reader;
 
-use Serafim\Mapper\Meta\ClassMetadata;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class NullReader extends Reader
 {

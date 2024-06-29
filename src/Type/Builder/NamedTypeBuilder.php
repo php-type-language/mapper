@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Builder;
+namespace TypeLang\Mapper\Type\Builder;
 
-use Serafim\Mapper\Exception\Creation\MissingTemplateArgumentsException;
-use Serafim\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
-use Serafim\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
-use Serafim\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
-use Serafim\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
-use Serafim\Mapper\Exception\Creation\TypeCreationException;
-use Serafim\Mapper\Exception\Creation\UnsupportedMetadataException;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\Meta\Reader\AttributeReader;
-use Serafim\Mapper\Type\Meta\Reader\ReaderInterface;
-use Serafim\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
-use Serafim\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
-use Serafim\Mapper\Type\Meta\TemplateParameterMetadata;
-use Serafim\Mapper\Type\Meta\TypeMetadata;
-use Serafim\Mapper\Type\Meta\TypeNameParameterMetadata;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Exception\Creation\MissingTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
+use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
+use TypeLang\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Creation\TypeCreationException;
+use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
+use TypeLang\Mapper\Type\Meta\Reader\ReaderInterface;
+use TypeLang\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
+use TypeLang\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
+use TypeLang\Mapper\Type\Meta\TemplateParameterMetadata;
+use TypeLang\Mapper\Type\Meta\TypeMetadata;
+use TypeLang\Mapper\Type\Meta\TypeNameParameterMetadata;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Literal\LiteralNodeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\ExplicitFieldNode;

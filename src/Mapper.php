@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper;
+namespace TypeLang\Mapper;
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Registry\Registry;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Registry\Registry;
+use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {

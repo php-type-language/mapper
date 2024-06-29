@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Registry;
+namespace TypeLang\Mapper\Registry;
 
-use Serafim\Mapper\Exception\TypeNotCreatableException;
-use Serafim\Mapper\Exception\TypeNotFoundException;
-use Serafim\Mapper\Platform\GrammarFeature;
-use Serafim\Mapper\Platform\StandardPlatform;
-use Serafim\Mapper\PlatformInterface;
-use Serafim\Mapper\Type\Builder\NamedTypeBuilder;
-use Serafim\Mapper\Type\Builder\ObjectNamedTypeBuilder;
-use Serafim\Mapper\Type\Builder\TypeBuilderInterface;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Exception\TypeNotCreatableException;
+use TypeLang\Mapper\Exception\TypeNotFoundException;
+use TypeLang\Mapper\Platform\GrammarFeature;
+use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\PlatformInterface;
+use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
+use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\InMemoryCachedParser;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;

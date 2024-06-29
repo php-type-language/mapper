@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Tests\Unit;
+namespace TypeLang\Mapper\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\Group;
-use Serafim\Mapper\Tests\TestCase as BaseTestCase;
+use TypeLang\Mapper\Tests\TestCase as BaseTestCase;
 
-#[Group('unit'), Group('serafim/mapper')]
+#[Group('unit'), Group('type-lang/mapper')]
 abstract class TestCase extends BaseTestCase {}

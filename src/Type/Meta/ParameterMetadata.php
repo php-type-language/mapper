@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Meta;
+namespace TypeLang\Mapper\Type\Meta;
 
 abstract class ParameterMetadata
 {

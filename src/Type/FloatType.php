@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type;
+namespace TypeLang\Mapper\Type;
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Exception\Mapping\InvalidValueException;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 

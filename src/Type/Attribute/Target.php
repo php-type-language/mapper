@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Attribute;
+namespace TypeLang\Mapper\Type\Attribute;
 
 enum Target
 {

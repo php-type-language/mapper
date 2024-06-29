@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception\Mapping;
+namespace TypeLang\Mapper\Exception\Mapping;
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Exception\StringInfo;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Exception\StringInfo;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

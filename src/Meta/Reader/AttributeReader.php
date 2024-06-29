@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Meta\Reader;
 
-use Serafim\Mapper\Attribute\MapProperty;
-use Serafim\Mapper\Meta\ClassMetadata;
-use Serafim\Mapper\Meta\PropertyMetadata;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Attribute\MapProperty;
+use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Meta\PropertyMetadata;
+use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class AttributeReader extends Reader
 {

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception\Definition;
+namespace TypeLang\Mapper\Exception\Definition;
 
-use Serafim\Mapper\Exception\MapperExceptionInterface;
+use TypeLang\Mapper\Exception\MapperExceptionInterface;
 
 interface TypeDefinitionExceptionInterface extends MapperExceptionInterface {}

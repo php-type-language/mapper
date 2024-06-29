@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Builder;
+namespace TypeLang\Mapper\Type\Builder;
 
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

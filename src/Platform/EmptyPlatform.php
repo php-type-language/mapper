@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Platform;
+namespace TypeLang\Mapper\Platform;
 
-use Serafim\Mapper\PlatformInterface;
+use TypeLang\Mapper\PlatformInterface;
 
 final class EmptyPlatform implements PlatformInterface
 {

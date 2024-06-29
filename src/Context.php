@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper;
+namespace TypeLang\Mapper;
 
 /**
  * @phpstan-consistent-constructor

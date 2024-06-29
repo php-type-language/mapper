@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception;
+namespace TypeLang\Mapper\Exception;
 
 /**
  * @internal This is an internal library class, please do not use it in your code.
- * @psalm-internal Serafim\Mapper
+ * @psalm-internal TypeLang\Mapper
  */
 final class StringInfo
 {

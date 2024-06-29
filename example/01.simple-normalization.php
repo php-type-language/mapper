@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Serafim\Mapper\Mapper;
+use TypeLang\Mapper\Mapper;
 
 require __DIR__ . '/../vendor/autoload.php';
 

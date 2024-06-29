@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Exception\Mapping\InvalidValueException;
-use Serafim\Mapper\Mapper;
-use Serafim\Mapper\Registry\Registry;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\NonDirectionalType;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Registry\Registry;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\NonDirectionalType;
 
 require __DIR__ . '/../vendor/autoload.php';
 

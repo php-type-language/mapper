@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception\Creation;
+namespace TypeLang\Mapper\Exception\Creation;
 
-use Serafim\Mapper\Exception\StringInfo;
+use TypeLang\Mapper\Exception\StringInfo;
 
 class MissingTemplateArgumentsException extends TemplateArgumentsException
 {

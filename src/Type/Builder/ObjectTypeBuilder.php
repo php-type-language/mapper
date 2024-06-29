@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Builder;
+namespace TypeLang\Mapper\Type\Builder;
 
-use Serafim\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
-use Serafim\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
-use Serafim\Mapper\Meta\Reader\AttributeReader;
-use Serafim\Mapper\Meta\Reader\InMemoryReader;
-use Serafim\Mapper\Meta\Reader\ReaderInterface;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\ObjectType;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
+use TypeLang\Mapper\Meta\Reader\AttributeReader;
+use TypeLang\Mapper\Meta\Reader\InMemoryReader;
+use TypeLang\Mapper\Meta\Reader\ReaderInterface;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\ObjectType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;

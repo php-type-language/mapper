@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Platform;
+namespace TypeLang\Mapper\Platform;
 
-use Serafim\Mapper\Meta\Reader\AttributeReader;
-use Serafim\Mapper\Meta\Reader\ReaderInterface;
-use Serafim\Mapper\PlatformInterface;
-use Serafim\Mapper\Type;
-use Serafim\Mapper\Type\Builder\ListTypeBuilder;
-use Serafim\Mapper\Type\Builder\NamedTypeBuilder;
-use Serafim\Mapper\Type\Builder\NullableTypeBuilder;
-use Serafim\Mapper\Type\Builder\ObjectNamedTypeBuilder;
-use Serafim\Mapper\Type\Builder\ObjectTypeBuilder;
+use TypeLang\Mapper\Meta\Reader\AttributeReader;
+use TypeLang\Mapper\Meta\Reader\ReaderInterface;
+use TypeLang\Mapper\PlatformInterface;
+use TypeLang\Mapper\Type;
+use TypeLang\Mapper\Type\Builder\ListTypeBuilder;
+use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
+use TypeLang\Mapper\Type\Builder\NullableTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
 
 class StandardPlatform implements PlatformInterface
 {

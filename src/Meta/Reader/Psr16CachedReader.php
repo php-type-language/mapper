@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Meta\Reader;
 
 use Psr\SimpleCache\CacheInterface;
-use Serafim\Mapper\Meta\ClassMetadata;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class Psr16CachedReader extends CachedReader
 {

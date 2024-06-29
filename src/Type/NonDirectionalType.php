@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type;
+namespace TypeLang\Mapper\Type;
 
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
  * @template TInput of mixed

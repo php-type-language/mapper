@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta;
+namespace TypeLang\Mapper\Meta;
 
 abstract class Metadata
 {

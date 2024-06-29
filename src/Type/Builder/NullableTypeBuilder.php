@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Builder;
+namespace TypeLang\Mapper\Type\Builder;
 
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\NullableType;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\NullableType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Registry;
+namespace TypeLang\Mapper\Registry;
 
-use Serafim\Mapper\Exception\TypeNotCreatableException;
-use Serafim\Mapper\Exception\TypeNotFoundException;
-use Serafim\Mapper\PlatformInterface;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Exception\TypeNotCreatableException;
+use TypeLang\Mapper\Exception\TypeNotFoundException;
+use TypeLang\Mapper\PlatformInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 interface RegistryInterface

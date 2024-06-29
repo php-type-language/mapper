@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Meta\Reader;
 
-use Serafim\Mapper\Exception\TypeNotFoundException;
-use Serafim\Mapper\Meta\ClassMetadata;
-use Serafim\Mapper\Meta\PropertyMetadata;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Exception\TypeNotFoundException;
+use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Meta\PropertyMetadata;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Reader\Exception\ReaderExceptionInterface;
 use TypeLang\Reader\PropertyReaderInterface as PropertyTypeReaderInterface;
 use TypeLang\Reader\ReflectionReader as ReflectionTypeReader;

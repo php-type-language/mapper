@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Attribute;
+namespace TypeLang\Mapper\Type\Attribute;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER)]
 final class TargetShapeFields extends InjectTarget

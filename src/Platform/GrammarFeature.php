@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Platform;
+namespace TypeLang\Mapper\Platform;
 
 enum GrammarFeature
 {

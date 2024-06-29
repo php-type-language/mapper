@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Tests\Unit\Type;
+namespace TypeLang\Mapper\Tests\Unit\Type;
 
-use Serafim\Mapper\Context;
-use Serafim\Mapper\Type\FloatType;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Type\FloatType;
+use TypeLang\Mapper\Type\TypeInterface;
 
 final class FloatTypeTest extends TypeTestCase
 {

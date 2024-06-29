@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Registry;
+namespace TypeLang\Mapper\Registry;
 
-use Serafim\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 
 interface MutableRegistryInterface extends RegistryInterface
 {

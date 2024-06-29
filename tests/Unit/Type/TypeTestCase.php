@@ -2,23 +2,23 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Tests\Unit\Type;
+namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
-use Serafim\Mapper\Context;
-use Serafim\Mapper\Context\LocalContext;
-use Serafim\Mapper\Exception\Mapping\MappingException;
-use Serafim\Mapper\Registry\Registry;
-use Serafim\Mapper\Registry\RegistryInterface;
-use Serafim\Mapper\Tests\Unit\TestCase;
-use Serafim\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
-use Serafim\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
-use Serafim\Mapper\Tests\Unit\Type\Stub\UnitEnum;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Exception\Mapping\MappingException;
+use TypeLang\Mapper\Registry\Registry;
+use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Tests\Unit\TestCase;
+use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
+use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
+use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
+use TypeLang\Mapper\Type\TypeInterface;
 
-#[Group('unit'), Group('serafim/mapper')]
+#[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
     protected readonly LocalContext $context;

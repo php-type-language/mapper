@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Exception;
+namespace TypeLang\Mapper\Exception;
 
 class TypeNotCreatableException extends TypeException
 {

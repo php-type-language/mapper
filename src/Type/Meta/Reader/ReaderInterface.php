@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Meta\Reader;
+namespace TypeLang\Mapper\Type\Meta\Reader;
 
-use Serafim\Mapper\Type\Meta\TypeMetadata;
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\Meta\TypeMetadata;
+use TypeLang\Mapper\Type\TypeInterface;
 
 interface ReaderInterface
 {

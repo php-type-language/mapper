@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Meta;
+namespace TypeLang\Mapper\Meta;
 
-use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class PropertyMetadata extends Metadata

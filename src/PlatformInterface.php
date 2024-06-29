@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper;
+namespace TypeLang\Mapper;
 
-use Serafim\Mapper\Platform\GrammarFeature;
-use Serafim\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Platform\GrammarFeature;
+use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 
 interface PlatformInterface
 {

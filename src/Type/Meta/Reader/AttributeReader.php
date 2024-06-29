@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Type\Meta\Reader;
+namespace TypeLang\Mapper\Type\Meta\Reader;
 
-use Serafim\Mapper\Exception\Definition\InvalidTypeArgumentException;
-use Serafim\Mapper\Exception\Definition\UnsupportedAttributeException;
-use Serafim\Mapper\Type\Attribute\InjectTarget;
-use Serafim\Mapper\Type\Attribute\TargetSealedShapeFlag;
-use Serafim\Mapper\Type\Attribute\TargetShapeFields;
-use Serafim\Mapper\Type\Attribute\TargetTemplateArgument;
-use Serafim\Mapper\Type\Attribute\TargetTypeName;
-use Serafim\Mapper\Type\Meta\ParameterMetadata;
-use Serafim\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
-use Serafim\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
-use Serafim\Mapper\Type\Meta\TemplateParameterMetadata;
-use Serafim\Mapper\Type\Meta\TypeMetadata;
-use Serafim\Mapper\Type\Meta\TypeNameParameterMetadata;
+use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
+use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
+use TypeLang\Mapper\Type\Attribute\InjectTarget;
+use TypeLang\Mapper\Type\Attribute\TargetSealedShapeFlag;
+use TypeLang\Mapper\Type\Attribute\TargetShapeFields;
+use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Meta\ParameterMetadata;
+use TypeLang\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
+use TypeLang\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
+use TypeLang\Mapper\Type\Meta\TemplateParameterMetadata;
+use TypeLang\Mapper\Type\Meta\TypeMetadata;
+use TypeLang\Mapper\Type\Meta\TypeNameParameterMetadata;
 
 final class AttributeReader implements ReaderInterface
 {

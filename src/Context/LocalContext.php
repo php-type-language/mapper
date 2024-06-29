@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Serafim\Mapper\Context;
+namespace TypeLang\Mapper\Context;
 
-use Serafim\Mapper\Context;
-use Serafim\Mapper\Context\Path\PathInterface;
-use Serafim\Mapper\Context\Path\PathType;
+use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\PathType;
 
 /**
  * Mutable local bypass context.

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Serafim\Mapper\Attribute\MapProperty;
-use Serafim\Mapper\Mapper;
+use TypeLang\Mapper\Attribute\MapProperty;
+use TypeLang\Mapper\Mapper;
 
 require __DIR__ . '/../vendor/autoload.php';
 
