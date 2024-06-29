@@ -16,7 +16,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
  * @template TOutputKey of array-key
  * @template TInput of mixed
  * @template TOutput of mixed
- *
  * @template-implements TypeInterface<iterable<TInputKey, TInput>, array<TOutputKey, TOutput>>
  */
 final class ArrayType implements TypeInterface
