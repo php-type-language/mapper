@@ -46,11 +46,11 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
     /**
      * @param non-empty-string $name
-     * @param class-string<TypeInterface<TInput, TOutput>> $class
+     * @param class-string<TypeInterface<TInput, TOutput>> $type
      */
     public function __construct(
         protected readonly string $name,
-        protected readonly string $class,
+        protected readonly string $type,
         protected readonly ReaderInterface $reader = new AttributeReader(),
         PrinterInterface $printer = new PrettyPrinter(),
     ) {
@@ -87,7 +87,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
         assert($type instanceof NamedTypeNode);
 
         $metadata = $this->reader->getTypeMetadata(
-            class: new \ReflectionClass($this->class),
+            class: new \ReflectionClass($this->type),
         );
 
         if (!$metadata->isShapeFieldsIsAllowed() && $type->fields !== null) {
@@ -104,7 +104,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
             );
         }
 
-        return new $this->class(...$this->createArguments(
+        return new $this->type(...$this->createArguments(
             metadata: $metadata,
             type: $type,
             context: $context,

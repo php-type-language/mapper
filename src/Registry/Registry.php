@@ -85,22 +85,22 @@ class Registry implements MutableRegistryInterface
      * @api
      *
      * @param non-empty-string $name
-     * @param class-string<TypeInterface> $class
+     * @param class-string<TypeInterface<mixed, mixed>> $type
      */
-    public function type(string $name, string $class): void
+    public function type(string $name, string $type): void
     {
-        $this->append(new NamedTypeBuilder($name, $class));
+        $this->append(new NamedTypeBuilder($name, $type));
     }
 
     /**
      * @api
      *
-     * @param non-empty-string $name
-     * @param class-string<TypeInterface> $class
+     * @param class-string $class
+     * @param class-string<TypeInterface<mixed, mixed>> $type
      */
-    public function instanceof(string $name, string $class): void
+    public function instanceof(string $class, string $type): void
     {
-        $this->append(new ObjectNamedTypeBuilder($name, $class));
+        $this->append(new ObjectNamedTypeBuilder($class, $type));
     }
 
     /**

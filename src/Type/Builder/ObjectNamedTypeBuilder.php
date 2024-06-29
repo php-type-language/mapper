@@ -17,11 +17,11 @@ class ObjectNamedTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @param class-string $name
-     * @param class-string<TypeInterface<TInput, TOutput>> $class
+     * @param class-string<TypeInterface<TInput, TOutput>> $type
      */
-    public function __construct(string $name, string $class)
+    public function __construct(string $name, string $type)
     {
-        parent::__construct($name, $class);
+        parent::__construct($name, $type);
     }
 
     /**
