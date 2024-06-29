@@ -66,7 +66,7 @@ final class ListType implements TypeInterface
             $context->enter($index);
 
             $result[] = $this->type !== null
-                ? $this->type->normalize($value, $types, $context)
+                ? $this->type->normalize($item, $types, $context)
                 : $this->normalizeImplicitTypedValue($item, $types, $context);
 
             $context->leave();
@@ -109,7 +109,7 @@ final class ListType implements TypeInterface
             $context->enter($index);
 
             $result[] = $this->type !== null
-                ? $this->type->denormalize($value, $types, $context)
+                ? $this->type->denormalize($item, $types, $context)
                 : $this->denormalizeImplicitTypedValue($item, $types, $context);
 
             $context->leave();
