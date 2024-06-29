@@ -23,13 +23,13 @@ class Context
      * If this option contains {@see false}, then type conversion is
      * allowed during transformation.
      */
-    private readonly ?bool $strictTypes;
+    protected readonly ?bool $strictTypes;
 
     /**
      * If this option contains {@see true}, then objects are converted to
      * associative arrays, otherwise anonymous {@see object} will be returned.
      */
-    private readonly ?bool $objectsAsArrays;
+    protected readonly ?bool $objectsAsArrays;
 
     public function __construct(
         ?bool $strictTypes = null,

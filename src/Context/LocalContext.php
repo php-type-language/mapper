@@ -18,7 +18,19 @@ final class LocalContext extends Context
 
     public static function fromContext(?Context $context): self
     {
-        $result = (new self())->with($context);
+        return (new self())->with($context);
+    }
+
+    public function with(?Context $context): static
+    {
+        if ($context === null) {
+            return $this;
+        }
+
+        $result = new self(
+            strictTypes: $context->strictTypes ?? $this->strictTypes,
+            objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
+        );
 
         if ($context instanceof self) {
             $result->stack = $context->stack;
