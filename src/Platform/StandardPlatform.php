@@ -39,6 +39,7 @@ class StandardPlatform implements PlatformInterface
 
     public function getBuiltinTypes(): iterable
     {
+        yield new NamedTypeBuilder('null', Type\NullType::class);
         yield new NamedTypeBuilder('mixed', Type\MixedType::class);
         yield new NamedTypeBuilder('int', Type\IntType::class);
         yield new NamedTypeBuilder('bool', Type\BoolType::class);
