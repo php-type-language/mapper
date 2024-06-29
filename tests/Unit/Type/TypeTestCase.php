@@ -8,7 +8,8 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Serafim\Mapper\Context;
-use Serafim\Mapper\Exception\MappingException;
+use Serafim\Mapper\Context\LocalContext;
+use Serafim\Mapper\Exception\Mapping\MappingException;
 use Serafim\Mapper\Registry\Registry;
 use Serafim\Mapper\Registry\RegistryInterface;
 use Serafim\Mapper\Tests\Unit\TestCase;
@@ -20,14 +21,14 @@ use Serafim\Mapper\Type\TypeInterface;
 #[Group('unit'), Group('serafim/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly Context $context;
+    protected readonly LocalContext $context;
 
     protected readonly RegistryInterface $types;
 
     #[Before]
     protected function setUpDefaultContext(): void
     {
-        $this->context = new Context();
+        $this->context = new LocalContext();
     }
 
     #[Before]
