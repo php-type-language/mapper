@@ -47,6 +47,8 @@ final class BackedEnumType implements TypeInterface
     /**
      * Converts enum case (of {@see \BackedEnum}) objects to their
      * scalar representation.
+     *
+     * @throws InvalidValueException
      */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): int|string
     {
@@ -63,6 +65,8 @@ final class BackedEnumType implements TypeInterface
 
     /**
      * Converts a scalar representation of an enum to an enum case object.
+     *
+     * @throws InvalidValueException
      */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \BackedEnum
     {

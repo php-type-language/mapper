@@ -50,7 +50,7 @@ class StandardPlatform implements PlatformInterface
         // @phpstan-ignore-next-line : Allow non-resolvable types
         yield new NamedTypeBuilder('array', Type\ArrayType::class);
         yield new ObjectNamedTypeBuilder(\DateTimeInterface::class, Type\DateTimeType::class);
-        yield new ObjectNamedTypeBuilder(\UnitEnum::class, Type\BackedEnumType::class);
+        yield new ObjectNamedTypeBuilder(\BackedEnum::class, Type\BackedEnumType::class);
         yield new NullableTypeBuilder();
         yield new ListTypeBuilder();
         yield new ObjectTypeBuilder($this->reader);

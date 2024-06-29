@@ -14,6 +14,7 @@ use TypeLang\Mapper\Registry\Registry;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
+use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -90,13 +91,8 @@ abstract class TypeTestCase extends TestCase
             yield "inf float $suffix" => [\INF, ValueType::InfFloat, $context];
             yield "negative inf float $suffix" => [-\INF, ValueType::NegativeInfFloat, $context];
             yield "nan float $suffix" => [\NAN, ValueType::NanFloat, $context];
-            yield "object $suffix" => [(object)[], ValueType::Object, $context];
-            yield "stringable object $suffix" => [new class implements \Stringable {
-                public function __toString(): string
-                {
-                    return '<EXAMPLE>';
-                }
-            }, ValueType::StringableObject, $context];
+            yield "object $suffix" => [new \stdClass(), ValueType::Object, $context];
+            yield "stringable object $suffix" => [new StringableObject(), ValueType::StringableObject, $context];
             yield "array $suffix" => [[1, 2, 3], ValueType::Array, $context];
             yield "empty array $suffix" => [[], ValueType::EmptyArray, $context];
             yield "string backed enum $suffix" => [StringBackedEnum::EXAMPLE, ValueType::StringBackedEnum, $context];
@@ -120,6 +116,8 @@ abstract class TypeTestCase extends TestCase
 
         if (\is_float($expected) && \is_nan($expected)) {
             self::assertNan($actual, $message);
+        } elseif (\is_object($expected)) {
+            self::assertEquals($expected, $actual, $message);
         } else {
             self::assertSame($expected, $actual, $message);
         }
