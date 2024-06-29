@@ -17,8 +17,15 @@ use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 final class DateTimeType implements TypeInterface
 {
     /**
-     * @param class-string<\DateTime|\DateTimeImmutable> $name
+     * @var class-string<\DateTime|\DateTimeImmutable>
+     */
+    private readonly string $class;
+
+    /**
+     * @param class-string<\DateTimeInterface> $name
      * @param non-empty-string $format
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         #[TargetTypeName]
@@ -32,6 +39,13 @@ final class DateTimeType implements TypeInterface
                 $this->name,
             ));
         }
+
+        $this->class = match (true) {
+            $this->name === \DateTimeInterface::class,
+            \interface_exists($this->name) => \DateTimeImmutable::class,
+            \is_a($this->name, \DateTime::class, true) => \DateTime::class,
+            default => \DateTimeImmutable::class,
+        };
     }
 
     /**
@@ -82,11 +96,11 @@ final class DateTimeType implements TypeInterface
     private function parseDateTime(string $value, Context $context): ?\DateTimeInterface
     {
         if ($context->isStrictTypesEnabled()) {
-            $result = ($this->name)::createFromFormat($this->format, $value);
+            $result = ($this->class)::createFromFormat($this->format, $value);
 
             return \is_bool($result) ? null : $result;
         }
 
-        return new $this->name($value);
+        return new $this->class($value);
     }
 }
