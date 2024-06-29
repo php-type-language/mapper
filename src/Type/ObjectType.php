@@ -44,6 +44,7 @@ final class ObjectType implements TypeInterface
 
     /**
      * @param T $object
+     *
      * @return object|array<non-empty-string, mixed>
      * @throws \ReflectionException
      */
@@ -107,6 +108,7 @@ final class ObjectType implements TypeInterface
 
     /**
      * @param array<array-key, mixed> $value
+     *
      * @return T
      * @throws MissingRequiredFieldException
      * @throws \ReflectionException

@@ -9,8 +9,10 @@ use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
-use TypeLang\Mapper\Exception\Creation\TypeCreationException;
 use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
+use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
+use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
+use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
 use TypeLang\Mapper\Type\Meta\Reader\ReaderInterface;
@@ -29,6 +31,10 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
 
+/**
+ * @template TInput of mixed
+ * @template TOutput of mixed
+ */
 class NamedTypeBuilder implements TypeBuilderInterface
 {
     /**
@@ -40,7 +46,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
     /**
      * @param non-empty-string $name
-     * @param class-string<TypeInterface> $class
+     * @param class-string<TypeInterface<TInput, TOutput>> $class
      */
     public function __construct(
         protected readonly string $name,
@@ -64,8 +70,17 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @throws TypeCreationException
+     * @return TypeInterface<TInput, TOutput>
+     * @throws MissingTemplateArgumentsException
+     * @throws ShapeFieldsNotSupportedException
+     * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TemplateArgumentsNotSupportedException
+     * @throws TooManyTemplateArgumentsException
+     * @throws TypeNotFoundException
+     * @throws UnsupportedMetadataException
      * @throws \ReflectionException
+     * @throws InvalidTypeArgumentException
+     * @throws UnsupportedAttributeException
      */
     public function build(TypeStatement $type, RegistryInterface $context): TypeInterface
     {
@@ -97,17 +112,20 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
+     * @param TypeMetadata<TypeInterface<TInput, TOutput>> $metadata
      * @return iterable<array-key, mixed>
-     * @throws TooManyTemplateArgumentsException
      * @throws MissingTemplateArgumentsException
+     * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TooManyTemplateArgumentsException
      * @throws UnsupportedMetadataException
+     * @throws TypeNotFoundException
      */
     private function createArguments(
         TypeMetadata $metadata,
         NamedTypeNode $type,
         RegistryInterface $context
     ): iterable {
-        $arguments = $type->arguments?->items ?? [];
+        $arguments = $type->arguments->items ?? [];
 
         $fields = null;
         $result = [];
@@ -138,7 +156,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
                     break;
 
                 case $parameter instanceof SealedShapeFlagParameterMetadata:
-                    $result[] = $type->fields?->sealed ?? false;
+                    $result[] = $type->fields->sealed ?? false;
                     break;
 
                 case $parameter instanceof ShapeFieldsParameterMetadata:
@@ -167,7 +185,8 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @return array<array-key, TypeInterface>
+     * @return array<array-key, TypeInterface<mixed, mixed>>
+     * @throws TypeNotFoundException
      */
     private function getShapeFieldsAsArray(NamedTypeNode $type, RegistryInterface $context): array
     {
@@ -189,6 +208,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
     /**
      * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TypeNotFoundException
      */
     private function getTemplateArgumentValue(
         TemplateParameterMetadata $metadata,

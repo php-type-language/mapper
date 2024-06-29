@@ -11,7 +11,6 @@ use TypeLang\Mapper\Meta\Reader\InMemoryReader;
 use TypeLang\Mapper\Meta\Reader\ReaderInterface;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\ObjectType;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
@@ -20,6 +19,8 @@ use TypeLang\Printer\PrinterInterface;
 /**
  * Creates an {@see ObjectType} from a type name containing a reference to an
  * existing class.
+ *
+ * @template T of object
  */
 final class ObjectTypeBuilder implements TypeBuilderInterface
 {
@@ -47,8 +48,13 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
      *
      * Please note that objects do not (yet) support template
      * arguments and shape fields.
+     *
+     * @return ObjectType<T>
+     * @throws ShapeFieldsNotSupportedException
+     * @throws TemplateArgumentsNotSupportedException
+     * @throws \ReflectionException
      */
-    public function build(TypeStatement $type, RegistryInterface $context): TypeInterface
+    public function build(TypeStatement $type, RegistryInterface $context): ObjectType
     {
         assert($type instanceof NamedTypeNode);
 
@@ -66,8 +72,12 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
             );
         }
 
+        /** @var class-string<T> $class */
+        $class = $type->name->toString();
+
+        /** @var ObjectType<T> */
         return new ObjectType($this->reader->getClassMetadata(
-            class: new \ReflectionClass($type->name->toString()),
+            class: new \ReflectionClass($class),
             types: $context,
         ));
     }

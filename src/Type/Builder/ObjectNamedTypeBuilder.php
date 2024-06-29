@@ -8,11 +8,16 @@ use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TInput of mixed
+ * @template TOutput of mixed
+ * @template-extends NamedTypeBuilder<TInput, TOutput>
+ */
 class ObjectNamedTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @param class-string $name
-     * @param class-string<TypeInterface> $class
+     * @param class-string<TypeInterface<TInput, TOutput>> $class
      */
     public function __construct(string $name, string $class)
     {
