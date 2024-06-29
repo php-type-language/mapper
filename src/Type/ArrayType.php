@@ -6,10 +6,10 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * @template TInputKey of array-key
@@ -20,17 +20,15 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
  */
 final class ArrayType implements TypeInterface
 {
-    private readonly bool $allowIntKeys;
-
     /**
      * @var TypeInterface<TInputKey, TOutputKey>
      */
     private readonly TypeInterface $key;
 
     /**
-     * @var TypeInterface<TInput, TOutput>|null
+     * @var TypeInterface<TInput, TOutput>
      */
-    private readonly ?TypeInterface $value;
+    private readonly TypeInterface $value;
 
     /**
      * @param TypeInterface<TInputKey, TOutputKey>|TypeInterface<TInput, TOutput>|null $key
@@ -42,11 +40,9 @@ final class ArrayType implements TypeInterface
         #[TargetTemplateArgument]
         ?TypeInterface $value = null,
     ) {
-        $this->allowIntKeys = $value === null;
-
         [$this->key, $this->value] = match (true) {
-            $key === null => [new StringType(), null],
-            $value === null => [new StringType(), $key],
+            $key === null => [new MixedType(), new MixedType()],
+            $value === null => [new MixedType(), $key],
             default => [$key, $value],
         };
     }
@@ -79,6 +75,7 @@ final class ArrayType implements TypeInterface
 
     /**
      * @throws InvalidValueException
+     * @throws TypeNotCreatableException
      * @throws TypeNotFoundException
      */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): array
@@ -90,9 +87,8 @@ final class ArrayType implements TypeInterface
         foreach ($value as $index => $item) {
             $context->enter($index);
 
-            $result[$this->normalizeKey($index, $types, $context)] = $this->value !== null
-                ? $this->value->normalize($item, $types, $context)
-                : $this->normalizeImplicitTypedValue($item, $types, $context);
+            $result[$this->key->normalize($index, $types, $context)]
+                = $this->value->normalize($item, $types, $context);
 
             $context->leave();
         }
@@ -100,38 +96,11 @@ final class ArrayType implements TypeInterface
         return $result;
     }
 
-    private function normalizeKey(mixed $index, RegistryInterface $types, LocalContext $context): int|string
-    {
-        if ($this->allowIntKeys && \is_int($index)) {
-            return $index;
-        }
-
-        return $this->key->normalize($index, $types, $context);
-    }
-
-    /**
-     * If the type of the list is not specified, then we try to infer the type
-     * based on the value, thus providing a more correct conversion.
-     *
-     * @throws TypeNotFoundException
-     */
-    private function normalizeImplicitTypedValue(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        if (\is_object($value) && !$value instanceof \stdClass) {
-            $type = $types->get(new NamedTypeNode(
-                name: \get_class($value),
-            ));
-
-            return $type->normalize($value, $types, $context);
-        }
-
-        return $value;
-    }
-
     /**
      * @return array<TInputKey, TInput>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
+     * @throws TypeNotCreatableException
      */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): array
     {
@@ -142,41 +111,12 @@ final class ArrayType implements TypeInterface
         foreach ($value as $index => $item) {
             $context->enter($index);
 
-            $result[$this->denormalizeKey($index, $types, $context)] = $this->value !== null
-                ? $this->value->denormalize($item, $types, $context)
-                : $this->denormalizeImplicitTypedValue($item, $types, $context);
+            $result[$this->key->denormalize($index, $types, $context)]
+                = $this->value->denormalize($item, $types, $context);
 
             $context->leave();
         }
 
         return $result;
-    }
-
-    private function denormalizeKey(mixed $index, RegistryInterface $types, LocalContext $context): int|string
-    {
-        if ($this->allowIntKeys && \is_int($index)) {
-            return $index;
-        }
-
-        return $this->key->denormalize($index, $types, $context);
-    }
-
-    /**
-     * If the type of the list is not specified, then we try to infer the type
-     * based on the value, thus providing a more correct conversion.
-     *
-     * @throws TypeNotFoundException
-     */
-    private function denormalizeImplicitTypedValue(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        if (\is_object($value) && !$value instanceof \stdClass) {
-            $type = $types->get(new NamedTypeNode(
-                name: \get_class($value),
-            ));
-
-            return $type->denormalize($value, $types, $context);
-        }
-
-        return $value;
     }
 }
