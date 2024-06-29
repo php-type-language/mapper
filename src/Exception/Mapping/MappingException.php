@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Exception\StringInfo;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Traverser;
@@ -87,7 +86,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
     {
         return [
             'expected' => $this->expectedType,
-            'path' => StringInfo::quoted($this->getPathAsString()),
+            'path' => $this->getPathAsString(),
         ];
     }
 
@@ -119,7 +118,13 @@ abstract class MappingException extends \RuntimeException implements MappingExce
             $result .= \is_string($segment) ? "$segment." : "[$segment].";
         }
 
-        return \rtrim($result, '.');
+        $result = \rtrim($result, '.');
+
+        if ($result === '$') {
+            return 'root';
+        }
+
+        return $result;
     }
 
     public function getExpectedType(): TypeStatement
