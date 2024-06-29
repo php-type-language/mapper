@@ -84,6 +84,7 @@ final class TypeMetadata
      */
     public function findParameterByType(string $class): ?ParameterMetadata
     {
+        /** @var TParam|null */
         return $this->findParameter(static fn(ParameterMetadata $meta): bool
             => $meta instanceof $class);
     }

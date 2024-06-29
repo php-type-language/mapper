@@ -9,7 +9,7 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
- * @template-extends NonDirectionalType<string, string>
+ * @template-extends NonDirectionalType<string>
  */
 final class StringType extends NonDirectionalType
 {

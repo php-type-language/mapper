@@ -8,16 +8,15 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
- * @template TInput of mixed
- * @template TOutput of mixed
- * @template-implements TypeInterface<TInput, TOutput, TInput, TOutput>
+ * @template TValue of mixed
+ * @template-implements TypeInterface<TValue, TValue>
  */
 abstract class NonDirectionalType implements TypeInterface
 {
     /**
-     * @param TInput|mixed $value
+     * @param TValue|mixed $value
      *
-     * @return TOutput
+     * @return TValue
      */
     abstract protected function format(mixed $value, RegistryInterface $types, LocalContext $context): mixed;
 

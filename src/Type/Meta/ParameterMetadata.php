@@ -23,6 +23,8 @@ abstract class ParameterMetadata
      * @api
      *
      * @param \ReflectionClass<object> $context
+     *
+     * @throws \InvalidArgumentException
      */
     public function getReflection(\ReflectionClass $context): \ReflectionParameter
     {
@@ -38,6 +40,10 @@ abstract class ParameterMetadata
             ?? throw $this->invalidReflectionClassException($context);
     }
 
+    /**
+     * @param \ReflectionClass<object> $class
+     * @return \InvalidArgumentException
+     */
     private function invalidReflectionClassException(\ReflectionClass $class): \InvalidArgumentException
     {
         return new \InvalidArgumentException(\sprintf(

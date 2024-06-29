@@ -17,7 +17,7 @@ use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
 
 /**
- * @template-extends NonDirectionalType<int, int>
+ * @template-extends NonDirectionalType<int>
  */
 final class IntType extends NonDirectionalType
 {
@@ -31,6 +31,7 @@ final class IntType extends NonDirectionalType
 
     /**
      * @param non-empty-string $name
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         #[TargetTypeName]
@@ -54,6 +55,8 @@ final class IntType extends NonDirectionalType
 
     /**
      * Converts argument to its {@see int} value.
+     *
+     * @throws \InvalidArgumentException
      */
     private function formatIdentifier(int|Identifier $value): int
     {
@@ -97,6 +100,8 @@ final class IntType extends NonDirectionalType
 
     /**
      * Converts incoming value to the int (in case of strict types is disabled).
+     *
+     * @throws InvalidValueException
      */
     protected function format(mixed $value, RegistryInterface $types, LocalContext $context): int
     {
@@ -136,7 +141,7 @@ final class IntType extends NonDirectionalType
             $value = $this->min;
         }
 
-        return (int) $value;
+        return $value;
     }
 
     /**
@@ -161,6 +166,7 @@ final class IntType extends NonDirectionalType
                 \ctype_digit($value) => (int) $value,
                 default => 1,
             },
+            // @phpstan-ignore-next-line : Any other type can be converted to int
             default => (int) $value,
         };
     }

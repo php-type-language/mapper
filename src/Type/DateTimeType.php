@@ -17,7 +17,7 @@ use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 final class DateTimeType implements TypeInterface
 {
     /**
-     * @param class-string<\DateTimeInterface> $name
+     * @param class-string<\DateTime|\DateTimeImmutable> $name
      * @param non-empty-string $format
      */
     public function __construct(
@@ -25,8 +25,18 @@ final class DateTimeType implements TypeInterface
         private readonly string $name,
         #[TargetTemplateArgument]
         private readonly string $format = \DateTimeInterface::RFC3339,
-    ) {}
+    ) {
+        if (!\is_a($this->name, \DateTimeInterface::class, true)) {
+            throw new \InvalidArgumentException(\sprintf(
+                '%s must be a class that implements \DateTimeInterface',
+                $this->name,
+            ));
+        }
+    }
 
+    /**
+     * @throws InvalidValueException
+     */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
@@ -40,6 +50,9 @@ final class DateTimeType implements TypeInterface
         return $value->format($this->format);
     }
 
+    /**
+     * @throws InvalidValueException
+     */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
@@ -56,8 +69,7 @@ final class DateTimeType implements TypeInterface
             if ($result instanceof \DateTimeInterface) {
                 return $result;
             }
-        } catch (\Throwable) {
-        }
+        } catch (\Throwable) {}
 
         throw InvalidValueException::becauseInvalidValue(
             context: $context,
@@ -69,10 +81,7 @@ final class DateTimeType implements TypeInterface
     private function parseDateTime(string $value, Context $context): ?\DateTimeInterface
     {
         if ($context->isStrictTypesEnabled()) {
-            $result = ($this->name)::createFromFormat(
-                format: $this->format,
-                datetime: $value,
-            );
+            $result = ($this->name)::createFromFormat($this->format, $value);
 
             return \is_bool($result) ? null : $result;
         }

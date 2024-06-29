@@ -11,10 +11,13 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
- * @template-extends NonDirectionalType<float|int, float>
+ * @template-extends NonDirectionalType<float>
  */
 final class FloatType extends NonDirectionalType
 {
+    /**
+     * @throws InvalidValueException
+     */
     protected function format(mixed $value, RegistryInterface $types, LocalContext $context): float
     {
         if (!$context->isStrictTypesEnabled()) {
@@ -54,6 +57,7 @@ final class FloatType extends NonDirectionalType
                 \is_numeric($value) => (float) $value,
                 default => 1.0,
             },
+            // @phpstan-ignore-next-line : Any other type can be converted to float
             default => (float) $value,
         };
     }

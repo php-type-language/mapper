@@ -8,7 +8,7 @@ use TypeLang\Mapper\Context;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
- * @template-extends NonDirectionalType<mixed, mixed>
+ * @template-extends NonDirectionalType<mixed>
  */
 final class MixedType extends NonDirectionalType
 {

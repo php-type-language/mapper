@@ -9,7 +9,7 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
- * @template-extends NonDirectionalType<bool, bool>
+ * @template-extends NonDirectionalType<bool>
  */
 final class BoolType extends NonDirectionalType
 {

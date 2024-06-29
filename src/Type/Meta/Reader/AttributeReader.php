@@ -109,6 +109,7 @@ final class AttributeReader implements ReaderInterface
         }
 
         return new TypeNameParameterMetadata(
+            // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
             position: $parameter->getPosition(),
             name: $parameter->getName(),
         );
@@ -130,6 +131,7 @@ final class AttributeReader implements ReaderInterface
         }
 
         return new SealedShapeFlagParameterMetadata(
+            // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
             position: $parameter->getPosition(),
             name: $parameter->getName(),
         );
@@ -151,6 +153,7 @@ final class AttributeReader implements ReaderInterface
         }
 
         return new ShapeFieldsParameterMetadata(
+            // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
             position: $parameter->getPosition(),
             name: $parameter->getName(),
         );
@@ -161,6 +164,7 @@ final class AttributeReader implements ReaderInterface
         ?TargetTemplateArgument $attribute
     ): TemplateParameterMetadata {
         $metadata = new TemplateParameterMetadata(
+            // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
             position: $parameter->getPosition(),
             name: $parameter->getName(),
         );
