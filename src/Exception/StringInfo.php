@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception;
 
 /**
- * @internal This is an internal library class, please do not use it in your code.
+ * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper
  */
 final class StringInfo
@@ -24,6 +24,7 @@ final class StringInfo
 
     /**
      * @param non-empty-string $word
+     *
      * @return 'an'|'a'
      */
     public static function getArticle(string $word): string
@@ -42,6 +43,7 @@ final class StringInfo
 
     /**
      * @param non-empty-string $word
+     *
      * @return non-empty-string
      */
     public static function withArticle(string $word): string
@@ -67,6 +69,7 @@ final class StringInfo
 
     /**
      * @param list<non-empty-string> $values
+     *
      * @return non-empty-string
      */
     public static function formatRangeValues(array $values): string
@@ -80,6 +83,7 @@ final class StringInfo
 
     /**
      * @param non-empty-string $value
+     *
      * @return non-empty-string
      */
     public static function quoted(string $value): string

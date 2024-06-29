@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Context;
-use TypeLang\Mapper\Context\Path\PathInterface;
-use TypeLang\Mapper\Context\Path\PathType;
 
 /**
  * Mutable local bypass context.
@@ -39,6 +37,7 @@ final class LocalContext extends Context
 
     /**
      * @param non-empty-string|int $item
+     *
      * @return $this
      */
     public function enter(string|int $item): self

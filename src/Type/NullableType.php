@@ -10,7 +10,6 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 /**
  * @template TInput of mixed
  * @template TOutput of mixed
- *
  * @template-extends NonDirectionalType<TInput|null, TOutput|null>
  */
 final class NullableType extends NonDirectionalType

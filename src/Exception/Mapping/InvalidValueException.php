@@ -76,6 +76,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
 
     /**
      * @api
+     *
      * @return $this
      */
     public function setActualValueAndType(mixed $value, ?TypeStatement $type = null): self

@@ -10,7 +10,7 @@ class InvalidTypeArgumentException extends TypeArgumentException
         \ReflectionParameter $param,
         string $expected,
         int $code = 0,
-        \Throwable $prev = null,
+        ?\Throwable $prev = null,
     ): self {
         $message = \vsprintf('Parameter $%s (%d) of %s must be of type %s', [
             $param->getName(),

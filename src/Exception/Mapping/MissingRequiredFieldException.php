@@ -67,6 +67,7 @@ final class MissingRequiredFieldException extends MappingException implements Fi
 
     /**
      * @api
+     *
      * @param non-empty-string $name
      */
     public function setFieldName(string $name): self

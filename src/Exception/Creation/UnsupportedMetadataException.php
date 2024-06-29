@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Exception\Creation;
 
 class UnsupportedMetadataException extends TypeCreationException
 {
-    public static function fromMetadataName(object $metadata, \Throwable $prev = null): static
+    public static function fromMetadataName(object $metadata, ?\Throwable $prev = null): static
     {
         $message = \sprintf('Unsupported metadata %s', $metadata::class);
 

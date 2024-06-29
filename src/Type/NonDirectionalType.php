@@ -10,13 +10,13 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 /**
  * @template TInput of mixed
  * @template TOutput of mixed
- *
  * @template-implements TypeInterface<TInput, TOutput, TInput, TOutput>
  */
 abstract class NonDirectionalType implements TypeInterface
 {
     /**
      * @param TInput|mixed $value
+     *
      * @return TOutput
      */
     abstract protected function format(mixed $value, RegistryInterface $types, LocalContext $context): mixed;

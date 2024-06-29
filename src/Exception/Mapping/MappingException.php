@@ -36,6 +36,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
 
     /**
      * @api
+     *
      * @return $this
      */
     public function setTypePrinter(PrinterInterface $printer): self
@@ -97,7 +98,9 @@ abstract class MappingException extends \RuntimeException implements MappingExce
 
     /**
      * @api
+     *
      * @param list<non-empty-string|int> $path
+     *
      * @return $this
      */
     public function setPath(array $path): self
@@ -120,6 +123,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
 
     /**
      * @api
+     *
      * @return $this
      */
     public function setExpectedType(TypeStatement $type): self
