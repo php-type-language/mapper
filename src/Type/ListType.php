@@ -18,17 +18,13 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
  */
 final class ListType implements TypeInterface
 {
-    private bool $isExplicitType;
-
     /**
-     * @param TypeInterface<TInput, TOutput> $type
+     * @param TypeInterface<TInput, TOutput>|null $type
      */
     public function __construct(
         #[TargetTemplateArgument]
-        private readonly TypeInterface $type = new MixedType(),
-    ) {
-        $this->isExplicitType = \func_num_args() > 0;
-    }
+        private readonly ?TypeInterface $type = null,
+    ) {}
 
     /**
      * @return array<array-key, mixed>
@@ -69,8 +65,8 @@ final class ListType implements TypeInterface
         foreach ($value as $index => $item) {
             $context->enter($index);
 
-            $result[] = $this->isExplicitType
-                ? $this->normalizeExplicitTypedValue($item, $types, $context)
+            $result[] = $this->type !== null
+                ? $this->type->normalize($value, $types, $context)
                 : $this->normalizeImplicitTypedValue($item, $types, $context);
 
             $context->leave();
@@ -95,16 +91,7 @@ final class ListType implements TypeInterface
             return $type->normalize($value, $types, $context);
         }
 
-        return $this->normalizeExplicitTypedValue($value, $types, $context);
-    }
-
-    /**
-     * In the case of the type is specified explicitly, then we use the
-     * passed type for conversion.
-     */
-    private function normalizeExplicitTypedValue(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        return $this->type->normalize($value, $types, $context);
+        return $value;
     }
 
     /**
@@ -121,8 +108,8 @@ final class ListType implements TypeInterface
         foreach ($value as $index => $item) {
             $context->enter($index);
 
-            $result[] = $this->isExplicitType
-                ? $this->denormalizeExplicitTypedValue($item, $types, $context)
+            $result[] = $this->type !== null
+                ? $this->type->denormalize($value, $types, $context)
                 : $this->denormalizeImplicitTypedValue($item, $types, $context);
 
             $context->leave();
@@ -147,15 +134,6 @@ final class ListType implements TypeInterface
             return $type->denormalize($value, $types, $context);
         }
 
-        return $this->denormalizeExplicitTypedValue($value, $types, $context);
-    }
-
-    /**
-     * In the case of the type is specified explicitly, then we use the
-     * passed type for conversion.
-     */
-    private function denormalizeExplicitTypedValue(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        return $this->type->denormalize($value, $types, $context);
+        return $value;
     }
 }
