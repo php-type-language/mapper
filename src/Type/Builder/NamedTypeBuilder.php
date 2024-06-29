@@ -1,0 +1,235 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Serafim\Mapper\Type\Builder;
+
+use Serafim\Mapper\Exception\Creation\MissingTemplateArgumentsException;
+use Serafim\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
+use Serafim\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
+use Serafim\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
+use Serafim\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
+use Serafim\Mapper\Exception\Creation\TypeCreationException;
+use Serafim\Mapper\Exception\Creation\UnsupportedMetadataException;
+use Serafim\Mapper\Registry\RegistryInterface;
+use Serafim\Mapper\Type\Meta\Reader\AttributeReader;
+use Serafim\Mapper\Type\Meta\Reader\ReaderInterface;
+use Serafim\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
+use Serafim\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
+use Serafim\Mapper\Type\Meta\TemplateParameterMetadata;
+use Serafim\Mapper\Type\Meta\TypeMetadata;
+use Serafim\Mapper\Type\Meta\TypeNameParameterMetadata;
+use Serafim\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Literal\LiteralNodeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Shape\ExplicitFieldNode;
+use TypeLang\Parser\Node\Stmt\Shape\ImplicitFieldNode;
+use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Printer\PrettyPrinter;
+use TypeLang\Printer\PrinterInterface;
+
+class NamedTypeBuilder implements TypeBuilderInterface
+{
+    /**
+     * @var non-empty-lowercase-string
+     */
+    protected readonly string $lower;
+
+    protected readonly PrinterInterface $printer;
+
+    /**
+     * @param non-empty-string $name
+     * @param class-string<TypeInterface> $class
+     */
+    public function __construct(
+        protected readonly string $name,
+        protected readonly string $class,
+        protected readonly ReaderInterface $reader = new AttributeReader(),
+        PrinterInterface $printer = new PrettyPrinter(),
+    ) {
+        if ($printer instanceof PrettyPrinter) {
+            $printer = clone $printer;
+            $printer->multilineShape = \PHP_INT_MAX;
+        }
+
+        $this->printer = $printer;
+        $this->lower = \strtolower($this->name);
+    }
+
+    public function isSupported(TypeStatement $statement): bool
+    {
+        return $statement instanceof NamedTypeNode
+            && $statement->name->toLowerString() === $this->lower;
+    }
+
+    /**
+     * @throws TypeCreationException
+     * @throws \ReflectionException
+     */
+    public function build(TypeStatement $type, RegistryInterface $context): TypeInterface
+    {
+        assert($type instanceof NamedTypeNode);
+
+        $metadata = $this->reader->getTypeMetadata(
+            class: new \ReflectionClass($this->class),
+        );
+
+        if (!$metadata->isShapeFieldsIsAllowed() && $type->fields !== null) {
+            throw ShapeFieldsNotSupportedException::fromTypeName(
+                type: $type->name->toString(),
+                given: $this->printer->print($type),
+            );
+        }
+
+        if (!$metadata->isTemplateArgumentsIsAllowed() && $type->arguments !== null) {
+            throw TemplateArgumentsNotSupportedException::fromTypeName(
+                type: $type->name->toString(),
+                given: $this->printer->print($type),
+            );
+        }
+
+        return new $this->class(...$this->createArguments(
+            metadata: $metadata,
+            type: $type,
+            context: $context,
+        ));
+    }
+
+    /**
+     * @return iterable<array-key, mixed>
+     *
+     * @throws TooManyTemplateArgumentsException
+     * @throws MissingTemplateArgumentsException
+     * @throws UnsupportedMetadataException
+     */
+    private function createArguments(
+        TypeMetadata $metadata,
+        NamedTypeNode $type,
+        RegistryInterface $context
+    ): iterable {
+        $arguments = $type->arguments?->items ?? [];
+
+        $fields = null;
+        $result = [];
+
+        foreach ($metadata->getParameters() as $parameter) {
+            switch (true) {
+                case $parameter instanceof TemplateParameterMetadata:
+                    if ($arguments === []) {
+                        if ($parameter->hasDefaultValue()) {
+                            $result[] = $parameter->getDefaultValue();
+                            break;
+                        }
+
+                        throw MissingTemplateArgumentsException::fromTemplateArgumentsCount(
+                            type: $this->printer->print($type),
+                            passed: $type->arguments?->count() ?? 0,
+                            expectedMin: $metadata->getNumberOfRequiredTemplateParameters(),
+                            expectedMax: $metadata->getNumberOfTemplateParameters(),
+                        );
+                    }
+
+                    $result[] = $this->getTemplateArgumentValue(
+                        metadata: $parameter,
+                        node: \array_shift($arguments),
+                        context: $context,
+                    );
+
+                    break;
+
+                case $parameter instanceof SealedShapeFlagParameterMetadata:
+                    $result[] = $type->fields?->sealed ?? false;
+                    break;
+
+                case $parameter instanceof ShapeFieldsParameterMetadata:
+                    $result[] = ($fields ??= $this->getShapeFieldsAsArray($type, $context));
+                    break;
+
+                case $parameter instanceof TypeNameParameterMetadata:
+                    $result[] = $type->name->toString();
+                    break;
+
+                default:
+                    throw UnsupportedMetadataException::fromMetadataName($parameter);
+            }
+        }
+
+        if ($arguments !== []) {
+            throw TooManyTemplateArgumentsException::fromTemplateArgumentsCount(
+                type: $this->printer->print($type),
+                passed: $type->arguments?->count() ?? 0,
+                expectedMin: $metadata->getNumberOfRequiredTemplateParameters(),
+                expectedMax: $metadata->getNumberOfTemplateParameters(),
+            );
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return array<array-key, TypeInterface>
+     */
+    private function getShapeFieldsAsArray(NamedTypeNode $type, RegistryInterface $context): array
+    {
+        $result = [];
+
+        foreach ($type->fields ?? [] as $field) {
+            switch (true) {
+                case $field instanceof ImplicitFieldNode:
+                    $result[] = $context->get($field->getType());
+                    break;
+                case $field instanceof ExplicitFieldNode:
+                    $result[$field->getKey()] = $context->get($field->getType());
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @throws TemplateArgumentsHintNotSupportedException
+     */
+    private function getTemplateArgumentValue(
+        TemplateParameterMetadata $metadata,
+        ArgumentNode $node,
+        RegistryInterface $context,
+    ): mixed {
+        $value = $node->value;
+
+        if ($node->hint !== null) {
+            throw TemplateArgumentsHintNotSupportedException::fromHintName(
+                type: $this->name,
+                argument: $this->printer->print($node->value),
+                hint: $node->hint->toString(),
+            );
+        }
+
+        /**
+         * Returns PHP literal value from {@see LiteralNodeInterface} node.
+         */
+        if ($value instanceof LiteralNodeInterface) {
+            return $value->getValue();
+        }
+
+        /**
+         * Returns template argument as {@see string} identifier in case of
+         * passed identifier is a part of allowed identifier.
+         */
+        if ($value instanceof NamedTypeNode && $value->name->isSimple()) {
+            // Identifier string without initial namespace ("\") delimiter.
+            $identifier = \ltrim($value->name->toString(), '\\');
+
+            if (\in_array($identifier, $metadata->getAllowedIdentifiers(), true)) {
+                return $value->name->getFirstPart();
+            }
+        }
+
+        /**
+         * Otherwise returns {@see TypeInterface} in case of given template
+         * argument is a valid type name.
+         */
+        return $context->get($value);
+    }
+}
