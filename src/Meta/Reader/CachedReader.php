@@ -20,6 +20,7 @@ abstract class CachedReader extends Reader
     ) {}
 
     /**
+     * @param \ReflectionClass<object> $class
      * @return non-empty-string
      */
     protected function getKey(\ReflectionClass $class): string
@@ -30,6 +31,7 @@ abstract class CachedReader extends Reader
     }
 
     /**
+     * @param \ReflectionClass<object> $class
      * @return non-empty-string
      */
     protected static function getKeyValue(\ReflectionClass $class): string
@@ -37,6 +39,9 @@ abstract class CachedReader extends Reader
         return \str_replace("\\\0", '_', $class->getName());
     }
 
+    /**
+     * @param \ReflectionClass<object> $class
+     */
     protected static function getKeySuffix(\ReflectionClass $class): string
     {
         $pathname = $class->getFileName();

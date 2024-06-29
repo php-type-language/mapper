@@ -20,6 +20,7 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @param non-empty-string $name
+     * @param TypeInterface<mixed, mixed>|null $type
      */
     public function __construct(
         string $name,
@@ -34,6 +35,9 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @api
+     *
+     * @param \ReflectionClass<object> $class
+     * @throws \ReflectionException
      */
     public function getReflection(\ReflectionClass $class): \ReflectionProperty
     {
@@ -105,6 +109,8 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @api
+     *
+     * @param TypeInterface<mixed, mixed> $type
      */
     public function withType(TypeInterface $type, TypeStatement $statement): self
     {
@@ -140,6 +146,8 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @api
+     *
+     * @return TypeInterface<mixed, mixed>
      */
     public function getType(): ?TypeInterface
     {

@@ -50,7 +50,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
     /**
      * @param \Closure(Name):(Name|null) $transform
      */
-    public function explain(callable $transform): self
+    public function explain(callable $transform): static
     {
         Traverser::through(
             visitor: new TypeMapVisitor($transform(...)),
@@ -81,7 +81,7 @@ abstract class MappingException extends \RuntimeException implements MappingExce
     }
 
     /**
-     * @return array<non-empty-string, string>
+     * @return array<non-empty-string, string|TypeStatement>
      */
     protected function getReplacements(): array
     {

@@ -59,7 +59,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
     /**
      * @param \Closure(Name):(Name|null) $transform
      */
-    public function explain(callable $transform): self
+    public function explain(callable $transform): static
     {
         Traverser::through(
             visitor: new TypeMapVisitor($transform(...)),
@@ -86,6 +86,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
     public function setActualValueAndType(mixed $value, ?TypeStatement $type = null): self
     {
         $this->actualValue = $value;
+        // @phpstan-ignore-next-line : False-positive, the "get_debug_type" always returns non-empty-string
         $this->actualType = $type ?? new NamedTypeNode(\get_debug_type($value));
 
         $this->updateMessage();

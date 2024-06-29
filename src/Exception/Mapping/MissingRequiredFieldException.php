@@ -33,6 +33,7 @@ final class MissingRequiredFieldException extends MappingException implements Fi
     }
 
     /**
+     * @param TypeStatement|non-empty-string $expectedType
      * @param non-empty-string $field
      */
     public static function becauseFieldIsMissing(

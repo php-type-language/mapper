@@ -17,7 +17,7 @@ use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
 class StandardPlatform implements PlatformInterface
 {
     /**
-     * @var GrammarFeature
+     * @var list<GrammarFeature>
      */
     private const FEATURES_LIST = [
         GrammarFeature::Shapes,
@@ -44,7 +44,9 @@ class StandardPlatform implements PlatformInterface
         yield new NamedTypeBuilder('bool', Type\BoolType::class);
         yield new NamedTypeBuilder('string', Type\StringType::class);
         yield new NamedTypeBuilder('float', Type\FloatType::class);
+        // @phpstan-ignore-next-line : Allow non-resolvable types
         yield new NamedTypeBuilder('list', Type\ListType::class);
+        // @phpstan-ignore-next-line : Allow non-resolvable types
         yield new NamedTypeBuilder('array', Type\ListType::class);
         yield new ObjectNamedTypeBuilder(\DateTime::class, Type\DateTimeType::class);
         yield new ObjectNamedTypeBuilder(\DateTimeImmutable::class, Type\DateTimeType::class);

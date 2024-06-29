@@ -15,6 +15,7 @@ final class StringInfo
      */
     public static function isVowel(string $letter): bool
     {
+        // @phpstan-ignore-next-line : Additional assertion
         assert($letter !== '');
 
         $lower = \strtolower($letter);
@@ -29,11 +30,13 @@ final class StringInfo
      */
     public static function getArticle(string $word): string
     {
+        // @phpstan-ignore-next-line : Additional assertion
         assert($word !== '');
 
         // Extract first letter from the word (sentence).
         \preg_match('/[a-z]/iu', $word, $matches);
 
+        /** @var list<non-empty-string> $matches */
         if ($matches === []) {
             return 'a';
         }
@@ -68,7 +71,7 @@ final class StringInfo
     }
 
     /**
-     * @param list<non-empty-string> $values
+     * @param list<scalar> $values
      *
      * @return non-empty-string
      */

@@ -8,7 +8,6 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Meta\ClassMetadata;
 use TypeLang\Mapper\Meta\PropertyMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Reader\Exception\ReaderExceptionInterface;
 use TypeLang\Reader\PropertyReaderInterface as PropertyTypeReaderInterface;
 use TypeLang\Reader\ReflectionReader as ReflectionTypeReader;
@@ -50,6 +49,7 @@ final class ReflectionReader extends Reader
     }
 
     /**
+     * @param \ReflectionClass<object> $class
      * @throws ReaderExceptionInterface
      */
     private function getPropertyMetadataForContext(
@@ -65,7 +65,7 @@ final class ReflectionReader extends Reader
         if ($property->isPromoted()) {
             $parameter = $this->findParameter($class, $property);
 
-            if ($parameter?->isDefaultValueAvailable()) {
+            if ($parameter?->isDefaultValueAvailable() === true) {
                 $metadata = $metadata->withDefaultValue($parameter->getDefaultValue());
             }
         }
@@ -83,6 +83,9 @@ final class ReflectionReader extends Reader
         return $metadata;
     }
 
+    /**
+     * @param \ReflectionClass<object> $class
+     */
     private function findParameter(\ReflectionClass $class, \ReflectionProperty $property): ?\ReflectionParameter
     {
         $constructor = $class->getConstructor();
@@ -98,24 +101,6 @@ final class ReflectionReader extends Reader
         }
 
         return null;
-    }
-
-    /**
-     * @throws ReaderExceptionInterface
-     */
-    private function fetchType(\ReflectionProperty $property, RegistryInterface $types): ?TypeInterface
-    {
-        $type = $this->properties->findPropertyType($property);
-
-        if ($type === null) {
-            return null;
-        }
-
-        try {
-            return $types->get($type);
-        } catch (TypeNotFoundException) {
-            return null;
-        }
     }
 
     private static function isValidProperty(\ReflectionProperty $property): bool
