@@ -124,6 +124,7 @@ final class IntType extends NonDirectionalType
                     context: $context,
                     expectedType: $this->getExpectedTypeStatement(),
                     actualValue: $value,
+                    showValue: true,
                 );
             }
 
@@ -136,6 +137,7 @@ final class IntType extends NonDirectionalType
                     context: $context,
                     expectedType: $this->getExpectedTypeStatement(),
                     actualValue: $value,
+                    showValue: true,
                 );
             }
 

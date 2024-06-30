@@ -39,6 +39,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
         TypeStatement|string $expectedType,
         mixed $actualValue,
         ?TypeStatement $actualType = null,
+        bool $showValue = false,
     ): self {
         // @phpstan-ignore-next-line : False-positive, the "get_debug_type" always returns non-empty-string
         $actualType ??= new NamedTypeNode(\get_debug_type($actualValue));
@@ -48,7 +49,10 @@ final class InvalidValueException extends MappingException implements ValueMappi
         }
 
         return new self(
-            template: 'Passed value must be of type {{expected}}, but {{actual}} given at {{path}}',
+            template: \sprintf(
+                'Passed value must be of type {{expected}}, but {{actual}}%s given in {{path}}',
+                $showValue ? '({{value}})' : '',
+            ),
             expectedType: $expectedType,
             actualType: $actualType,
             actualValue: $actualValue,

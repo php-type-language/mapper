@@ -46,7 +46,7 @@ final class MissingRequiredFieldException extends MappingException implements Fi
         }
 
         return new self(
-            template: 'Object of type {{expected}} requires field {{field}} at {{path}}',
+            template: 'Object of type {{expected}} requires field {{field}} in {{path}}',
             expectedType: $expectedType,
             field: $field,
             path: $context->getPath(),
