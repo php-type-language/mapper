@@ -8,10 +8,14 @@ use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Meta\ClassMetadata;
 use TypeLang\Mapper\Meta\PropertyMetadata;
+use TypeLang\Mapper\Meta\Reader\CodeReader\NativeUseStatementsReader;
+use TypeLang\Mapper\Meta\Reader\CodeReader\UseStatementsReaderInterface;
 use TypeLang\Mapper\Meta\Reader\DocBlockReader\ClassPropertyTypeReader;
 use TypeLang\Mapper\Meta\Reader\DocBlockReader\PromotedPropertyTypeReader;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\TypeResolver;
+use TypeLang\Parser\TypeResolverInterface;
 use TypeLang\PHPDoc\Parser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
@@ -34,6 +38,10 @@ final class DocBlockReader extends Reader
 
     private readonly ClassPropertyTypeReader $classProperties;
 
+    private readonly UseStatementsReaderInterface $uses;
+
+    private readonly TypeResolverInterface $typeResolver;
+
     /**
      * @param non-empty-string $paramTagName
      * @param non-empty-string $varTagName
@@ -43,6 +51,7 @@ final class DocBlockReader extends Reader
         private readonly ReaderInterface $delegate = new ReflectionReader(),
         string $paramTagName = self::DEFAULT_PARAM_TAG_NAME,
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
+        UseStatementsReaderInterface $uses = null,
     ) {
         self::assertKernelPackageIsInstalled();
 
@@ -53,6 +62,17 @@ final class DocBlockReader extends Reader
 
         $this->promotedProperties = new PromotedPropertyTypeReader($paramTagName, $parser);
         $this->classProperties = new ClassPropertyTypeReader($varTagName, $parser);
+        $this->typeResolver = new TypeResolver();
+        $this->uses = $this->createUseStatementsReader($uses);
+    }
+
+    private function createUseStatementsReader(?UseStatementsReaderInterface $reader): UseStatementsReaderInterface
+    {
+        if ($reader !== null) {
+            return $reader;
+        }
+
+        return new NativeUseStatementsReader();
     }
 
     /**
@@ -106,6 +126,8 @@ final class DocBlockReader extends Reader
     {
         $metadata = $this->delegate->getClassMetadata($class, $types);
 
+        $uses = $this->uses->getUseStatements($class);
+
         foreach ($class->getProperties() as $reflection) {
             $property = $metadata->findPropertyByName($reflection->getName())
                 ?? new PropertyMetadata($reflection->getName());
@@ -113,6 +135,8 @@ final class DocBlockReader extends Reader
             $type = $this->findType($class, $property);
 
             if ($type !== null) {
+                $type = $this->typeResolver->resolveWith($type, $uses);
+
                 $property = $property->withType(
                     type: $types->get($type),
                     statement: $type,
