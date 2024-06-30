@@ -2,12 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Type;
+namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Context;
-use TypeLang\Mapper\Tests\Unit\Type\TypeTestCase;
-use TypeLang\Mapper\Tests\Unit\Type\ValueType;
 use TypeLang\Mapper\Type\NullType;
 use TypeLang\Mapper\Type\TypeInterface;
 
