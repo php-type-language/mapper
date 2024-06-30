@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
-/**
- * @phpstan-consistent-constructor
- */
 class Context
 {
     /**
@@ -61,7 +58,7 @@ class Context
         return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
 
-    public function with(?Context $context): static
+    public function merge(?Context $context): static
     {
         if ($context === null) {
             return $this;

@@ -22,15 +22,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly LocalContext $context;
-
     protected readonly RegistryInterface $types;
-
-    #[Before]
-    protected function setUpDefaultContext(): void
-    {
-        $this->context = new LocalContext();
-    }
 
     #[Before]
     protected function setUpDefaultRegistry(): void
@@ -127,13 +119,17 @@ abstract class TypeTestCase extends TestCase
     {
         $type = $this->getType();
 
-        return $type->normalize($value, $this->types, $this->context->with($context));
+        $local = LocalContext::fromContext(Context\Direction::Normalize, $context);
+
+        return $type->normalize($value, $this->types, $local);
     }
 
     protected function denormalize(mixed $value, Context $context = new Context()): mixed
     {
         $type = $this->getType();
 
-        return $type->denormalize($value, $this->types, $this->context->with($context));
+        $local = LocalContext::fromContext(Context\Direction::Denormalize, $context);
+
+        return $type->denormalize($value, $this->types, $local);
     }
 }

@@ -16,18 +16,29 @@ final class LocalContext extends Context
      */
     private array $stack = [];
 
-    public static function fromContext(?Context $context): self
-    {
-        return (new self())->with($context);
+    final public function __construct(
+        private readonly Direction $direction,
+        ?bool $strictTypes = null,
+        ?bool $objectsAsArrays = null,
+    ) {
+        parent::__construct($strictTypes, $objectsAsArrays);
     }
 
-    public function with(?Context $context): static
+    public static function fromContext(Direction $direction, ?Context $context): self
+    {
+        return (new self($direction))
+            ->merge($context);
+    }
+
+    #[\Override]
+    public function merge(?Context $context): static
     {
         if ($context === null) {
             return $this;
         }
 
         $result = new self(
+            direction: $context instanceof self ? $context->direction : $this->direction,
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
         );
@@ -37,6 +48,30 @@ final class LocalContext extends Context
         }
 
         return $result;
+    }
+
+    /**
+     * @api
+     */
+    public function isNormalization(): bool
+    {
+        return $this->getDirection() === Direction::Normalize;
+    }
+
+    /**
+     * @api
+     */
+    public function isDenormalization(): bool
+    {
+        return $this->getDirection() === Direction::Denormalize;
+    }
+
+    /**
+     * @api
+     */
+    public function getDirection(): Direction
+    {
+        return $this->direction;
     }
 
     /**

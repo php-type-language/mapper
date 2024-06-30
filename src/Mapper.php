@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
@@ -32,7 +33,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function withAddedContext(Context $context): self
     {
-        return $this->withContext($this->context->with($context));
+        return $this->withContext($this->context->merge($context));
     }
 
     /**
@@ -49,13 +50,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     public function getTypes(): RegistryInterface
     {
         return $this->types;
-    }
-
-    private function createLocalContext(?Context $context): LocalContext
-    {
-        return LocalContext::fromContext(
-            context: $this->context->with($context),
-        );
     }
 
     /**
@@ -83,7 +77,10 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $concreteType = $this->getType($value, $type);
 
-        $context = $this->createLocalContext($context);
+        $context = LocalContext::fromContext(
+            direction: Direction::Normalize,
+            context: $this->context->merge($context),
+        );
 
         return $concreteType->normalize($value, $this->types, $context);
     }
@@ -96,7 +93,10 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $concreteType = $this->getType($value, $type);
 
-        $context = $this->createLocalContext($context);
+        $context = LocalContext::fromContext(
+            direction: Direction::Denormalize,
+            context: $this->context->merge($context),
+        );
 
         return $concreteType->denormalize($value, $this->types, $context);
     }
