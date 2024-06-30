@@ -5,7 +5,7 @@ declare(strict_types=1);
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Registry\Registry;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 // The set of types and grammar is defined using a "platform". You can create
 // your own platform, for example, for a specific DB, or use built-in ones.
