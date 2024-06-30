@@ -8,7 +8,7 @@ class TypeNotFoundException extends TypeException
 {
     public static function fromTypeName(string $name, ?\Throwable $prev = null): self
     {
-        $message = \sprintf('Type "%s" is not registered', $name);
+        $message = \sprintf('Type %s is not registered', StringInfo::quoted($name));
 
         return new static($message, previous: $prev);
     }

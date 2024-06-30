@@ -20,12 +20,10 @@ final class LocalContext extends Context
         private readonly Direction $direction,
         ?bool $strictTypes = null,
         ?bool $objectsAsArrays = null,
-        ?bool $totallyTyped = null,
     ) {
         parent::__construct(
             strictTypes: $strictTypes,
             objectsAsArrays: $objectsAsArrays,
-            totallyTyped: $totallyTyped,
         );
     }
 
@@ -46,7 +44,6 @@ final class LocalContext extends Context
             direction: $context instanceof self ? $context->direction : $this->direction,
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
-            totallyTyped: $context->totallyTyped ?? $this->totallyTyped,
         );
 
         if ($context instanceof self) {

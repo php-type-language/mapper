@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Creation;
 
+use TypeLang\Mapper\Exception\StringInfo;
+
 class TemplateArgumentsNotSupportedException extends TemplateArgumentsException
 {
     /**
@@ -12,7 +14,7 @@ class TemplateArgumentsNotSupportedException extends TemplateArgumentsException
      */
     public static function fromTypeName(string $type, ?string $given = null, ?\Throwable $prev = null): self
     {
-        $message = \sprintf('Type "%s" does not support template arguments', $type);
+        $message = \sprintf('Type %s does not support template arguments', StringInfo::quoted($type));
 
         if ($given !== null) {
             $message .= \sprintf(', but %s given', $given);

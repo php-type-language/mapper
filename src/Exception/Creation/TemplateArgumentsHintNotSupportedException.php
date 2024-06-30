@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Creation;
 
+use TypeLang\Mapper\Exception\StringInfo;
+
 class TemplateArgumentsHintNotSupportedException extends TemplateArgumentHintException
 {
     /**
@@ -13,8 +15,8 @@ class TemplateArgumentsHintNotSupportedException extends TemplateArgumentHintExc
      */
     public static function fromHintName(string $type, string $argument, string $hint, ?\Throwable $prev = null): self
     {
-        $message = \vsprintf('Template hint "%s" of type %s defined on %s is not supported', [
-            $hint,
+        $message = \vsprintf('Template hint %s of type %s defined on %s is not supported', [
+            StringInfo::quoted($hint),
             $type,
             $argument,
         ]);

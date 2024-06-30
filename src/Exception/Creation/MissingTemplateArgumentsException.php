@@ -21,8 +21,8 @@ class MissingTemplateArgumentsException extends TemplateArgumentsException
         int $expectedMax,
         ?\Throwable $prev = null,
     ): self {
-        $message = \vsprintf('Type "%s" expects %s template %s, but only %d were passed', [
-            $type,
+        $message = \vsprintf('Type %s expects %s template %s, but only %d were passed', [
+            StringInfo::quoted($type),
             StringInfo::formatRange($expectedMin, $expectedMax),
             $expectedMin === $expectedMax ? 'argument' : 'arguments',
             $passed,

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Environment;
 
+use TypeLang\Mapper\Exception\StringInfo;
+
 final class ComposerPackageRequiredException extends EnvironmentException implements EnvironmentExceptionInterface
 {
     /**
@@ -12,8 +14,8 @@ final class ComposerPackageRequiredException extends EnvironmentException implem
      */
     public static function becausePackageNotInstalled(string $package, string $for): self
     {
-        $message = 'The "%s" component is required to %s. Try running "composer require %$1s"';
+        $message = 'The %s component is required to %s. Try running "composer require %$1s"';
 
-        return new self(\sprintf($message, $package, $for));
+        return new self(\sprintf($message, StringInfo::quoted($package), $for));
     }
 }

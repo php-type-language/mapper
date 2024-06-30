@@ -21,8 +21,8 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsException
         int $expectedMax,
         ?\Throwable $prev = null,
     ): self {
-        $message = \vsprintf('Type "%s" only accepts %s template arguments, but %d were passed', [
-            $type,
+        $message = \vsprintf('Type %s only accepts %s template arguments, but %d were passed', [
+            StringInfo::quoted($type),
             StringInfo::formatRange($expectedMin, $expectedMax),
             $passed,
         ]);

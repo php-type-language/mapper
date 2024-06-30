@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
+use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Meta\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
@@ -26,6 +27,7 @@ final class ObjectType implements TypeInterface
     /**
      * @throws InvalidValueException
      * @throws \ReflectionException
+     * @throws TypeRequiredException
      */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): object|array
     {
@@ -47,6 +49,7 @@ final class ObjectType implements TypeInterface
      *
      * @return object|array<non-empty-string, mixed>
      * @throws \ReflectionException
+     * @throws TypeRequiredException
      */
     private function normalizeObject(object $object, RegistryInterface $types, LocalContext $context): object|array
     {
@@ -62,12 +65,16 @@ final class ObjectType implements TypeInterface
                 object: $object,
             );
 
-            // Convert inherited property value if type is defined
-            if (($type = $meta->getType()) !== null) {
-                $propertyValue = $type->normalize($propertyValue, $types, $context);
+            $type = $meta->getType();
+
+            if ($type === null) {
+                throw TypeRequiredException::fromInvalidFieldType(
+                    class: $this->metadata->getName(),
+                    field: $meta->getName(),
+                );
             }
 
-            $result[$meta->getExportName()] = $propertyValue;
+            $result[$meta->getExportName()] = $type->normalize($propertyValue, $types, $context);
 
             $context->leave();
         }
@@ -87,6 +94,7 @@ final class ObjectType implements TypeInterface
     /**
      * @throws InvalidValueException
      * @throws MissingRequiredFieldException
+     * @throws TypeRequiredException
      * @throws \ReflectionException
      */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): object
@@ -112,6 +120,7 @@ final class ObjectType implements TypeInterface
      * @return T
      * @throws MissingRequiredFieldException
      * @throws \ReflectionException
+     * @throws TypeRequiredException
      */
     private function denormalizeObject(array $value, RegistryInterface $types, LocalContext $context): object
     {
@@ -125,12 +134,16 @@ final class ObjectType implements TypeInterface
 
             // In case of value has been passed
             if (\array_key_exists($meta->getExportName(), $value)) {
-                $propertyValue = $value[$meta->getExportName()];
+                $type = $meta->getType();
 
-                // Convert inherited property value if type is defined
-                if (($type = $meta->getType()) !== null) {
-                    $propertyValue = $type->denormalize($propertyValue, $types, $context);
+                if ($type === null) {
+                    throw TypeRequiredException::fromInvalidFieldType(
+                        class: $this->metadata->getName(),
+                        field: $meta->getName(),
+                    );
                 }
+
+                $propertyValue = $type->denormalize($value[$meta->getExportName()], $types, $context);
 
                 $this->setValue($property, $object, $propertyValue);
                 $context->leave();
