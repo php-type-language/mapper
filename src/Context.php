@@ -58,13 +58,13 @@ class Context
         return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
 
-    public function merge(?Context $context): static
+    public function merge(?Context $context): self
     {
         if ($context === null) {
             return $this;
         }
 
-        return new static(
+        return new self(
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
         );

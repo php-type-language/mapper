@@ -31,7 +31,7 @@ final class LocalContext extends Context
     }
 
     #[\Override]
-    public function merge(?Context $context): static
+    public function merge(?Context $context): self
     {
         if ($context === null) {
             return $this;
