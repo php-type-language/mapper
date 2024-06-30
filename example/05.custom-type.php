@@ -18,7 +18,7 @@ class MyNonEmptyStringType extends NonDirectionalType
     protected function format(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
         if (!\is_string($value) || $value === '') {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'non-empty-string',
                 actualValue: $value,

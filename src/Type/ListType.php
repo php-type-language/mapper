@@ -42,7 +42,7 @@ final class ListType implements TypeInterface
         }
 
         if (!\is_array($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'array',
                 actualValue: $value,

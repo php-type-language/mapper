@@ -23,7 +23,7 @@ final class BoolType extends NonDirectionalType
         }
 
         if (!\is_bool($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'bool',
                 actualValue: $value,

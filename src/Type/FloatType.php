@@ -25,7 +25,7 @@ final class FloatType extends NonDirectionalType
         }
 
         if (!\is_float($value) && !\is_int($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: new UnionTypeNode(
                     a: new NamedTypeNode('int'),

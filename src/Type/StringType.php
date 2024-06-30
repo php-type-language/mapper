@@ -25,7 +25,7 @@ final class StringType extends NonDirectionalType
         }
 
         if (!\is_string($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'string',
                 actualValue: $value,

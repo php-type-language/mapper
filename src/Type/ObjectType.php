@@ -32,7 +32,7 @@ final class ObjectType implements TypeInterface
         $className = $this->metadata->getName();
 
         if (!$value instanceof $className) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->metadata->getTypeStatement(false),
                 actualValue: $value,
@@ -96,7 +96,7 @@ final class ObjectType implements TypeInterface
         }
 
         if (!\is_array($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->metadata->getName(),
                 actualValue: $value,

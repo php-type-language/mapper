@@ -111,7 +111,7 @@ final class IntType extends NonDirectionalType
         }
 
         if (!\is_int($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->getExpectedTypeStatement(),
                 actualValue: $value,
@@ -120,7 +120,7 @@ final class IntType extends NonDirectionalType
 
         if ($value > $this->max) {
             if ($context->isStrictTypesEnabled()) {
-                throw InvalidValueException::becauseInvalidValue(
+                throw InvalidValueException::becauseInvalidValueGiven(
                     context: $context,
                     expectedType: $this->getExpectedTypeStatement(),
                     actualValue: $value,
@@ -132,7 +132,7 @@ final class IntType extends NonDirectionalType
 
         if ($value < $this->min) {
             if ($context->isStrictTypesEnabled()) {
-                throw InvalidValueException::becauseInvalidValue(
+                throw InvalidValueException::becauseInvalidValueGiven(
                     context: $context,
                     expectedType: $this->getExpectedTypeStatement(),
                     actualValue: $value,

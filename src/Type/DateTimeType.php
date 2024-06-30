@@ -54,7 +54,7 @@ final class DateTimeType implements TypeInterface
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: \DateTimeInterface::class,
                 actualValue: $value,
@@ -70,7 +70,7 @@ final class DateTimeType implements TypeInterface
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'string',
                 actualValue: $value,
@@ -86,7 +86,7 @@ final class DateTimeType implements TypeInterface
         } catch (\Throwable) {
         }
 
-        throw InvalidValueException::becauseInvalidValue(
+        throw InvalidValueException::becauseInvalidValueGiven(
             context: $context,
             expectedType: 'string',
             actualValue: $value,

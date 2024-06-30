@@ -53,7 +53,7 @@ final class BackedEnumType implements TypeInterface
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): int|string
     {
         if (!$value instanceof \BackedEnum) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->getExpectedTypeStatement(),
                 actualValue: $value,
@@ -71,7 +71,7 @@ final class BackedEnumType implements TypeInterface
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \BackedEnum
     {
         if (!\is_string($value) && !\is_int($value)) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->getExpectedTypeStatement(),
                 actualValue: $value,
@@ -81,14 +81,14 @@ final class BackedEnumType implements TypeInterface
         try {
             $case = $this->name::tryFrom($value);
         } catch (\TypeError) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: $this->getExpectedTypeStatement(),
                 actualValue: $value,
             );
         }
 
-        return $case ?? throw InvalidValueException::becauseInvalidValue(
+        return $case ?? throw InvalidValueException::becauseInvalidValueGiven(
             context: $context,
             expectedType: $this->getExpectedTypeStatement(),
             actualValue: $value,

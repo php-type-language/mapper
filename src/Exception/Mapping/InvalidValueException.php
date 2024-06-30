@@ -34,7 +34,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
     /**
      * @param TypeStatement|non-empty-string $expectedType
      */
-    public static function becauseInvalidValue(
+    public static function becauseInvalidValueGiven(
         LocalContext $context,
         TypeStatement|string $expectedType,
         mixed $actualValue,

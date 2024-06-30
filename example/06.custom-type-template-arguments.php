@@ -27,7 +27,7 @@ class MyNonEmpty implements TypeInterface
             return;
         }
 
-        throw InvalidValueException::becauseInvalidValue(
+        throw InvalidValueException::becauseInvalidValueGiven(
             context: $context,
             expectedType: 'non-empty',
             actualValue: $value,

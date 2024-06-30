@@ -23,7 +23,7 @@ final class NullType extends NonDirectionalType
         }
 
         if ($value !== null) {
-            throw InvalidValueException::becauseInvalidValue(
+            throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
                 expectedType: 'null',
                 actualValue: $value,
