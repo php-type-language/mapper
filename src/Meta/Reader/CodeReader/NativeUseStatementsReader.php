@@ -10,6 +10,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
      * Return array of use statements from class.
      *
      * @param \ReflectionClass<object> $class
+     *
      * @return array<int|non-empty-string, non-empty-string>
      * @throws \LogicException
      * @throws \RuntimeException
@@ -21,12 +22,11 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
         return [...$this->parse($class, $header)];
     }
 
-
     /**
      * Read file source up to the line where our class is defined.
      *
      * @param \ReflectionClass<object> $class
-     * @return string
+     *
      * @throws \LogicException
      * @throws \RuntimeException
      */
@@ -83,6 +83,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
                 $result = $current->text;
             } elseif ($current->text === ';') {
                 $tokens->next();
+
                 return $result ?? '';
             }
 
@@ -95,6 +96,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
     /**
      * @param \ReflectionClass<object> $class
      * @param \Iterator<array-key, \PhpToken> $tokens
+     *
      * @return \Iterator<array-key, \PhpToken>
      */
     private function skipUnimportantNamespaces(\ReflectionClass $class, \Iterator $tokens): \Iterator
@@ -129,6 +131,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
 
     /**
      * @param \Iterator<array-key, \PhpToken> $tokens
+     *
      * @return \Iterator<int|non-empty-string, non-empty-string>
      */
     private function lookupUseStatements(\Iterator $tokens): \Iterator
@@ -162,6 +165,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
 
     /**
      * @param \Iterator<array-key, \PhpToken> $tokens
+     *
      * @return array{non-empty-string, non-empty-string|null}|null
      */
     private function fetchUseStatement(\Iterator $tokens): ?array
@@ -172,7 +176,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
             $current = $tokens->current();
 
             switch ($current->id) {
-                case \T_NAME_QUALIFIED;
+                case \T_NAME_QUALIFIED:
                     /** @var non-empty-string $namespace */
                     $namespace = $current->text;
                     break;
@@ -213,6 +217,7 @@ final class NativeUseStatementsReader implements UseStatementsReaderInterface
      * an array of use statements and aliases.
      *
      * @param \ReflectionClass<object> $class
+     *
      * @return \Iterator<int|non-empty-string, non-empty-string>
      */
     private function parse(\ReflectionClass $class, string $source): \Iterator

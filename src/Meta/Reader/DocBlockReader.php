@@ -45,13 +45,14 @@ final class DocBlockReader extends Reader
     /**
      * @param non-empty-string $paramTagName
      * @param non-empty-string $varTagName
+     *
      * @throws ComposerPackageRequiredException
      */
     public function __construct(
         private readonly ReaderInterface $delegate = new ReflectionReader(),
         string $paramTagName = self::DEFAULT_PARAM_TAG_NAME,
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
-        UseStatementsReaderInterface $uses = null,
+        ?UseStatementsReaderInterface $uses = null,
     ) {
         self::assertKernelPackageIsInstalled();
 
@@ -104,6 +105,7 @@ final class DocBlockReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @throws \ReflectionException
      */
     private function findType(\ReflectionClass $class, PropertyMetadata $meta): ?TypeStatement
