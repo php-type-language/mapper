@@ -47,7 +47,7 @@ abstract class TypeTestCase extends TestCase
         if ($ctx->isStrictTypesEnabled()) {
             $this->expectException(MappingException::class);
 
-            return '<MUST_THROW_ERROR(' . __FUNCTION__ . ')>';
+            return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
         }
 
         return $expected;
@@ -57,7 +57,7 @@ abstract class TypeTestCase extends TestCase
     {
         $this->expectException(MappingException::class);
 
-        return '<MUST_THROW_ERROR(' . __FUNCTION__ . ')>';
+        return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
     }
 
     public static function contextDataProvider(): iterable

@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Unit\Type;
+namespace Type;
 
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Context;
-use TypeLang\Mapper\Type\BoolType;
+use TypeLang\Mapper\Tests\Unit\Type\TypeTestCase;
+use TypeLang\Mapper\Tests\Unit\Type\ValueType;
+use TypeLang\Mapper\Type\NullType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type-lang/mapper')]
-final class BoolTypeTest extends TypeTestCase
+final class NullTypeTest extends TypeTestCase
 {
     protected function getType(): TypeInterface
     {
-        return new BoolType();
+        return new NullType();
     }
 
     protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
@@ -26,12 +28,12 @@ final class BoolTypeTest extends TypeTestCase
             ValueType::FloatNumericString,
             ValueType::NegativeFloatNumericString,
             ValueType::ExponentNumericString,
-            ValueType::NegativeExponentNumericString => $this->expectCastIfNonStrict(true, $ctx),
-            ValueType::Null => $this->expectCastIfNonStrict(false, $ctx),
+            ValueType::NegativeExponentNumericString => $this->expectCastIfNonStrict(null, $ctx),
+            ValueType::Null => null,
             ValueType::Int,
-            ValueType::NegativeInt => $this->expectCastIfNonStrict(true, $ctx),
-            ValueType::True => true,
-            ValueType::False => false,
+            ValueType::NegativeInt,
+            ValueType::True,
+            ValueType::False,
             ValueType::Float,
             ValueType::AroundZeroFloat,
             ValueType::AroundOneFloat,
@@ -41,11 +43,11 @@ final class BoolTypeTest extends TypeTestCase
             ValueType::NanFloat,
             ValueType::Object,
             ValueType::StringableObject,
-            ValueType::Array => $this->expectCastIfNonStrict(true, $ctx),
-            ValueType::EmptyArray => $this->expectCastIfNonStrict(false, $ctx),
+            ValueType::Array,
+            ValueType::EmptyArray,
             ValueType::StringBackedEnum,
             ValueType::IntBackedEnum,
-            ValueType::UnitEnum =>$this->expectCastIfNonStrict(true, $ctx),
+            ValueType::UnitEnum => $this->expectCastIfNonStrict(null, $ctx),
         };
     }
 }
