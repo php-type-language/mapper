@@ -41,11 +41,9 @@ class ExampleDTO
     ) {}
 }
 
-$mapper = new Mapper(
-    types: new Registry(
-        platform: new SimplePlatform(),
-    ),
-);
+$platform = new SimplePlatform();
+
+$mapper = new Mapper(new Registry($platform));
 
 var_dump($mapper->normalize(new ExampleDTO()));
 //
