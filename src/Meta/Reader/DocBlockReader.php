@@ -15,7 +15,6 @@ use TypeLang\Mapper\Meta\Reader\DocBlockReader\PromotedPropertyTypeReader;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;
-use TypeLang\Parser\TypeResolverInterface;
 use TypeLang\PHPDoc\Parser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
@@ -40,7 +39,7 @@ final class DocBlockReader extends Reader
 
     private readonly UseStatementsReaderInterface $uses;
 
-    private readonly TypeResolverInterface $typeResolver;
+    private readonly TypeResolver $typeResolver;
 
     /**
      * @param non-empty-string $paramTagName
