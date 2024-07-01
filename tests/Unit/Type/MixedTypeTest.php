@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
+use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
 use TypeLang\Mapper\Type\MixedType;
@@ -20,7 +21,7 @@ final class MixedTypeTest extends TypeTestCase
         return new MixedType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, LocalContext $ctx): mixed
     {
         return match ($type) {
             ValueType::String,
@@ -42,13 +43,17 @@ final class MixedTypeTest extends TypeTestCase
             ValueType::InfFloat,
             ValueType::NegativeInfFloat,
             ValueType::NanFloat => $value,
-            ValueType::Object,
-            ValueType::StringableObject => [],
+            ValueType::Object => $ctx->isNormalization() ? [] : (object)[],
+            ValueType::StringableObject => $ctx->isNormalization() ? [] : new StringableObject(),
             ValueType::Array,
             ValueType::EmptyArray => $value,
-            ValueType::StringBackedEnum => StringBackedEnum::EXAMPLE->value,
-            ValueType::IntBackedEnum => IntBackedEnum::EXAMPLE->value,
-            ValueType::UnitEnum => ['name' => UnitEnum::EXAMPLE->name],
+            ValueType::StringBackedEnum => $ctx->isNormalization()
+                ? StringBackedEnum::EXAMPLE->value
+                : $this->expectMappingError(),
+            ValueType::IntBackedEnum => $ctx->isNormalization()
+                ? IntBackedEnum::EXAMPLE->value
+                : $this->expectMappingError(),
+            ValueType::UnitEnum => $this->expectTypeNotFoundError(),
         };
     }
 }

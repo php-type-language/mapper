@@ -8,14 +8,14 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-final class StringType extends NonDirectionalType
+final class StringType implements TypeInterface
 {
     /**
      * Converts incoming value to the string (in case of strict types is disabled).
      *
      * @throws InvalidValueException
      */
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): string
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToStringIfPossible($value);

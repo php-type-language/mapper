@@ -8,12 +8,12 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-final class NullType extends NonDirectionalType
+final class NullType implements TypeInterface
 {
     /**
      * @throws InvalidValueException
      */
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
     {
         if (!$context->isStrictTypesEnabled()) {
             return null;

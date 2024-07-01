@@ -16,7 +16,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
 
-final class IntType extends NonDirectionalType
+final class IntType implements TypeInterface
 {
     /**
      * @var non-empty-string
@@ -101,7 +101,7 @@ final class IntType extends NonDirectionalType
      *
      * @throws InvalidValueException
      */
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): int
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): int
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToIntIfPossible($value);

@@ -25,20 +25,10 @@ final class MixedType implements TypeInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
     {
         $type = $this->getType($value, $types);
 
-        return $type->normalize($value, $types, $context);
-    }
-
-    /**
-     * @throws TypeNotFoundException
-     */
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        $type = $this->getType($value, $types);
-
-        return $type->denormalize($value, $types, $context);
+        return $type->cast($value, $types, $context);
     }
 }

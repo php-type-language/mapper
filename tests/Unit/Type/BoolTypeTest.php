@@ -17,7 +17,7 @@ final class BoolTypeTest extends TypeTestCase
         return new BoolType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String,
@@ -44,8 +44,8 @@ final class BoolTypeTest extends TypeTestCase
             ValueType::Array => $this->expectCastIfNonStrict(true, $ctx),
             ValueType::EmptyArray => $this->expectCastIfNonStrict(false, $ctx),
             ValueType::StringBackedEnum,
-            ValueType::IntBackedEnum,
-            ValueType::UnitEnum =>$this->expectCastIfNonStrict(true, $ctx),
+            ValueType::IntBackedEnum => $this->expectCastIfNonStrict(true, $ctx),
+            ValueType::UnitEnum => $this->expectCastIfNonStrict(true, $ctx),
         };
     }
 }

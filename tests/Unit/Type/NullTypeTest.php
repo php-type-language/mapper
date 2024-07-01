@@ -17,7 +17,7 @@ final class NullTypeTest extends TypeTestCase
         return new NullType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String,

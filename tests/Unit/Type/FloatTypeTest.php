@@ -17,7 +17,7 @@ final class FloatTypeTest extends TypeTestCase
         return new FloatType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String => $this->expectCastIfNonStrict(1.0, $ctx),

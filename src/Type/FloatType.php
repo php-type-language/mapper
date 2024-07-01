@@ -10,12 +10,12 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-final class FloatType extends NonDirectionalType
+final class FloatType implements TypeInterface
 {
     /**
      * @throws InvalidValueException
      */
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): float
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): float
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToFloatIfPossible($value);

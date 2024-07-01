@@ -17,7 +17,7 @@ final class IntTypeTest extends TypeTestCase
         return new IntType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String => $this->expectCastIfNonStrict(1, $ctx),

@@ -11,50 +11,6 @@ namespace TypeLang\Mapper\Exception;
 final class StringInfo
 {
     /**
-     * @param non-empty-string $letter
-     */
-    public static function isVowel(string $letter): bool
-    {
-        // @phpstan-ignore-next-line : Additional assertion
-        assert($letter !== '');
-
-        $lower = \strtolower($letter);
-
-        return \in_array($lower, ['a', 'e', 'i', 'o', 'u'], true);
-    }
-
-    /**
-     * @param non-empty-string $word
-     *
-     * @return 'an'|'a'
-     */
-    public static function getArticle(string $word): string
-    {
-        // @phpstan-ignore-next-line : Additional assertion
-        assert($word !== '');
-
-        // Extract first letter from the word (sentence).
-        \preg_match('/[a-z]/iu', $word, $matches);
-
-        /** @var list<non-empty-string> $matches */
-        if ($matches === []) {
-            return 'a';
-        }
-
-        return self::isVowel($matches[0]) ? 'an' : 'a';
-    }
-
-    /**
-     * @param non-empty-string $word
-     *
-     * @return non-empty-string
-     */
-    public static function withArticle(string $word): string
-    {
-        return self::getArticle($word) . ' ' . $word;
-    }
-
-    /**
      * @return non-empty-string
      */
     public static function formatRange(int $from, int $to): string

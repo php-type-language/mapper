@@ -8,12 +8,14 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-final class BoolType extends NonDirectionalType
+final class BoolType implements TypeInterface
 {
     /**
      * Converts incoming value to the bool (in case of strict types is disabled).
+     *
+     * @throws InvalidValueException
      */
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): bool
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): bool
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToBoolIfPossible($value);

@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
@@ -61,7 +60,7 @@ final class ArrayType implements TypeInterface
      * @throws InvalidValueException
      * @throws TypeNotFoundException
      */
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): array
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): array
     {
         $value = $this->validateAndCast($value, $context);
 
@@ -70,31 +69,8 @@ final class ArrayType implements TypeInterface
         foreach ($value as $index => $item) {
             $context->enter($index);
 
-            $result[$this->key->normalize($index, $types, $context)]
-                = $this->value->normalize($item, $types, $context);
-
-            $context->leave();
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return array<array-key, mixed>
-     * @throws InvalidValueException
-     * @throws TypeNotFoundException
-     */
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): array
-    {
-        $value = $this->validateAndCast($value, $context);
-
-        $result = [];
-
-        foreach ($value as $index => $item) {
-            $context->enter($index);
-
-            $result[$this->key->denormalize($index, $types, $context)]
-                = $this->value->denormalize($item, $types, $context);
+            $result[$this->key->cast($index, $types, $context)]
+                = $this->value->cast($item, $types, $context);
 
             $context->leave();
         }

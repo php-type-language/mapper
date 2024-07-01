@@ -8,8 +8,10 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\MappingException;
+use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\Registry;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Tests\Unit\TestCase;
@@ -32,7 +34,17 @@ abstract class TypeTestCase extends TestCase
 
     abstract protected function getType(): TypeInterface;
 
-    abstract protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed;
+    abstract protected function getCastExpectation(mixed $value, ValueType $type, LocalContext $ctx): mixed;
+
+    protected function getNormalizationExpectation(mixed $value, ValueType $type, LocalContext $ctx): mixed
+    {
+        return $this->getCastExpectation($value, $type, $ctx);
+    }
+
+    protected function getDenormalizationExpectation(mixed $value, ValueType $type, LocalContext $ctx): mixed
+    {
+        return $this->getCastExpectation($value, $type, $ctx);
+    }
 
     protected function expectCastIfNonStrict(mixed $expected, Context $ctx): mixed
     {
@@ -48,6 +60,13 @@ abstract class TypeTestCase extends TestCase
     protected function expectMappingError(): mixed
     {
         $this->expectException(MappingException::class);
+
+        return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
+    }
+
+    protected function expectTypeNotFoundError(): mixed
+    {
+        $this->expectException(TypeNotFoundException::class);
 
         return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
     }
@@ -96,10 +115,29 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testNormalization(mixed $value, ValueType $type, Context $ctx): void
     {
-        $expected = $this->getNormalizationExpectation($value, $type, $ctx);
+        $local = LocalContext::fromContext(Direction::Normalize, $ctx);
 
-        $actual = $this->normalize($value, $ctx);
+        $expected = $this->getNormalizationExpectation($value, $type, $local);
 
+        $actual = $this->normalize($value, $local);
+
+        $this->assertCasting($value, $expected, $actual);
+    }
+
+    #[DataProvider('valuesDataProvider')]
+    public function testDenormalization(mixed $value, ValueType $type, Context $ctx): void
+    {
+        $local = LocalContext::fromContext(Direction::Denormalize, $ctx);
+
+        $expected = $this->getDenormalizationExpectation($value, $type, $local);
+
+        $actual = $this->denormalize($value, $local);
+
+        $this->assertCasting($value, $expected, $actual);
+    }
+
+    private function assertCasting(mixed $value, mixed $expected, mixed $actual): void
+    {
         $message = \vsprintf('Passed value %s was converted to %s, but expected is %s', [
             \var_export($value, true),
             \var_export($actual, true),
@@ -115,21 +153,17 @@ abstract class TypeTestCase extends TestCase
         }
     }
 
-    protected function normalize(mixed $value, Context $context = new Context()): mixed
+    protected function normalize(mixed $value, LocalContext $context): mixed
     {
         $type = $this->getType();
 
-        $local = LocalContext::fromContext(Context\Direction::Normalize, $context);
-
-        return $type->normalize($value, $this->types, $local);
+        return $type->cast($value, $this->types, $context);
     }
 
-    protected function denormalize(mixed $value, Context $context = new Context()): mixed
+    protected function denormalize(mixed $value, LocalContext $context): mixed
     {
         $type = $this->getType();
 
-        $local = LocalContext::fromContext(Context\Direction::Denormalize, $context);
-
-        return $type->denormalize($value, $this->types, $local);
+        return $type->cast($value, $this->types, $context);
     }
 }

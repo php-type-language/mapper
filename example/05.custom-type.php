@@ -7,15 +7,15 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Registry\Registry;
 use TypeLang\Mapper\Registry\RegistryInterface;
-use TypeLang\Mapper\Type\NonDirectionalType;
+use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 // You can also add your own types.
 
-class MyNonEmptyStringType extends NonDirectionalType
+class MyNonEmptyStringType implements TypeInterface
 {
-    protected function format(mixed $value, RegistryInterface $types, LocalContext $context): string
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): string
     {
         if (!\is_string($value) || $value === '') {
             throw InvalidValueException::becauseInvalidValueGiven(

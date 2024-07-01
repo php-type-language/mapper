@@ -17,7 +17,7 @@ final class StringTypeTest extends TypeTestCase
         return new StringType();
     }
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String => 'EXAMPLE',

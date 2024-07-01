@@ -40,7 +40,8 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
     {
         return $statement instanceof NamedTypeNode
             && !$statement->name->isBuiltin()
-            && \class_exists($statement->name->toString());
+            && \class_exists($statement->name->toString())
+            && !\enum_exists($statement->name->toString());
     }
 
     /**

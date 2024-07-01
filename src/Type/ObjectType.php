@@ -14,7 +14,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 /**
  * @template T of object
  */
-final class ObjectType implements TypeInterface
+final class ObjectType extends AsymmetricType
 {
     /**
      * @param ClassMetadata<T> $metadata
@@ -74,7 +74,7 @@ final class ObjectType implements TypeInterface
                 );
             }
 
-            $result[$meta->getExportName()] = $type->normalize($propertyValue, $types, $context);
+            $result[$meta->getExportName()] = $type->cast($propertyValue, $types, $context);
 
             $context->leave();
         }
@@ -144,7 +144,7 @@ final class ObjectType implements TypeInterface
                     );
                 }
 
-                $propertyValue = $type->denormalize($value[$meta->getExportName()], $types, $context);
+                $propertyValue = $type->cast($value[$meta->getExportName()], $types, $context);
 
                 $this->setValue($property, $object, $propertyValue);
                 $context->leave();

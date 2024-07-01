@@ -74,13 +74,13 @@ abstract class MappingException extends TypeException implements MappingExceptio
 
     public function getPathAsString(): string
     {
-        $result = '$.';
+        $result = '$';
 
         foreach ($this->getPath() as $segment) {
-            $result .= \is_string($segment) ? "$segment." : "[$segment].";
+            $result .= \is_string($segment)
+                ? ".$segment"
+                : "[$segment]";
         }
-
-        $result = \rtrim($result, '.');
 
         if ($result === '$') {
             return 'root';
