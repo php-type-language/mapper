@@ -9,7 +9,6 @@ use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Traverser;
 use TypeLang\Parser\Traverser\TypeMapVisitor;
-use TypeLang\Printer\PrinterInterface;
 
 abstract class MappingException extends TypeException implements MappingExceptionInterface
 {

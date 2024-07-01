@@ -11,16 +11,8 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 
-/**
- * @template TInput of mixed
- * @template TOutput of mixed
- * @template-implements TypeInterface<iterable<array-key, TInput>, list<TOutput>>
- */
 final class ListType implements TypeInterface
 {
-    /**
-     * @param TypeInterface<TInput, TOutput> $type
-     */
     public function __construct(
         #[TargetTemplateArgument]
         private readonly TypeInterface $type = new MixedType(),
@@ -53,9 +45,9 @@ final class ListType implements TypeInterface
     }
 
     /**
+     * @return list<mixed>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
-     * @throws TypeNotCreatableException
      */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): array
     {
@@ -75,9 +67,8 @@ final class ListType implements TypeInterface
     }
 
     /**
-     * @return list<TInput>
+     * @return list<mixed>
      * @throws InvalidValueException
-     * @throws TypeNotCreatableException
      * @throws TypeNotFoundException
      */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): array

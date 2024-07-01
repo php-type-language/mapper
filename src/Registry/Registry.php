@@ -67,7 +67,7 @@ class Registry implements MutableRegistryInterface
      * @api
      *
      * @param non-empty-string $name
-     * @param class-string<TypeInterface<mixed, mixed>> $type
+     * @param class-string<TypeInterface> $type
      */
     public function type(string $name, string $type): void
     {
@@ -78,7 +78,7 @@ class Registry implements MutableRegistryInterface
      * @api
      *
      * @param class-string $class
-     * @param class-string<TypeInterface<mixed, mixed>> $type
+     * @param class-string<TypeInterface> $type
      */
     public function instanceof(string $class, string $type): void
     {

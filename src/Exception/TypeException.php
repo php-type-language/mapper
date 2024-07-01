@@ -8,9 +8,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
 
-/**
- * @phpstan-consistent-constructor
- */
 class TypeException extends \LogicException implements MapperExceptionInterface
 {
     private PrinterInterface $printer;

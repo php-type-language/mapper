@@ -12,8 +12,5 @@ interface TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool;
 
-    /**
-     * @return TypeInterface<mixed, mixed>
-     */
     public function build(TypeStatement $type, RegistryInterface $context): TypeInterface;
 }

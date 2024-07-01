@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Exception;
 
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class TypeNotFoundException extends TypeException
+final class TypeNotFoundException extends TypeException
 {
     public function __construct(
         string $template,

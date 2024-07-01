@@ -11,29 +11,12 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 
-/**
- * @template TInputKey of array-key
- * @template TOutputKey of array-key
- * @template TInput of mixed
- * @template TOutput of mixed
- * @template-implements TypeInterface<iterable<TInputKey, TInput>, array<TOutputKey, TOutput>>
- */
 final class ArrayType implements TypeInterface
 {
-    /**
-     * @var TypeInterface<TInputKey, TOutputKey>
-     */
     private readonly TypeInterface $key;
 
-    /**
-     * @var TypeInterface<TInput, TOutput>
-     */
     private readonly TypeInterface $value;
 
-    /**
-     * @param TypeInterface<TInputKey, TOutputKey>|TypeInterface<TInput, TOutput>|null $key
-     * @param TypeInterface<TInput, TOutput>|null $value
-     */
     public function __construct(
         #[TargetTemplateArgument]
         ?TypeInterface $key = null,
@@ -74,8 +57,8 @@ final class ArrayType implements TypeInterface
     }
 
     /**
+     * @return array<array-key, mixed>
      * @throws InvalidValueException
-     * @throws TypeNotCreatableException
      * @throws TypeNotFoundException
      */
     public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): array
@@ -97,10 +80,9 @@ final class ArrayType implements TypeInterface
     }
 
     /**
-     * @return array<TInputKey, TInput>
+     * @return array<array-key, mixed>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
-     * @throws TypeNotCreatableException
      */
     public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): array
     {

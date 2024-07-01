@@ -11,9 +11,6 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 
-/**
- * @template-implements TypeInterface<\DateTimeInterface, non-empty-string>
- */
 final class DateTimeType implements TypeInterface
 {
     /**

@@ -13,7 +13,6 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 
 /**
  * @template T of object
- * @template-implements TypeInterface<T, object|array<non-empty-string, mixed>>
  */
 final class ObjectType implements TypeInterface
 {
@@ -25,6 +24,7 @@ final class ObjectType implements TypeInterface
     ) {}
 
     /**
+     * @return object|array<non-empty-string, mixed>
      * @throws InvalidValueException
      * @throws \ReflectionException
      * @throws TypeRequiredException
@@ -92,6 +92,7 @@ final class ObjectType implements TypeInterface
     }
 
     /**
+     * @return T
      * @throws InvalidValueException
      * @throws MissingRequiredFieldException
      * @throws TypeRequiredException

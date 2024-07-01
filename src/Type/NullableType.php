@@ -7,16 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-/**
- * @template TInput of mixed
- * @template TOutput of mixed
- * @template-implements TypeInterface<TInput|null, TOutput|null>
- */
 final class NullableType implements TypeInterface
 {
-    /**
-     * @param TypeInterface<TInput, TOutput> $parent
-     */
     public function __construct(
         private readonly TypeInterface $parent,
     ) {}

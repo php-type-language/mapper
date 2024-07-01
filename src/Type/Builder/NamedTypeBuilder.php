@@ -31,10 +31,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
 
-/**
- * @template TInput of mixed
- * @template TOutput of mixed
- */
 class NamedTypeBuilder implements TypeBuilderInterface
 {
     /**
@@ -46,7 +42,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
     /**
      * @param non-empty-string $name
-     * @param class-string<TypeInterface<TInput, TOutput>> $type
+     * @param class-string<TypeInterface> $type
      */
     public function __construct(
         protected readonly string $name,
@@ -70,7 +66,6 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @return TypeInterface<TInput, TOutput>
      * @throws MissingTemplateArgumentsException
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentsHintNotSupportedException
@@ -112,7 +107,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @param TypeMetadata<TypeInterface<TInput, TOutput>> $metadata
+     * @param TypeMetadata<TypeInterface> $metadata
      *
      * @return iterable<array-key, mixed>
      * @throws MissingTemplateArgumentsException
@@ -186,7 +181,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @return array<array-key, TypeInterface<mixed, mixed>>
+     * @return array<array-key, TypeInterface>
      * @throws TypeNotFoundException
      */
     private function getShapeFieldsAsArray(NamedTypeNode $type, RegistryInterface $context): array

@@ -14,9 +14,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-/**
- * @template-implements TypeInterface<\BackedEnum, int|string>
- */
 final class BackedEnumType implements TypeInterface
 {
     /**

@@ -25,7 +25,6 @@ interface RegistryInterface
     public function parse(string $type): TypeStatement;
 
     /**
-     * @return TypeInterface<mixed, mixed>
      * @throws TypeNotFoundException
      */
     public function get(TypeStatement $type): TypeInterface;

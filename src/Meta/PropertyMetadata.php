@@ -15,7 +15,6 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @param non-empty-string $export
-     * @param TypeInterface<mixed, mixed>|null $type
      */
     public function __construct(
         private string $export,
@@ -103,8 +102,6 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @api
-     *
-     * @param TypeInterface<mixed, mixed> $type
      */
     public function withType(TypeInterface $type, TypeStatement $statement): self
     {
@@ -140,8 +137,6 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @api
-     *
-     * @return TypeInterface<mixed, mixed>
      */
     public function getType(): ?TypeInterface
     {

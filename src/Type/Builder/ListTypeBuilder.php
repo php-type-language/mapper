@@ -12,9 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * Creates a {@see ListType} from the "Type[]" syntax.
- *
- * @template TInput of mixed
- * @template TOutput of mixed
  */
 final class ListTypeBuilder implements TypeBuilderInterface
 {
@@ -24,14 +21,12 @@ final class ListTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @return ListType<TInput, TOutput>
      * @throws TypeNotFoundException
      */
     public function build(TypeStatement $type, RegistryInterface $context): ListType
     {
         assert($type instanceof TypesListNode);
 
-        /** @var ListType<TInput, TOutput> */
         return new ListType($context->get($type->type));
     }
 }

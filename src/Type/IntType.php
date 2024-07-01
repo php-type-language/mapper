@@ -16,9 +16,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
 
-/**
- * @template-extends NonDirectionalType<int>
- */
 final class IntType extends NonDirectionalType
 {
     /**

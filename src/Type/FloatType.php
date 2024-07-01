@@ -10,9 +10,6 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-/**
- * @template-extends NonDirectionalType<float>
- */
 final class FloatType extends NonDirectionalType
 {
     /**

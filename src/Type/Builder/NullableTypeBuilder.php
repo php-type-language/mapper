@@ -12,9 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * Creates a {@see NullableType} from "?Type" syntax.
- *
- * @template TInput of mixed
- * @template TOutput of mixed
  */
 final class NullableTypeBuilder implements TypeBuilderInterface
 {
@@ -24,14 +21,12 @@ final class NullableTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @return NullableType<TInput, TOutput>
      * @throws TypeNotFoundException
      */
     public function build(TypeStatement $type, RegistryInterface $context): NullableType
     {
         assert($type instanceof NullableTypeNode);
 
-        /** @var NullableType<TInput, TOutput> */
         return new NullableType($context->get($type->type));
     }
 }
