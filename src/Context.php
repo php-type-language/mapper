@@ -16,25 +16,18 @@ class Context
      */
     public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
 
-    /**
-     * If this option contains {@see false}, then type conversion is
-     * allowed during transformation.
-     */
-    protected readonly ?bool $strictTypes;
-
-    /**
-     * If this option contains {@see true}, then objects are converted to
-     * associative arrays, otherwise anonymous {@see object} will be returned.
-     */
-    protected readonly ?bool $objectsAsArrays;
-
     public function __construct(
-        ?bool $strictTypes = null,
-        ?bool $objectsAsArrays = null,
-    ) {
-        $this->strictTypes = $strictTypes;
-        $this->objectsAsArrays = $objectsAsArrays;
-    }
+        /**
+         * If this option contains {@see false}, then type conversion is
+         * allowed during transformation.
+         */
+        protected readonly ?bool $strictTypes = null,
+        /**
+         * If this option contains {@see true}, then objects are converted to
+         * associative arrays, otherwise anonymous {@see object} will be returned.
+         */
+        protected readonly ?bool $objectsAsArrays = null
+    ) {}
 
     /**
      * Returns current {@see $strictTypes} option or default value

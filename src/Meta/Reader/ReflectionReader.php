@@ -14,7 +14,7 @@ use TypeLang\Reader\ReflectionReader as ReflectionTypeReader;
 
 final class ReflectionReader extends Reader
 {
-    private PropertyTypeReaderInterface $properties;
+    private readonly PropertyTypeReaderInterface $properties;
 
     public function __construct(
         private readonly ReaderInterface $delegate = new NullReader(),

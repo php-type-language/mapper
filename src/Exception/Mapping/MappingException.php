@@ -4,46 +4,26 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
+use TypeLang\Mapper\Exception\TypeException;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Traverser;
 use TypeLang\Parser\Traverser\TypeMapVisitor;
-use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
 
-abstract class MappingException extends \RuntimeException implements MappingExceptionInterface
+abstract class MappingException extends TypeException implements MappingExceptionInterface
 {
-    private PrinterInterface $printer;
-
     /**
      * @param list<non-empty-string|int> $path
      */
     public function __construct(
-        private readonly string $template,
+        string $template,
         private TypeStatement $expectedType,
         private array $path = [],
         int $code = 0,
         ?\Throwable $previous = null
     ) {
-        $this->printer = new PrettyPrinter();
-        $this->printer->multilineShape = \PHP_INT_MAX;
-
-        $message = $this->updateMessage();
-
-        parent::__construct($message, $code, $previous);
-    }
-
-    /**
-     * @api
-     *
-     * @return $this
-     */
-    public function setTypePrinter(PrinterInterface $printer): self
-    {
-        $this->printer = $printer;
-        $this->updateMessage();
-
-        return $this;
+        parent::__construct($template, $code, $previous);
     }
 
     /**
@@ -61,30 +41,13 @@ abstract class MappingException extends \RuntimeException implements MappingExce
         return $this;
     }
 
-    protected function updateMessage(): string
-    {
-        return $this->message = $this->render($this->template);
-    }
-
-    private function render(string $template): string
-    {
-        foreach ($this->getReplacements() as $from => $to) {
-            if ($to instanceof TypeStatement) {
-                $to = $this->printer->print($to);
-            }
-
-            $template = \str_replace('{{' . $from . '}}', $to, $template);
-        }
-
-        return $template;
-    }
-
     /**
      * @return array<non-empty-string, string|TypeStatement>
      */
     protected function getReplacements(): array
     {
         return [
+            ...parent::getReplacements(),
             'expected' => $this->expectedType,
             'path' => $this->getPathAsString(),
         ];

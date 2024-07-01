@@ -60,8 +60,15 @@ final class DocBlockReader extends Reader
             $varTagName => new VarTagFactory(),
         ]));
 
-        $this->promotedProperties = new PromotedPropertyTypeReader($paramTagName, $parser);
-        $this->classProperties = new ClassPropertyTypeReader($varTagName, $parser);
+        $this->classProperties = new ClassPropertyTypeReader(
+            varTagName: $varTagName,
+            parser: $parser,
+        );
+        $this->promotedProperties = new PromotedPropertyTypeReader(
+            paramTagName: $paramTagName,
+            classProperties: $this->classProperties,
+            parser: $parser,
+        );
         $this->typeResolver = new TypeResolver();
         $this->uses = $this->createUseStatementsReader($uses);
     }
@@ -133,15 +140,23 @@ final class DocBlockReader extends Reader
             $property = $metadata->findPropertyByName($reflection->getName())
                 ?? new PropertyMetadata($reflection->getName());
 
-            $type = $this->findType($class, $property);
+            $statement = $this->findType($class, $property);
 
-            if ($type !== null) {
-                $type = $this->typeResolver->resolveWith($type, $uses);
+            if ($statement !== null) {
+                $statement = $this->typeResolver->resolveWith($statement, $uses);
 
-                $property = $property->withType(
-                    type: $types->get($type),
-                    statement: $type,
-                );
+                try {
+                    $type = $types->get($statement);
+                } catch (TypeNotFoundException $e) {
+                    throw TypeNotFoundException::fromPropertyType(
+                        class: $metadata->getName(),
+                        property: $property->getName(),
+                        type: $e->getExpectedType(),
+                        prev: $e,
+                    );
+                }
+
+                $property = $property->withType($type, $statement);
             }
 
             $metadata = $metadata->withAddedProperty($property);

@@ -17,8 +17,6 @@ use TypeLang\Parser\InMemoryCachedParser;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
-use TypeLang\Printer\PrettyPrinter;
-use TypeLang\Printer\PrinterInterface;
 
 class Registry implements MutableRegistryInterface
 {
@@ -27,14 +25,11 @@ class Registry implements MutableRegistryInterface
      */
     protected array $builders = [];
 
-    private PrinterInterface $printer;
-
     private readonly ParserInterface $parser;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
     ) {
-        $this->printer = new PrettyPrinter();
         $this->parser = $this->createPlatformParser($this->platform);
 
         $this->loadPlatformTypes($this->platform);
@@ -66,19 +61,6 @@ class Registry implements MutableRegistryInterface
     public function getPlatform(): PlatformInterface
     {
         return $this->platform;
-    }
-
-    /**
-     * @api
-     *
-     * @return $this
-     */
-    public function withPrinter(PrinterInterface $printer): self
-    {
-        $clone = clone $this;
-        $clone->printer = $printer;
-
-        return $clone;
     }
 
     /**
@@ -136,8 +118,6 @@ class Registry implements MutableRegistryInterface
             }
         }
 
-        throw TypeNotFoundException::fromTypeName(
-            name: $this->printer->print($type),
-        );
+        throw TypeNotFoundException::fromType($type);
     }
 }

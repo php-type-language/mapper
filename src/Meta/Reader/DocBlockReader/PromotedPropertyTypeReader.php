@@ -23,6 +23,7 @@ final class PromotedPropertyTypeReader
      */
     public function __construct(
         private readonly string $paramTagName,
+        private readonly ClassPropertyTypeReader $classProperties,
         private readonly ParserInterface $parser,
     ) {}
 
@@ -31,6 +32,12 @@ final class PromotedPropertyTypeReader
      */
     public function findType(\ReflectionProperty $property, PropertyMetadata $meta): ?TypeStatement
     {
+        $result = $this->classProperties->findType($property);
+
+        if ($result !== null) {
+            return $result;
+        }
+
         $class = $property->getDeclaringClass();
 
         $phpdoc = $this->constructors[$class->getName()]

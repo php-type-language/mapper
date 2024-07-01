@@ -23,9 +23,7 @@ final class Psr16CachedReader extends CachedReader
     {
         $index = $this->getKey($class);
 
-        $result = $this->cache->get($index, function () use ($class, $types) {
-            return $this->delegate->getClassMetadata($class, $types);
-        });
+        $result = $this->cache->get($index, fn() => $this->delegate->getClassMetadata($class, $types));
 
         if ($result instanceof \Closure) {
             $result = $result();

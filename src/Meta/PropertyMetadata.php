@@ -14,23 +14,16 @@ final class PropertyMetadata extends Metadata
     private bool $hasDefaultValue = false;
 
     /**
-     * @var non-empty-string
-     */
-    private string $export;
-
-    /**
-     * @param non-empty-string $name
+     * @param non-empty-string $export
      * @param TypeInterface<mixed, mixed>|null $type
      */
     public function __construct(
-        string $name,
+        private string $export,
         private ?TypeInterface $type = null,
         private ?TypeStatement $statement = null,
         ?int $createdAt = null,
     ) {
-        $this->export = $name;
-
-        parent::__construct($name, $createdAt);
+        parent::__construct($this->export, $createdAt);
     }
 
     /**

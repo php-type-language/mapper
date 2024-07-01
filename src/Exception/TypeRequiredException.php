@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception;
 
-class TypeRequiredException extends TypeNotFoundException
+class TypeRequiredException extends TypeException
 {
     public static function fromInvalidFieldType(
         string $class,
