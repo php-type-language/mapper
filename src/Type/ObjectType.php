@@ -10,6 +10,7 @@ use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Meta\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template T of object
@@ -22,6 +23,13 @@ final class ObjectType extends AsymmetricLogicalType
     public function __construct(
         private readonly ClassMetadata $metadata,
     ) {}
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return $this->metadata->getTypeStatement(
+            export: $context->isDenormalization(),
+        );
+    }
 
     protected function supportsNormalization(mixed $value, LocalContext $context): bool
     {
@@ -43,7 +51,7 @@ final class ObjectType extends AsymmetricLogicalType
         if (!$value instanceof $className) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: $this->metadata->getTypeStatement(false),
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }
@@ -172,7 +180,7 @@ final class ObjectType extends AsymmetricLogicalType
 
             throw MissingRequiredFieldException::becauseFieldIsMissing(
                 context: $context,
-                expectedType: $this->metadata->getTypeStatement(true),
+                expectedType: $this->getTypeStatement($context),
                 field: $meta->getExportName(),
             );
         }

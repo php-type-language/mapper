@@ -27,6 +27,9 @@ final class ListTypeBuilder implements TypeBuilderInterface
     {
         assert($type instanceof TypesListNode);
 
-        return new ListType($context->get($type->type));
+        return new ListType(
+            name: 'list',
+            type: $context->get($type->type),
+        );
     }
 }

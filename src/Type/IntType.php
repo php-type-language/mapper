@@ -84,7 +84,7 @@ final class IntType implements LogicalTypeInterface
         );
     }
 
-    private function getExpectedTypeStatement(): NamedTypeNode
+    public function getTypeStatement(LocalContext $context): NamedTypeNode
     {
         if ($this->min === \PHP_INT_MIN && $this->max === \PHP_INT_MAX) {
             return new NamedTypeNode($this->name);
@@ -115,7 +115,7 @@ final class IntType implements LogicalTypeInterface
         if (!\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: $this->getExpectedTypeStatement(),
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }
@@ -124,7 +124,7 @@ final class IntType implements LogicalTypeInterface
             if ($context->isStrictTypesEnabled()) {
                 throw InvalidValueException::becauseInvalidValueGiven(
                     context: $context,
-                    expectedType: $this->getExpectedTypeStatement(),
+                    expectedType: $this->getTypeStatement($context),
                     actualValue: $value,
                     showValue: true,
                 );
@@ -137,7 +137,7 @@ final class IntType implements LogicalTypeInterface
             if ($context->isStrictTypesEnabled()) {
                 throw InvalidValueException::becauseInvalidValueGiven(
                     context: $context,
-                    expectedType: $this->getExpectedTypeStatement(),
+                    expectedType: $this->getTypeStatement($context),
                     actualValue: $value,
                     showValue: true,
                 );

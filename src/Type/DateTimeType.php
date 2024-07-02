@@ -10,6 +10,8 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class DateTimeType extends AsymmetricLogicalType
 {
@@ -43,6 +45,11 @@ final class DateTimeType extends AsymmetricLogicalType
             \is_a($this->name, \DateTime::class, true) => \DateTime::class,
             default => \DateTimeImmutable::class,
         };
+    }
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode($this->name);
     }
 
     protected function supportsNormalization(mixed $value, LocalContext $context): bool

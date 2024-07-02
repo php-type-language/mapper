@@ -7,10 +7,30 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class MixedType implements LogicalTypeInterface
 {
+    /**
+     * @var non-empty-string
+     */
+    private const DEFAULT_TYPE_NAME = 'mixed';
+
+    /**
+     * @param non-empty-string $name
+     */
+    public function __construct(
+        #[TargetTypeName]
+        private readonly string $name = self::DEFAULT_TYPE_NAME,
+    ) {}
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode($this->name);
+    }
+
     /**
      * @throws TypeNotFoundException
      */

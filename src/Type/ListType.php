@@ -9,13 +9,38 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class ListType implements LogicalTypeInterface
 {
+    /**
+     * @var non-empty-string
+     */
+    private const DEFAULT_TYPE_NAME = 'list';
+
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
+        #[TargetTypeName]
+        private readonly string $name = self::DEFAULT_TYPE_NAME,
         #[TargetTemplateArgument]
         private readonly TypeInterface $type = new MixedType(),
     ) {}
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode(
+            name: $this->name,
+            arguments: new ArgumentsListNode([
+                new ArgumentNode($this->type->getTypeStatement($context)),
+            ]),
+        );
+    }
 
     /**
      * @return array<array-key, mixed>

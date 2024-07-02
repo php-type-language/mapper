@@ -9,14 +9,29 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class ArrayType implements LogicalTypeInterface
 {
+    /**
+     * @var non-empty-string
+     */
+    private const DEFAULT_TYPE_NAME = 'array';
+
     private readonly TypeInterface $key;
 
     private readonly TypeInterface $value;
 
+    /**
+     * @param non-empty-string $name
+     */
     public function __construct(
+        #[TargetTypeName]
+        private readonly string $name = self::DEFAULT_TYPE_NAME,
         #[TargetTemplateArgument]
         ?TypeInterface $key = null,
         #[TargetTemplateArgument]
@@ -27,6 +42,17 @@ final class ArrayType implements LogicalTypeInterface
             $value === null => [new MixedType(), $key],
             default => [$key, $value],
         };
+    }
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode(
+            name: $this->name,
+            arguments: new ArgumentsListNode([
+                new ArgumentNode($this->key->getTypeStatement($context)),
+                new ArgumentNode($this->value->getTypeStatement($context)),
+            ]),
+        );
     }
 
     /**
@@ -47,7 +73,7 @@ final class ArrayType implements LogicalTypeInterface
         if (!\is_array($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: 'array',
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }

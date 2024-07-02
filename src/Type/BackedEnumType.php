@@ -22,11 +22,9 @@ final class BackedEnumType extends AsymmetricLogicalType
     public function __construct(
         #[TargetTypeName]
         private readonly string $name,
-    ) {
+    ) {}
 
-    }
-
-    private function getExpectedTypeStatement(): TypeStatement
+    public function getTypeStatement(LocalContext $context): TypeStatement
     {
         $cases = [];
 
@@ -59,7 +57,7 @@ final class BackedEnumType extends AsymmetricLogicalType
         if (!$value instanceof \BackedEnum) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: $this->getExpectedTypeStatement(),
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }
@@ -91,7 +89,7 @@ final class BackedEnumType extends AsymmetricLogicalType
         if (!\is_string($value) && !\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: $this->getExpectedTypeStatement(),
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }
@@ -101,14 +99,14 @@ final class BackedEnumType extends AsymmetricLogicalType
         } catch (\TypeError) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 context: $context,
-                expectedType: $this->getExpectedTypeStatement(),
+                expectedType: $this->getTypeStatement($context),
                 actualValue: $value,
             );
         }
 
         return $case ?? throw InvalidValueException::becauseInvalidValueGiven(
             context: $context,
-            expectedType: $this->getExpectedTypeStatement(),
+            expectedType: $this->getTypeStatement($context),
             actualValue: $value,
         );
     }

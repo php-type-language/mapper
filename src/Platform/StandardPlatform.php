@@ -13,6 +13,7 @@ use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\NullableTypeBuilder;
 use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
+use TypeLang\Mapper\Type\Builder\UnionTypeBuilder;
 
 class StandardPlatform implements PlatformInterface
 {
@@ -24,7 +25,6 @@ class StandardPlatform implements PlatformInterface
         GrammarFeature::Literals,
         GrammarFeature::Generics,
         GrammarFeature::Union,
-        GrammarFeature::Intersection,
         GrammarFeature::List,
     ];
 
@@ -53,6 +53,7 @@ class StandardPlatform implements PlatformInterface
         yield new ObjectNamedTypeBuilder(\BackedEnum::class, Type\BackedEnumType::class);
         yield new NullableTypeBuilder();
         yield new ListTypeBuilder();
+        yield new UnionTypeBuilder();
         yield new ObjectTypeBuilder($this->reader);
     }
 

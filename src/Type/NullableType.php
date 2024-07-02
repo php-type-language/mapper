@@ -6,12 +6,23 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Parser\Node\Stmt\NullableTypeNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class NullableType implements LogicalTypeInterface
 {
     public function __construct(
+        #[TargetTemplateArgument]
         private readonly TypeInterface $parent,
     ) {}
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NullableTypeNode(
+            type: $this->parent->getTypeStatement($context),
+        );
+    }
 
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {
