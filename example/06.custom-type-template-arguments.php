@@ -21,31 +21,17 @@ class MyNonEmpty implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    private function assertValidNonEmpty(mixed $value, LocalContext $context): void
+    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
     {
-        if (!empty($value)) {
-            return;
+        if (empty($value)) {
+            throw InvalidValueException::becauseInvalidValueGiven(
+                context: $context,
+                expectedType: 'non-empty',
+                actualValue: $value,
+            );
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
-            context: $context,
-            expectedType: 'non-empty',
-            actualValue: $value,
-        );
-    }
-
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        $this->assertValidNonEmpty($value, $context);
-
-        return $this->type->normalize($value, $types, $context);
-    }
-
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed
-    {
-        $this->assertValidNonEmpty($value, $context);
-
-        return $this->type->denormalize($value, $types, $context);
+        return $this->type->cast($value, $types, $context);
     }
 }
 
@@ -66,7 +52,7 @@ var_dump($mapper->normalize('example', 'non-empty<string>'));
 // string(7) "example"
 //
 
-var_dump($mapper->normalize([1, 2, 3], 'non-empty<mixed>'));
+var_dump($mapper->normalize([1, 2, 3], 'non-empty<array>'));
 //
 // array:3 [
 //  0 => 1
@@ -82,7 +68,7 @@ var_dump($mapper->normalize([], 'non-empty<string>'));
 //
 
 
-var_dump($mapper->normalize(null, 'non-empty<string>'));
+var_dump($mapper->normalize('', 'non-empty<string>'));
 //
 // InvalidValueException: Passed value must be of type non-empty, but
 //                        null given at root.
