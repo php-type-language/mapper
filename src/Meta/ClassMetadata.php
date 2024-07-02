@@ -22,8 +22,14 @@ final class ClassMetadata extends Metadata
     private array $properties = [];
 
     /**
+     * @var iterable<array-key, PropertyMetadata>|null
+     */
+    private ?iterable $uninitializedProperties = null;
+
+    /**
      * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
+     * @throws \Exception
      */
     public function __construct(
         string $name,
@@ -32,9 +38,7 @@ final class ClassMetadata extends Metadata
     ) {
         parent::__construct($name, $createdAt);
 
-        foreach ($properties as $property) {
-            $this->addProperty($property);
-        }
+        $this->uninitializedProperties = $properties;
     }
 
     /**
@@ -91,8 +95,23 @@ final class ClassMetadata extends Metadata
         return parent::getName();
     }
 
+    private function initializeProperties(): void
+    {
+        if ($this->uninitializedProperties === null) {
+            return;
+        }
+
+        foreach ($this->uninitializedProperties as $property) {
+            $this->properties[$property->getName()] = $property;
+        }
+
+        $this->uninitializedProperties = null;
+    }
+
     private function addProperty(PropertyMetadata $property): void
     {
+        $this->initializeProperties();
+
         $this->properties[$property->getName()] = $property;
     }
 
@@ -116,6 +135,8 @@ final class ClassMetadata extends Metadata
      */
     public function findPropertyByName(string $name): ?PropertyMetadata
     {
+        $this->initializeProperties();
+
         return $this->properties[$name] ?? null;
     }
 
@@ -124,6 +145,26 @@ final class ClassMetadata extends Metadata
      */
     public function getProperties(): array
     {
+        $this->initializeProperties();
+
         return \array_values($this->properties);
+    }
+
+    public function __serialize(): array
+    {
+        $this->initializeProperties();
+
+        return [
+            ...parent::__serialize(),
+            'properties' => $this->getProperties(),
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+
+        $this->properties = $data['properties'];
+        $this->uninitializedProperties = null;
     }
 }
