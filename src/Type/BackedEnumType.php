@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-final class BackedEnumType extends AsymmetricType
+final class BackedEnumType extends AsymmetricLogicalType
 {
     /**
      * @param class-string<\BackedEnum> $name

@@ -8,7 +8,7 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-final class StringType implements TypeInterface
+final class StringType implements LogicalTypeInterface
 {
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {

@@ -10,7 +10,7 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 
-final class ListType implements TypeInterface
+final class ListType implements LogicalTypeInterface
 {
     public function __construct(
         #[TargetTemplateArgument]

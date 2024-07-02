@@ -10,7 +10,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-final class FloatType implements TypeInterface
+final class FloatType implements LogicalTypeInterface
 {
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {

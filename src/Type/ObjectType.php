@@ -14,7 +14,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 /**
  * @template T of object
  */
-final class ObjectType extends AsymmetricType
+final class ObjectType extends AsymmetricLogicalType
 {
     /**
      * @param ClassMetadata<T> $metadata

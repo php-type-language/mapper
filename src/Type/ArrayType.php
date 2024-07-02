@@ -10,7 +10,7 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 
-final class ArrayType implements TypeInterface
+final class ArrayType implements LogicalTypeInterface
 {
     private readonly TypeInterface $key;
 

@@ -9,7 +9,7 @@ use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
-final class MixedType implements TypeInterface
+final class MixedType implements LogicalTypeInterface
 {
     /**
      * @throws TypeNotFoundException

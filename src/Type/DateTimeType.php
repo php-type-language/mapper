@@ -11,7 +11,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 
-final class DateTimeType extends AsymmetricType
+final class DateTimeType extends AsymmetricLogicalType
 {
     /**
      * @var class-string<\DateTime|\DateTimeImmutable>
