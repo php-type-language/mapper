@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Meta;
 
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class PropertyMetadata extends Metadata
 {
@@ -15,6 +14,7 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @param non-empty-string $export
+     * @throws \Exception
      */
     public function __construct(
         private string $export,
@@ -135,5 +135,26 @@ final class PropertyMetadata extends Metadata
     public function hasType(): bool
     {
         return $this->type !== null;
+    }
+
+    public function __serialize(): array
+    {
+        return [
+            ...parent::__serialize(),
+            'defaultValue' => $this->getDefaultValue(),
+            'hasDefaultValue' => $this->hasDefaultValue(),
+            'export' => $this->getExportName(),
+            'type' => $this->getType(),
+        ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+
+        $this->defaultValue = $data['defaultValue'];
+        $this->hasDefaultValue = $data['hasDefaultValue'];
+        $this->export = $data['export'];
+        $this->type = $data['type'];
     }
 }

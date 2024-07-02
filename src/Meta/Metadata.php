@@ -4,14 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Meta;
 
-/**
- * @phpstan-type MetaSerializableType array{
- *     version: int<0, max>,
- *     name: non-empty-string,
- *     createdAt: int,
- *     ...
- * }
- */
 abstract class Metadata
 {
     /**
@@ -20,6 +12,14 @@ abstract class Metadata
     public const METADATA_VERSION = 1;
 
     private readonly int $createdAt;
+
+    /**
+     * @var list<non-empty-string>
+     */
+    protected const SERIALIZABLE_PROPERTIES = [
+        'name',
+        'createdAt',
+    ];
 
     /**
      * @param non-empty-string $name
@@ -47,9 +47,6 @@ abstract class Metadata
         return $date->getTimestamp();
     }
 
-    /**
-     * @phpstan-return MetaSerializableType
-     */
     public function __serialize(): array
     {
         return [

@@ -22,9 +22,9 @@ final class ClassMetadata extends Metadata
     private array $properties = [];
 
     /**
-     * @var iterable<array-key, PropertyMetadata>|null
+     * @var list<callable():PropertyMetadata>
      */
-    private ?iterable $uninitializedProperties = null;
+    private array $lazyInitializedProperties = [];
 
     /**
      * @param class-string<T> $name
@@ -38,7 +38,9 @@ final class ClassMetadata extends Metadata
     ) {
         parent::__construct($name, $createdAt);
 
-        $this->uninitializedProperties = $properties;
+        foreach ($properties as $property) {
+            $this->addProperty($property);
+        }
     }
 
     /**
@@ -70,7 +72,6 @@ final class ClassMetadata extends Metadata
             );
         }
 
-
         return new NamedTypeNode(
             name: $this->getName(),
             fields: new FieldsListNode($fields),
@@ -95,24 +96,14 @@ final class ClassMetadata extends Metadata
         return parent::getName();
     }
 
-    private function initializeProperties(): void
-    {
-        if ($this->uninitializedProperties === null) {
-            return;
-        }
-
-        foreach ($this->uninitializedProperties as $property) {
-            $this->properties[$property->getName()] = $property;
-        }
-
-        $this->uninitializedProperties = null;
-    }
-
     private function addProperty(PropertyMetadata $property): void
     {
-        $this->initializeProperties();
-
         $this->properties[$property->getName()] = $property;
+    }
+
+    private function addLazyProperty(callable $resolver): void
+    {
+        $this->lazyInitializedProperties[] = $resolver;
     }
 
     /**
@@ -120,10 +111,15 @@ final class ClassMetadata extends Metadata
      *
      * @return self<T>
      */
-    public function withAddedProperty(PropertyMetadata $property): self
+    public function withAddedProperty(PropertyMetadata|callable $property): self
     {
         $self = clone $this;
-        $self->addProperty($property);
+
+        if ($property instanceof PropertyMetadata) {
+            $self->addProperty($property);
+        } else {
+            $self->addLazyProperty($property);
+        }
 
         return $self;
     }
@@ -150,6 +146,17 @@ final class ClassMetadata extends Metadata
         return \array_values($this->properties);
     }
 
+    private function initializeProperties(): void
+    {
+        foreach ($this->lazyInitializedProperties as $resolver) {
+            $property = $resolver();
+
+            $this->properties[$property->getName()] = $property;
+        }
+
+        $this->lazyInitializedProperties = [];
+    }
+
     public function __serialize(): array
     {
         $this->initializeProperties();
@@ -165,6 +172,5 @@ final class ClassMetadata extends Metadata
         parent::__unserialize($data);
 
         $this->properties = $data['properties'];
-        $this->uninitializedProperties = null;
     }
 }
