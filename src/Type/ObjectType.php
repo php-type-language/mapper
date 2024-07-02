@@ -26,9 +26,7 @@ final class ObjectType extends AsymmetricLogicalType
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        return $this->metadata->getTypeStatement(
-            export: $context->isDenormalization(),
-        );
+        return $this->metadata->getTypeStatement($context);
     }
 
     protected function supportsNormalization(mixed $value, LocalContext $context): bool

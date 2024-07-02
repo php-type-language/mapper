@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Meta;
 
+use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
@@ -38,17 +40,32 @@ final class ClassMetadata extends Metadata
     /**
      * @api
      */
-    public function getTypeStatement(bool $export = true): TypeStatement
+    public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if (!$context->isDetailedTypes()) {
+            return new NamedTypeNode($this->getName());
+        }
+
         $fields = [];
 
+        $childContext = $context->merge(new Context(
+            detailedTypes: false,
+        ));
+
         foreach ($this->getProperties() as $property) {
+            $type = $property->getType();
+
             $fields[] = new NamedFieldNode(
-                key: $export ? $property->getExportName() : $property->getName(),
-                of: $property->getTypeStatement() ?? new NamedTypeNode('mixed'),
+                key: $childContext->isDenormalization()
+                    ? $property->getExportName()
+                    : $property->getName(),
+                of: $type === null
+                    ? new NamedTypeNode('mixed')
+                    : $type->getTypeStatement($childContext),
                 optional: $property->hasDefaultValue(),
             );
         }
+
 
         return new NamedTypeNode(
             name: $this->getName(),

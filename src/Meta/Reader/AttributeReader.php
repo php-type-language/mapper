@@ -38,10 +38,7 @@ final class AttributeReader extends Reader
             if ($attribute->type !== null) {
                 $statement = $types->parse($attribute->type);
 
-                $property = $property->withType(
-                    type: $types->get($statement),
-                    statement: $statement,
-                );
+                $property = $property->withType($types->get($statement));
             }
 
             $metadata = $metadata->withAddedProperty($property);

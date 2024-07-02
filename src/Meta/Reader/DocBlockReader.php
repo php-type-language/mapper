@@ -156,7 +156,7 @@ final class DocBlockReader extends Reader
                     );
                 }
 
-                $property = $property->withType($type, $statement);
+                $property = $property->withType($type);
             }
 
             $metadata = $metadata->withAddedProperty($property);

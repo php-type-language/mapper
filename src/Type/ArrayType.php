@@ -38,14 +38,19 @@ final class ArrayType implements LogicalTypeInterface
         ?TypeInterface $value = null,
     ) {
         [$this->key, $this->value] = match (true) {
-            $key === null => [new MixedType(), new MixedType()],
-            $value === null => [new MixedType(), $key],
-            default => [$key, $value],
+            $key !== null && $value !== null => [$key, $value],
+            $key === null && $value !== null => [new ArrayKeyType(), $value],
+            $key !== null && $value === null => [new ArrayKeyType(), $key],
+            default => [new ArrayKeyType(), new MixedType()],
         };
     }
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if (!$context->isDetailedTypes()) {
+            return new NamedTypeNode($this->name);
+        }
+
         return new NamedTypeNode(
             name: $this->name,
             arguments: new ArgumentsListNode([

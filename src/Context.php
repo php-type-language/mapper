@@ -16,6 +16,11 @@ class Context
      */
     public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
 
+    /**
+     * Default value for {@see $detailedTypes} option.
+     */
+    public const DETAILED_TYPES_DEFAULT_VALUE = true;
+
     public function __construct(
         /**
          * If this option contains {@see false}, then type conversion is
@@ -26,7 +31,12 @@ class Context
          * If this option contains {@see true}, then objects are converted to
          * associative arrays, otherwise anonymous {@see object} will be returned.
          */
-        protected readonly ?bool $objectsAsArrays = null
+        protected readonly ?bool $objectsAsArrays = null,
+        /**
+         * If this option contains {@see true}, then all composite types will
+         * be displayed along with detailed fields/values.
+         */
+        protected readonly ?bool $detailedTypes = null
     ) {}
 
     /**
@@ -49,6 +59,17 @@ class Context
     public function isObjectsAsArrays(): bool
     {
         return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+    }
+
+    /**
+     * Returns current {@see $detailedTypes} option or default value
+     * in case of option is not set.
+     *
+     * @api
+     */
+    public function isDetailedTypes(): bool
+    {
+        return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
     }
 
     public function merge(?Context $context): self

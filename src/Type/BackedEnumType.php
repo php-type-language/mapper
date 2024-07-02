@@ -26,11 +26,15 @@ final class BackedEnumType extends AsymmetricLogicalType
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if ($context->isNormalization()) {
+            return new NamedTypeNode($this->name);
+        }
+
         $cases = [];
 
         foreach ($this->name::cases() as $case) {
             $cases[] = \is_string($case->value)
-                ? new StringLiteralNode($case->value)
+                ? StringLiteralNode::createFromValue($case->value)
                 : new IntLiteralNode($case->value);
         }
 

@@ -34,6 +34,10 @@ final class ListType implements LogicalTypeInterface
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if (!$context->isDetailedTypes()) {
+            return new NamedTypeNode($this->name);
+        }
+
         return new NamedTypeNode(
             name: $this->name,
             arguments: new ArgumentsListNode([

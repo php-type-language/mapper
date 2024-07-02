@@ -75,9 +75,9 @@ final class ReflectionReader extends Reader
 
         if ($statement !== null) {
             try {
-                $metadata = $metadata->withType($types->get($statement), $statement);
+                $metadata = $metadata->withType($types->get($statement));
             } catch (TypeNotFoundException) {
-                $metadata = $metadata->withTypeStatement($statement);
+                //
             }
         }
 

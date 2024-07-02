@@ -19,7 +19,6 @@ final class PropertyMetadata extends Metadata
     public function __construct(
         private string $export,
         private ?TypeInterface $type = null,
-        private ?TypeStatement $statement = null,
         ?int $createdAt = null,
     ) {
         parent::__construct($this->export, $createdAt);
@@ -103,22 +102,10 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function withType(TypeInterface $type, TypeStatement $statement): self
+    public function withType(TypeInterface $type): self
     {
         $self = clone $this;
         $self->type = $type;
-        $self->statement = $statement;
-
-        return $self;
-    }
-
-    /**
-     * @api
-     */
-    public function withTypeStatement(TypeStatement $statement): self
-    {
-        $self = clone $this;
-        $self->statement = $statement;
 
         return $self;
     }
@@ -130,7 +117,6 @@ final class PropertyMetadata extends Metadata
     {
         $self = clone $this;
         $self->type = null;
-        $self->statement = null;
 
         return $self;
     }
@@ -141,14 +127,6 @@ final class PropertyMetadata extends Metadata
     public function getType(): ?TypeInterface
     {
         return $this->type;
-    }
-
-    /**
-     * @api
-     */
-    public function getTypeStatement(): ?TypeStatement
-    {
-        return $this->statement;
     }
 
     /**
