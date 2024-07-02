@@ -10,6 +10,11 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class NullType implements TypeInterface
 {
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return $value === null;
+    }
+
     /**
      * @throws InvalidValueException
      */

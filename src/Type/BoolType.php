@@ -10,6 +10,11 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class BoolType implements TypeInterface
 {
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return \is_bool($value);
+    }
+
     /**
      * Converts incoming value to the bool (in case of strict types is disabled).
      *

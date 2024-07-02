@@ -22,6 +22,11 @@ final class MixedType implements TypeInterface
         return $types->get(new NamedTypeNode(\get_debug_type($value)));
     }
 
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return true;
+    }
+
     /**
      * @throws TypeNotFoundException
      */

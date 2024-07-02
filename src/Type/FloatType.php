@@ -12,6 +12,11 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 final class FloatType implements TypeInterface
 {
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return \is_float($value) || \is_int($value);
+    }
+
     /**
      * @throws InvalidValueException
      */

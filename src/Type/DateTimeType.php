@@ -45,6 +45,11 @@ final class DateTimeType extends AsymmetricType
         };
     }
 
+    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    {
+        return $value instanceof \DateTimeInterface;
+    }
+
     /**
      * @throws InvalidValueException
      */
@@ -59,6 +64,19 @@ final class DateTimeType extends AsymmetricType
         }
 
         return $value->format($this->format);
+    }
+
+    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    {
+        if (!\is_string($value)) {
+            return false;
+        }
+
+        try {
+            return $this->parseDateTime($value, $context) !== null;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

@@ -22,7 +22,9 @@ final class BackedEnumType extends AsymmetricType
     public function __construct(
         #[TargetTypeName]
         private readonly string $name,
-    ) {}
+    ) {
+
+    }
 
     private function getExpectedTypeStatement(): TypeStatement
     {
@@ -39,6 +41,11 @@ final class BackedEnumType extends AsymmetricType
             1 => $cases[0],
             default => new UnionTypeNode(...$cases),
         };
+    }
+
+    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    {
+        return $value instanceof \BackedEnum;
     }
 
     /**
@@ -58,6 +65,20 @@ final class BackedEnumType extends AsymmetricType
         }
 
         return $value->value;
+    }
+
+    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    {
+        if (!\is_int($value) && !\is_string($value)) {
+            return false;
+        }
+
+        try {
+            $this->name::from($value);
+            return true;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     /**

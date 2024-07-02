@@ -13,6 +13,11 @@ final class NullableType implements TypeInterface
         private readonly TypeInterface $parent,
     ) {}
 
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return $value === null || $this->parent->supportsCasting($value, $context);
+    }
+
     public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
     {
         if ($value === null) {

@@ -23,6 +23,13 @@ final class ObjectType extends AsymmetricType
         private readonly ClassMetadata $metadata,
     ) {}
 
+    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    {
+        $class = $this->metadata->getName();
+
+        return $value instanceof $class;
+    }
+
     /**
      * @return object|array<non-empty-string, mixed>
      * @throws InvalidValueException
@@ -89,6 +96,11 @@ final class ObjectType extends AsymmetricType
     private function getValue(\ReflectionProperty $property, object $object): mixed
     {
         return $property->getValue($object);
+    }
+
+    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    {
+        return \is_object($value) || \is_array($value);
     }
 
     /**

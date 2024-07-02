@@ -10,6 +10,11 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class StringType implements TypeInterface
 {
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        return \is_string($value);
+    }
+
     /**
      * Converts incoming value to the string (in case of strict types is disabled).
      *

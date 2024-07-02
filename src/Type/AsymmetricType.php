@@ -18,7 +18,20 @@ abstract class AsymmetricType implements TypeInterface
         return $this->normalize($value, $types, $context);
     }
 
-    abstract public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed;
+    public function supportsCasting(mixed $value, LocalContext $context): bool
+    {
+        if ($context->isDenormalization()) {
+            return $this->supportsDenormalization($value, $context);
+        }
 
-    abstract public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed;
+        return $this->supportsNormalization($value, $context);
+    }
+
+    abstract protected function supportsNormalization(mixed $value, LocalContext $context): bool;
+
+    abstract protected function normalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed;
+
+    abstract protected function supportsDenormalization(mixed $value, LocalContext $context): bool;
+
+    abstract protected function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): mixed;
 }
