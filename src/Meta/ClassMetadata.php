@@ -22,11 +22,6 @@ final class ClassMetadata extends Metadata
     private array $properties = [];
 
     /**
-     * @var list<callable():PropertyMetadata>
-     */
-    private array $lazyInitializedProperties = [];
-
-    /**
      * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
      * @throws \Exception
@@ -101,25 +96,15 @@ final class ClassMetadata extends Metadata
         $this->properties[$property->getName()] = $property;
     }
 
-    private function addLazyProperty(callable $resolver): void
-    {
-        $this->lazyInitializedProperties[] = $resolver;
-    }
-
     /**
      * @api
      *
      * @return self<T>
      */
-    public function withAddedProperty(PropertyMetadata|callable $property): self
+    public function withAddedProperty(PropertyMetadata $property): self
     {
         $self = clone $this;
-
-        if ($property instanceof PropertyMetadata) {
-            $self->addProperty($property);
-        } else {
-            $self->addLazyProperty($property);
-        }
+        $self->addProperty($property);
 
         return $self;
     }
@@ -131,8 +116,6 @@ final class ClassMetadata extends Metadata
      */
     public function findPropertyByName(string $name): ?PropertyMetadata
     {
-        $this->initializeProperties();
-
         return $this->properties[$name] ?? null;
     }
 
@@ -141,26 +124,11 @@ final class ClassMetadata extends Metadata
      */
     public function getProperties(): array
     {
-        $this->initializeProperties();
-
         return \array_values($this->properties);
-    }
-
-    private function initializeProperties(): void
-    {
-        foreach ($this->lazyInitializedProperties as $resolver) {
-            $property = $resolver();
-
-            $this->properties[$property->getName()] = $property;
-        }
-
-        $this->lazyInitializedProperties = [];
     }
 
     public function __serialize(): array
     {
-        $this->initializeProperties();
-
         return [
             ...parent::__serialize(),
             'properties' => $this->getProperties(),
