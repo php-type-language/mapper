@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
@@ -70,7 +71,7 @@ final class ObjectType extends AsymmetricLogicalType
         $reflection = $this->metadata->getReflection();
 
         foreach ($this->metadata->getProperties() as $meta) {
-            $context->enter($meta->getName());
+            $context->enter(new ObjectPropertyEntry($meta->getName()));
 
             // Fetch property value from object
             $propertyValue = $this->getValue(
@@ -147,7 +148,7 @@ final class ObjectType extends AsymmetricLogicalType
         $reflection = $this->metadata->getReflection();
 
         foreach ($this->metadata->getProperties() as $meta) {
-            $context->enter($meta->getExportName());
+            $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
             $property = $meta->getReflection($reflection);
 

@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Context;
+use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
+use TypeLang\Mapper\Context\Path\EntryInterface;
+use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 
 /**
  * Mutable local bypass context.
  */
 final class LocalContext extends Context
 {
-    /**
-     * @var list<non-empty-string|int>
-     */
-    private array $stack = [];
+    private readonly PathInterface $path;
 
     final public function __construct(
         private readonly Direction $direction,
@@ -22,6 +22,8 @@ final class LocalContext extends Context
         ?bool $objectsAsArrays = null,
         ?bool $detailedTypes = null,
     ) {
+        $this->path = new Path();
+
         parent::__construct(
             strictTypes: $strictTypes,
             objectsAsArrays: $objectsAsArrays,
@@ -42,18 +44,12 @@ final class LocalContext extends Context
             return $this;
         }
 
-        $result = new self(
+        return new self(
             direction: $context instanceof self ? $context->direction : $this->direction,
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
             detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
         );
-
-        if ($context instanceof self) {
-            $result->stack = $context->stack;
-        }
-
-        return $result;
     }
 
     /**
@@ -83,27 +79,42 @@ final class LocalContext extends Context
     /**
      * @return list<non-empty-string|int>
      */
-    public function getPath(): array
+    public function getPathAsSegmentsArray(): array
     {
-        return $this->stack;
+        $result = [];
+
+        foreach ($this->path as $entry) {
+            switch (true) {
+                case $entry instanceof ArrayIndexEntry:
+                    $result[] = $entry->index;
+                    break;
+
+                case $entry instanceof ObjectPropertyEntry:
+                    $result[] = $entry->value;
+                    break;
+            }
+        }
+
+        return $result;
+    }
+
+    public function getPath(): PathInterface
+    {
+        return $this->path;
     }
 
     /**
-     * @param non-empty-string|int $item
-     *
      * @return $this
      */
-    public function enter(string|int $item): self
+    public function enter(EntryInterface $item): self
     {
-        $this->stack[] = $item;
+        $this->path->enter($item);
 
         return $this;
     }
 
     public function leave(): void
     {
-        if ($this->stack !== []) {
-            \array_pop($this->stack);
-        }
+        $this->path->leave();
     }
 }

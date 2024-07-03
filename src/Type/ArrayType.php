@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
@@ -94,7 +95,6 @@ final class ArrayType implements LogicalTypeInterface
     /**
      * @return array<array-key, mixed>
      * @throws InvalidValueException
-     * @throws TypeNotFoundException
      */
     public function cast(mixed $value, RegistryInterface $types, LocalContext $context): array
     {
@@ -103,7 +103,7 @@ final class ArrayType implements LogicalTypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $context->enter($index);
+            $context->enter(new ArrayIndexEntry($index));
 
             $result[$this->key->cast($index, $types, $context)]
                 = $this->value->cast($item, $types, $context);

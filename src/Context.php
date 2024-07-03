@@ -29,7 +29,7 @@ class Context
         protected readonly ?bool $strictTypes = null,
         /**
          * If this option contains {@see true}, then objects are converted to
-         * associative arrays, otherwise anonymous {@see object} will be returned.
+         * associative arrays, otherwise anonymous {@see ObjectEntry} will be returned.
          */
         protected readonly ?bool $objectsAsArrays = null,
         /**

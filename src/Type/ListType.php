@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
@@ -89,7 +90,7 @@ final class ListType implements LogicalTypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $context->enter($index);
+            $context->enter(new ArrayIndexEntry($index));
 
             $result[] = $this->type->cast($item, $types, $context);
 

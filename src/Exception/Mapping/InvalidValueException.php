@@ -56,7 +56,7 @@ final class InvalidValueException extends MappingException implements ValueMappi
             expectedType: $expectedType,
             actualType: $actualType,
             actualValue: $actualValue,
-            path: $context->getPath(),
+            path: $context->getPathAsSegmentsArray(),
         );
     }
 

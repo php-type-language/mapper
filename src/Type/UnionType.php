@@ -10,7 +10,7 @@ use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-final class UnionType implements LogicalTypeInterface
+class UnionType implements LogicalTypeInterface
 {
     /**
      * @param non-empty-list<TypeInterface> $types
@@ -37,13 +37,23 @@ final class UnionType implements LogicalTypeInterface
         return new UnionTypeNode(...$statements);
     }
 
-    private function findType(mixed $value, LocalContext $context): ?LogicalTypeInterface
+    /**
+     * Checks a child type against a value.
+     */
+    protected function matchType(TypeInterface $type, mixed $value, LocalContext $context): bool
+    {
+        return $type instanceof LogicalTypeInterface
+            && $type->supportsCasting($value, $context);
+    }
+
+    /**
+     * Finds a child supported type from their {@see $types} list by value.
+     */
+    protected function findType(mixed $value, LocalContext $context): ?LogicalTypeInterface
     {
         foreach ($this->types as $type) {
-            $matched = $type instanceof LogicalTypeInterface
-                && $type->supportsCasting($value, $context);
-
-            if ($matched) {
+            /** @var LogicalTypeInterface $type */
+            if ($this->matchType($type, $value, $context)) {
                 return $type;
             }
         }
