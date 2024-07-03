@@ -126,19 +126,4 @@ final class ClassMetadata extends Metadata
     {
         return \array_values($this->properties);
     }
-
-    public function __serialize(): array
-    {
-        return [
-            ...parent::__serialize(),
-            'properties' => $this->getProperties(),
-        ];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        parent::__unserialize($data);
-
-        $this->properties = $data['properties'];
-    }
 }

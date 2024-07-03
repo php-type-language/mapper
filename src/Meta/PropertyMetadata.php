@@ -136,25 +136,4 @@ final class PropertyMetadata extends Metadata
     {
         return $this->type !== null;
     }
-
-    public function __serialize(): array
-    {
-        return [
-            ...parent::__serialize(),
-            'defaultValue' => $this->getDefaultValue(),
-            'hasDefaultValue' => $this->hasDefaultValue(),
-            'export' => $this->getExportName(),
-            'type' => $this->getType(),
-        ];
-    }
-
-    public function __unserialize(array $data): void
-    {
-        parent::__unserialize($data);
-
-        $this->defaultValue = $data['defaultValue'];
-        $this->hasDefaultValue = $data['hasDefaultValue'];
-        $this->export = $data['export'];
-        $this->type = $data['type'];
-    }
 }
