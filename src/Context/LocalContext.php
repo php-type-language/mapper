@@ -103,6 +103,11 @@ final class LocalContext extends Context
         return $this->path;
     }
 
+    public function contains(mixed $value): bool
+    {
+        return $this->path->contains($value);
+    }
+
     /**
      * @return $this
      */

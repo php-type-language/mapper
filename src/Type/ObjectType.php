@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Context\Path\ObjectEntry;
 use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
@@ -70,6 +71,8 @@ final class ObjectType extends AsymmetricLogicalType
         $result = [];
         $reflection = $this->metadata->getReflection();
 
+        $context->enter(new ObjectEntry($this->metadata->getName()));
+
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getName()));
 
@@ -92,6 +95,8 @@ final class ObjectType extends AsymmetricLogicalType
 
             $context->leave();
         }
+
+        $context->leave();
 
         if ($context->isObjectsAsArrays()) {
             return $result;
@@ -147,6 +152,8 @@ final class ObjectType extends AsymmetricLogicalType
         $object = $this->newInstance();
         $reflection = $this->metadata->getReflection();
 
+        $context->enter(new ObjectEntry($this->metadata->getName()));
+
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
@@ -183,6 +190,8 @@ final class ObjectType extends AsymmetricLogicalType
                 field: $meta->getExportName(),
             );
         }
+
+        $context->leave();
 
         return $object;
     }
