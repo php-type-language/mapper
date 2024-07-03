@@ -34,7 +34,10 @@ final class BackedEnumType extends AsymmetricLogicalType
 
         foreach ($this->name::cases() as $case) {
             $cases[] = \is_string($case->value)
-                ? StringLiteralNode::createFromValue($case->value)
+                ? new StringLiteralNode(
+                    value: $case->value,
+                    raw: \sprintf('"%s"', \addcslashes($case->value, '"')),
+                )
                 : new IntLiteralNode($case->value);
         }
 

@@ -55,7 +55,10 @@ final class DateTimeType extends AsymmetricLogicalType
         return new NamedTypeNode(
             name: $this->name,
             arguments: new ArgumentsListNode([
-                new ArgumentNode(StringLiteralNode::createFromValue($this->format)),
+                new ArgumentNode(new StringLiteralNode(
+                    value: $this->format,
+                    raw: \sprintf('"%s"', \addcslashes($this->format, '"')),
+                )),
             ])
         );
     }
