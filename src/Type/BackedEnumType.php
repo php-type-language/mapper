@@ -80,6 +80,7 @@ final class BackedEnumType extends AsymmetricLogicalType
 
         try {
             $this->name::from($value);
+
             return true;
         } catch (\Throwable) {
             return false;

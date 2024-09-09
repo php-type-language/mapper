@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;

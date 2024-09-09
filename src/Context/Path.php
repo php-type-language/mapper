@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context;
 
-use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
 use TypeLang\Mapper\Context\Path\EntryInterface;
-use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 
 /**
  * @template-implements \IteratorAggregate<array-key, EntryInterface>
@@ -59,7 +57,9 @@ class Path implements PathInterface, \IteratorAggregate
 
     /**
      * @template T of EntryInterface
+     *
      * @param list<class-string<T>> $classes
+     *
      * @return list<T>
      */
     public function only(array $classes): array

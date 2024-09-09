@@ -10,6 +10,7 @@ abstract class Metadata
 
     /**
      * @param non-empty-string $name
+     *
      * @throws \Exception
      */
     public function __construct(

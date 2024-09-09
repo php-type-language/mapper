@@ -27,8 +27,8 @@ final class NullableType implements LogicalTypeInterface
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {
         return $value === null || (
-            $this->parent instanceof LogicalTypeInterface &&
-            $this->parent->supportsCasting($value, $context)
+            $this->parent instanceof LogicalTypeInterface
+            && $this->parent->supportsCasting($value, $context)
         );
     }
 
