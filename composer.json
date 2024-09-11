@@ -24,7 +24,6 @@
         "symfony/cache": "^5.4|^6.0|^7.0",
         "friendsofphp/php-cs-fixer": "^3.53",
         "jetbrains/phpstorm-attributes": "^1.0",
-        "phplrt/compiler": "^3.6",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^1.11",
         "phpstan/phpstan-strict-rules": "^1.6",
