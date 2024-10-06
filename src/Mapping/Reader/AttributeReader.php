@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Attribute\MapProperty;
-use TypeLang\Mapper\Meta\ClassMetadata;
-use TypeLang\Mapper\Meta\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Attribute\MapProperty;
+use TypeLang\Mapper\Mapping\ClassMetadata;
+use TypeLang\Mapper\Mapping\PropertyMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class AttributeReader extends Reader

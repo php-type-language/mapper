@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Meta\Reader\AttributeReader;
-use TypeLang\Mapper\Meta\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Reader\AttributeReader;
+use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\PlatformInterface;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder\ListTypeBuilder;

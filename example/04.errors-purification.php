@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Attribute\MapProperty;
 use TypeLang\Mapper\Exception\Mapping\MappingException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Mapping\Attribute\MapProperty;
 use TypeLang\Parser\Node\Name;
 
 require __DIR__ . '/../vendor/autoload.php';

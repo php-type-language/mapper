@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Meta\ClassMetadata;
-use TypeLang\Mapper\Meta\PropertyMetadata;
-use TypeLang\Mapper\Meta\Reader\CodeReader\NativeUseStatementsReader;
-use TypeLang\Mapper\Meta\Reader\CodeReader\UseStatementsReaderInterface;
-use TypeLang\Mapper\Meta\Reader\DocBlockReader\ClassPropertyTypeReader;
-use TypeLang\Mapper\Meta\Reader\DocBlockReader\PromotedPropertyTypeReader;
+use TypeLang\Mapper\Mapping\ClassMetadata;
+use TypeLang\Mapper\Mapping\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Reader\CodeReader\NativeUseStatementsReader;
+use TypeLang\Mapper\Mapping\Reader\CodeReader\UseStatementsReaderInterface;
+use TypeLang\Mapper\Mapping\Reader\DocBlockReader\ClassPropertyTypeReader;
+use TypeLang\Mapper\Mapping\Reader\DocBlockReader\PromotedPropertyTypeReader;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;

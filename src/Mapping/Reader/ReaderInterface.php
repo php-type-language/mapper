@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Mapping\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 interface ReaderInterface

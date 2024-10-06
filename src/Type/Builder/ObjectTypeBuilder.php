@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Meta\Reader\AttributeReader;
-use TypeLang\Mapper\Meta\Reader\InMemoryReader;
-use TypeLang\Mapper\Meta\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Reader\AttributeReader;
+use TypeLang\Mapper\Mapping\Reader\InMemoryReader;
+use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;

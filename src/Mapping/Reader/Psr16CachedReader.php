@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Meta\Reader;
+namespace TypeLang\Mapper\Mapping\Reader;
 
 use Psr\SimpleCache\CacheInterface;
-use TypeLang\Mapper\Meta\ClassMetadata;
+use TypeLang\Mapper\Mapping\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class Psr16CachedReader extends CachedReader

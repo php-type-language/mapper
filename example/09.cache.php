@@ -31,10 +31,10 @@ $cache = new \Symfony\Component\Cache\Psr16Cache(
 );
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    reader: new \TypeLang\Mapper\Meta\Reader\Psr16CachedReader(
+    reader: new \TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver(
         cache: $cache,
-        delegate: new \TypeLang\Mapper\Meta\Reader\DocBlockReader(
-            delegate: new \TypeLang\Mapper\Meta\Reader\AttributeReader(),
+        delegate: new \TypeLang\Mapper\Mapping\Driver\DocBlockReader(
+            delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeReader(),
         ),
     ),
 );

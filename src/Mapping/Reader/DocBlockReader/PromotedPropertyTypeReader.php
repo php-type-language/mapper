@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Meta\Reader\DocBlockReader;
+namespace TypeLang\Mapper\Mapping\Reader\DocBlockReader;
 
-use TypeLang\Mapper\Meta\PropertyMetadata;
+use TypeLang\Mapper\Mapping\PropertyMetadata;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\DocBlock;
 use TypeLang\PHPDoc\ParserInterface;
