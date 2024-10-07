@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -15,6 +17,11 @@ require __DIR__ . '/../vendor/autoload.php';
 
 class MyNonEmptyStringType implements TypeInterface
 {
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode('non-empty-string');
+    }
+
     public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): string
     {
         if (!\is_string($value) || $value === '') {

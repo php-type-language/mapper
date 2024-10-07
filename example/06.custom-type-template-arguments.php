@@ -2,13 +2,17 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,6 +24,13 @@ class MyNonEmpty implements TypeInterface
         #[TargetTemplateArgument]
         private readonly TypeInterface $type,
     ) {}
+
+    public function getTypeStatement(LocalContext $context): TypeStatement
+    {
+        return new NamedTypeNode('non-empty', new TemplateArgumentsListNode([
+            new TemplateArgumentNode($this->type->getTypeStatement($context)),
+        ]));
+    }
 
     public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
