@@ -8,6 +8,7 @@ use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Registry\Registry;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\TypeInterface;

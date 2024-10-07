@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
-use TypeLang\Mapper\PlatformInterface;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder\ListTypeBuilder;
 use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
@@ -37,7 +36,7 @@ class StandardPlatform implements PlatformInterface
         return 'standard';
     }
 
-    public function getBuiltinTypes(): iterable
+    public function getTypes(): iterable
     {
         yield new NamedTypeBuilder('null', Type\NullType::class);
         yield new NamedTypeBuilder('mixed', Type\MixedType::class);

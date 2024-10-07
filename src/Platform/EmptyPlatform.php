@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\PlatformInterface;
-
 final class EmptyPlatform implements PlatformInterface
 {
     public function getName(): string
@@ -13,7 +11,7 @@ final class EmptyPlatform implements PlatformInterface
         return 'empty';
     }
 
-    public function getBuiltinTypes(): iterable
+    public function getTypes(): iterable
     {
         return [];
     }

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Registry;
 
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\PlatformInterface;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

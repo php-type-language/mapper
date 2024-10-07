@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Registry;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\GrammarFeature;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\PlatformInterface;
 use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
@@ -37,24 +37,24 @@ class Registry implements MutableRegistryInterface
 
     private function loadPlatformTypes(PlatformInterface $platform): void
     {
-        foreach ($platform->getBuiltinTypes() as $builder) {
+        foreach ($platform->getTypes() as $builder) {
             $this->append($builder);
         }
     }
 
     private function createPlatformParser(PlatformInterface $platform): ParserInterface
     {
-        return new InMemoryCachedParser(
-            parser: new Parser(
-                conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
-                shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
-                callables: $platform->isFeatureSupported(GrammarFeature::Callables),
-                literals: $platform->isFeatureSupported(GrammarFeature::Literals),
-                generics: $platform->isFeatureSupported(GrammarFeature::Generics),
-                union: $platform->isFeatureSupported(GrammarFeature::Union),
-                intersection: $platform->isFeatureSupported(GrammarFeature::Intersection),
-                list: $platform->isFeatureSupported(GrammarFeature::List),
-            ),
+        return new Parser(
+            conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
+            shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
+            callables: $platform->isFeatureSupported(GrammarFeature::Callables),
+            literals: $platform->isFeatureSupported(GrammarFeature::Literals),
+            generics: $platform->isFeatureSupported(GrammarFeature::Generics),
+            union: $platform->isFeatureSupported(GrammarFeature::Union),
+            intersection: $platform->isFeatureSupported(GrammarFeature::Intersection),
+            list: $platform->isFeatureSupported(GrammarFeature::List),
+            hints: $platform->isFeatureSupported(GrammarFeature::Hints),
+            attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
         );
     }
 

@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper;
+namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 
 interface PlatformInterface
@@ -39,7 +38,7 @@ interface PlatformInterface
      *
      * @return iterable<array-key, TypeBuilderInterface>
      */
-    public function getBuiltinTypes(): iterable;
+    public function getTypes(): iterable;
 
     /**
      * Returns {@see true} in case of feature is supported.

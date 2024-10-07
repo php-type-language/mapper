@@ -13,14 +13,14 @@ require __DIR__ . '/../vendor/autoload.php';
 // For example, let's create a platform that supports only simple types,
 // without generics, union types, shapes, and other things.
 
-class SimplePlatform implements \TypeLang\Mapper\PlatformInterface
+class SimplePlatform implements \TypeLang\Mapper\Platform\PlatformInterface
 {
     public function getName(): string
     {
         return 'simple';
     }
 
-    public function getBuiltinTypes(): iterable
+    public function getTypes(): iterable
     {
         // The platform will only support objects, that is,
         // references to existing classes.

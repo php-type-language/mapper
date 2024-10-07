@@ -45,4 +45,15 @@ enum GrammarFeature
      * Enables list types such as `T[]`.
      */
     case List;
+
+    /**
+     * Enables or disables support for template argument
+     * hints such as `T<out U, in V>`.
+     */
+    case Hints;
+
+    /**
+     * Enables or disables support for attributes such as `#[attr]`.
+     */
+    case Attributes;
 }
