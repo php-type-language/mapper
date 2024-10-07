@@ -6,28 +6,32 @@ namespace TypeLang\Mapper\Mapping\Metadata;
 
 abstract class Metadata
 {
-    private readonly int $createdAt;
+    private readonly int $timestamp;
 
     /**
      * @param non-empty-string $name
-     *
-     * @throws \Exception
      */
     public function __construct(
         private readonly string $name,
         ?int $createdAt = null,
     ) {
-        $this->createdAt = $createdAt ?? $this->getCurrentTimestamp();
+        $this->timestamp = $createdAt ?? $this->getCurrentTimestamp();
     }
 
     private function getCurrentTimestamp(): int
     {
-        $date = new \DateTimeImmutable();
+        try {
+            $date = new \DateTimeImmutable();
 
-        return $date->getTimestamp();
+            return $date->getTimestamp();
+        } catch (\Throwable) {
+            return 0;
+        }
     }
 
     /**
+     * Returns entry name.
+     *
      * @api
      *
      * @return non-empty-string
@@ -38,19 +42,12 @@ abstract class Metadata
     }
 
     /**
+     * Returns the metadata creation timestamp in seconds.
+     *
      * @api
      */
-    public function getCreatedAtTimestamp(): int
+    public function getTimestamp(): int
     {
-        return $this->createdAt;
-    }
-
-    /**
-     * @api
-     */
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return (new \DateTimeImmutable())
-            ->setTimestamp($this->getCreatedAtTimestamp());
+        return $this->timestamp;
     }
 }

@@ -69,7 +69,7 @@ final class ObjectType extends AsymmetricLogicalType
     private function normalizeObject(object $object, RegistryInterface $types, LocalContext $context): object|array
     {
         $result = [];
-        $reflection = $this->metadata->getReflection();
+        $reflection = new \ReflectionClass($this->metadata->getName());
 
         $context->enter(new ObjectEntry($this->metadata->getName()));
 
@@ -149,8 +149,8 @@ final class ObjectType extends AsymmetricLogicalType
      */
     private function denormalizeObject(array $value, RegistryInterface $types, LocalContext $context): object
     {
-        $object = $this->newInstance();
-        $reflection = $this->metadata->getReflection();
+        $reflection = new \ReflectionClass($this->metadata->getName());
+        $object = $reflection->newInstanceWithoutConstructor();
 
         $context->enter(new ObjectEntry($this->metadata->getName()));
 
@@ -199,16 +199,5 @@ final class ObjectType extends AsymmetricLogicalType
     private function setValue(\ReflectionProperty $property, object $object, mixed $value): void
     {
         $property->setValue($object, $value);
-    }
-
-    /**
-     * @return T
-     * @throws \ReflectionException
-     */
-    private function newInstance(): object
-    {
-        $reflection = $this->metadata->getReflection();
-
-        return $reflection->newInstanceWithoutConstructor();
     }
 }

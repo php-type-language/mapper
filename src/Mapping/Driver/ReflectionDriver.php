@@ -34,9 +34,9 @@ final class ReflectionDriver extends Driver
                 continue;
             }
 
-            $metadata = $metadata->withAddedProperty(
+            $metadata->addProperty(
                 property: $this->getPropertyMetadataForContext(
-                    metadata: $metadata->findPropertyByName($property->getName())
+                    metadata: $metadata->findProperty($property->getName())
                         ?? new PropertyMetadata($property->getName()),
                     class: $class,
                     property: $property,

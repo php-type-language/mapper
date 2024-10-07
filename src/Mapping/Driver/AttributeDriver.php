@@ -26,7 +26,7 @@ final class AttributeDriver extends Driver
                 continue;
             }
 
-            $property = $metadata->findPropertyByName($reflection->getName())
+            $property = $metadata->findProperty($reflection->getName())
                 ?? new PropertyMetadata($reflection->getName());
 
             if ($attribute->name !== null) {
@@ -41,7 +41,7 @@ final class AttributeDriver extends Driver
                 $property = $property->withType($types->get($statement));
             }
 
-            $metadata = $metadata->withAddedProperty($property);
+            $metadata->addProperty($property);
         }
 
         return $metadata;

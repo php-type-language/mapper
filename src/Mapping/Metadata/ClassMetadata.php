@@ -75,24 +75,19 @@ final class ClassMetadata extends Metadata
     }
 
     /**
-     * @return \ReflectionClass<T>
-     * @throws \ReflectionException
-     */
-    public function getReflection(): \ReflectionClass
-    {
-        return new \ReflectionClass($this->getName());
-    }
-
-    /**
      * @return class-string<T>
      */
+    #[\Override]
     public function getName(): string
     {
         /** @var class-string<T> */
         return parent::getName();
     }
 
-    private function addProperty(PropertyMetadata $property): void
+    /**
+     * @api
+     */
+    public function addProperty(PropertyMetadata $property): void
     {
         $this->properties[$property->getName()] = $property;
     }
@@ -100,14 +95,11 @@ final class ClassMetadata extends Metadata
     /**
      * @api
      *
-     * @return self<T>
+     * @param non-empty-string $name
      */
-    public function withAddedProperty(PropertyMetadata $property): self
+    public function getPropertyOrCreate(string $name): PropertyMetadata
     {
-        $self = clone $this;
-        $self->addProperty($property);
-
-        return $self;
+        return $this->properties[$name] ??= new PropertyMetadata($name);
     }
 
     /**
@@ -115,9 +107,19 @@ final class ClassMetadata extends Metadata
      *
      * @param non-empty-string $name
      */
-    public function findPropertyByName(string $name): ?PropertyMetadata
+    public function findProperty(string $name): ?PropertyMetadata
     {
         return $this->properties[$name] ?? null;
+    }
+
+    /**
+     * @api
+     *
+     * @param non-empty-string $name
+     */
+    public function hasProperty(string $name): bool
+    {
+        return isset($this->properties[$name]);
     }
 
     /**

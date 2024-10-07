@@ -137,7 +137,7 @@ final class DocBlockDriver extends Driver
         $uses = $this->uses->getUseStatements($class);
 
         foreach ($class->getProperties() as $reflection) {
-            $property = $metadata->findPropertyByName($reflection->getName())
+            $property = $metadata->findProperty($reflection->getName())
                 ?? new PropertyMetadata($reflection->getName());
 
             $statement = $this->findType($class, $property);
@@ -159,7 +159,7 @@ final class DocBlockDriver extends Driver
                 $property = $property->withType($type);
             }
 
-            $metadata = $metadata->withAddedProperty($property);
+            $metadata->addProperty($property);
         }
 
         $this->promotedProperties->cleanup();

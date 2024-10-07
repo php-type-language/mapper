@@ -14,8 +14,6 @@ final class PropertyMetadata extends Metadata
 
     /**
      * @param non-empty-string $export
-     *
-     * @throws \Exception
      */
     public function __construct(
         private string $export,
