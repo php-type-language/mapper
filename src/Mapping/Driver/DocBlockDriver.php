@@ -6,10 +6,10 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Mapping\ClassMetadata;
-use TypeLang\Mapper\Mapping\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Mapping\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Registry\RegistryInterface;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Driver;
 
 use Psr\SimpleCache\CacheInterface;
-use TypeLang\Mapper\Mapping\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class Psr16CachedDriver extends CachedDriver

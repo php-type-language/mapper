@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
 
-use TypeLang\Mapper\Mapping\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\DocBlock;
 use TypeLang\PHPDoc\ParserInterface;

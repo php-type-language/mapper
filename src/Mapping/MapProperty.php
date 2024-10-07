@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Attribute;
+namespace TypeLang\Mapper\Mapping;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class MapProperty

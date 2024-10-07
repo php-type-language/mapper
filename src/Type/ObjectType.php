@@ -10,7 +10,7 @@ use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
-use TypeLang\Mapper\Mapping\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

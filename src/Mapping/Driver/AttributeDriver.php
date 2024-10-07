@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
-use TypeLang\Mapper\Mapping\Attribute\MapProperty;
-use TypeLang\Mapper\Mapping\ClassMetadata;
-use TypeLang\Mapper\Mapping\PropertyMetadata;
+use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
 final class AttributeDriver extends Driver

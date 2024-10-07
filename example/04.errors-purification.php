@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\MappingException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Attribute\MapProperty;
+use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Parser\Node\Name;
 
 require __DIR__ . '/../vendor/autoload.php';

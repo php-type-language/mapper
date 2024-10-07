@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping;
+namespace TypeLang\Mapper\Mapping\Metadata;
 
 use TypeLang\Mapper\Context;
 use TypeLang\Mapper\Context\LocalContext;

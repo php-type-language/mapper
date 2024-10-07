@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Attribute\MapProperty;
+use TypeLang\Mapper\Mapping\MapProperty;
 
 require __DIR__ . '/../vendor/autoload.php';
 
