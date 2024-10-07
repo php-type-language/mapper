@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
+use TypeLang\Mapper\Type\Context\Context;
+
 interface DenormalizerInterface
 {
     /**

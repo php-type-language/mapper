@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Context\Path;
+namespace TypeLang\Mapper\Type\Context\Path\Entry;
 
 final class ObjectEntry extends Entry
 {

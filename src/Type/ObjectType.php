@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\LocalContext;
-use TypeLang\Mapper\Context\Path\ObjectEntry;
-use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Type\Context\Path\Entry\ObjectEntry;
+use TypeLang\Mapper\Type\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

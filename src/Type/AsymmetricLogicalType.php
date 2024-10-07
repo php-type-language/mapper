@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\LocalContext;
+use TypeLang\Mapper\Type\Context\LocalContext;
 
 abstract class AsymmetricLogicalType extends AsymmetricType implements LogicalTypeInterface
 {

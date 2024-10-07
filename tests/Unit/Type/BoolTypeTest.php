@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Context;
 use TypeLang\Mapper\Type\BoolType;
+use TypeLang\Mapper\Type\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type-lang/mapper')]

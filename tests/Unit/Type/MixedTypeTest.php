@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
-use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
+use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\MixedType;
 use TypeLang\Mapper\Type\TypeInterface;
 

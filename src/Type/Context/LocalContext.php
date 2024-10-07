@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Context;
+namespace TypeLang\Mapper\Type\Context;
 
-use TypeLang\Mapper\Context;
-use TypeLang\Mapper\Context\Path\ArrayIndexEntry;
-use TypeLang\Mapper\Context\Path\EntryInterface;
-use TypeLang\Mapper\Context\Path\ObjectPropertyEntry;
+use TypeLang\Mapper\Type\Context\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Type\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Type\Context\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Type\Context\Path\ExecutionStackInterface;
+use TypeLang\Mapper\Type\Context\Path\MutablePath;
+use TypeLang\Mapper\Type\Context\Path\PathInterface;
 
 /**
  * Mutable local bypass context.
  */
-final class LocalContext extends Context
+final class LocalContext extends Context implements ExecutionStackInterface
 {
-    private readonly PathInterface $path;
+    private readonly MutablePath $path;
 
     final public function __construct(
         private readonly Direction $direction,
@@ -22,7 +24,7 @@ final class LocalContext extends Context
         ?bool $objectsAsArrays = null,
         ?bool $detailedTypes = null,
     ) {
-        $this->path = new Path();
+        $this->path = new MutablePath();
 
         parent::__construct(
             strictTypes: $strictTypes,
@@ -78,6 +80,7 @@ final class LocalContext extends Context
 
     /**
      * @return list<non-empty-string|int>
+     * @deprecated Will be removed
      */
     public function getPathAsSegmentsArray(): array
     {
@@ -103,19 +106,9 @@ final class LocalContext extends Context
         return $this->path;
     }
 
-    public function contains(mixed $value): bool
+    public function enter(EntryInterface $entry): void
     {
-        return $this->path->contains($value);
-    }
-
-    /**
-     * @return $this
-     */
-    public function enter(EntryInterface $item): self
-    {
-        $this->path->enter($item);
-
-        return $this;
+        $this->path->enter($entry);
     }
 
     public function leave(): void

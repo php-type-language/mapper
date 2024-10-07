@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
-use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Type\Context\Context;
+use TypeLang\Mapper\Type\Context\Direction;
+use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;

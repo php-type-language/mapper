@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Context\Path;
+namespace TypeLang\Mapper\Type\Context\Path\Entry;
 
 interface EntryInterface extends \Stringable
 {
@@ -10,8 +10,6 @@ interface EntryInterface extends \Stringable
 
     /**
      * Returns string representation of the path entry.
-     *
-     * @return non-empty-string
      */
     public function __toString(): string;
 }
