@@ -27,6 +27,6 @@ final class NullableTypeBuilder implements TypeBuilderInterface
     {
         assert($type instanceof NullableTypeNode);
 
-        return new NullableType($context->get($type->type));
+        return new NullableType($context->getByStatement($type->type));
     }
 }

@@ -11,10 +11,13 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
+use TypeLang\Parser\TypeResolver;
 
 /**
  * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface>
@@ -28,9 +31,13 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     private readonly ParserInterface $parser;
 
+    private readonly TypeResolver $typeResolver;
+
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
+        private readonly ReferencesReaderInterface $references = new NativeReferencesReader(),
     ) {
+        $this->typeResolver = new TypeResolver();
         $this->parser = $this->createPlatformParser($this->platform);
         $this->builders = $this->getTypeBuilders($this->platform);
     }
@@ -75,6 +82,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
      *
      * @param non-empty-string $name
      * @param class-string<TypeInterface> $type
+     *
      * @deprecated Must be removed
      */
     public function type(string $name, string $type): void
@@ -82,24 +90,31 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         $this->builders[] = new NamedTypeBuilder($name, $type);
     }
 
-    public function parse(string $type): TypeStatement
+    public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface
     {
         try {
-            return $this->parser->parse($type);
+            $statement = $this->parser->parse($type);
         } catch (\Throwable $e) {
             throw TypeNotCreatableException::fromTypeName($type, $e);
         }
+
+        return $this->getByStatement($statement, $class);
     }
 
-    public function get(TypeStatement $type): TypeInterface
+    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface
     {
+        if ($class !== null) {
+            $uses = $this->references->getUseStatements($class);
+            $statement = $this->typeResolver->resolveWith($statement, $uses);
+        }
+
         foreach ($this->builders as $factory) {
-            if ($factory->isSupported($type)) {
-                return $factory->build($type, $this);
+            if ($factory->isSupported($statement)) {
+                return $factory->build($statement, $this);
             }
         }
 
-        throw TypeNotFoundException::fromType($type);
+        throw TypeNotFoundException::fromType($statement);
     }
 
     public function getIterator(): \Traversable

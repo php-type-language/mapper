@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Reference;
+namespace TypeLang\Mapper\Type\Repository\Reference;
 
 final class NullReferencesReader implements ReferencesReaderInterface
 {

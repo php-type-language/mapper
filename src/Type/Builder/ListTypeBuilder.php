@@ -29,7 +29,7 @@ final class ListTypeBuilder implements TypeBuilderInterface
 
         return new ArrayType(
             name: 'array',
-            value: $context->get($type->type),
+            value: $context->getByStatement($type->type),
         );
     }
 }

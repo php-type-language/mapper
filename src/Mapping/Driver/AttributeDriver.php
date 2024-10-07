@@ -34,8 +34,10 @@ final class AttributeDriver extends Driver
             }
 
             if ($attribute->type !== null) {
-                $statement = $types->parse($attribute->type);
-                $property->setType($types->get($statement));
+                $property->setType($types->getByType(
+                    type: $attribute->type,
+                    class: $class,
+                ));
             }
 
             $metadata->addProperty($property);

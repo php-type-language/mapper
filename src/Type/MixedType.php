@@ -39,7 +39,7 @@ final class MixedType implements LogicalTypeInterface
         /**
          * @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
          */
-        return $types->get(new NamedTypeNode(\get_debug_type($value)));
+        return $types->getByStatement(new NamedTypeNode(\get_debug_type($value)));
     }
 
     public function supportsCasting(mixed $value, LocalContext $context): bool

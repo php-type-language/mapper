@@ -191,10 +191,10 @@ class NamedTypeBuilder implements TypeBuilderInterface
         foreach ($type->fields ?? [] as $field) {
             switch (true) {
                 case $field instanceof ImplicitFieldNode:
-                    $result[] = $context->get($field->getType());
+                    $result[] = $context->getByStatement($field->getType());
                     break;
                 case $field instanceof ExplicitFieldNode:
-                    $result[$field->getKey()] = $context->get($field->getType());
+                    $result[$field->getKey()] = $context->getByStatement($field->getType());
                     break;
             }
         }
@@ -245,6 +245,6 @@ class NamedTypeBuilder implements TypeBuilderInterface
          * Otherwise returns {@see TypeInterface} in case of given template
          * argument is a valid type name.
          */
-        return $context->get($value);
+        return $context->getByStatement($value);
     }
 }

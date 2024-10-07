@@ -63,10 +63,10 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         if ($type === null) {
             // @phpstan-ignore-next-line : False-positive, the "get_debug_type" method returns a non-empty string
-            return $this->types->get(new NamedTypeNode(\get_debug_type($value)));
+            return $this->types->getByStatement(new NamedTypeNode(\get_debug_type($value)));
         }
 
-        return $this->types->get($this->types->parse($type));
+        return $this->types->getByType($type);
     }
 
     /**

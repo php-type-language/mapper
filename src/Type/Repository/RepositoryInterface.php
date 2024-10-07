@@ -23,15 +23,19 @@ interface RepositoryInterface extends \Traversable, \Countable
 
     /**
      * @param non-empty-string $type
+     * @param \ReflectionClass<object>|null $class
      *
+     * @throws TypeNotFoundException
      * @throws TypeNotCreatableException
      */
-    public function parse(string $type): TypeStatement;
+    public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface;
 
     /**
+     * @param \ReflectionClass<object>|null $class
+     *
      * @throws TypeNotFoundException
      */
-    public function get(TypeStatement $type): TypeInterface;
+    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface;
 
     /**
      * @return int<0, max>

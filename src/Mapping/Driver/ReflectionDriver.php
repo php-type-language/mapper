@@ -75,7 +75,7 @@ final class ReflectionDriver extends Driver
 
         if ($statement !== null) {
             try {
-                $metadata->setType($types->get($statement));
+                $metadata->setType($types->getByStatement($statement));
             } catch (TypeNotFoundException) {
             }
         }

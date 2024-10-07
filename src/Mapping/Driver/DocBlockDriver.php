@@ -10,8 +10,8 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-use TypeLang\Mapper\Mapping\Reference\NativeReferencesReader;
-use TypeLang\Mapper\Mapping\Reference\ReferencesReaderInterface;
+use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;
@@ -37,10 +37,6 @@ final class DocBlockDriver extends Driver
 
     private readonly ClassPropertyTypeDriver $classProperties;
 
-    private readonly ReferencesReaderInterface $uses;
-
-    private readonly TypeResolver $typeResolver;
-
     /**
      * @param non-empty-string $paramTagName
      * @param non-empty-string $varTagName
@@ -51,7 +47,6 @@ final class DocBlockDriver extends Driver
         private readonly DriverInterface $delegate = new ReflectionDriver(),
         string $paramTagName = self::DEFAULT_PARAM_TAG_NAME,
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
-        ?ReferencesReaderInterface $references = null,
     ) {
         self::assertKernelPackageIsInstalled();
 
@@ -69,17 +64,6 @@ final class DocBlockDriver extends Driver
             classProperties: $this->classProperties,
             parser: $parser,
         );
-        $this->typeResolver = new TypeResolver();
-        $this->uses = $this->createReferencesReader($references);
-    }
-
-    private function createReferencesReader(?ReferencesReaderInterface $reader): ReferencesReaderInterface
-    {
-        if ($reader !== null) {
-            return $reader;
-        }
-
-        return new NativeReferencesReader();
     }
 
     /**
@@ -134,8 +118,6 @@ final class DocBlockDriver extends Driver
     {
         $metadata = $this->delegate->getClassMetadata($class, $types);
 
-        $uses = $this->uses->getUseStatements($class);
-
         foreach ($class->getProperties() as $reflection) {
             $property = $metadata->findProperty($reflection->getName())
                 ?? new PropertyMetadata($reflection->getName());
@@ -143,10 +125,8 @@ final class DocBlockDriver extends Driver
             $statement = $this->findType($class, $property);
 
             if ($statement !== null) {
-                $statement = $this->typeResolver->resolveWith($statement, $uses);
-
                 try {
-                    $type = $types->get($statement);
+                    $type = $types->getByStatement($statement, $class);
                 } catch (TypeNotFoundException $e) {
                     throw TypeNotFoundException::fromPropertyType(
                         class: $metadata->getName(),

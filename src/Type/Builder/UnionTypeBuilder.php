@@ -23,7 +23,7 @@ final class UnionTypeBuilder implements TypeBuilderInterface
         $types = [];
 
         foreach ($type->statements as $statement) {
-            $types[] = $context->get($statement);
+            $types[] = $context->getByStatement($statement);
         }
 
         return new UnionType($types);

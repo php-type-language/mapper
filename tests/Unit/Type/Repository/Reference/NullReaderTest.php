@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Unit\Mapping\Reference;
+namespace TypeLang\Mapper\Tests\Unit\Type\Repository\Reference;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Mapping\Reference\NullReferencesReader;
+use TypeLang\Mapper\Type\Repository\Reference\NullReferencesReader;
 
 #[Group('unit'), Group('type-lang/mapper')]
 final class NullReaderTest extends ReferenceTestCase
