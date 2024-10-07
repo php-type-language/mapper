@@ -23,7 +23,7 @@ final class Psr16CachedDriver extends CachedDriver
     {
         $index = $this->getKey($class);
 
-        $result = $this->cache->get($index, fn() => $this->delegate->getClassMetadata($class, $types));
+        $result = $this->cache->get($index, fn() => parent::getClassMetadata($class, $types));
 
         if ($result instanceof \Closure) {
             $result = $result();

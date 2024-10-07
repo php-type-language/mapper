@@ -10,18 +10,14 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
-use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\TypeResolver;
 use TypeLang\PHPDoc\Parser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
 use TypeLang\PHPDoc\Tag\Factory\TagFactory;
-use TypeLang\Reader\Exception\ReaderExceptionInterface;
 
-final class DocBlockDriver extends Driver
+final class DocBlockDriver extends LoadableDriver
 {
     /**
      * @var non-empty-string
@@ -44,9 +40,9 @@ final class DocBlockDriver extends Driver
      * @throws ComposerPackageRequiredException
      */
     public function __construct(
-        private readonly DriverInterface $delegate = new ReflectionDriver(),
         string $paramTagName = self::DEFAULT_PARAM_TAG_NAME,
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
+        DriverInterface $delegate = new ReflectionDriver(),
     ) {
         self::assertKernelPackageIsInstalled();
 
@@ -59,11 +55,14 @@ final class DocBlockDriver extends Driver
             varTagName: $varTagName,
             parser: $parser,
         );
+
         $this->promotedProperties = new PromotedPropertyTypeDriver(
             paramTagName: $paramTagName,
             classProperties: $this->classProperties,
             parser: $parser,
         );
+
+        parent::__construct($delegate);
     }
 
     /**
@@ -109,27 +108,19 @@ final class DocBlockDriver extends Driver
         return $this->classProperties->findType($property);
     }
 
-    /**
-     * @throws ReaderExceptionInterface
-     * @throws \ReflectionException
-     * @throws TypeNotFoundException
-     */
-    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
+    protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
     {
-        $metadata = $this->delegate->getClassMetadata($class, $types);
+        foreach ($class->getProperties() as $reflectionProperty) {
+            $property = $class->getPropertyOrCreate($reflectionProperty->getName());
 
-        foreach ($class->getProperties() as $reflection) {
-            $property = $metadata->findProperty($reflection->getName())
-                ?? new PropertyMetadata($reflection->getName());
-
-            $statement = $this->findType($class, $property);
+            $statement = $this->findType($reflection, $property);
 
             if ($statement !== null) {
                 try {
-                    $type = $types->getByStatement($statement, $class);
+                    $type = $types->getByStatement($statement, $reflection);
                 } catch (TypeNotFoundException $e) {
                     throw TypeNotFoundException::fromPropertyType(
-                        class: $metadata->getName(),
+                        class: $class->getName(),
                         property: $property->getName(),
                         type: $e->getExpectedType(),
                         prev: $e,
@@ -139,11 +130,9 @@ final class DocBlockDriver extends Driver
                 $property->setType($type);
             }
 
-            $metadata->addProperty($property);
+            $class->addProperty($property);
         }
 
         $this->promotedProperties->cleanup();
-
-        return $metadata;
     }
 }

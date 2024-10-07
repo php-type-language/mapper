@@ -8,7 +8,6 @@ use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
-use TypeLang\Mapper\Mapping\Driver\InMemoryDriver;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -24,14 +23,10 @@ use TypeLang\Printer\PrinterInterface;
  */
 final class ObjectTypeBuilder implements TypeBuilderInterface
 {
-    private readonly DriverInterface $reader;
-
     public function __construct(
-        DriverInterface $reader = new AttributeDriver(),
+        private readonly DriverInterface $driver = new AttributeDriver(),
         private readonly PrinterInterface $printer = new PrettyPrinter(),
-    ) {
-        $this->reader = new InMemoryDriver($reader);
-    }
+    ) {}
 
     /**
      * Returns {@see true} if the type contains a reference to an existing class.
@@ -77,7 +72,7 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
         $class = $type->name->toString();
 
         /** @var ObjectType<T> */
-        return new ObjectType($this->reader->getClassMetadata(
+        return new ObjectType($this->driver->getClassMetadata(
             class: new \ReflectionClass($class),
             types: $context,
         ));

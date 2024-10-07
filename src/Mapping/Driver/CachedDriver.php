@@ -16,8 +16,10 @@ abstract class CachedDriver extends Driver
     public function __construct(
         protected readonly string $prefix = self::DEFAULT_CACHE_PREFIX,
         protected readonly \DateInterval|int|null $ttl = self::DEFAULT_TTL,
-        protected readonly DriverInterface $delegate = new ReflectionDriver(),
-    ) {}
+        DriverInterface $delegate = new ReflectionDriver(),
+    ) {
+        parent::__construct($delegate);
+    }
 
     /**
      * @param \ReflectionClass<object> $class

@@ -6,44 +6,42 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
-final class AttributeDriver extends Driver
+final class AttributeDriver extends LoadableDriver
 {
     public function __construct(
-        private readonly DriverInterface $delegate = new ReflectionDriver(),
-    ) {}
+        DriverInterface $delegate = new ReflectionDriver(),
+    ) {
+        parent::__construct($delegate);
+    }
 
-    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
+    #[\Override]
+    protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
     {
-        $metadata = $this->delegate->getClassMetadata($class, $types);
-
-        foreach ($class->getProperties() as $reflection) {
-            $attribute = $this->findPropertyAttribute($reflection, MapProperty::class);
+        foreach ($reflection->getProperties() as $property) {
+            $attribute = $this->findPropertyAttribute(
+                property: $property,
+                class: MapProperty::class,
+            );
 
             if ($attribute === null) {
                 continue;
             }
 
-            $property = $metadata->findProperty($reflection->getName())
-                ?? new PropertyMetadata($reflection->getName());
+            $metadata = $class->getPropertyOrCreate($property->getName());
 
             if ($attribute->name !== null) {
-                $property->setExportName($attribute->name);
+                $metadata->setExportName($attribute->name);
             }
 
             if ($attribute->type !== null) {
-                $property->setType($types->getByType(
+                $metadata->setType($types->getByType(
                     type: $attribute->type,
-                    class: $class,
+                    class: $reflection,
                 ));
             }
-
-            $metadata->addProperty($property);
         }
-
-        return $metadata;
     }
 
     /**

@@ -26,7 +26,7 @@ class ExampleDTO
 $cache = new \Symfony\Component\Cache\Psr16Cache(
     pool: new \Symfony\Component\Cache\Adapter\FilesystemAdapter(
         namespace: 'typelang',
-        directory: __DIR__ . '/var/cache',
+        directory: __DIR__ . '/../var/cache',
     ),
 );
 
