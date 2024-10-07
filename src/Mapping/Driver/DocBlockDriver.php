@@ -116,7 +116,7 @@ final class DocBlockDriver extends Driver
      */
     private function findType(\ReflectionClass $class, PropertyMetadata $meta): ?TypeStatement
     {
-        $property = $meta->getReflection($class);
+        $property = $class->getProperty($meta->getName());
 
         if ($property->isPromoted()) {
             return $this->promotedProperties->findType($property, $meta);
@@ -156,7 +156,7 @@ final class DocBlockDriver extends Driver
                     );
                 }
 
-                $property = $property->withType($type);
+                $property->setType($type);
             }
 
             $metadata->addProperty($property);

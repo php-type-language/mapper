@@ -60,14 +60,14 @@ final class ReflectionDriver extends Driver
         RegistryInterface $types,
     ): PropertyMetadata {
         if ($property->hasDefaultValue()) {
-            $metadata = $metadata->withDefaultValue($property->getDefaultValue());
+            $metadata->setDefaultValue($property->getDefaultValue());
         }
 
         if ($property->isPromoted()) {
             $parameter = $this->findParameter($class, $property);
 
             if ($parameter?->isDefaultValueAvailable() === true) {
-                $metadata = $metadata->withDefaultValue($parameter->getDefaultValue());
+                $metadata->setDefaultValue($parameter->getDefaultValue());
             }
         }
 
@@ -75,7 +75,7 @@ final class ReflectionDriver extends Driver
 
         if ($statement !== null) {
             try {
-                $metadata = $metadata->withType($types->get($statement));
+                $metadata->setType($types->get($statement));
             } catch (TypeNotFoundException) {
             }
         }

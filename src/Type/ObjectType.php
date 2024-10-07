@@ -78,7 +78,7 @@ final class ObjectType extends AsymmetricLogicalType
 
             // Fetch property value from object
             $propertyValue = $this->getValue(
-                property: $meta->getReflection($reflection),
+                property: $reflection->getProperty($meta->getName()),
                 object: $object,
             );
 
@@ -157,7 +157,7 @@ final class ObjectType extends AsymmetricLogicalType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
-            $property = $meta->getReflection($reflection);
+            $property = $reflection->getProperty($meta->getName());
 
             // In case of value has been passed
             if (\array_key_exists($meta->getExportName(), $value)) {

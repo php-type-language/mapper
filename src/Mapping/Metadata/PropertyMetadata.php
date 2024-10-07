@@ -12,6 +12,8 @@ final class PropertyMetadata extends Metadata
 
     private bool $hasDefaultValue = false;
 
+    private bool $readonly = false;
+
     /**
      * @param non-empty-string $export
      */
@@ -26,26 +28,11 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      *
-     * @param \ReflectionClass<object> $class
-     *
-     * @throws \ReflectionException
-     */
-    public function getReflection(\ReflectionClass $class): \ReflectionProperty
-    {
-        return $class->getProperty($this->getName());
-    }
-
-    /**
-     * @api
-     *
      * @param non-empty-string $name
      */
-    public function withExportName(string $name): self
+    public function setExportName(string $name): void
     {
-        $self = clone $this;
-        $self->export = $name;
-
-        return $self;
+        $this->export = $name;
     }
 
     /**
@@ -61,25 +48,51 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function withDefaultValue(mixed $value): self
+    public function setType(TypeInterface $type): void
     {
-        $self = clone $this;
-        $self->defaultValue = $value;
-        $self->hasDefaultValue = true;
-
-        return $self;
+        $this->type = $type;
     }
 
     /**
      * @api
      */
-    public function withoutDefaultValue(): self
+    public function removeType(): void
     {
-        $self = clone $this;
-        $self->defaultValue = null;
-        $self->hasDefaultValue = false;
+        $this->type = null;
+    }
 
-        return $self;
+    /**
+     * @api
+     */
+    public function getType(): ?TypeInterface
+    {
+        return $this->type;
+    }
+
+    /**
+     * @api
+     */
+    public function hasType(): bool
+    {
+        return $this->type !== null;
+    }
+
+    /**
+     * @api
+     */
+    public function setDefaultValue(mixed $value): void
+    {
+        $this->defaultValue = $value;
+        $this->hasDefaultValue = true;
+    }
+
+    /**
+     * @api
+     */
+    public function removeDefaultValue(): void
+    {
+        $this->defaultValue = null;
+        $this->hasDefaultValue = false;
     }
 
     /**
@@ -101,38 +114,16 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function withType(TypeInterface $type): self
+    public function markAsReadonly(bool $readonly = true): void
     {
-        $self = clone $this;
-        $self->type = $type;
-
-        return $self;
+        $this->readonly = $readonly;
     }
 
     /**
      * @api
      */
-    public function withoutType(): self
+    public function isReadonly(): bool
     {
-        $self = clone $this;
-        $self->type = null;
-
-        return $self;
-    }
-
-    /**
-     * @api
-     */
-    public function getType(): ?TypeInterface
-    {
-        return $this->type;
-    }
-
-    /**
-     * @api
-     */
-    public function hasType(): bool
-    {
-        return $this->type !== null;
+        return $this->readonly;
     }
 }

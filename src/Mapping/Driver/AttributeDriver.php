@@ -30,15 +30,12 @@ final class AttributeDriver extends Driver
                 ?? new PropertyMetadata($reflection->getName());
 
             if ($attribute->name !== null) {
-                $property = $property->withExportName(
-                    name: $attribute->name,
-                );
+                $property->setExportName($attribute->name);
             }
 
             if ($attribute->type !== null) {
                 $statement = $types->parse($attribute->type);
-
-                $property = $property->withType($types->get($statement));
+                $property->setType($types->get($statement));
             }
 
             $metadata->addProperty($property);
