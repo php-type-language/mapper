@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Mapping\Reader\AttributeReader;
-use TypeLang\Mapper\Mapping\Reader\InMemoryReader;
-use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
+use TypeLang\Mapper\Mapping\Driver\InMemoryDriver;
+use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -24,13 +24,13 @@ use TypeLang\Printer\PrinterInterface;
  */
 final class ObjectTypeBuilder implements TypeBuilderInterface
 {
-    private readonly ReaderInterface $reader;
+    private readonly DriverInterface $reader;
 
     public function __construct(
-        ReaderInterface $reader = new AttributeReader(),
+        DriverInterface $reader = new AttributeDriver(),
         private readonly PrinterInterface $printer = new PrettyPrinter(),
     ) {
-        $this->reader = new InMemoryReader($reader);
+        $this->reader = new InMemoryDriver($reader);
     }
 
     /**

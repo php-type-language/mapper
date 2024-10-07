@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Mapping\Reader\AttributeReader;
-use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
+use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\PlatformInterface;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder\ListTypeBuilder;
@@ -29,7 +29,7 @@ class StandardPlatform implements PlatformInterface
     ];
 
     public function __construct(
-        private readonly ReaderInterface $reader = new AttributeReader(),
+        private readonly DriverInterface $reader = new AttributeDriver(),
     ) {}
 
     public function getName(): string

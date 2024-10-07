@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Reader;
+namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Mapping\ClassMetadata;
 use TypeLang\Mapper\Registry\RegistryInterface;
 
-interface ReaderInterface
+interface DriverInterface
 {
     /**
      * @template T of object
