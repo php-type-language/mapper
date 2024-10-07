@@ -5,9 +5,9 @@ declare(strict_types=1);
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Registry\Registry;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Repository\Repository;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -21,7 +21,7 @@ class MyNonEmpty implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
         if (empty($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -36,7 +36,7 @@ class MyNonEmpty implements TypeInterface
 }
 
 // Create own types registry and add "non-empty" type.
-$registry = new Registry();
+$registry = new Repository();
 $registry->type('non-empty', MyNonEmpty::class);
 
 $mapper = new Mapper($registry);

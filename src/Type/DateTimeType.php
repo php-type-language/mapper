@@ -7,9 +7,9 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
@@ -71,7 +71,7 @@ final class DateTimeType extends AsymmetricLogicalType
     /**
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): string
+    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -100,7 +100,7 @@ final class DateTimeType extends AsymmetricLogicalType
     /**
      * @throws InvalidValueException
      */
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \DateTimeInterface
+    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(

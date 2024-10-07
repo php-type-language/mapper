@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class AttributeDriver extends Driver
 {
@@ -15,7 +15,7 @@ final class AttributeDriver extends Driver
         private readonly DriverInterface $delegate = new ReflectionDriver(),
     ) {}
 
-    public function getClassMetadata(\ReflectionClass $class, RegistryInterface $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
         $metadata = $this->delegate->getClassMetadata($class, $types);
 

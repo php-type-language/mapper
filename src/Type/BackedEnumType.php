@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -59,7 +59,7 @@ final class BackedEnumType extends AsymmetricLogicalType
      *
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): int|string
+    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): int|string
     {
         if (!$value instanceof \BackedEnum) {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -92,7 +92,7 @@ final class BackedEnumType extends AsymmetricLogicalType
      *
      * @throws InvalidValueException
      */
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): \BackedEnum
+    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): \BackedEnum
     {
         if (!\is_string($value) && !\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(

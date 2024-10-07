@@ -11,7 +11,7 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
@@ -44,7 +44,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws \ReflectionException
      * @throws TypeRequiredException
      */
-    public function normalize(mixed $value, RegistryInterface $types, LocalContext $context): object|array
+    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): object|array
     {
         $className = $this->metadata->getName();
 
@@ -66,7 +66,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws \ReflectionException
      * @throws TypeRequiredException
      */
-    private function normalizeObject(object $object, RegistryInterface $types, LocalContext $context): object|array
+    private function normalizeObject(object $object, RepositoryInterface $types, LocalContext $context): object|array
     {
         $result = [];
         $reflection = new \ReflectionClass($this->metadata->getName());
@@ -122,7 +122,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws TypeRequiredException
      * @throws \ReflectionException
      */
-    public function denormalize(mixed $value, RegistryInterface $types, LocalContext $context): object
+    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): object
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -147,7 +147,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws \ReflectionException
      * @throws TypeRequiredException
      */
-    private function denormalizeObject(array $value, RegistryInterface $types, LocalContext $context): object
+    private function denormalizeObject(array $value, RepositoryInterface $types, LocalContext $context): object
     {
         $reflection = new \ReflectionClass($this->metadata->getName());
         $object = $reflection->newInstanceWithoutConstructor();

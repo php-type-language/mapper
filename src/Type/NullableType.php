@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -32,7 +32,7 @@ final class NullableType implements LogicalTypeInterface
         );
     }
 
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
         if ($value === null) {
             return null;

@@ -12,24 +12,24 @@ use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\MappingException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Registry\Registry;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
+use TypeLang\Mapper\Type\Repository\Repository;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly RegistryInterface $types;
+    protected readonly RepositoryInterface $types;
 
     #[Before]
     protected function setUpDefaultRegistry(): void
     {
-        $this->types = new Registry();
+        $this->types = new Repository();
     }
 
     abstract protected function getType(): TypeInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\UnionType;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
@@ -16,7 +16,7 @@ final class UnionTypeBuilder implements TypeBuilderInterface
         return $statement instanceof UnionTypeNode;
     }
 
-    public function build(TypeStatement $type, RegistryInterface $context): UnionType
+    public function build(TypeStatement $type, RepositoryInterface $context): UnionType
     {
         assert($type instanceof UnionTypeNode);
 

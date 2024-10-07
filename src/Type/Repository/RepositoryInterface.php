@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Registry;
+namespace TypeLang\Mapper\Type\Repository;
 
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-interface RegistryInterface
+/**
+ * @template-extends \Traversable<array-key, TypeBuilderInterface>
+ */
+interface RepositoryInterface extends \Traversable, \Countable
 {
     /**
      * Returns platform of the current registry set.
@@ -28,4 +32,9 @@ interface RegistryInterface
      * @throws TypeNotFoundException
      */
     public function get(TypeStatement $type): TypeInterface;
+
+    /**
+     * @return int<0, max>
+     */
+    public function count(): int;
 }

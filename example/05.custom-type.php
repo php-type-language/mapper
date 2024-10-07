@@ -5,8 +5,8 @@ declare(strict_types=1);
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Registry\Registry;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\Repository;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -15,7 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 class MyNonEmptyStringType implements TypeInterface
 {
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): string
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): string
     {
         if (!\is_string($value) || $value === '') {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -30,7 +30,7 @@ class MyNonEmptyStringType implements TypeInterface
 }
 
 // Create own types registry and add custom "non-empty-string" type.
-$registry = new Registry();
+$registry = new Repository();
 $registry->type('non-empty-string', MyNonEmptyStringType::class);
 
 

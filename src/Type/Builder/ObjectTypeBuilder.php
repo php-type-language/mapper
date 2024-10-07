@@ -9,8 +9,8 @@ use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\InMemoryDriver;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\ObjectType;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
@@ -55,7 +55,7 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
      * @throws TemplateArgumentsNotSupportedException
      * @throws \ReflectionException
      */
-    public function build(TypeStatement $type, RegistryInterface $context): ObjectType
+    public function build(TypeStatement $type, RepositoryInterface $context): ObjectType
     {
         assert($type instanceof NamedTypeNode);
 

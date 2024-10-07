@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\NullableType;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -23,7 +23,7 @@ final class NullableTypeBuilder implements TypeBuilderInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function build(TypeStatement $type, RegistryInterface $context): NullableType
+    public function build(TypeStatement $type, RepositoryInterface $context): NullableType
     {
         assert($type instanceof NullableTypeNode);
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class ArrayKeyType implements LogicalTypeInterface
@@ -41,7 +41,7 @@ final class ArrayKeyType implements LogicalTypeInterface
         return $this->delegate->getTypeStatement($context);
     }
 
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
         return $this->delegate->cast($value, $types, $context);
     }

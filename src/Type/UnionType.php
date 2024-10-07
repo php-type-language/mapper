@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
@@ -69,7 +69,7 @@ class UnionType implements LogicalTypeInterface
     /**
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
         $type = $this->findType($value, $context);
 

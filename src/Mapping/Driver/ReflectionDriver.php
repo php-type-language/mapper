@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Reader\Exception\ReaderExceptionInterface;
 use TypeLang\Reader\PropertyReaderInterface as PropertyTypeReaderInterface;
 use TypeLang\Reader\ReflectionReader as ReflectionTypeReader;
@@ -25,7 +25,7 @@ final class ReflectionDriver extends Driver
     /**
      * @throws ReaderExceptionInterface
      */
-    public function getClassMetadata(\ReflectionClass $class, RegistryInterface $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
         $metadata = $this->delegate->getClassMetadata($class, $types);
 
@@ -57,7 +57,7 @@ final class ReflectionDriver extends Driver
         PropertyMetadata $metadata,
         \ReflectionClass $class,
         \ReflectionProperty $property,
-        RegistryInterface $types,
+        RepositoryInterface $types,
     ): PropertyMetadata {
         if ($property->hasDefaultValue()) {
             $metadata->setDefaultValue($property->getDefaultValue());

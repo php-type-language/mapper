@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Registry;
+namespace TypeLang\Mapper\Type\Repository;
 
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
@@ -10,14 +10,16 @@ use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
-use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
 
-class Registry implements MutableRegistryInterface
+/**
+ * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface>
+ */
+class Repository implements RepositoryInterface, \IteratorAggregate
 {
     /**
      * @var list<TypeBuilderInterface>
@@ -30,15 +32,21 @@ class Registry implements MutableRegistryInterface
         private readonly PlatformInterface $platform = new StandardPlatform(),
     ) {
         $this->parser = $this->createPlatformParser($this->platform);
-
-        $this->loadPlatformTypes($this->platform);
+        $this->builders = $this->getTypeBuilders($this->platform);
     }
 
-    private function loadPlatformTypes(PlatformInterface $platform): void
+    /**
+     * @return list<TypeBuilderInterface>
+     */
+    private function getTypeBuilders(PlatformInterface $platform): array
     {
-        foreach ($platform->getTypes() as $builder) {
-            $this->append($builder);
-        }
+        $builders = $platform->getTypes();
+
+        return match (true) {
+            $builders instanceof \Traversable => \iterator_to_array($builders, false),
+            \array_is_list($builders) => $builders,
+            default => \array_values($builders),
+        };
     }
 
     private function createPlatformParser(PlatformInterface $platform): ParserInterface
@@ -67,37 +75,11 @@ class Registry implements MutableRegistryInterface
      *
      * @param non-empty-string $name
      * @param class-string<TypeInterface> $type
+     * @deprecated Must be removed
      */
     public function type(string $name, string $type): void
     {
-        $this->append(new NamedTypeBuilder($name, $type));
-    }
-
-    /**
-     * @api
-     *
-     * @param class-string $class
-     * @param class-string<TypeInterface> $type
-     */
-    public function instanceof(string $class, string $type): void
-    {
-        $this->append(new ObjectNamedTypeBuilder($class, $type));
-    }
-
-    /**
-     * @api
-     */
-    public function append(TypeBuilderInterface $type): void
-    {
-        $this->builders[] = $type;
-    }
-
-    /**
-     * @api
-     */
-    public function prepend(TypeBuilderInterface $type): void
-    {
-        \array_unshift($this->builders, $type);
+        $this->builders[] = new NamedTypeBuilder($name, $type);
     }
 
     public function parse(string $type): TypeStatement
@@ -118,5 +100,15 @@ class Registry implements MutableRegistryInterface
         }
 
         throw TypeNotFoundException::fromType($type);
+    }
+
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->builders);
+    }
+
+    public function count(): int
+    {
+        return \count($this->builders);
     }
 }

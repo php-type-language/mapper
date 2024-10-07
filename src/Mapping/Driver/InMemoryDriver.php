@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class InMemoryDriver extends Driver
 {
@@ -25,7 +25,7 @@ final class InMemoryDriver extends Driver
      *
      * @return ClassMetadata<T>
      */
-    public function getClassMetadata(\ReflectionClass $class, RegistryInterface $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
         /** @var ClassMetadata<T> */
         return $this->types[$class->getName()] ??= $this->delegate->getClassMetadata($class, $types);

@@ -9,15 +9,15 @@ use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Registry\Registry;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\Repository;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
     public function __construct(
-        private readonly RegistryInterface $types = new Registry(),
+        private readonly RepositoryInterface $types = new Repository(),
         private readonly Context $context = new Context(),
     ) {}
 
@@ -48,7 +48,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * Returns current types registry.
      */
-    public function getTypes(): RegistryInterface
+    public function getTypes(): RepositoryInterface
     {
         return $this->types;
     }

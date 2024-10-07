@@ -12,7 +12,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Mapping\Reference\ReferencesReaderInterface;
-use TypeLang\Mapper\Registry\RegistryInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;
 use TypeLang\PHPDoc\Parser;
@@ -130,7 +130,7 @@ final class DocBlockDriver extends Driver
      * @throws \ReflectionException
      * @throws TypeNotFoundException
      */
-    public function getClassMetadata(\ReflectionClass $class, RegistryInterface $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
         $metadata = $this->delegate->getClassMetadata($class, $types);
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\ArrayType;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypesListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -23,7 +23,7 @@ final class ListTypeBuilder implements TypeBuilderInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function build(TypeStatement $type, RegistryInterface $context): ArrayType
+    public function build(TypeStatement $type, RepositoryInterface $context): ArrayType
     {
         assert($type instanceof TypesListNode);
 

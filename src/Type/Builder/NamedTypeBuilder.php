@@ -13,7 +13,6 @@ use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
 use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
 use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
 use TypeLang\Mapper\Type\Meta\Reader\ReaderInterface;
 use TypeLang\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
@@ -21,6 +20,7 @@ use TypeLang\Mapper\Type\Meta\ShapeFieldsParameterMetadata;
 use TypeLang\Mapper\Type\Meta\TemplateParameterMetadata;
 use TypeLang\Mapper\Type\Meta\TypeMetadata;
 use TypeLang\Mapper\Type\Meta\TypeNameParameterMetadata;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Literal\LiteralNodeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -77,7 +77,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
      * @throws InvalidTypeArgumentException
      * @throws UnsupportedAttributeException
      */
-    public function build(TypeStatement $type, RegistryInterface $context): TypeInterface
+    public function build(TypeStatement $type, RepositoryInterface $context): TypeInterface
     {
         assert($type instanceof NamedTypeNode);
 
@@ -119,7 +119,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
     private function createArguments(
         TypeMetadata $metadata,
         NamedTypeNode $type,
-        RegistryInterface $context
+        RepositoryInterface $context
     ): iterable {
         $arguments = $type->arguments->items ?? [];
 
@@ -184,7 +184,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
      * @return array<array-key, TypeInterface>
      * @throws TypeNotFoundException
      */
-    private function getShapeFieldsAsArray(NamedTypeNode $type, RegistryInterface $context): array
+    private function getShapeFieldsAsArray(NamedTypeNode $type, RepositoryInterface $context): array
     {
         $result = [];
 
@@ -209,7 +209,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
     private function getTemplateArgumentValue(
         TemplateParameterMetadata $metadata,
         ArgumentNode $node,
-        RegistryInterface $context,
+        RepositoryInterface $context,
     ): mixed {
         $value = $node->value;
 

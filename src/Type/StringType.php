@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -41,7 +41,7 @@ final class StringType implements LogicalTypeInterface
      *
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): string
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): string
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToStringIfPossible($value);

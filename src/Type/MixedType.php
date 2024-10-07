@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -34,7 +34,7 @@ final class MixedType implements LogicalTypeInterface
     /**
      * @throws TypeNotFoundException
      */
-    private function getType(mixed $value, RegistryInterface $types): TypeInterface
+    private function getType(mixed $value, RepositoryInterface $types): TypeInterface
     {
         /**
          * @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
@@ -50,7 +50,7 @@ final class MixedType implements LogicalTypeInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
         $type = $this->getType($value, $types);
 

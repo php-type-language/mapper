@@ -7,9 +7,9 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\LocalContext;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\StringInfo;
-use TypeLang\Mapper\Registry\RegistryInterface;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -106,7 +106,7 @@ final class IntType implements LogicalTypeInterface
      *
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RegistryInterface $types, LocalContext $context): int
+    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): int
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToIntIfPossible($value);

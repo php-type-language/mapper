@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Registry\Registry;
+use TypeLang\Mapper\Type\Repository\Repository;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -43,7 +43,7 @@ class ExampleDTO
 
 $platform = new SimplePlatform();
 
-$mapper = new Mapper(new Registry($platform));
+$mapper = new Mapper(new Repository($platform));
 
 var_dump($mapper->normalize(new ExampleDTO()));
 //
