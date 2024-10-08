@@ -50,7 +50,7 @@ class MissingFieldValueException extends MissingValueException
         LocalContext $context,
         ?\Throwable $previous = null,
     ): self {
-        $template = 'Object of type {{expected}} requires field "{{field}}" at {{path}}';
+        $template = 'An object of type {{expected}} requires a field {{field}} which must be passed at {{path}}';
 
         return new self(
             field: $field,
