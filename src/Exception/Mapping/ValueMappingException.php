@@ -17,7 +17,7 @@ abstract class ValueMappingException extends TypeMappingException
 
     public function __construct(
         protected readonly mixed $value,
-        TypeStatement $expected,
+        TypeStatement|string $expected,
         PathInterface $path,
         string $template,
         int $code = 0,
