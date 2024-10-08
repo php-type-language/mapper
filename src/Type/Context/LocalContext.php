@@ -80,6 +80,7 @@ final class LocalContext extends Context implements ExecutionStackInterface
 
     /**
      * @return list<non-empty-string|int>
+     *
      * @deprecated Will be removed
      */
     public function getPathAsSegmentsArray(): array

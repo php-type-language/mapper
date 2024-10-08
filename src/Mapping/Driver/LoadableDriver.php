@@ -20,7 +20,9 @@ abstract class LoadableDriver extends Driver
 
     /**
      * @template TArg of object
+     *
      * @param \ReflectionClass<TArg> $class
+     *
      * @return ClassMetadata<TArg>
      */
     public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
@@ -39,6 +41,7 @@ abstract class LoadableDriver extends Driver
 
     /**
      * @template TArg of object
+     *
      * @param \ReflectionClass<TArg> $reflection
      * @param ClassMetadata<TArg> $class
      */
