@@ -9,7 +9,6 @@ use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
@@ -95,7 +94,7 @@ final class ArrayType implements LogicalTypeInterface
      * @return array<array-key, mixed>
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): array
+    public function cast(mixed $value, LocalContext $context): array
     {
         $value = $this->validateAndCast($value, $context);
 
@@ -104,8 +103,8 @@ final class ArrayType implements LogicalTypeInterface
         foreach ($value as $index => $item) {
             $context->enter(new ArrayIndexEntry($index));
 
-            $result[$this->key->cast($index, $types, $context)]
-                = $this->value->cast($item, $types, $context);
+            $result[$this->key->cast($index, $context)]
+                = $this->value->cast($item, $context);
 
             $context->leave();
         }

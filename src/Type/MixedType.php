@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -39,10 +38,10 @@ final class MixedType implements LogicalTypeInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, LocalContext $context): mixed
     {
         return $context->getTypes()
             ->getByValue($value)
-            ->cast($value, $types, $context);
+            ->cast($value, $context);
     }
 }

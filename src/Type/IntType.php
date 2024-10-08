@@ -105,7 +105,7 @@ final class IntType implements LogicalTypeInterface
      *
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): int
+    public function cast(mixed $value, LocalContext $context): int
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToIntIfPossible($value);

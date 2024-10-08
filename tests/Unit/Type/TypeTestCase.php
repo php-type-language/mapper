@@ -157,13 +157,13 @@ abstract class TypeTestCase extends TestCase
     {
         $type = $this->getType();
 
-        return $type->cast($value, $this->types, $context);
+        return $type->cast($value, $context);
     }
 
     protected function denormalize(mixed $value, LocalContext $context): mixed
     {
         $type = $this->getType();
 
-        return $type->cast($value, $this->types, $context);
+        return $type->cast($value, $context);
     }
 }

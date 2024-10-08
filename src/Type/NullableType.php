@@ -32,12 +32,12 @@ final class NullableType implements LogicalTypeInterface
         );
     }
 
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, LocalContext $context): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        return $this->parent->cast($value, $types, $context);
+        return $this->parent->cast($value, $context);
     }
 }

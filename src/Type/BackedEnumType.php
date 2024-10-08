@@ -59,7 +59,7 @@ final class BackedEnumType extends AsymmetricLogicalType
      *
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): int|string
+    public function normalize(mixed $value, LocalContext $context): int|string
     {
         if (!$value instanceof \BackedEnum) {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -92,7 +92,7 @@ final class BackedEnumType extends AsymmetricLogicalType
      *
      * @throws InvalidValueException
      */
-    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): \BackedEnum
+    public function denormalize(mixed $value, LocalContext $context): \BackedEnum
     {
         if (!\is_string($value) && !\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(

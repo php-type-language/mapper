@@ -41,8 +41,8 @@ final class ArrayKeyType implements LogicalTypeInterface
         return $this->delegate->getTypeStatement($context);
     }
 
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, LocalContext $context): mixed
     {
-        return $this->delegate->cast($value, $types, $context);
+        return $this->delegate->cast($value, $context);
     }
 }

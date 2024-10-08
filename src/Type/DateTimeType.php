@@ -9,11 +9,10 @@ use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\Context;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class DateTimeType extends AsymmetricLogicalType
@@ -54,8 +53,8 @@ final class DateTimeType extends AsymmetricLogicalType
     {
         return new NamedTypeNode(
             name: $this->name,
-            arguments: new ArgumentsListNode([
-                new ArgumentNode(new StringLiteralNode(
+            arguments: new TemplateArgumentsListNode([
+                new TemplateArgumentNode(new StringLiteralNode(
                     value: $this->format,
                     raw: \sprintf('"%s"', \addcslashes($this->format, '"')),
                 )),
@@ -71,7 +70,7 @@ final class DateTimeType extends AsymmetricLogicalType
     /**
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): string
+    public function normalize(mixed $value, LocalContext $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
             throw InvalidValueException::becauseInvalidValueGiven(
@@ -100,7 +99,7 @@ final class DateTimeType extends AsymmetricLogicalType
     /**
      * @throws InvalidValueException
      */
-    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): \DateTimeInterface
+    public function denormalize(mixed $value, LocalContext $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(

@@ -41,7 +41,7 @@ final class BoolType implements LogicalTypeInterface
      *
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): bool
+    public function cast(mixed $value, LocalContext $context): bool
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->castToBoolIfPossible($value);

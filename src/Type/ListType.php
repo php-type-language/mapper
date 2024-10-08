@@ -10,10 +10,9 @@ use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class ListType implements LogicalTypeInterface
@@ -41,8 +40,8 @@ final class ListType implements LogicalTypeInterface
 
         return new NamedTypeNode(
             name: $this->name,
-            arguments: new ArgumentsListNode([
-                new ArgumentNode($this->type->getTypeStatement($context)),
+            arguments: new TemplateArgumentsListNode([
+                new TemplateArgumentNode($this->type->getTypeStatement($context)),
             ]),
         );
     }
@@ -83,7 +82,7 @@ final class ListType implements LogicalTypeInterface
      * @throws InvalidValueException
      * @throws TypeNotFoundException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): array
+    public function cast(mixed $value, LocalContext $context): array
     {
         $value = $this->validateAndCast($value, $context);
 
@@ -92,7 +91,7 @@ final class ListType implements LogicalTypeInterface
         foreach ($value as $index => $item) {
             $context->enter(new ArrayIndexEntry($index));
 
-            $result[] = $this->type->cast($item, $types, $context);
+            $result[] = $this->type->cast($item, $context);
 
             $context->leave();
         }

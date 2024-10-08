@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 interface TypeInterface
@@ -30,5 +29,5 @@ interface TypeInterface
      */
     public function getTypeStatement(LocalContext $context): TypeStatement;
 
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed;
+    public function cast(mixed $value, LocalContext $context): mixed;
 }

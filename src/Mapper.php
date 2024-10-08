@@ -59,7 +59,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             context: $this->context->with($context),
         );
 
-        return $concreteType->cast($value, $this->types, $context);
+        return $concreteType->cast($value, $context);
     }
 
     /**
@@ -75,6 +75,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             context: $this->context->with($context),
         );
 
-        return $concreteType->cast($value, $this->types, $context);
+        return $concreteType->cast($value, $context);
     }
 }

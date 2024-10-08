@@ -10,7 +10,6 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
@@ -42,7 +41,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws InvalidValueException
      * @throws \ReflectionException
      */
-    public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): object|array
+    public function normalize(mixed $value, LocalContext $context): object|array
     {
         $className = $this->metadata->getName();
 
@@ -54,7 +53,7 @@ final class ObjectType extends AsymmetricLogicalType
             );
         }
 
-        return $this->normalizeObject($value, $types, $context);
+        return $this->normalizeObject($value, $context);
     }
 
     /**
@@ -63,7 +62,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @return object|array<non-empty-string, mixed>
      * @throws \ReflectionException
      */
-    private function normalizeObject(object $object, RepositoryInterface $types, LocalContext $context): object|array
+    private function normalizeObject(object $object, LocalContext $context): object|array
     {
         $result = [];
         $reflection = new \ReflectionClass($this->metadata->getName());
@@ -85,7 +84,7 @@ final class ObjectType extends AsymmetricLogicalType
                 continue;
             }
 
-            $result[$meta->getExportName()] = $type->cast($propertyValue, $types, $context);
+            $result[$meta->getExportName()] = $type->cast($propertyValue, $context);
 
             $context->leave();
         }
@@ -115,7 +114,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws MissingFieldValueException
      * @throws \ReflectionException
      */
-    public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): object
+    public function denormalize(mixed $value, LocalContext $context): object
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -129,7 +128,7 @@ final class ObjectType extends AsymmetricLogicalType
             );
         }
 
-        return $this->denormalizeObject($value, $types, $context);
+        return $this->denormalizeObject($value, $context);
     }
 
     /**
@@ -139,7 +138,7 @@ final class ObjectType extends AsymmetricLogicalType
      * @throws MissingFieldValueException
      * @throws \ReflectionException
      */
-    private function denormalizeObject(array $value, RepositoryInterface $types, LocalContext $context): object
+    private function denormalizeObject(array $value, LocalContext $context): object
     {
         $reflection = new \ReflectionClass($this->metadata->getName());
         $object = $reflection->newInstanceWithoutConstructor();
@@ -159,7 +158,7 @@ final class ObjectType extends AsymmetricLogicalType
                     continue;
                 }
 
-                $propertyValue = $type->cast($value[$meta->getExportName()], $types, $context);
+                $propertyValue = $type->cast($value[$meta->getExportName()], $context);
 
                 $this->setValue($property, $object, $propertyValue);
                 $context->leave();

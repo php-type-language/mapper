@@ -39,7 +39,7 @@ final class NullType implements LogicalTypeInterface
     /**
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
+    public function cast(mixed $value, LocalContext $context): mixed
     {
         if (!$context->isStrictTypesEnabled()) {
             return null;
