@@ -37,7 +37,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function withAddedContext(Context $context): self
     {
-        return $this->withContext($this->context->merge($context));
+        return $this->withContext($this->context->with($context));
     }
 
     /**
@@ -72,7 +72,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
         $context = LocalContext::fromContext(
             direction: Direction::Normalize,
-            context: $this->context->merge($context),
+            context: $this->context->with($context),
         );
 
         return $concreteType->cast($value, $this->types, $context);
@@ -88,7 +88,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
         $context = LocalContext::fromContext(
             direction: Direction::Denormalize,
-            context: $this->context->merge($context),
+            context: $this->context->with($context),
         );
 
         return $concreteType->cast($value, $this->types, $context);

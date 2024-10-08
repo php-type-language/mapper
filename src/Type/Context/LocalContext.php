@@ -36,18 +36,20 @@ final class LocalContext extends Context implements ExecutionStackInterface
     public static function fromContext(Direction $direction, ?Context $context): self
     {
         return (new self($direction))
-            ->merge($context);
+            ->with($context);
     }
 
     #[\Override]
-    public function merge(?Context $context): self
+    public function with(?Context $context): self
     {
         if ($context === null) {
             return $this;
         }
 
+        $local = $context instanceof self ? $context : $this;
+
         return new self(
-            direction: $context instanceof self ? $context->direction : $this->direction,
+            direction: $local->direction,
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
             detailedTypes: $context->detailedTypes ?? $this->detailedTypes,

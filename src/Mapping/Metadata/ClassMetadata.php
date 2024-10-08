@@ -50,7 +50,7 @@ final class ClassMetadata extends Metadata
 
         $fields = [];
 
-        $childContext = $context->merge(new Context(
+        $childContext = $context->with(new Context(
             detailedTypes: false,
         ));
 

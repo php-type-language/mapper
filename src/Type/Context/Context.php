@@ -28,17 +28,17 @@ class Context
          * If this option contains {@see false}, then type conversion is
          * allowed during transformation.
          */
-        protected readonly ?bool $strictTypes = null,
+        protected ?bool $strictTypes = null,
         /**
          * If this option contains {@see true}, then objects are converted to
          * associative arrays, otherwise anonymous {@see ObjectEntry} will be returned.
          */
-        protected readonly ?bool $objectsAsArrays = null,
+        protected ?bool $objectsAsArrays = null,
         /**
          * If this option contains {@see true}, then all composite types will
          * be displayed along with detailed fields/values.
          */
-        protected readonly ?bool $detailedTypes = null
+        protected ?bool $detailedTypes = null
     ) {}
 
     /**
@@ -74,7 +74,7 @@ class Context
         return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
     }
 
-    public function merge(?Context $context): self
+    public function with(?Context $context): self
     {
         if ($context === null) {
             return $this;
