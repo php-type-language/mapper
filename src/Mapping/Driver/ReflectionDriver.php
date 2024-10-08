@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
+use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\FullQualifiedName;
@@ -27,9 +29,18 @@ final class ReflectionDriver extends LoadableDriver
 
             $metadata = $class->getPropertyOrCreate($property->getName());
 
-            $metadata->setType($types->getByStatement(
-                statement: $this->getTypeStatement($property),
-            ));
+            try {
+                $metadata->setType($types->getByStatement(
+                    statement: $this->getTypeStatement($property),
+                ));
+            } catch (TypeNotFoundException $e) {
+                throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
+                    class: $class->getName(),
+                    property: $property->getName(),
+                    type: $e->getType(),
+                    previous: $e,
+                );
+            }
 
             if ($property->isReadOnly()) {
                 $metadata->markAsReadonly();

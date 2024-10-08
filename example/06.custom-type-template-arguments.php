@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -33,37 +33,31 @@ class MyNonEmpty implements TypeInterface
         ]));
     }
 
-    public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
+    public function match(mixed $value, LocalContext $context): bool
     {
-        if (empty($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: 'non-empty',
-                context: $context,
-            );
+        return !empty($value);
+    }
+
+    public function cast(mixed $value, LocalContext $context): mixed
+    {
+        if (!empty($value)) {
+            return $this->type->cast($value, $context);
         }
 
-        return $this->type->cast($value, $types, $context);
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: 'non-empty',
+            context: $context,
+        );
     }
 }
 
-class CustomStandardPlatform extends StandardPlatform
-{
-    public function getTypes(): iterable
-    {
-        yield from parent::getTypes();
-
-        yield new NamedTypeBuilder('non-empty', MyNonEmpty::class);
-    }
-}
-
-$mapper = new Mapper(new CustomStandardPlatform());
-
-var_dump($mapper->normalize('example', 'non-empty'));
-//
-// MissingTemplateArgumentsException: Type "non-empty" expects 1 template
-//                                    argument, but only 0 were passed
-//
+$mapper = new Mapper(new DelegatePlatform(
+    delegate: new StandardPlatform(),
+    types: [
+        new NamedTypeBuilder('non-empty', MyNonEmpty::class),
+    ]
+));
 
 var_dump($mapper->normalize('example', 'non-empty<string>'));
 //
@@ -85,6 +79,12 @@ var_dump($mapper->normalize([], 'non-empty<string>'));
 //                        array given at root.
 //
 
+
+var_dump($mapper->normalize('example', 'non-empty'));
+//
+// MissingTemplateArgumentsException: Type "non-empty" expects 1 template
+//                                    argument, but only 0 were passed
+//
 
 var_dump($mapper->normalize('', 'non-empty<string>'));
 //

@@ -48,5 +48,5 @@ var_dump($mapper->normalize(new ExampleDTO(42)));
 var_dump($mapper->normalize(new ExampleDTO(-42)));
 //
 // InvalidValueException: Passed value must be of type int<0, max>, but
-//                        int(-42) given in $.value
+//                        int ("-42") given in $.value
 //

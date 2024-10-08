@@ -10,6 +10,7 @@ use TypeLang\Mapper\Path\PathInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Traverser;
 
 /**
  * An exception that occurs in case of errors during mapping process.
@@ -47,12 +48,15 @@ abstract class MappingException extends \RuntimeException implements MapperExcep
     }
 
     /**
-     * TODO
-     *
      * @param \Closure(Name):(Name|null) $transform
      */
     public function explain(callable $transform): self
     {
+        Traverser::through(
+            visitor: new Traverser\TypeMapVisitor($transform(...)),
+            nodes: [$this->expected],
+        );
+
         return $this;
     }
 

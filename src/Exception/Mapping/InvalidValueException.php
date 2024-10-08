@@ -31,7 +31,7 @@ class InvalidValueException extends ValueMappingException
         $template = 'Passed value must be of type {{expected}}, but {{actual}} given';
 
         if (\is_scalar($value)) {
-            $template = \str_replace('{{actual}}', '{{actual}} ({{value}})', $template);
+            $template = \str_replace('{{actual}}', '{{actual}} ("{{value}}")', $template);
         }
 
         $path = $context->getPath();

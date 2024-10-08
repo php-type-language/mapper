@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Path\PathInterface;
+use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Traverser;
 
 abstract class TypeMappingException extends MappingException
 {
@@ -39,5 +41,21 @@ abstract class TypeMappingException extends MappingException
     public function getActualType(): TypeStatement
     {
         return $this->actual;
+    }
+
+    /**
+     * @param \Closure(Name):(Name|null) $transform
+     */
+    #[\Override]
+    public function explain(callable $transform): self
+    {
+        Traverser::through(
+            visitor: new Traverser\TypeMapVisitor($transform(...)),
+            nodes: [$this->actual],
+        );
+
+        parent::explain($transform);
+
+        return $this;
     }
 }

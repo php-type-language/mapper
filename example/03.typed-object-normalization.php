@@ -39,5 +39,5 @@ $result = $mapper->normalize(new ExampleDTO(
 
 //
 // InvalidValueException: Passed value must be of type ChildDTO{name: string},
-//                        but int given in $.children[2]
+//                        but int (42) given at $.children[2]
 //
