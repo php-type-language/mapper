@@ -50,7 +50,7 @@ class ComposerPackageRequiredException extends EnvironmentException
         string $purpose,
         ?\Throwable $previous = null,
     ): self {
-        $template = 'The "{{package}}" component is required to %s. '
+        $template = 'The {{package}} component is required to %s. '
             . 'Try running "composer require {{package}}"';
 
         return new self(

@@ -27,9 +27,9 @@ class MyNonEmptyStringType implements TypeInterface
     {
         if (!\is_string($value) || $value === '') {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: 'non-empty-string',
                 context: $context,
-                expectedType: 'non-empty-string',
-                actualValue: $value,
             );
         }
 

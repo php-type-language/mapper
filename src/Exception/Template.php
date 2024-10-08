@@ -73,7 +73,7 @@ final class Template implements \Stringable
             $value instanceof PathInterface => $this->paths->print($value),
             $value === true => 'true',
             $value === false => 'false',
-            \is_string($value) => $value,
+            \is_string($value) => \sprintf('"%s"', \addcslashes($value, '"')),
             \is_scalar($value),
             $value instanceof \Stringable => (string) $value,
             default => \get_debug_type($value),

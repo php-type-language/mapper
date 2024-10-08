@@ -49,9 +49,9 @@ final class BoolType implements LogicalTypeInterface
 
         if (!\is_bool($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: 'bool',
                 context: $context,
-                expectedType: 'bool',
-                actualValue: $value,
             );
         }
 

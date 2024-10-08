@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
-use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
@@ -42,7 +41,6 @@ final class ObjectType extends AsymmetricLogicalType
      * @return object|array<non-empty-string, mixed>
      * @throws InvalidValueException
      * @throws \ReflectionException
-     * @throws TypeRequiredException
      */
     public function normalize(mixed $value, RepositoryInterface $types, LocalContext $context): object|array
     {
@@ -50,9 +48,9 @@ final class ObjectType extends AsymmetricLogicalType
 
         if (!$value instanceof $className) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 
@@ -64,7 +62,6 @@ final class ObjectType extends AsymmetricLogicalType
      *
      * @return object|array<non-empty-string, mixed>
      * @throws \ReflectionException
-     * @throws TypeRequiredException
      */
     private function normalizeObject(object $object, RepositoryInterface $types, LocalContext $context): object|array
     {
@@ -85,10 +82,7 @@ final class ObjectType extends AsymmetricLogicalType
             $type = $meta->getType();
 
             if ($type === null) {
-                throw TypeRequiredException::fromInvalidFieldType(
-                    class: $this->metadata->getName(),
-                    field: $meta->getName(),
-                );
+                continue;
             }
 
             $result[$meta->getExportName()] = $type->cast($propertyValue, $types, $context);
@@ -118,8 +112,7 @@ final class ObjectType extends AsymmetricLogicalType
     /**
      * @return T
      * @throws InvalidValueException
-     * @throws MissingRequiredFieldException
-     * @throws TypeRequiredException
+     * @throws MissingFieldValueException
      * @throws \ReflectionException
      */
     public function denormalize(mixed $value, RepositoryInterface $types, LocalContext $context): object
@@ -130,9 +123,9 @@ final class ObjectType extends AsymmetricLogicalType
 
         if (!\is_array($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->metadata->getName(),
                 context: $context,
-                expectedType: $this->metadata->getName(),
-                actualValue: $value,
             );
         }
 
@@ -143,9 +136,8 @@ final class ObjectType extends AsymmetricLogicalType
      * @param array<array-key, mixed> $value
      *
      * @return T
-     * @throws MissingRequiredFieldException
+     * @throws MissingFieldValueException
      * @throws \ReflectionException
-     * @throws TypeRequiredException
      */
     private function denormalizeObject(array $value, RepositoryInterface $types, LocalContext $context): object
     {
@@ -164,10 +156,7 @@ final class ObjectType extends AsymmetricLogicalType
                 $type = $meta->getType();
 
                 if ($type === null) {
-                    throw TypeRequiredException::fromInvalidFieldType(
-                        class: $this->metadata->getName(),
-                        field: $meta->getName(),
-                    );
+                    continue;
                 }
 
                 $propertyValue = $type->cast($value[$meta->getExportName()], $types, $context);
@@ -184,10 +173,10 @@ final class ObjectType extends AsymmetricLogicalType
                 continue;
             }
 
-            throw MissingRequiredFieldException::becauseFieldIsMissing(
-                context: $context,
-                expectedType: $this->getTypeStatement($context),
+            throw MissingFieldValueException::becausePropertyValueRequired(
                 field: $meta->getExportName(),
+                expected: $this->getTypeStatement($context),
+                context: $context,
             );
         }
 

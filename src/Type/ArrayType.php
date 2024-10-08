@@ -77,9 +77,9 @@ final class ArrayType implements LogicalTypeInterface
 
         if (!\is_array($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 

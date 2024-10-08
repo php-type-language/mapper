@@ -114,19 +114,18 @@ final class IntType implements LogicalTypeInterface
 
         if (!\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 
         if ($value > $this->max) {
             if ($context->isStrictTypesEnabled()) {
                 throw InvalidValueException::becauseInvalidValueGiven(
+                    value: $value,
+                    expected: $this->getTypeStatement($context),
                     context: $context,
-                    expectedType: $this->getTypeStatement($context),
-                    actualValue: $value,
-                    showValue: true,
                 );
             }
 
@@ -136,10 +135,9 @@ final class IntType implements LogicalTypeInterface
         if ($value < $this->min) {
             if ($context->isStrictTypesEnabled()) {
                 throw InvalidValueException::becauseInvalidValueGiven(
+                    value: $value,
+                    expected: $this->getTypeStatement($context),
                     context: $context,
-                    expectedType: $this->getTypeStatement($context),
-                    actualValue: $value,
-                    showValue: true,
                 );
             }
 

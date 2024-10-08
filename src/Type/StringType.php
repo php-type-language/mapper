@@ -49,9 +49,9 @@ final class StringType implements LogicalTypeInterface
 
         if (!\is_string($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 

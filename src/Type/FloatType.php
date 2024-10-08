@@ -48,12 +48,12 @@ final class FloatType implements LogicalTypeInterface
 
         if (!\is_float($value) && !\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
-                context: $context,
-                expectedType: new UnionTypeNode(
+                value: $value,
+                expected: new UnionTypeNode(
                     a: new NamedTypeNode('int'),
                     b: new NamedTypeNode('float'),
                 ),
-                actualValue: $value,
+                context: $context,
             );
         }
 

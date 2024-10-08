@@ -63,9 +63,9 @@ final class BackedEnumType extends AsymmetricLogicalType
     {
         if (!$value instanceof \BackedEnum) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 
@@ -96,9 +96,9 @@ final class BackedEnumType extends AsymmetricLogicalType
     {
         if (!\is_string($value) && !\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 
@@ -106,16 +106,16 @@ final class BackedEnumType extends AsymmetricLogicalType
             $case = $this->name::tryFrom($value);
         } catch (\TypeError) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
                 context: $context,
-                expectedType: $this->getTypeStatement($context),
-                actualValue: $value,
             );
         }
 
         return $case ?? throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: $this->getTypeStatement($context),
             context: $context,
-            expectedType: $this->getTypeStatement($context),
-            actualValue: $value,
         );
     }
 }

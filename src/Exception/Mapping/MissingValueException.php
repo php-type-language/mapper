@@ -7,32 +7,27 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class InvalidValueException extends ValueMappingException
+class MissingValueException extends MappingException
 {
     /**
      * @var int
      */
-    public const CODE_ERROR_INVALID_VALUE = 0x01 + parent::CODE_ERROR_LAST;
+    public const CODE_ERROR_MISSING_PROPERTY_VALUE = 0x01 + parent::CODE_ERROR_LAST;
 
     /**
      * @var int
      */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_INVALID_VALUE;
+    protected const CODE_ERROR_LAST = self::CODE_ERROR_MISSING_PROPERTY_VALUE;
 
     /**
      * @param TypeStatement|non-empty-string $expected
      */
-    public static function becauseInvalidValueGiven(
-        mixed $value,
+    public static function becauseValueRequired(
         TypeStatement|string $expected,
         LocalContext $context,
         ?\Throwable $previous = null,
     ): self {
-        $template = 'Passed value must be of type {{expected}}, but {{actual}} given';
-
-        if (\is_scalar($value)) {
-            $template = \str_replace('{{actual}}', '{{actual}} ({{value}})', $template);
-        }
+        $template = 'A value for type {{expected}} is required, but one has not been passed';
 
         $path = $context->getPath();
 
@@ -41,11 +36,10 @@ class InvalidValueException extends ValueMappingException
         }
 
         return new self(
-            value: $value,
             expected: $expected,
             path: $path,
             template: $template,
-            code: self::CODE_ERROR_INVALID_VALUE,
+            code: self::CODE_ERROR_MISSING_PROPERTY_VALUE,
             previous: $previous,
         );
     }

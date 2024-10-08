@@ -75,9 +75,9 @@ final class DateTimeType extends AsymmetricLogicalType
     {
         if (!$value instanceof \DateTimeInterface) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: \DateTimeInterface::class,
                 context: $context,
-                expectedType: \DateTimeInterface::class,
-                actualValue: $value,
             );
         }
 
@@ -104,9 +104,9 @@ final class DateTimeType extends AsymmetricLogicalType
     {
         if (!\is_string($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: 'string',
                 context: $context,
-                expectedType: 'string',
-                actualValue: $value,
             );
         }
 
@@ -120,9 +120,9 @@ final class DateTimeType extends AsymmetricLogicalType
         }
 
         throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: 'string',
             context: $context,
-            expectedType: 'string',
-            actualValue: $value,
         );
     }
 

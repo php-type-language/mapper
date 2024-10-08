@@ -64,9 +64,9 @@ final class ListType implements LogicalTypeInterface
 
         if (!\is_array($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: 'array',
                 context: $context,
-                expectedType: 'array',
-                actualValue: $value,
             );
         }
 
