@@ -9,7 +9,7 @@ use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class NullableType implements LogicalTypeInterface
+final class NullableType implements TypeInterface
 {
     public function __construct(
         #[TargetTemplateArgument]
@@ -25,10 +25,8 @@ final class NullableType implements LogicalTypeInterface
 
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {
-        return $value === null || (
-            $this->parent instanceof LogicalTypeInterface
-            && $this->parent->supportsCasting($value, $context)
-        );
+        return $value === null
+            || $this->parent->supportsCasting($value, $context);
     }
 
     public function cast(mixed $value, LocalContext $context): mixed

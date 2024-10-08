@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class ArrayType implements LogicalTypeInterface
+final class ArrayType implements TypeInterface
 {
     /**
      * @var non-empty-string

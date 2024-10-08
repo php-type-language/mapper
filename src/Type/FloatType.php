@@ -11,7 +11,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-final class FloatType implements LogicalTypeInterface
+final class FloatType implements TypeInterface
 {
     /**
      * @var non-empty-string

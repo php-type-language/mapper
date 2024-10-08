@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 
-final class IntType implements LogicalTypeInterface
+final class IntType implements TypeInterface
 {
     /**
      * @var non-empty-string

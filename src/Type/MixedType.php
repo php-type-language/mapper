@@ -10,7 +10,7 @@ use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class MixedType implements LogicalTypeInterface
+final class MixedType implements TypeInterface
 {
     /**
      * @var non-empty-string

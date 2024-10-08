@@ -29,5 +29,7 @@ interface TypeInterface
      */
     public function getTypeStatement(LocalContext $context): TypeStatement;
 
+    public function supportsCasting(mixed $value, LocalContext $context): bool;
+
     public function cast(mixed $value, LocalContext $context): mixed;
 }

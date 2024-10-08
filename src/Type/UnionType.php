@@ -9,7 +9,7 @@ use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-class UnionType implements LogicalTypeInterface
+class UnionType implements TypeInterface
 {
     /**
      * @param non-empty-list<TypeInterface> $types
@@ -37,22 +37,12 @@ class UnionType implements LogicalTypeInterface
     }
 
     /**
-     * Checks a child type against a value.
-     */
-    protected function matchType(TypeInterface $type, mixed $value, LocalContext $context): bool
-    {
-        return $type instanceof LogicalTypeInterface
-            && $type->supportsCasting($value, $context);
-    }
-
-    /**
      * Finds a child supported type from their {@see $types} list by value.
      */
-    protected function findType(mixed $value, LocalContext $context): ?LogicalTypeInterface
+    protected function findType(mixed $value, LocalContext $context): ?TypeInterface
     {
         foreach ($this->types as $type) {
-            /** @var LogicalTypeInterface $type */
-            if ($this->matchType($type, $value, $context)) {
+            if ($type->supportsCasting($value, $context)) {
                 return $type;
             }
         }
