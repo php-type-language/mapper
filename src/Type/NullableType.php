@@ -23,10 +23,10 @@ final class NullableType implements TypeInterface
         );
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
         return $value === null
-            || $this->parent->supportsCasting($value, $context);
+            || $this->parent->match($value, $context);
     }
 
     public function cast(mixed $value, LocalContext $context): mixed

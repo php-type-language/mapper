@@ -30,7 +30,7 @@ final class StringType implements TypeInterface
         return new NamedTypeNode($this->name);
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
         return \is_string($value);
     }

@@ -94,7 +94,7 @@ final class IntType implements TypeInterface
         ]));
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
         return \is_int($value) && $value >= $this->min && $value <= $this->max;
     }

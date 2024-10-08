@@ -30,9 +30,9 @@ final class ArrayKeyType implements TypeInterface
         ]);
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
-        return $this->delegate->supportsCasting($value, $context);
+        return $this->delegate->match($value, $context);
     }
 
     public function getTypeStatement(LocalContext $context): TypeStatement

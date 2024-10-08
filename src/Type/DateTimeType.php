@@ -62,7 +62,7 @@ final class DateTimeType extends AsymmetricType
         );
     }
 
-    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
         return $value instanceof \DateTimeInterface;
     }
@@ -83,7 +83,7 @@ final class DateTimeType extends AsymmetricType
         return $value->format($this->format);
     }
 
-    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    protected function isDenormalizable(mixed $value, LocalContext $context): bool
     {
         if (!\is_string($value)) {
             return false;

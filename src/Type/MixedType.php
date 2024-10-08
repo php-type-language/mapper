@@ -30,7 +30,7 @@ final class MixedType implements TypeInterface
         return new NamedTypeNode($this->name);
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
         return true;
     }

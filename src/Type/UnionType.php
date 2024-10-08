@@ -42,7 +42,7 @@ class UnionType implements TypeInterface
     protected function findType(mixed $value, LocalContext $context): ?TypeInterface
     {
         foreach ($this->types as $type) {
-            if ($type->supportsCasting($value, $context)) {
+            if ($type->match($value, $context)) {
                 return $type;
             }
         }
@@ -50,7 +50,7 @@ class UnionType implements TypeInterface
         return null;
     }
 
-    public function supportsCasting(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, LocalContext $context): bool
     {
         return $this->findType($value, $context) !== null;
     }

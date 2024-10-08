@@ -47,7 +47,7 @@ final class BackedEnumType extends AsymmetricType
         };
     }
 
-    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
         return $value instanceof \BackedEnum;
     }
@@ -71,7 +71,7 @@ final class BackedEnumType extends AsymmetricType
         return $value->value;
     }
 
-    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    protected function isDenormalizable(mixed $value, LocalContext $context): bool
     {
         if (!\is_int($value) && !\is_string($value)) {
             return false;

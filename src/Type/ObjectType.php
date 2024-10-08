@@ -29,7 +29,7 @@ final class ObjectType extends AsymmetricType
         return $this->metadata->getTypeStatement($context);
     }
 
-    protected function supportsNormalization(mixed $value, LocalContext $context): bool
+    protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
         $class = $this->metadata->getName();
 
@@ -103,7 +103,7 @@ final class ObjectType extends AsymmetricType
         return $property->getValue($object);
     }
 
-    protected function supportsDenormalization(mixed $value, LocalContext $context): bool
+    protected function isDenormalizable(mixed $value, LocalContext $context): bool
     {
         return \is_object($value) || \is_array($value);
     }
