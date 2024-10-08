@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Context\Context;
@@ -46,7 +45,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @throws TypeNotCreatableException
      * @throws TypeNotFoundException
      */
     public function normalize(mixed $value, ?string $type = null, ?Context $context = null): mixed
@@ -65,7 +63,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @throws TypeNotCreatableException
      * @throws TypeNotFoundException
      */
     public function denormalize(mixed $value, string $type, ?Context $context = null): mixed

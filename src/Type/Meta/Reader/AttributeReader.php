@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Meta\Reader;
 
-use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
-use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
 use TypeLang\Mapper\Type\Attribute\InjectTarget;
 use TypeLang\Mapper\Type\Attribute\TargetSealedShapeFlag;
 use TypeLang\Mapper\Type\Attribute\TargetShapeFields;
@@ -21,8 +19,7 @@ use TypeLang\Mapper\Type\Meta\TypeNameParameterMetadata;
 final class AttributeReader implements ReaderInterface
 {
     /**
-     * @throws UnsupportedAttributeException
-     * @throws InvalidTypeArgumentException
+     * @throws \InvalidArgumentException
      */
     public function getTypeMetadata(\ReflectionClass $class): TypeMetadata
     {
@@ -41,9 +38,9 @@ final class AttributeReader implements ReaderInterface
         return $metadata;
     }
 
-    private function findBuildTargetAttribute(\ReflectionParameter $parameter): ?InjectTarget
+    private function findBuildTargetAttribute(\ReflectionParameter $param): ?InjectTarget
     {
-        $attributes = $parameter->getAttributes(InjectTarget::class, \ReflectionAttribute::IS_INSTANCEOF);
+        $attributes = $param->getAttributes(InjectTarget::class, \ReflectionAttribute::IS_INSTANCEOF);
 
         foreach ($attributes as $attribute) {
             return $attribute->newInstance();
@@ -53,124 +50,76 @@ final class AttributeReader implements ReaderInterface
     }
 
     /**
-     * @throws UnsupportedAttributeException
-     * @throws InvalidTypeArgumentException
+     * @throws \InvalidArgumentException
      */
-    private function getParameterMetadata(\ReflectionParameter $parameter): ParameterMetadata
+    private function getParameterMetadata(\ReflectionParameter $param): ParameterMetadata
     {
-        $attribute = $this->findBuildTargetAttribute($parameter);
+        $attribute = $this->findBuildTargetAttribute($param);
 
         $metadata = match (true) {
             $attribute instanceof TargetSealedShapeFlag
-                => $this->getSealedShapeFlagParameterMetadata($parameter, $attribute),
+                => $this->getSealedShapeFlagParameterMetadata($param),
             $attribute instanceof TargetTypeName
-                => $this->getTypeNameParameterMetadata($parameter, $attribute),
+                => $this->getTypeNameParameterMetadata($param),
             $attribute instanceof TargetShapeFields
-                => $this->getShapeFieldsParameterMetadata($parameter, $attribute),
+                => $this->getShapeFieldsParameterMetadata($param),
             $attribute instanceof TargetTemplateArgument,
             $attribute === null
-                => $this->getTemplateParameterMetadata($parameter, $attribute),
-            default => throw UnsupportedAttributeException::fromAttributeName($attribute),
+                => $this->getTemplateParameterMetadata($param, $attribute),
+            default => throw new \InvalidArgumentException(\sprintf(
+                'Unsupported attribute of type %s',
+                $attribute::class,
+            )),
         };
 
-        if ($parameter->isDefaultValueAvailable()) {
+        if ($param->isDefaultValueAvailable()) {
             $metadata = $metadata->withDefaultValue(
-                value: $parameter->getDefaultValue(),
+                value: $param->getDefaultValue(),
             );
         }
 
         return $metadata;
     }
 
-    /**
-     * @param non-empty-string $type
-     */
-    private function isType(\ReflectionParameter $parameter, string $type): bool
+    private function getTypeNameParameterMetadata(\ReflectionParameter $param): TypeNameParameterMetadata
     {
-        $actualType = $parameter->getType();
-
-        return $actualType instanceof \ReflectionNamedType
-            && $actualType->getName() === $type;
-    }
-
-    /**
-     * @throws InvalidTypeArgumentException
-     */
-    private function getTypeNameParameterMetadata(
-        \ReflectionParameter $parameter,
-        TargetTypeName $attribute
-    ): TypeNameParameterMetadata {
-        if (!$this->isType($parameter, 'string')) {
-            throw InvalidTypeArgumentException::fromParamReflection(
-                param: $parameter,
-                expected: 'string for type name injection',
-                code: 1,
-            );
-        }
-
         return new TypeNameParameterMetadata(
             // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
-            position: $parameter->getPosition(),
-            name: $parameter->getName(),
+            position: $param->getPosition(),
+            name: $param->getName(),
         );
     }
 
-    /**
-     * @throws InvalidTypeArgumentException
-     */
-    private function getSealedShapeFlagParameterMetadata(
-        \ReflectionParameter $parameter,
-        TargetSealedShapeFlag $attribute
-    ): SealedShapeFlagParameterMetadata {
-        if (!$this->isType($parameter, 'bool')) {
-            throw InvalidTypeArgumentException::fromParamReflection(
-                param: $parameter,
-                expected: 'bool for sealed flag injection',
-                code: 2,
-            );
-        }
-
+    private function getSealedShapeFlagParameterMetadata(\ReflectionParameter $param): SealedShapeFlagParameterMetadata
+    {
         return new SealedShapeFlagParameterMetadata(
             // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
-            position: $parameter->getPosition(),
-            name: $parameter->getName(),
+            position: $param->getPosition(),
+            name: $param->getName(),
         );
     }
 
-    /**
-     * @throws InvalidTypeArgumentException
-     */
-    private function getShapeFieldsParameterMetadata(
-        \ReflectionParameter $parameter,
-        TargetShapeFields $attribute
-    ): ShapeFieldsParameterMetadata {
-        if (!$this->isType($parameter, 'bool')) {
-            throw InvalidTypeArgumentException::fromParamReflection(
-                param: $parameter,
-                expected: 'array<array-key, TypeInterface> for shape fields injection',
-                code: 3,
-            );
-        }
-
+    private function getShapeFieldsParameterMetadata(\ReflectionParameter $param): ShapeFieldsParameterMetadata
+    {
         return new ShapeFieldsParameterMetadata(
             // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
-            position: $parameter->getPosition(),
-            name: $parameter->getName(),
+            position: $param->getPosition(),
+            name: $param->getName(),
         );
     }
 
     private function getTemplateParameterMetadata(
-        \ReflectionParameter $parameter,
-        ?TargetTemplateArgument $attribute
+        \ReflectionParameter $param,
+        ?TargetTemplateArgument $attr
     ): TemplateParameterMetadata {
         $metadata = new TemplateParameterMetadata(
             // @phpstan-ignore-next-line : Reflection position value cannot be less than 0
-            position: $parameter->getPosition(),
-            name: $parameter->getName(),
+            position: $param->getPosition(),
+            name: $param->getName(),
         );
 
-        if ($attribute !== null) {
-            foreach ($attribute->allowedIdentifiers as $identifier) {
+        if ($attr !== null) {
+            foreach ($attr->allowedIdentifiers as $identifier) {
                 $metadata = $metadata->withAllowedIdentifier($identifier);
             }
         }

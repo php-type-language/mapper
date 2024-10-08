@@ -12,12 +12,14 @@ final class NativeReferencesReader implements ReferencesReaderInterface
      * @param \ReflectionClass<object> $class
      *
      * @return array<int|non-empty-string, non-empty-string>
-     * @throws \LogicException
-     * @throws \RuntimeException
      */
     public function getUseStatements(\ReflectionClass $class): array
     {
-        $header = $this->getCodeHeader($class);
+        try {
+            $header = $this->getCodeHeader($class);
+        } catch (\Throwable) {
+            $header = '';
+        }
 
         return [...$this->parse($class, $header)];
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -88,11 +87,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface
     {
-        try {
-            $statement = $this->parser->parse($type);
-        } catch (\Throwable $e) {
-            throw TypeNotCreatableException::fromTypeName($type, $e);
-        }
+        $statement = $this->parser->parse($type);
 
         return $this->getByStatement($statement, $class);
     }

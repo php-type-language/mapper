@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\StringInfo;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
@@ -66,9 +65,9 @@ final class IntType implements LogicalTypeInterface
             'min' => \PHP_INT_MIN,
             'max' => \PHP_INT_MAX,
             default => throw new \InvalidArgumentException(\sprintf(
-                'Invalid %s type identifier %s',
-                StringInfo::quoted($this->name),
-                StringInfo::quoted($value->toString()),
+                'Invalid "%s" type identifier "%s"',
+                $this->name,
+                $value->toString(),
             )),
         };
     }

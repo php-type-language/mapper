@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
-use TypeLang\Mapper\Exception\UnsupportedMetadataException;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
 use TypeLang\Mapper\Type\Meta\Reader\ReaderInterface;
 use TypeLang\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
@@ -72,10 +69,8 @@ class NamedTypeBuilder implements TypeBuilderInterface
      * @throws TemplateArgumentsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws TypeNotFoundException
-     * @throws UnsupportedMetadataException
+     * @throws \InvalidArgumentException
      * @throws \ReflectionException
-     * @throws InvalidTypeArgumentException
-     * @throws UnsupportedAttributeException
      */
     public function build(TypeStatement $type, RepositoryInterface $context): TypeInterface
     {
@@ -107,11 +102,12 @@ class NamedTypeBuilder implements TypeBuilderInterface
      * @param TypeMetadata<TypeInterface> $metadata
      *
      * @return iterable<array-key, mixed>
+     *
      * @throws MissingTemplateArgumentsException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
-     * @throws UnsupportedMetadataException
      * @throws TypeNotFoundException
+     * @throws \InvalidArgumentException
      */
     private function createArguments(
         TypeMetadata $metadata,
@@ -162,7 +158,10 @@ class NamedTypeBuilder implements TypeBuilderInterface
                     break;
 
                 default:
-                    throw UnsupportedMetadataException::fromMetadataName($parameter);
+                    throw new \InvalidArgumentException(\sprintf(
+                        'Unknown metadata entry of type %s',
+                        $parameter::class,
+                    ));
             }
         }
 
