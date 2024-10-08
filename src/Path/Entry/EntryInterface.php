@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Path\Entry;
 
 interface EntryInterface extends \Stringable
 {
-    public function match(mixed $value): bool;
-
     /**
      * Returns string representation of the path entry.
      */

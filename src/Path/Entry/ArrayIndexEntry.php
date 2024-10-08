@@ -17,9 +17,4 @@ final class ArrayIndexEntry extends Entry
 
         parent::__construct($key);
     }
-
-    public function match(mixed $value): bool
-    {
-        return $this->index === $value;
-    }
 }
