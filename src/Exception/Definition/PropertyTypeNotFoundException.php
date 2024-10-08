@@ -23,8 +23,8 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
      * @param non-empty-string $property
      */
     public function __construct(
-        private readonly string $class,
-        private readonly string $property,
+        protected readonly string $class,
+        protected readonly string $property,
         TypeStatement $type,
         string $template,
         int $code = 0,

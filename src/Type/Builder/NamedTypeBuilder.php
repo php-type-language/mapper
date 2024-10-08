@@ -6,11 +6,11 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Creation\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
-use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
 use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
@@ -90,9 +90,9 @@ class NamedTypeBuilder implements TypeBuilderInterface
         }
 
         if (!$metadata->isTemplateArgumentsIsAllowed() && $type->arguments !== null) {
-            throw TemplateArgumentsNotSupportedException::fromTypeName(
-                type: $type->name->toString(),
-                given: $this->printer->print($type),
+            throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
+                passedArgumentsCount: $type->arguments->count(),
+                type: $type,
             );
         }
 
@@ -166,11 +166,11 @@ class NamedTypeBuilder implements TypeBuilderInterface
         }
 
         if ($arguments !== []) {
-            throw TooManyTemplateArgumentsException::fromTemplateArgumentsCount(
-                type: $this->printer->print($type),
-                passed: $type->arguments?->count() ?? 0,
-                expectedMin: $metadata->getNumberOfRequiredTemplateParameters(),
-                expectedMax: $metadata->getNumberOfTemplateParameters(),
+            throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
+                passedArgumentsCount: $type->arguments?->count() ?? 0,
+                minSupportedArgumentsCount: $metadata->getNumberOfRequiredTemplateParameters(),
+                maxSupportedArgumentsCount: $metadata->getNumberOfTemplateParameters(),
+                type: $type,
             );
         }
 
