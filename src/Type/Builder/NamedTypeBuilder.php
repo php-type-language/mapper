@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
-use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
 use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
+use TypeLang\Mapper\Exception\UnsupportedMetadataException;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
 use TypeLang\Mapper\Type\Meta\Reader\ReaderInterface;
 use TypeLang\Mapper\Type\Meta\SealedShapeFlagParameterMetadata;
@@ -26,7 +26,7 @@ use TypeLang\Parser\Node\Literal\LiteralNodeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\ExplicitFieldNode;
 use TypeLang\Parser\Node\Stmt\Shape\ImplicitFieldNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
@@ -68,7 +68,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
     /**
      * @throws MissingTemplateArgumentsException
      * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TemplateArgumentHintsNotSupportedException
      * @throws TemplateArgumentsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws TypeNotFoundException
@@ -108,7 +108,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
      *
      * @return iterable<array-key, mixed>
      * @throws MissingTemplateArgumentsException
-     * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws UnsupportedMetadataException
      * @throws TypeNotFoundException
@@ -141,8 +141,9 @@ class NamedTypeBuilder implements TypeBuilderInterface
                     }
 
                     $result[] = $this->getTemplateArgumentValue(
+                        type: $type,
                         metadata: $parameter,
-                        node: \array_shift($arguments),
+                        argument: \array_shift($arguments),
                         context: $context,
                     );
 
@@ -200,21 +201,22 @@ class NamedTypeBuilder implements TypeBuilderInterface
     }
 
     /**
-     * @throws TemplateArgumentsHintNotSupportedException
+     * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
      */
     private function getTemplateArgumentValue(
+        NamedTypeNode $type,
         TemplateParameterMetadata $metadata,
-        ArgumentNode $node,
+        TemplateArgumentNode $argument,
         RepositoryInterface $context,
     ): mixed {
-        $value = $node->value;
+        $value = $argument->value;
 
-        if ($node->hint !== null) {
-            throw TemplateArgumentsHintNotSupportedException::fromHintName(
-                type: $this->name,
-                argument: $this->printer->print($node->value),
-                hint: $node->hint->toString(),
+        if ($argument->hint !== null) {
+            throw TemplateArgumentHintsNotSupportedException::becauseTemplateArgumentHintsNotSupported(
+                hint: $argument->hint,
+                argument: $argument,
+                type: $type,
             );
         }
 

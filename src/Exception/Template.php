@@ -8,6 +8,8 @@ use TypeLang\Mapper\Path\JsonPathPrinter;
 use TypeLang\Mapper\Path\PathInterface;
 use TypeLang\Mapper\Path\PathPrinterInterface;
 use TypeLang\Parser\Node\Statement;
+use TypeLang\Parser\Node\Stmt\Shape\FieldNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface as TypePrinterInterface;
 
@@ -66,11 +68,14 @@ final class Template implements \Stringable
     {
         return match (true) {
             $value instanceof Statement => $this->types->print($value),
+            $value instanceof TemplateArgumentNode => $this->types->print($value->value),
+            $value instanceof FieldNode => $this->types->print($value->type),
             $value instanceof PathInterface => $this->paths->print($value),
             $value === true => 'true',
             $value === false => 'false',
             \is_string($value) => $value,
-            \is_scalar($value) => (string) $value,
+            \is_scalar($value),
+            $value instanceof \Stringable => (string) $value,
             default => \get_debug_type($value),
         };
     }

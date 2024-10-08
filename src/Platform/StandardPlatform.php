@@ -25,6 +25,8 @@ class StandardPlatform implements PlatformInterface
         GrammarFeature::Generics,
         GrammarFeature::Union,
         GrammarFeature::List,
+        GrammarFeature::Hints,
+        GrammarFeature::Attributes,
     ];
 
     public function __construct(
