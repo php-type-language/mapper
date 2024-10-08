@@ -10,6 +10,7 @@ use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Path\ExecutionStackInterface;
 use TypeLang\Mapper\Path\MutablePath;
 use TypeLang\Mapper\Path\PathInterface;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 /**
  * Mutable local bypass context.
@@ -20,6 +21,7 @@ final class LocalContext extends Context implements ExecutionStackInterface
 
     final public function __construct(
         private readonly Direction $direction,
+        private readonly RepositoryInterface $types,
         ?bool $strictTypes = null,
         ?bool $objectsAsArrays = null,
         ?bool $detailedTypes = null,
@@ -33,10 +35,14 @@ final class LocalContext extends Context implements ExecutionStackInterface
         );
     }
 
-    public static function fromContext(Direction $direction, ?Context $context): self
-    {
-        return (new self($direction))
-            ->with($context);
+    public static function fromContext(
+        Direction $direction,
+        RepositoryInterface $types,
+        ?Context $context,
+    ): self {
+        $instance = new self($direction, $types);
+
+        return $instance->with($context);
     }
 
     #[\Override]
@@ -50,6 +56,7 @@ final class LocalContext extends Context implements ExecutionStackInterface
 
         return new self(
             direction: $local->direction,
+            types: $local->types,
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
             detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
@@ -104,9 +111,20 @@ final class LocalContext extends Context implements ExecutionStackInterface
         return $result;
     }
 
+    /**
+     * @api
+     */
     public function getPath(): PathInterface
     {
         return $this->path;
+    }
+
+    /**
+     * @api
+     */
+    public function getTypes(): RepositoryInterface
+    {
+        return $this->types;
     }
 
     public function enter(EntryInterface $entry): void

@@ -72,6 +72,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
         $context = LocalContext::fromContext(
             direction: Direction::Normalize,
+            types: $this->types,
             context: $this->context->with($context),
         );
 
@@ -88,6 +89,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
         $context = LocalContext::fromContext(
             direction: Direction::Denormalize,
+            types: $this->types,
             context: $this->context->with($context),
         );
 
