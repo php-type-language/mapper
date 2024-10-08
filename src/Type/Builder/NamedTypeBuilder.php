@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Creation\MissingTemplateArgumentsException;
-use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
 use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\UnsupportedAttributeException;
 use TypeLang\Mapper\Type\Meta\Reader\AttributeReader;
@@ -86,10 +86,7 @@ class NamedTypeBuilder implements TypeBuilderInterface
         );
 
         if (!$metadata->isShapeFieldsIsAllowed() && $type->fields !== null) {
-            throw ShapeFieldsNotSupportedException::fromTypeName(
-                type: $type->name->toString(),
-                given: $this->printer->print($type),
-            );
+            throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported($type);
         }
 
         if (!$metadata->isTemplateArgumentsIsAllowed() && $type->arguments !== null) {

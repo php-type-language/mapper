@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Creation\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Type\ObjectType;
@@ -55,10 +55,7 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
         assert($type instanceof NamedTypeNode);
 
         if ($type->fields !== null) {
-            throw ShapeFieldsNotSupportedException::fromTypeName(
-                type: $type->name->toString(),
-                given: $this->printer->print($type),
-            );
+            throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported($type);
         }
 
         if ($type->arguments !== null) {
