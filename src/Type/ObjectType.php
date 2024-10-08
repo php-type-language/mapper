@@ -8,9 +8,9 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredFieldException;
 use TypeLang\Mapper\Exception\TypeRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Path\Entry\ObjectEntry;
+use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Context\Path\Entry\ObjectEntry;
-use TypeLang\Mapper\Type\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

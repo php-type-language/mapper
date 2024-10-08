@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Context;
 
-use TypeLang\Mapper\Type\Context\Path\Entry\ObjectEntry;
+use TypeLang\Mapper\Path\Entry\ObjectEntry;
 
 class Context
 {

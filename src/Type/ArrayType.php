@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\ArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class ArrayType implements LogicalTypeInterface
@@ -53,9 +53,9 @@ final class ArrayType implements LogicalTypeInterface
 
         return new NamedTypeNode(
             name: $this->name,
-            arguments: new ArgumentsListNode([
-                new ArgumentNode($this->key->getTypeStatement($context)),
-                new ArgumentNode($this->value->getTypeStatement($context)),
+            arguments: new TemplateArgumentsListNode([
+                new TemplateArgumentNode($this->key->getTypeStatement($context)),
+                new TemplateArgumentNode($this->value->getTypeStatement($context)),
             ]),
         );
     }

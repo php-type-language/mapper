@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Context\Path;
+namespace TypeLang\Mapper\Path;
 
-use TypeLang\Mapper\Type\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Path\Entry\EntryInterface;
 
 /**
  * @template-implements \IteratorAggregate<array-key, EntryInterface>

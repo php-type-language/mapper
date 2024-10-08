@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Context;
 
-use TypeLang\Mapper\Type\Context\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Type\Context\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Type\Context\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Type\Context\Path\ExecutionStackInterface;
-use TypeLang\Mapper\Type\Context\Path\MutablePath;
-use TypeLang\Mapper\Type\Context\Path\PathInterface;
+use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Path\ExecutionStackInterface;
+use TypeLang\Mapper\Path\MutablePath;
+use TypeLang\Mapper\Path\PathInterface;
 
 /**
  * Mutable local bypass context.
