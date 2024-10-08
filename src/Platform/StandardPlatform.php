@@ -30,7 +30,7 @@ class StandardPlatform implements PlatformInterface
     ];
 
     public function __construct(
-        private readonly DriverInterface $reader = new AttributeDriver(),
+        private readonly DriverInterface $driver = new AttributeDriver(),
     ) {}
 
     public function getName(): string
@@ -55,7 +55,7 @@ class StandardPlatform implements PlatformInterface
         yield new NullableTypeBuilder();
         yield new ListTypeBuilder();
         yield new UnionTypeBuilder();
-        yield new ObjectTypeBuilder($this->reader);
+        yield new ObjectTypeBuilder($this->driver);
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool
