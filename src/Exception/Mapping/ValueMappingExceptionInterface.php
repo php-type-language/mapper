@@ -6,6 +6,9 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @deprecated TODO
+ */
 interface ValueMappingExceptionInterface extends MappingExceptionInterface
 {
     /**

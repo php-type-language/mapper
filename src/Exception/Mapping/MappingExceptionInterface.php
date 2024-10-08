@@ -9,6 +9,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * An exception that occurs in case of errors during mapping process.
+ * @deprecated TODO
  */
 interface MappingExceptionInterface extends MapperExceptionInterface
 {

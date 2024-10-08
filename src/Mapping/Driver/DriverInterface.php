@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
+use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 

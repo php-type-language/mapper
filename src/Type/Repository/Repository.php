@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository;
 
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
-use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -118,7 +118,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             }
         }
 
-        throw TypeNotFoundException::fromType($statement);
+        throw TypeNotFoundException::becauseTypeNotDefined($statement);
     }
 
     public function getIterator(): \Traversable

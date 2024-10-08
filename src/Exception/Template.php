@@ -80,8 +80,13 @@ final class Template implements \Stringable
         $search = $replace = [];
 
         foreach ($this->getPlaceholders() as $placeholder => $value) {
+            $replacement = $this->formatValueToString($value);
+
             $search[] = $placeholder;
-            $replace[] = $this->formatValueToString($value);
+            $replace[] = $replacement;
+
+            $search[] = \sprintf('"%s"', $placeholder);
+            $replace[] = \addcslashes($replacement, '"');
         }
 
         return \str_replace($search, $replace, $this->template);

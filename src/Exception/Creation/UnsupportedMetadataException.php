@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Creation;
 
+/**
+ * @deprecated TODO
+ */
 class UnsupportedMetadataException extends TypeCreationException
 {
     public static function fromMetadataName(object $metadata, ?\Throwable $prev = null): static

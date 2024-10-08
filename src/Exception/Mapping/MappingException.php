@@ -10,6 +10,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Traverser;
 use TypeLang\Parser\Traverser\TypeMapVisitor;
 
+/**
+ * @deprecated TODO
+ */
 abstract class MappingException extends TypeException implements MappingExceptionInterface
 {
     /**

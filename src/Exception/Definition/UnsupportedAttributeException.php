@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition;
 
+/**
+ * @deprecated TODO
+ */
 class UnsupportedAttributeException extends TypeDefinitionException
 {
     public static function fromAttributeName(object $attribute, ?\Throwable $prev = null): static

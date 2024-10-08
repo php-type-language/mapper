@@ -6,6 +6,9 @@ namespace TypeLang\Mapper\Exception\Creation;
 
 use TypeLang\Mapper\Exception\StringInfo;
 
+/**
+ * @deprecated TODO
+ */
 class TemplateArgumentsHintNotSupportedException extends TemplateArgumentHintException
 {
     /**

@@ -4,10 +4,19 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Environment;
 
+use TypeLang\Mapper\Exception\MapperExceptionInterface;
 use TypeLang\Mapper\Exception\Template;
 
-abstract class EnvironmentException extends \LogicException implements EnvironmentExceptionInterface
+/**
+ * Occurs when the working environment does not match the required one.
+ */
+abstract class EnvironmentException extends \LogicException implements MapperExceptionInterface
 {
+    /**
+     * @var int
+     */
+    protected const CODE_ERROR_LAST = 0x00;
+
     public readonly Template $template;
 
     public function __construct(string $template, int $code = 0, ?\Throwable $previous = null)

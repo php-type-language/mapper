@@ -11,6 +11,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Traverser;
 use TypeLang\Parser\Traverser\TypeMapVisitor;
 
+/**
+ * @deprecated TODO
+ */
 final class InvalidValueException extends MappingException implements ValueMappingExceptionInterface
 {
     public function __construct(

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
-use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Context\Context;

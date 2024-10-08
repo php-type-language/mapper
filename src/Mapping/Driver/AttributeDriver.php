@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
+use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
@@ -36,10 +38,18 @@ final class AttributeDriver extends LoadableDriver
             }
 
             if ($attribute->type !== null) {
-                $metadata->setType($types->getByType(
-                    type: $attribute->type,
-                    class: $reflection,
-                ));
+                try {
+                    $type = $types->getByType($attribute->type, $reflection);
+                } catch (TypeNotFoundException $e) {
+                    throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
+                        class: $class->getName(),
+                        property: $property->getName(),
+                        type: $e->getType(),
+                        previous: $e,
+                    );
+                }
+
+                $metadata->setType($type);
             }
         }
     }

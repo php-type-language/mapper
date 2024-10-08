@@ -9,6 +9,9 @@ use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @deprecated TODO
+ */
 final class MissingRequiredFieldException extends MappingException implements FieldMappingExceptionInterface
 {
     /**

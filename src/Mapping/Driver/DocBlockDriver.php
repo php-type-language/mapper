@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
+use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
-use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
@@ -71,21 +72,21 @@ final class DocBlockDriver extends LoadableDriver
     private static function assertKernelPackageIsInstalled(): void
     {
         if (!\class_exists(Parser::class)) {
-            throw new ComposerPackageRequiredException(
+            throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc',
                 purpose: 'docblock support'
             );
         }
 
         if (!\class_exists(ParamTagFactory::class)) {
-            throw new ComposerPackageRequiredException(
+            throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc-standard-tags',
                 purpose: '"@param" tag support'
             );
         }
 
         if (!\class_exists(VarTagFactory::class)) {
-            throw new ComposerPackageRequiredException(
+            throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc-standard-tags',
                 purpose: '"@var" tag support'
             );
@@ -119,11 +120,11 @@ final class DocBlockDriver extends LoadableDriver
                 try {
                     $type = $types->getByStatement($statement, $reflection);
                 } catch (TypeNotFoundException $e) {
-                    throw TypeNotFoundException::fromPropertyType(
+                    throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                         class: $class->getName(),
                         property: $property->getName(),
-                        type: $e->getExpectedType(),
-                        prev: $e,
+                        type: $e->getType(),
+                        previous: $e,
                     );
                 }
 
