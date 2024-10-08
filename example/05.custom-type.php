@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -36,12 +37,17 @@ class MyNonEmptyStringType implements TypeInterface
     }
 }
 
-// Create own types registry and add custom "non-empty-string" type.
-$registry = new Repository();
-$registry->type('non-empty-string', MyNonEmptyStringType::class);
+class CustomStandardPlatform extends StandardPlatform
+{
+    public function getTypes(): iterable
+    {
+        yield from parent::getTypes();
 
+        yield new NamedTypeBuilder('non-empty-string', MyNonEmptyStringType::class);
+    }
+}
 
-$mapper = new Mapper($registry);
+$mapper = new Mapper(new CustomStandardPlatform());
 
 $result = $mapper->normalize('example', 'non-empty-string');
 

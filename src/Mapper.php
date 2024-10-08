@@ -7,6 +7,7 @@ namespace TypeLang\Mapper;
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Context\Context;
 use TypeLang\Mapper\Type\Context\Direction;
 use TypeLang\Mapper\Type\Context\LocalContext;
@@ -15,29 +16,13 @@ use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
+    private readonly RepositoryInterface $types;
+
     public function __construct(
-        private readonly RepositoryInterface $types = new Repository(),
+        private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Context $context = new Context(),
-    ) {}
-
-    /**
-     * Returns new mapper instance with new context.
-     *
-     * @api
-     */
-    public function withContext(Context $context): self
-    {
-        return new self($this->types, $context);
-    }
-
-    /**
-     * Returns new mapper instance with extended context.
-     *
-     * @api
-     */
-    public function withAddedContext(Context $context): self
-    {
-        return $this->withContext($this->context->with($context));
+    ) {
+        $this->types = new Repository($this->platform);
     }
 
     /**
@@ -47,7 +32,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function getPlatform(): PlatformInterface
     {
-        return $this->types->getPlatform();
+        return $this->platform;
     }
 
     /**

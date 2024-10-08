@@ -35,12 +35,12 @@ class Repository implements RepositoryInterface, \IteratorAggregate
     private readonly TypeResolver $typeResolver;
 
     public function __construct(
-        private readonly PlatformInterface $platform = new StandardPlatform(),
+        PlatformInterface $platform = new StandardPlatform(),
         private readonly ReferencesReaderInterface $references = new NativeReferencesReader(),
     ) {
         $this->typeResolver = new TypeResolver();
-        $this->parser = $this->createPlatformParser($this->platform);
-        $this->builders = $this->getTypeBuilders($this->platform);
+        $this->parser = $this->createPlatformParser($platform);
+        $this->builders = $this->getTypeBuilders($platform);
     }
 
     /**
@@ -71,11 +71,6 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
         );
-    }
-
-    public function getPlatform(): PlatformInterface
-    {
-        return $this->platform;
     }
 
     /**

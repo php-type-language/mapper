@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
+use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -46,11 +47,17 @@ class MyNonEmpty implements TypeInterface
     }
 }
 
-// Create own types registry and add "non-empty" type.
-$registry = new Repository();
-$registry->type('non-empty', MyNonEmpty::class);
+class CustomStandardPlatform extends StandardPlatform
+{
+    public function getTypes(): iterable
+    {
+        yield from parent::getTypes();
 
-$mapper = new Mapper($registry);
+        yield new NamedTypeBuilder('non-empty', MyNonEmpty::class);
+    }
+}
+
+$mapper = new Mapper(new CustomStandardPlatform());
 
 var_dump($mapper->normalize('example', 'non-empty'));
 //

@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Type\Repository\Repository;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -28,13 +27,13 @@ class ExampleDTO
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
     reader: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
-        delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),
         paramTagName: 'tl-param', // Read only "@tl-param" annotations for promoted properties
         varTagName: 'tl-var',     // Read only "@tl-var" annotations for basic properties
+        delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),
     ),
 );
 
-$mapper = new Mapper(new Repository($platform));
+$mapper = new Mapper($platform);
 
 var_dump($mapper->normalize(new ExampleDTO(42)));
 //

@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type\Repository;
 
 use TypeLang\Mapper\Exception\TypeNotCreatableException;
 use TypeLang\Mapper\Exception\TypeNotFoundException;
-use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -16,11 +15,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 interface RepositoryInterface extends \Traversable, \Countable
 {
-    /**
-     * Returns platform of the current registry set.
-     */
-    public function getPlatform(): PlatformInterface;
-
     /**
      * @param non-empty-string $type
      * @param \ReflectionClass<object>|null $class
