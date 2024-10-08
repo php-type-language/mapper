@@ -31,17 +31,6 @@ final class MixedType implements LogicalTypeInterface
         return new NamedTypeNode($this->name);
     }
 
-    /**
-     * @throws TypeNotFoundException
-     */
-    private function getType(mixed $value, RepositoryInterface $types): TypeInterface
-    {
-        /**
-         * @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
-         */
-        return $types->getByStatement(new NamedTypeNode(\get_debug_type($value)));
-    }
-
     public function supportsCasting(mixed $value, LocalContext $context): bool
     {
         return true;
@@ -52,8 +41,8 @@ final class MixedType implements LogicalTypeInterface
      */
     public function cast(mixed $value, RepositoryInterface $types, LocalContext $context): mixed
     {
-        $type = $this->getType($value, $types);
-
-        return $type->cast($value, $types, $context);
+        return $context->getTypes()
+            ->getByValue($value)
+            ->cast($value, $types, $context);
     }
 }
