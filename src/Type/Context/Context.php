@@ -83,6 +83,7 @@ class Context
         return new self(
             strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
+            detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
         );
     }
 }
