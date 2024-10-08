@@ -26,7 +26,7 @@ class ExampleDTO
 }
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    reader: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
+    driver: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
         paramTagName: 'tl-param', // Read only "@tl-param" annotations for promoted properties
         varTagName: 'tl-var',     // Read only "@tl-var" annotations for basic properties
         delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),

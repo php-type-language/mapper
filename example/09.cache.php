@@ -30,7 +30,7 @@ $cache = new \Symfony\Component\Cache\Psr16Cache(
 );
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    reader: new \TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver(
+    driver: new \TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver(
         cache: $cache,
         delegate: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
             delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),
