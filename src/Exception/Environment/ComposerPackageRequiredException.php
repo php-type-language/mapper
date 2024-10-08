@@ -4,18 +4,30 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Environment;
 
-use TypeLang\Mapper\Exception\StringInfo;
-
 final class ComposerPackageRequiredException extends EnvironmentException implements EnvironmentExceptionInterface
 {
     /**
      * @param non-empty-string $package
-     * @param non-empty-string $for
+     * @param non-empty-string $purpose
      */
-    public static function becausePackageNotInstalled(string $package, string $for): self
-    {
-        $message = 'The %s component is required to %s. Try running "composer require %$1s"';
+    public function __construct(
+        private readonly string $package,
+        string $purpose,
+        int $code = 0,
+        ?\Throwable $previous = null,
+    ) {
+        $template = 'The {{package}} component is required to %s. Try running "composer require {{package}}"';
 
-        return new self(\sprintf($message, StringInfo::quoted($package), $for));
+        parent::__construct(\sprintf($template, $purpose), $code, $previous);
+    }
+
+    /**
+     * @api
+     *
+     * @return non-empty-string
+     */
+    public function getPackage(): string
+    {
+        return $this->package;
     }
 }

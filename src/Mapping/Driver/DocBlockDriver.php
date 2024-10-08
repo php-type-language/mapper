@@ -71,23 +71,23 @@ final class DocBlockDriver extends LoadableDriver
     private static function assertKernelPackageIsInstalled(): void
     {
         if (!\class_exists(Parser::class)) {
-            throw ComposerPackageRequiredException::becausePackageNotInstalled(
+            throw new ComposerPackageRequiredException(
                 package: 'type-lang/phpdoc',
-                for: 'docblock support'
+                purpose: 'docblock support'
             );
         }
 
         if (!\class_exists(ParamTagFactory::class)) {
-            throw ComposerPackageRequiredException::becausePackageNotInstalled(
+            throw new ComposerPackageRequiredException(
                 package: 'type-lang/phpdoc-standard-tags',
-                for: '"@param" tag support'
+                purpose: '"@param" tag support'
             );
         }
 
         if (!\class_exists(VarTagFactory::class)) {
-            throw ComposerPackageRequiredException::becausePackageNotInstalled(
+            throw new ComposerPackageRequiredException(
                 package: 'type-lang/phpdoc-standard-tags',
-                for: '"@var" tag support'
+                purpose: '"@var" tag support'
             );
         }
     }
