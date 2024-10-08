@@ -6,8 +6,16 @@ namespace TypeLang\Mapper\Exception\Definition\Template;
 
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * Group of errors related to incorrect number of template arguments
+ */
 abstract class TemplateArgumentsCountException extends TemplateArgumentsException
 {
+    /**
+     * @var int
+     */
+    protected const CODE_ERROR_LAST = parent::CODE_ERROR_LAST;
+
     /**
      * @param int<0, max> $passedArgumentsCount
      * @param int<0, max> $minSupportedArgumentsCount

@@ -7,33 +7,33 @@ namespace TypeLang\Mapper\Exception\Definition\Template;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * Occurs when a type supports fewer arguments than were passed
+ * Occurs when a type requires more template arguments to be specified than required
  */
-class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
+class MissingTemplateArgumentsException extends TemplateArgumentsCountException
 {
     /**
      * @var int
      */
-    public const CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS = 0x01 + parent::CODE_ERROR_LAST;
+    public const CODE_ERROR_MISSING_TEMPLATE_ARGUMENTS = 0x01 + parent::CODE_ERROR_LAST;
 
     /**
      * @var int
      */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS;
+    protected const CODE_ERROR_LAST = self::CODE_ERROR_MISSING_TEMPLATE_ARGUMENTS;
 
     /**
      * @param int<0, max> $passedArgumentsCount
      * @param int<0, max> $minSupportedArgumentsCount
      * @param int<0, max> $maxSupportedArgumentsCount
      */
-    public static function becauseTemplateArgumentsRangeOverflows(
+    public static function becauseTemplateArgumentsRangeRequired(
         int $passedArgumentsCount,
         int $minSupportedArgumentsCount,
         int $maxSupportedArgumentsCount,
         TypeStatement $type,
         ?\Throwable $previous = null
     ): self {
-        $template = 'Type "{{type}}" only accepts %s template arguments, '
+        $template = 'Type "{{type}}" expects %s template argument(s), '
             . 'but {{passedArgumentsCount}} were passed';
 
         $template = $minSupportedArgumentsCount === $maxSupportedArgumentsCount
@@ -46,7 +46,7 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
             maxSupportedArgumentsCount: $maxSupportedArgumentsCount,
             type: $type,
             template: $template,
-            code: self::CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS,
+            code: self::CODE_ERROR_MISSING_TEMPLATE_ARGUMENTS,
             previous: $previous,
         );
     }

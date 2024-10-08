@@ -6,6 +6,9 @@ namespace TypeLang\Mapper\Exception\Definition\Template;
 
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * Occurs when a type does not support template arguments
+ */
 class TemplateArgumentsNotSupportedException extends TemplateArgumentsCountException
 {
     /**

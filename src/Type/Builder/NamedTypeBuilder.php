@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Creation\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Creation\TemplateArgumentsHintNotSupportedException;
 use TypeLang\Mapper\Exception\Creation\UnsupportedMetadataException;
 use TypeLang\Mapper\Exception\Definition\InvalidTypeArgumentException;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
@@ -132,11 +132,11 @@ class NamedTypeBuilder implements TypeBuilderInterface
                             break;
                         }
 
-                        throw MissingTemplateArgumentsException::fromTemplateArgumentsCount(
-                            type: $this->printer->print($type),
-                            passed: $type->arguments?->count() ?? 0,
-                            expectedMin: $metadata->getNumberOfRequiredTemplateParameters(),
-                            expectedMax: $metadata->getNumberOfTemplateParameters(),
+                        throw MissingTemplateArgumentsException::becauseTemplateArgumentsRangeRequired(
+                            passedArgumentsCount: $type->arguments?->count() ?? 0,
+                            minSupportedArgumentsCount: $metadata->getNumberOfRequiredTemplateParameters(),
+                            maxSupportedArgumentsCount: $metadata->getNumberOfTemplateParameters(),
+                            type: $type,
                         );
                     }
 

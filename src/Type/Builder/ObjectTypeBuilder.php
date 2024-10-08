@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Creation\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Printer\PrettyPrinter;
-use TypeLang\Printer\PrinterInterface;
 
 /**
  * Creates an {@see ObjectType} from a type name containing a reference to an
@@ -25,7 +23,6 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
 {
     public function __construct(
         private readonly DriverInterface $driver = new AttributeDriver(),
-        private readonly PrinterInterface $printer = new PrettyPrinter(),
     ) {}
 
     /**
@@ -59,9 +56,9 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
         }
 
         if ($type->arguments !== null) {
-            throw TemplateArgumentsNotSupportedException::fromTypeName(
-                type: $type->name->toString(),
-                given: $this->printer->print($type),
+            throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
+                passedArgumentsCount: $type->arguments->count(),
+                type: $type,
             );
         }
 
