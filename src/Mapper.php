@@ -12,8 +12,6 @@ use TypeLang\Mapper\Type\Context\Direction;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
-use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
@@ -24,6 +22,8 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * Returns new mapper instance with new context.
+     *
+     * @api
      */
     public function withContext(Context $context): self
     {
@@ -32,6 +32,8 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * Returns new mapper instance with extended context.
+     *
+     * @api
      */
     public function withAddedContext(Context $context): self
     {
@@ -40,6 +42,8 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * Returns current mapper platform.
+     *
+     * @api
      */
     public function getPlatform(): PlatformInterface
     {
@@ -48,26 +52,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * Returns current types registry.
+     *
+     * @api
      */
     public function getTypes(): RepositoryInterface
     {
         return $this->types;
-    }
-
-    /**
-     * @param non-empty-string|null $type
-     *
-     * @throws TypeNotCreatableException
-     * @throws TypeNotFoundException
-     */
-    private function getType(mixed $value, ?string $type): TypeInterface
-    {
-        if ($type === null) {
-            // @phpstan-ignore-next-line : False-positive, the "get_debug_type" method returns a non-empty string
-            return $this->types->getByStatement(new NamedTypeNode(\get_debug_type($value)));
-        }
-
-        return $this->types->getByType($type);
     }
 
     /**
@@ -76,7 +66,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function normalize(mixed $value, ?string $type = null, ?Context $context = null): mixed
     {
-        $concreteType = $this->getType($value, $type);
+        $concreteType = $type === null
+            ? $this->types->getByValue($value)
+            : $this->types->getByType($type);
 
         $context = LocalContext::fromContext(
             direction: Direction::Normalize,
@@ -92,7 +84,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function denormalize(mixed $value, string $type, ?Context $context = null): mixed
     {
-        $concreteType = $this->getType($value, $type);
+        $concreteType = $this->types->getByType($type);
 
         $context = LocalContext::fromContext(
             direction: Direction::Denormalize,

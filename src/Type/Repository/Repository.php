@@ -14,6 +14,7 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
@@ -99,6 +100,14 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         }
 
         return $this->getByStatement($statement, $class);
+    }
+
+    public function getByValue(mixed $value, ?\ReflectionClass $class = null): TypeInterface
+    {
+        // @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
+        $statement = new NamedTypeNode(\get_debug_type($value));
+
+        return $this->getByStatement($statement);
     }
 
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface

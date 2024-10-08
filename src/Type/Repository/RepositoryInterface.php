@@ -34,6 +34,15 @@ interface RepositoryInterface extends \Traversable, \Countable
      * @param \ReflectionClass<object>|null $class
      *
      * @throws TypeNotFoundException
+     * @throws TypeNotCreatableException
+     */
+    public function getByValue(mixed $value, ?\ReflectionClass $class = null): TypeInterface;
+
+    /**
+     * @param \ReflectionClass<object>|null $class
+     *
+     * @throws TypeNotFoundException
+     * @throws TypeNotCreatableException
      */
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface;
 
