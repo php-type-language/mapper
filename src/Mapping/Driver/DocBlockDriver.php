@@ -123,7 +123,7 @@ final class DocBlockDriver extends LoadableDriver
                     throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                         class: $class->getName(),
                         property: $property->getName(),
-                        type: $e->getExpected(),
+                        type: $e->getType(),
                         previous: $e,
                     );
                 }
