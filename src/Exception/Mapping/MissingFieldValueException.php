@@ -64,6 +64,7 @@ class MissingFieldValueException extends MissingValueException
 
     /**
      * @api
+     *
      * @return non-empty-string
      */
     public function getField(): string

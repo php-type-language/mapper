@@ -102,7 +102,6 @@ class NamedTypeBuilder implements TypeBuilderInterface
      * @param TypeMetadata<TypeInterface> $metadata
      *
      * @return iterable<array-key, mixed>
-     *
      * @throws MissingTemplateArgumentsException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException

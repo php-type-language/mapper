@@ -25,9 +25,8 @@ abstract class LoadableDriver extends Driver
      * @param \ReflectionClass<TArg> $class
      *
      * @return ClassMetadata<TArg>
-     *
-     * @throws DefinitionException in case of type cannot be defined.
-     * @throws \Throwable in case of internal error occurred.
+     * @throws DefinitionException in case of type cannot be defined
+     * @throws \Throwable in case of internal error occurred
      */
     public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
@@ -49,8 +48,8 @@ abstract class LoadableDriver extends Driver
      * @param \ReflectionClass<TArg> $reflection
      * @param ClassMetadata<TArg> $class
      *
-     * @throws DefinitionException in case of type cannot be defined.
-     * @throws \Throwable in case of internal error occurred.
+     * @throws DefinitionException in case of type cannot be defined
+     * @throws \Throwable in case of internal error occurred
      */
     abstract protected function load(
         \ReflectionClass $reflection,

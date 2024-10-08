@@ -35,6 +35,7 @@ abstract class TemplateArgumentsCountException extends TemplateArgumentsExceptio
 
     /**
      * @api
+     *
      * @return int<0, max>
      */
     public function getPassedArgumentsCount(): int
@@ -44,6 +45,7 @@ abstract class TemplateArgumentsCountException extends TemplateArgumentsExceptio
 
     /**
      * @api
+     *
      * @return int<0, max>
      */
     public function getMinSupportedArgumentsCount(): int
@@ -53,6 +55,7 @@ abstract class TemplateArgumentsCountException extends TemplateArgumentsExceptio
 
     /**
      * @api
+     *
      * @return int<0, max>
      */
     public function getMaxSupportedArgumentsCount(): int

@@ -35,6 +35,7 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
 
     /**
      * @api
+     *
      * @return class-string
      */
     public function getClass(): string
@@ -44,6 +45,7 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
 
     /**
      * @api
+     *
      * @return non-empty-string
      */
     public function getProperty(): string
