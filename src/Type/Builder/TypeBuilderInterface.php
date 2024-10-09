@@ -11,6 +11,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TStmt of TypeStatement
+ *
  * @template-covariant TType of TypeInterface
  */
 interface TypeBuilderInterface
@@ -24,9 +25,8 @@ interface TypeBuilderInterface
      * @param TStmt $statement
      *
      * @return TType
-     *
-     * @throws DefinitionException in case of building error.
-     * @throws \Throwable in case of any internal error.
+     * @throws DefinitionException in case of building error
+     * @throws \Throwable in case of any internal error
      */
     public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface;
 }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Context;
 
-use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Path\ExecutionStackInterface;
 use TypeLang\Mapper\Path\MutablePath;
 use TypeLang\Mapper\Path\PathInterface;

@@ -26,6 +26,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @api
+     *
      * @see Context::withStrictTypes()
      */
     public function withStrictTypes(?bool $enabled = null): self
@@ -38,6 +39,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @api
+     *
      * @see Context::withObjectsAsArrays()
      */
     public function withObjectsAsArrays(?bool $enabled = null): self
@@ -50,6 +52,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @api
+     *
      * @see Context::withDetailedTypes()
      */
     public function withDetailedTypes(?bool $enabled = null): self
