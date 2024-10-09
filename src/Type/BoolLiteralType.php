@@ -31,7 +31,7 @@ class BoolLiteralType extends BoolType
 
         if ($context->isDetailedTypes()) {
             return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
-                new TemplateArgumentNode($result)
+                new TemplateArgumentNode($result),
             ]));
         }
 
