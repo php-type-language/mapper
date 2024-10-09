@@ -39,12 +39,12 @@ var_dump($result);
 //
 // array:1 [
 //   "children" => array:3 [
-//     0 => ChildDTO {
-//       +name: "first"
-//     }
-//     1 => ChildDTO {
-//       +name: "second"
-//     }
+//     0 => array:1 [
+//       "name" => "first"
+//     ]
+//     1 => array:1 [
+//       "name" => "second"
+//     ]
 //     2 => 42
 //   ]
 // ]
