@@ -88,30 +88,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
     }
 
     /**
-     * @return list<non-empty-string|int>
-     *
-     * @deprecated Will be removed
-     */
-    public function getPathAsSegmentsArray(): array
-    {
-        $result = [];
-
-        foreach ($this->path as $entry) {
-            switch (true) {
-                case $entry instanceof ArrayIndexEntry:
-                    $result[] = $entry->index;
-                    break;
-
-                case $entry instanceof ObjectPropertyEntry:
-                    $result[] = $entry->value;
-                    break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
      * @api
      */
     public function getPath(): PathInterface

@@ -19,9 +19,45 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
-        private readonly Context $context = new Context(),
+        private Context $context = new Context(),
     ) {
         $this->types = new Repository($this->platform);
+    }
+
+    /**
+     * @api
+     * @see Context::withStrictTypes()
+     */
+    public function withStrictTypes(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->context = $this->context->withStrictTypes($enabled);
+
+        return $self;
+    }
+
+    /**
+     * @api
+     * @see Context::withObjectsAsArrays()
+     */
+    public function withObjectsAsArrays(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->context = $this->context->withObjectsAsArrays($enabled);
+
+        return $self;
+    }
+
+    /**
+     * @api
+     * @see Context::withDetailedTypes()
+     */
+    public function withDetailedTypes(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->context = $this->context->withDetailedTypes($enabled);
+
+        return $self;
     }
 
     /**
@@ -53,13 +89,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             ? $this->types->getByValue($value)
             : $this->types->getByType($type);
 
-        $context = LocalContext::fromContext(
-            direction: Direction::Normalize,
-            types: $this->types,
-            context: $this->context->with($context),
-        );
+        $local = $this->createLocalContext(Direction::Normalize, $context);
 
-        return $concreteType->cast($value, $context);
+        return $concreteType->cast($value, $local);
     }
 
     /**
@@ -69,12 +101,17 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $concreteType = $this->types->getByType($type);
 
-        $context = LocalContext::fromContext(
-            direction: Direction::Denormalize,
+        $local = $this->createLocalContext(Direction::Denormalize, $context);
+
+        return $concreteType->cast($value, $local);
+    }
+
+    private function createLocalContext(Direction $direction, ?Context $context): LocalContext
+    {
+        return LocalContext::fromContext(
+            direction: $direction,
             types: $this->types,
             context: $this->context->with($context),
         );
-
-        return $concreteType->cast($value, $context);
     }
 }

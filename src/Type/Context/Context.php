@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Context;
 
-use TypeLang\Mapper\Path\Entry\ObjectEntry;
-
 class Context
 {
     /**
@@ -31,15 +29,31 @@ class Context
         protected ?bool $strictTypes = null,
         /**
          * If this option contains {@see true}, then objects are converted to
-         * associative arrays, otherwise anonymous {@see ObjectEntry} will be returned.
+         * associative arrays, otherwise anonymous {@see object} will be
+         * returned.
          */
         protected ?bool $objectsAsArrays = null,
         /**
          * If this option contains {@see true}, then all composite types will
          * be displayed along with detailed fields/values.
          */
-        protected ?bool $detailedTypes = null
+        protected ?bool $detailedTypes = null,
     ) {}
+
+    /**
+     * Enables or disables strict types checking.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
+    public function withStrictTypes(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->strictTypes = $enabled;
+
+        return $self;
+    }
 
     /**
      * Returns current {@see $strictTypes} option or default value
@@ -53,6 +67,21 @@ class Context
     }
 
     /**
+     * Enables or disables object to arrays conversion.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
+    public function withObjectsAsArrays(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->objectsAsArrays = $enabled;
+
+        return $self;
+    }
+
+    /**
      * Returns current {@see $objectsAsArrays} option or default value
      * in case of option is not set.
      *
@@ -61,6 +90,21 @@ class Context
     public function isObjectsAsArrays(): bool
     {
         return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+    }
+
+    /**
+     * Enables or disables detailed types in exceptions.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
+    public function withDetailedTypes(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->detailedTypes = $enabled;
+
+        return $self;
     }
 
     /**
