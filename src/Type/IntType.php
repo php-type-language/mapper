@@ -13,16 +13,17 @@ use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class IntType implements TypeInterface
 {
     /**
      * @var non-empty-string
      */
-    private const DEFAULT_TYPE_NAME = 'int';
+    public const DEFAULT_TYPE_NAME = 'int';
 
-    private readonly int $min;
-    private readonly int $max;
+    protected readonly int $min;
+    protected readonly int $max;
 
     /**
      * @param non-empty-string $name
@@ -31,7 +32,7 @@ class IntType implements TypeInterface
      */
     public function __construct(
         #[TargetTypeName]
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
+        protected readonly string $name = self::DEFAULT_TYPE_NAME,
         #[TargetTemplateArgument(allowedIdentifiers: ['min', 'max'])]
         int|Identifier $min = \PHP_INT_MIN,
         #[TargetTemplateArgument(allowedIdentifiers: ['min', 'max'])]
@@ -82,7 +83,7 @@ class IntType implements TypeInterface
         );
     }
 
-    public function getTypeStatement(LocalContext $context): NamedTypeNode
+    public function getTypeStatement(LocalContext $context): TypeStatement
     {
         if ($this->min === \PHP_INT_MIN && $this->max === \PHP_INT_MAX) {
             return new NamedTypeNode($this->name);

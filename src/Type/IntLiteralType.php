@@ -6,20 +6,21 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Parser\Node\Literal\BoolLiteralNode;
+use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class BoolLiteralType extends BoolType
+final class IntLiteralType extends IntType
 {
     /**
-     * @param non-empty-string $name
+     * @param numeric-string $name
+     * @throws \InvalidArgumentException
      */
     public function __construct(
         string $name,
-        private readonly bool $value,
+        private readonly int $value,
     ) {
         parent::__construct($name);
     }
@@ -27,7 +28,7 @@ class BoolLiteralType extends BoolType
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        $result = new BoolLiteralNode($this->value, $this->name);
+        $result = new IntLiteralNode($this->value, $this->name);
 
         if ($context->isDetailedTypes()) {
             return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
@@ -42,22 +43,17 @@ class BoolLiteralType extends BoolType
     public function match(mixed $value, LocalContext $context): bool
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
+            $value = $this->tryCastToInt($value);
         }
 
         return $value === $this->value;
     }
 
-    /**
-     * Converts incoming value to the bool (in case of strict types is disabled).
-     *
-     * @throws InvalidValueException
-     */
     #[\Override]
-    public function cast(mixed $value, LocalContext $context): bool
+    public function cast(mixed $value, LocalContext $context): int
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
+            $value = $this->tryCastToInt($value);
         }
 
         if ($value === $this->value) {

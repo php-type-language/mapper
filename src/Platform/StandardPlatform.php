@@ -69,6 +69,9 @@ class StandardPlatform implements PlatformInterface
         // Adds support for the "true" and "false" literals
         yield new Builder\BoolLiteralTypeBuilder();
 
+        // Adds support for the integer literal types
+        yield new Builder\IntLiteralTypeBuilder();
+
         // Adds support for the "T[]" statement
         yield new Builder\TypesListBuilder();
 
