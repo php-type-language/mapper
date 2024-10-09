@@ -28,7 +28,6 @@ final class PropertyMetadata extends Metadata
         parent::__construct($this->export, $createdAt);
     }
 
-
     /**
      * Dynamically creates AST type representation.
      *

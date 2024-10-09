@@ -41,6 +41,7 @@ final class ClassMetadata extends Metadata
      * Dynamically creates AST class representation.
      *
      * @api
+     *
      * @codeCoverageIgnore
      */
     public function getTypeStatement(LocalContext $context): TypeStatement
