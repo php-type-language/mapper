@@ -16,6 +16,7 @@ final class IntLiteralType extends IntType
 {
     /**
      * @param numeric-string $name
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(
@@ -32,7 +33,7 @@ final class IntLiteralType extends IntType
 
         if ($context->isDetailedTypes()) {
             return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
-                new TemplateArgumentNode($result)
+                new TemplateArgumentNode($result),
             ]));
         }
 
