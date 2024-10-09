@@ -15,7 +15,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template T of object
  */
-final class ObjectType extends AsymmetricType
+class ObjectType extends AsymmetricType
 {
     /**
      * @param ClassMetadata<T> $metadata

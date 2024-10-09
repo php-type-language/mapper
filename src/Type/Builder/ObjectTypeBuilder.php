@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
+use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -18,11 +16,12 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * existing class.
  *
  * @template T of object
+ * @template-extends Builder<NamedTypeNode, ObjectType<T>>
  */
-final class ObjectTypeBuilder implements TypeBuilderInterface
+final class ObjectTypeBuilder extends Builder
 {
     public function __construct(
-        private readonly DriverInterface $driver = new AttributeDriver(),
+        private readonly DriverInterface $driver = new ReflectionDriver(),
     ) {}
 
     /**
@@ -36,39 +35,17 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
             && !\enum_exists($statement->name->toString());
     }
 
-    /**
-     * Returns the {@see ObjectType} from the class reference.
-     *
-     * Please note that objects do not (yet) support template
-     * arguments and shape fields.
-     *
-     * @return ObjectType<T>
-     * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentsNotSupportedException
-     * @throws \ReflectionException
-     */
-    public function build(TypeStatement $type, RepositoryInterface $context): ObjectType
+    public function build(TypeStatement $statement, RepositoryInterface $types): ObjectType
     {
-        assert($type instanceof NamedTypeNode);
-
-        if ($type->fields !== null) {
-            throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported($type);
-        }
-
-        if ($type->arguments !== null) {
-            throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
-                passedArgumentsCount: $type->arguments->count(),
-                type: $type,
-            );
-        }
+        self::assertNoTemplateArguments($statement);
+        self::assertNoShapeFields($statement);
 
         /** @var class-string<T> $class */
-        $class = $type->name->toString();
+        $class = $statement->name->toString();
 
-        /** @var ObjectType<T> */
         return new ObjectType($this->driver->getClassMetadata(
             class: new \ReflectionClass($class),
-            types: $context,
+            types: $types,
         ));
     }
 }

@@ -28,6 +28,11 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface;
 
+/**
+ * @deprecated TODO
+ *
+ * @template-implements TypeBuilderInterface<NamedTypeNode, TypeInterface>
+ */
 class NamedTypeBuilder implements TypeBuilderInterface
 {
     /**
@@ -62,39 +67,27 @@ class NamedTypeBuilder implements TypeBuilderInterface
             && $statement->name->toLowerString() === $this->lower;
     }
 
-    /**
-     * @throws MissingTemplateArgumentsException
-     * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentHintsNotSupportedException
-     * @throws TemplateArgumentsNotSupportedException
-     * @throws TooManyTemplateArgumentsException
-     * @throws TypeNotFoundException
-     * @throws \InvalidArgumentException
-     * @throws \ReflectionException
-     */
-    public function build(TypeStatement $type, RepositoryInterface $context): TypeInterface
+    public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface
     {
-        assert($type instanceof NamedTypeNode);
-
         $metadata = $this->reader->getTypeMetadata(
             class: new \ReflectionClass($this->type),
         );
 
-        if (!$metadata->isShapeFieldsIsAllowed() && $type->fields !== null) {
-            throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported($type);
+        if (!$metadata->isShapeFieldsIsAllowed() && $statement->fields !== null) {
+            throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported($statement);
         }
 
-        if (!$metadata->isTemplateArgumentsIsAllowed() && $type->arguments !== null) {
+        if (!$metadata->isTemplateArgumentsIsAllowed() && $statement->arguments !== null) {
             throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
-                passedArgumentsCount: $type->arguments->count(),
-                type: $type,
+                passedArgumentsCount: $statement->arguments->count(),
+                type: $statement,
             );
         }
 
         return new $this->type(...$this->createArguments(
             metadata: $metadata,
-            type: $type,
-            context: $context,
+            type: $statement,
+            context: $types,
         ));
     }
 

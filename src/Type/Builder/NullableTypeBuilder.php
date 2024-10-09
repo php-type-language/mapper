@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\NullableType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
@@ -12,6 +11,8 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * Creates a {@see NullableType} from "?Type" syntax.
+ *
+ * @template-implements TypeBuilderInterface<NullableTypeNode<TypeStatement>, NullableType>
  */
 final class NullableTypeBuilder implements TypeBuilderInterface
 {
@@ -20,13 +21,8 @@ final class NullableTypeBuilder implements TypeBuilderInterface
         return $statement instanceof NullableTypeNode;
     }
 
-    /**
-     * @throws TypeNotFoundException
-     */
-    public function build(TypeStatement $type, RepositoryInterface $context): NullableType
+    public function build(TypeStatement $statement, RepositoryInterface $types): NullableType
     {
-        assert($type instanceof NullableTypeNode);
-
-        return new NullableType($context->getByStatement($type->type));
+        return new NullableType($types->getByStatement($statement->type));
     }
 }

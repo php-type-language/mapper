@@ -8,7 +8,7 @@ use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class ArrayKeyType implements TypeInterface
+class ArrayKeyType implements TypeInterface
 {
     /**
      * @var non-empty-string

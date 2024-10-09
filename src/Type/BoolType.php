@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class BoolType implements TypeInterface
+class BoolType implements TypeInterface
 {
     /**
      * @var non-empty-string
@@ -21,8 +20,7 @@ final class BoolType implements TypeInterface
      * @param non-empty-string $name
      */
     public function __construct(
-        #[TargetTypeName]
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
+        protected readonly string $name = self::DEFAULT_TYPE_NAME,
     ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
@@ -43,18 +41,18 @@ final class BoolType implements TypeInterface
     public function cast(mixed $value, LocalContext $context): bool
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->castToBoolIfPossible($value);
+            $value = $this->tryCastToBool($value);
         }
 
-        if (!\is_bool($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: 'bool',
-                context: $context,
-            );
+        if (\is_bool($value)) {
+            return $value;
         }
 
-        return $value;
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: 'bool',
+            context: $context,
+        );
     }
 
     /**
@@ -62,7 +60,7 @@ final class BoolType implements TypeInterface
      *
      * If conversion is not possible, it returns the value "as is".
      */
-    private function castToBoolIfPossible(mixed $value): bool
+    protected function tryCastToBool(mixed $value): bool
     {
         return match (true) {
             \is_array($value) => $value !== [],

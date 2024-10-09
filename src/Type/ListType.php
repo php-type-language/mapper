@@ -15,7 +15,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class ListType implements TypeInterface
+class ListType implements TypeInterface
 {
     /**
      * @var non-empty-string

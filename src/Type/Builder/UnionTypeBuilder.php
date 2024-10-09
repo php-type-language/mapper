@@ -9,6 +9,9 @@ use TypeLang\Mapper\Type\UnionType;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
+/**
+ * @template-implements TypeBuilderInterface<UnionTypeNode<TypeStatement>, UnionType>
+ */
 final class UnionTypeBuilder implements TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool
@@ -16,16 +19,14 @@ final class UnionTypeBuilder implements TypeBuilderInterface
         return $statement instanceof UnionTypeNode;
     }
 
-    public function build(TypeStatement $type, RepositoryInterface $context): UnionType
+    public function build(TypeStatement $statement, RepositoryInterface $types): UnionType
     {
-        assert($type instanceof UnionTypeNode);
+        $result = [];
 
-        $types = [];
-
-        foreach ($type->statements as $statement) {
-            $types[] = $context->getByStatement($statement);
+        foreach ($statement->statements as $leaf) {
+            $result[] = $types->getByStatement($leaf);
         }
 
-        return new UnionType($types);
+        return new UnionType($result);
     }
 }

@@ -5,29 +5,14 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Node\Literal\NullLiteralNode;
 
-final class NullType implements TypeInterface
+class NullType implements TypeInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    private const DEFAULT_TYPE_NAME = 'null';
-
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(
-        #[TargetTypeName]
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
-    ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
+    public function getTypeStatement(LocalContext $context): NullLiteralNode
     {
-        return new NamedTypeNode($this->name);
+        return new NullLiteralNode();
     }
 
     public function match(mixed $value, LocalContext $context): bool

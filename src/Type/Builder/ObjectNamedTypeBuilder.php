@@ -8,6 +8,9 @@ use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @deprecated TODO
+ */
 class ObjectNamedTypeBuilder extends NamedTypeBuilder
 {
     /**

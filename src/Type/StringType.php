@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class StringType implements TypeInterface
+class StringType implements TypeInterface
 {
     /**
      * @var non-empty-string
@@ -21,7 +20,6 @@ final class StringType implements TypeInterface
      * @param non-empty-string $name
      */
     public function __construct(
-        #[TargetTypeName]
         private readonly string $name = self::DEFAULT_TYPE_NAME,
     ) {}
 
@@ -46,15 +44,15 @@ final class StringType implements TypeInterface
             $value = $this->castToStringIfPossible($value);
         }
 
-        if (!\is_string($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: $this->getTypeStatement($context),
-                context: $context,
-            );
+        if (\is_string($value)) {
+            return $value;
         }
 
-        return $value;
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: $this->getTypeStatement($context),
+            context: $context,
+        );
     }
 
     /**

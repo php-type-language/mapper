@@ -9,7 +9,7 @@ use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class NullableType implements TypeInterface
+class NullableType implements TypeInterface
 {
     public function __construct(
         #[TargetTemplateArgument]

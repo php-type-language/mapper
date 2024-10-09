@@ -15,7 +15,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class DateTimeType extends AsymmetricType
+class DateTimeType extends AsymmetricType
 {
     /**
      * @var class-string<\DateTime|\DateTimeImmutable>

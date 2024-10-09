@@ -7,12 +7,7 @@ namespace TypeLang\Mapper\Platform;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Type;
-use TypeLang\Mapper\Type\Builder\ListTypeBuilder;
-use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
-use TypeLang\Mapper\Type\Builder\NullableTypeBuilder;
-use TypeLang\Mapper\Type\Builder\ObjectNamedTypeBuilder;
-use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
-use TypeLang\Mapper\Type\Builder\UnionTypeBuilder;
+use TypeLang\Mapper\Type\Builder;
 
 class StandardPlatform implements PlatformInterface
 {
@@ -40,22 +35,44 @@ class StandardPlatform implements PlatformInterface
 
     public function getTypes(): iterable
     {
-        yield new NamedTypeBuilder('null', Type\NullType::class);
-        yield new NamedTypeBuilder('mixed', Type\MixedType::class);
-        yield new NamedTypeBuilder('int', Type\IntType::class);
-        yield new NamedTypeBuilder('bool', Type\BoolType::class);
-        yield new NamedTypeBuilder('string', Type\StringType::class);
-        yield new NamedTypeBuilder('float', Type\FloatType::class);
-        // @phpstan-ignore-next-line : Allow non-resolvable types
-        yield new NamedTypeBuilder('list', Type\ListType::class);
-        // @phpstan-ignore-next-line : Allow non-resolvable types
-        yield new NamedTypeBuilder('array', Type\ArrayType::class);
-        yield new ObjectNamedTypeBuilder(\DateTimeInterface::class, Type\DateTimeType::class);
-        yield new ObjectNamedTypeBuilder(\BackedEnum::class, Type\BackedEnumType::class);
-        yield new NullableTypeBuilder();
-        yield new ListTypeBuilder();
-        yield new UnionTypeBuilder();
-        yield new ObjectTypeBuilder($this->driver);
+        // Adds support for the "mixed" type
+        yield new Builder\MixedTypeBuilder();
+
+        yield new Builder\NamedTypeBuilder('int', Type\IntType::class);
+
+        // Adds support for the "bool" type
+        yield new Builder\BoolTypeBuilder();
+
+        // Adds support for the "true" and "false" literals
+        yield new Builder\BoolLiteralTypeBuilder();
+
+        // Adds support for the "string" type
+        yield new Builder\StringTypeBuilder();
+
+        yield new Builder\NamedTypeBuilder('float', Type\FloatType::class);
+
+        yield new Builder\NamedTypeBuilder('list', Type\ListType::class);
+
+        yield new Builder\NamedTypeBuilder('array', Type\ArrayType::class);
+
+        yield new Builder\ObjectNamedTypeBuilder(\DateTimeInterface::class, Type\DateTimeType::class);
+
+        yield new Builder\ObjectNamedTypeBuilder(\BackedEnum::class, Type\BackedEnumType::class);
+
+        // Adds support for the "?T" statement
+        yield new Builder\NullableTypeBuilder();
+
+        // Adds support for the "null" literal and/or named type statement
+        yield new Builder\NullTypeBuilder();
+
+        // Adds support for the "T[]" statement
+        yield new Builder\ListTypeBuilder();
+
+        // Adds support for the "T|U" union types
+        yield new Builder\UnionTypeBuilder();
+
+        // Adds support for the "Path\To\Class" statement
+        yield new Builder\ObjectTypeBuilder($this->driver);
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool
