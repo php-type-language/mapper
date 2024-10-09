@@ -14,7 +14,7 @@ final class Psr16CachedDriver extends CachedDriver
         private readonly CacheInterface $cache,
         string $prefix = self::DEFAULT_CACHE_PREFIX,
         \DateInterval|int|null $ttl = self::DEFAULT_TTL,
-        DriverInterface $delegate = new ReflectionDriver(),
+        DriverInterface $delegate = new NullDriver(),
     ) {
         parent::__construct($prefix, $ttl, $delegate);
     }

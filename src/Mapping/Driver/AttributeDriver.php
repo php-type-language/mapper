@@ -12,12 +12,6 @@ use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class AttributeDriver extends LoadableDriver
 {
-    public function __construct(
-        DriverInterface $delegate = new ReflectionDriver(),
-    ) {
-        parent::__construct($delegate);
-    }
-
     #[\Override]
     protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
     {

@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Identifier;
@@ -29,29 +30,59 @@ final class ReflectionDriver extends LoadableDriver
 
             $metadata = $class->getPropertyOrCreate($property->getName());
 
-            try {
-                $metadata->setType($types->getByStatement(
-                    statement: $this->getTypeStatement($property),
-                ));
-            } catch (TypeNotFoundException $e) {
-                throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                    class: $class->getName(),
-                    property: $property->getName(),
-                    type: $e->getType(),
-                    previous: $e,
-                );
-            }
-
-            if ($property->isReadOnly()) {
-                $metadata->markAsReadonly();
-            }
-
-            if ($property->hasDefaultValue()) {
-                $metadata->setDefaultValue($property->getDefaultValue());
-            }
+            $this->fillType($property, $metadata, $types);
+            $this->fillReadonlyModifier($property, $metadata);
+            $this->fillDefaultValue($property, $metadata);
         }
     }
 
+    private function fillDefaultValue(\ReflectionProperty $property, PropertyMetadata $meta): void
+    {
+        if (!$property->hasDefaultValue()) {
+            return;
+        }
+
+        $default = $property->getDefaultValue();
+
+        $meta->setDefaultValue($default);
+    }
+
+    private function fillReadonlyModifier(\ReflectionProperty $property, PropertyMetadata $meta): void
+    {
+        if (!$property->isReadOnly()) {
+            return;
+        }
+
+        $meta->markAsReadonly();
+    }
+
+    /**
+     * @throws PropertyTypeNotFoundException
+     * @throws \InvalidArgumentException
+     */
+    private function fillType(\ReflectionProperty $property, PropertyMetadata $meta, RepositoryInterface $types): void
+    {
+        $statement = $this->getTypeStatement($property);
+
+        try {
+            $type = $types->getByStatement($statement);
+        } catch (TypeNotFoundException $e) {
+            $class = $property->getDeclaringClass();
+
+            throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
+                class: $class->getName(),
+                property: $property->getName(),
+                type: $e->getType(),
+                previous: $e,
+            );
+        }
+
+        $meta->setType($type);
+    }
+
+    /**
+     * @throws \InvalidArgumentException
+     */
     private function getTypeStatement(\ReflectionProperty $property): TypeStatement
     {
         $type = $property->getType();
@@ -74,13 +105,16 @@ final class ReflectionDriver extends LoadableDriver
         return new NamedTypeNode(new Name(new Identifier('mixed')));
     }
 
+    /**
+     * @throws \InvalidArgumentException
+     */
     private function createTypeStatement(\ReflectionType $type): TypeStatement
     {
         return match (true) {
             $type instanceof \ReflectionUnionType => $this->createUnionTypeStatement($type),
             $type instanceof \ReflectionIntersectionType => $this->createIntersectionTypeStatement($type),
             $type instanceof \ReflectionNamedType => $this->createNamedTypeStatement($type),
-            default => throw new \LogicException(\sprintf(
+            default => throw new \InvalidArgumentException(\sprintf(
                 'Unsupported reflection type: %s',
                 $type::class,
             )),
@@ -114,6 +148,7 @@ final class ReflectionDriver extends LoadableDriver
 
     /**
      * @return UnionTypeNode<TypeStatement>
+     * @throws \InvalidArgumentException
      */
     private function createUnionTypeStatement(\ReflectionUnionType $type): UnionTypeNode
     {
@@ -128,6 +163,7 @@ final class ReflectionDriver extends LoadableDriver
 
     /**
      * @return IntersectionTypeNode<TypeStatement>
+     * @throws \InvalidArgumentException
      */
     private function createIntersectionTypeStatement(\ReflectionIntersectionType $type): IntersectionTypeNode
     {

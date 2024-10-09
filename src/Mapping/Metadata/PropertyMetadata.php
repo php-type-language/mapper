@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class PropertyMetadata extends Metadata
 {
@@ -23,6 +26,45 @@ final class PropertyMetadata extends Metadata
         ?int $createdAt = null,
     ) {
         parent::__construct($this->export, $createdAt);
+    }
+
+
+    /**
+     * Dynamically creates AST type representation.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getTypeStatement(LocalContext $context): ?TypeStatement
+    {
+        $type = $this->getType();
+
+        return $type?->getTypeStatement($context->withDetailedTypes(false));
+    }
+
+    /**
+     * Dynamically creates AST field representation.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getFieldNode(LocalContext $context): ?NamedFieldNode
+    {
+        $statement = $this->getTypeStatement($context);
+
+        if ($statement === null) {
+            return null;
+        }
+
+        $name = $this->getName();
+
+        if ($context->isDenormalization()) {
+            $name = $this->getExportName();
+        }
+
+        return new NamedFieldNode(
+            key: $name,
+            of: $statement,
+            optional: $this->hasDefaultValue(),
+        );
     }
 
     /**

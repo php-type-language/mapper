@@ -43,7 +43,7 @@ final class DocBlockDriver extends LoadableDriver
     public function __construct(
         string $paramTagName = self::DEFAULT_PARAM_TAG_NAME,
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
-        DriverInterface $delegate = new ReflectionDriver(),
+        DriverInterface $delegate = new NullDriver(),
     ) {
         self::assertKernelPackageIsInstalled();
 
