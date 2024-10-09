@@ -8,7 +8,6 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
