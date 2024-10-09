@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class DelegatePlatform implements PlatformInterface
 {
     /**
-     * @param list<TypeBuilderInterface> $types
+     * @param list<TypeBuilderInterface<TypeStatement, TypeInterface>> $types
      * @param list<GrammarFeature> $features
      */
     public function __construct(

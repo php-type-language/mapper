@@ -20,12 +20,12 @@ use TypeLang\Parser\ParserInterface;
 use TypeLang\Parser\TypeResolver;
 
 /**
- * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface>
+ * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
  */
 class Repository implements RepositoryInterface, \IteratorAggregate
 {
     /**
-     * @var list<TypeBuilderInterface>
+     * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>
      */
     protected array $builders = [];
 
@@ -43,10 +43,11 @@ class Repository implements RepositoryInterface, \IteratorAggregate
     }
 
     /**
-     * @return list<TypeBuilderInterface>
+     * @return list<TypeBuilderInterface<TypeStatement, TypeInterface>>
      */
     private function getTypeBuilders(PlatformInterface $platform): array
     {
+        /** @var iterable<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>> $builders */
         $builders = $platform->getTypes();
 
         return match (true) {
@@ -70,19 +71,6 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
         );
-    }
-
-    /**
-     * @api
-     *
-     * @param non-empty-string $name
-     * @param class-string<TypeInterface> $type
-     *
-     * @deprecated Must be removed
-     */
-    public function type(string $name, string $type): void
-    {
-        $this->builders[] = new NamedTypeBuilder($name, $type);
     }
 
     public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface

@@ -10,7 +10,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends \Traversable<array-key, TypeBuilderInterface>
+ * @template-extends \Traversable<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
  */
 interface RepositoryInterface extends \Traversable, \Countable
 {
