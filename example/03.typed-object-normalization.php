@@ -3,7 +3,9 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Platform\StandardPlatform;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -27,7 +29,9 @@ class ExampleDTO
     ) {}
 }
 
-$mapper = new Mapper();
+$mapper = new Mapper(new StandardPlatform(
+    driver: new AttributeDriver(),
+));
 
 $result = $mapper->normalize(new ExampleDTO(
     children: [
