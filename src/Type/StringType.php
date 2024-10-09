@@ -14,7 +14,7 @@ class StringType implements TypeInterface
     /**
      * @var non-empty-string
      */
-    private const DEFAULT_TYPE_NAME = 'string';
+    public const DEFAULT_TYPE_NAME = 'string';
 
     /**
      * @param non-empty-string $name

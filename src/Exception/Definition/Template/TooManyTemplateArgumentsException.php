@@ -33,7 +33,7 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
         TypeStatement $type,
         ?\Throwable $previous = null
     ): self {
-        $template = 'Type "{{type}}" only accepts %s template arguments, '
+        $template = 'Type "{{type}}" only accepts %s template argument(s), '
             . 'but {{passedArgumentsCount}} were passed';
 
         $template = $minSupportedArgumentsCount === $maxSupportedArgumentsCount

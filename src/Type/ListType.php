@@ -7,8 +7,6 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -20,24 +18,18 @@ class ListType implements TypeInterface
     /**
      * @var non-empty-string
      */
-    private const DEFAULT_TYPE_NAME = 'list';
+    public const DEFAULT_TYPE_NAME = 'list';
 
     /**
      * @param non-empty-string $name
      */
     public function __construct(
-        #[TargetTypeName]
         private readonly string $name = self::DEFAULT_TYPE_NAME,
-        #[TargetTemplateArgument]
         private readonly TypeInterface $type = new MixedType(),
     ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        if (!$context->isDetailedTypes()) {
-            return new NamedTypeNode($this->name);
-        }
-
         return new NamedTypeNode(
             name: $this->name,
             arguments: new TemplateArgumentsListNode([
@@ -61,15 +53,15 @@ class ListType implements TypeInterface
             };
         }
 
-        if (!\is_array($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: 'array',
-                context: $context,
-            );
+        if (\is_array($value)) {
+            return $value;
         }
 
-        return $value;
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: $this->getTypeStatement($context),
+            context: $context,
+        );
     }
 
     public function match(mixed $value, LocalContext $context): bool

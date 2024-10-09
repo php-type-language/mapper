@@ -12,9 +12,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class BoolType implements TypeInterface
 {
     /**
-     * @var non-empty-string
+     * @var non-empty-lowercase-string
      */
-    private const DEFAULT_TYPE_NAME = 'bool';
+    public const DEFAULT_TYPE_NAME = 'bool';
 
     /**
      * @param non-empty-string $name

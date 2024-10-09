@@ -36,22 +36,20 @@ class StandardPlatform implements PlatformInterface
     public function getTypes(): iterable
     {
         // Adds support for the "mixed" type
-        yield new Builder\MixedTypeBuilder();
+        yield new Builder\MixedTypeBuilder('mixed');
 
         yield new Builder\NamedTypeBuilder('int', Type\IntType::class);
 
         // Adds support for the "bool" type
-        yield new Builder\BoolTypeBuilder();
-
-        // Adds support for the "true" and "false" literals
-        yield new Builder\BoolLiteralTypeBuilder();
+        yield new Builder\BoolTypeBuilder('bool');
 
         // Adds support for the "string" type
-        yield new Builder\StringTypeBuilder();
+        yield new Builder\StringTypeBuilder('string');
 
         yield new Builder\NamedTypeBuilder('float', Type\FloatType::class);
 
-        yield new Builder\NamedTypeBuilder('list', Type\ListType::class);
+        // Adds support for the "list<T>" type
+        yield new Builder\ListTypeBuilder('list');
 
         yield new Builder\NamedTypeBuilder('array', Type\ArrayType::class);
 
@@ -65,8 +63,11 @@ class StandardPlatform implements PlatformInterface
         // Adds support for the "null" literal and/or named type statement
         yield new Builder\NullTypeBuilder();
 
+        // Adds support for the "true" and "false" literals
+        yield new Builder\BoolLiteralTypeBuilder();
+
         // Adds support for the "T[]" statement
-        yield new Builder\ListTypeBuilder();
+        yield new Builder\TypesListBuilder();
 
         // Adds support for the "T|U" union types
         yield new Builder\UnionTypeBuilder();

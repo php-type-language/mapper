@@ -33,7 +33,7 @@ class MissingTemplateArgumentsException extends TemplateArgumentsCountException
         TypeStatement $type,
         ?\Throwable $previous = null
     ): self {
-        $template = 'Type "{{type}}" expects %s template argument(s), '
+        $template = 'Type "{{type}}" expects at least %s template argument(s), '
             . 'but {{passedArgumentsCount}} were passed';
 
         $template = $minSupportedArgumentsCount === $maxSupportedArgumentsCount
