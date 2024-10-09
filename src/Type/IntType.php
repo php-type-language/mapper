@@ -96,6 +96,10 @@ class IntType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToInt($value);
+        }
+
         return \is_int($value) && $value >= $this->min && $value <= $this->max;
     }
 
@@ -107,7 +111,7 @@ class IntType implements TypeInterface
     public function cast(mixed $value, LocalContext $context): int
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->castToIntIfPossible($value);
+            $value = $this->tryCastToInt($value);
         }
 
         if (!\is_int($value)) {
@@ -150,7 +154,7 @@ class IntType implements TypeInterface
      *
      * If conversion is not possible, it returns the value "as is".
      */
-    private function castToIntIfPossible(mixed $value): mixed
+    protected function tryCastToInt(mixed $value): mixed
     {
         if ($value instanceof \BackedEnum) {
             $value = $value->value;

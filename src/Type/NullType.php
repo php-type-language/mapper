@@ -17,6 +17,10 @@ class NullType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            return true;
+        }
+
         return $value === null;
     }
 

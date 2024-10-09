@@ -47,7 +47,7 @@ class Context
      *
      * @api
      */
-    public function withStrictTypes(?bool $enabled = null): self
+    public function withStrictTypes(?bool $enabled = null): static
     {
         $self = clone $this;
         $self->strictTypes = $enabled;
@@ -73,7 +73,7 @@ class Context
      *
      * @api
      */
-    public function withObjectsAsArrays(?bool $enabled = null): self
+    public function withObjectsAsArrays(?bool $enabled = null): static
     {
         $self = clone $this;
         $self->objectsAsArrays = $enabled;
@@ -99,7 +99,7 @@ class Context
      *
      * @api
      */
-    public function withDetailedTypes(?bool $enabled = null): self
+    public function withDetailedTypes(?bool $enabled = null): static
     {
         $self = clone $this;
         $self->detailedTypes = $enabled;

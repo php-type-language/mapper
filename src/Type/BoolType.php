@@ -30,6 +30,10 @@ class BoolType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToBool($value);
+        }
+
         return \is_bool($value);
     }
 

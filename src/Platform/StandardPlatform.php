@@ -51,6 +51,9 @@ class StandardPlatform implements PlatformInterface
         // Adds support for the "list<T>" type
         yield new Builder\ListTypeBuilder('list');
 
+        // Adds support for the "array-key" type
+        yield new Builder\ArrayKeyTypeBuilder('array-key');
+
         yield new Builder\NamedTypeBuilder('array', Type\ArrayType::class);
 
         yield new Builder\ObjectNamedTypeBuilder(\DateTimeInterface::class, Type\DateTimeType::class);

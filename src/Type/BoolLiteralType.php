@@ -29,6 +29,10 @@ class BoolLiteralType extends BoolType
     #[\Override]
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToBool($value);
+        }
+
         return $value === $this->value;
     }
 

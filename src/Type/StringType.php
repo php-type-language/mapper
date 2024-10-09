@@ -30,6 +30,10 @@ class StringType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToString($value);
+        }
+
         return \is_string($value);
     }
 
@@ -41,7 +45,7 @@ class StringType implements TypeInterface
     public function cast(mixed $value, LocalContext $context): string
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->castToStringIfPossible($value);
+            $value = $this->tryCastToString($value);
         }
 
         if (\is_string($value)) {
@@ -60,7 +64,7 @@ class StringType implements TypeInterface
      *
      * If conversion is not possible, it returns the value "as is".
      */
-    private function castToStringIfPossible(mixed $value): mixed
+    private function tryCastToString(mixed $value): mixed
     {
         if ($value instanceof \BackedEnum) {
             $value = $value->value;

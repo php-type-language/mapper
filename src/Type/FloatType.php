@@ -33,6 +33,10 @@ class FloatType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToFloat($value);
+        }
+
         return \is_float($value) || \is_int($value);
     }
 
@@ -42,7 +46,7 @@ class FloatType implements TypeInterface
     public function cast(mixed $value, LocalContext $context): float
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = $this->castToFloatIfPossible($value);
+            $value = $this->tryCastToFloat($value);
         }
 
         if (!\is_float($value) && !\is_int($value)) {
@@ -64,7 +68,7 @@ class FloatType implements TypeInterface
      *
      * If conversion is not possible, it returns the value "as is".
      */
-    private function castToFloatIfPossible(mixed $value): mixed
+    protected function tryCastToFloat(mixed $value): mixed
     {
         if ($value instanceof \BackedEnum) {
             $value = $value->value;

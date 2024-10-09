@@ -41,8 +41,18 @@ class UnionType implements TypeInterface
      */
     protected function findType(mixed $value, LocalContext $context): ?TypeInterface
     {
+        $strict = $context->withStrictTypes(true);
+
         foreach ($this->types as $type) {
-            if ($type->match($value, $context)) {
+            if ($type->match($value, $strict)) {
+                return $type;
+            }
+        }
+
+        $nonStrict = $context->withStrictTypes(false);
+
+        foreach ($this->types as $type) {
+            if ($type->match($value, $nonStrict)) {
                 return $type;
             }
         }

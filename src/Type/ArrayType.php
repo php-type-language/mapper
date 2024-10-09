@@ -66,12 +66,7 @@ class ArrayType implements TypeInterface
     private function validateAndCast(mixed $value, LocalContext $context): array
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = match (true) {
-                \is_array($value) => $value,
-                $value instanceof \Traversable => \iterator_to_array($value, false),
-                \is_string($value) => \str_split($value),
-                default => [$value],
-            };
+            $value = $this->tryCastToArray($value);
         }
 
         if (!\is_array($value)) {
@@ -87,6 +82,10 @@ class ArrayType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToArray($value);
+        }
+
         return \is_array($value);
     }
 
@@ -110,5 +109,19 @@ class ArrayType implements TypeInterface
         }
 
         return $result;
+    }
+
+    /**
+     * A method to convert input data to a `array<T, U>` representation, if possible.
+     *
+     * If conversion is not possible, it returns the value "as is".
+     */
+    protected function tryCastToArray(mixed $value): mixed
+    {
+        return match (true) {
+            \is_array($value) => $value,
+            $value instanceof \Traversable => \iterator_to_array($value, false),
+            default => [$value],
+        };
     }
 }

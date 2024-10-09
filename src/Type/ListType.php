@@ -45,12 +45,7 @@ class ListType implements TypeInterface
     private function validateAndCast(mixed $value, LocalContext $context): array
     {
         if (!$context->isStrictTypesEnabled()) {
-            $value = match (true) {
-                \is_array($value) => $value,
-                $value instanceof \Traversable => \iterator_to_array($value, false),
-                \is_string($value) => \str_split($value),
-                default => [$value],
-            };
+            $value = $this->tryCastToList($value);
         }
 
         if (\is_array($value)) {
@@ -66,7 +61,13 @@ class ListType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        return \is_array($value) && \array_is_list($value);
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->tryCastToList($value);
+        } else {
+            return \is_array($value) && \array_is_list($value);
+        }
+
+        return \is_array($value);
     }
 
     /**
@@ -89,5 +90,19 @@ class ListType implements TypeInterface
         }
 
         return $result;
+    }
+
+    /**
+     * A method to convert input data to a list<T> representation, if possible.
+     *
+     * If conversion is not possible, it returns the value "as is".
+     */
+    protected function tryCastToList(mixed $value): mixed
+    {
+        return match (true) {
+            \is_array($value) => $value,
+            $value instanceof \Traversable => \iterator_to_array($value, false),
+            default => [$value],
+        };
     }
 }
