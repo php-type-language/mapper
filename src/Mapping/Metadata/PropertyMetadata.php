@@ -35,7 +35,7 @@ final class PropertyMetadata extends Metadata
      */
     public function getTypeStatement(LocalContext $context): ?TypeStatement
     {
-        $type = $this->getType();
+        $type = $this->findType();
 
         return $type?->getTypeStatement($context->withDetailedTypes(false));
     }
@@ -103,9 +103,14 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
+     * Note: The prefix "find" is used to indicate that the {@see TypeInterface}
+     *       definition may be optional and method may return {@see null}.
+     *       The prefix "get" is used when the value is forced to be obtained
+     *       and should throw an exception if the type definition is missing.
+     *
      * @api
      */
-    public function getType(): ?TypeInterface
+    public function findType(): ?TypeInterface
     {
         return $this->type;
     }
@@ -137,9 +142,14 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
+     * Note: The prefix "find" is used to indicate that the default value
+     *       definition may be optional and method may return {@see null}.
+     *       The prefix "get" is used when the value is forced to be obtained
+     *       and should throw an exception if the default value is missing.
+     *
      * @api
      */
-    public function getDefaultValue(): mixed
+    public function findDefaultValue(): mixed
     {
         return $this->defaultValue;
     }

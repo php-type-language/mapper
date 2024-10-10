@@ -10,6 +10,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
@@ -22,6 +23,7 @@ class ObjectType extends AsymmetricType
      */
     public function __construct(
         private readonly ClassMetadata $metadata,
+        private readonly PropertyAccessorInterface $accessor,
     ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
@@ -39,7 +41,7 @@ class ObjectType extends AsymmetricType
     /**
      * @return object|array<non-empty-string, mixed>
      * @throws InvalidValueException
-     * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function normalize(mixed $value, LocalContext $context): object|array
     {
@@ -53,41 +55,9 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        return $this->normalizeObject($value, $context);
-    }
-
-    /**
-     * @param T $object
-     *
-     * @return object|array<non-empty-string, mixed>
-     * @throws \ReflectionException
-     */
-    private function normalizeObject(object $object, LocalContext $context): object|array
-    {
-        $result = [];
-        $reflection = new \ReflectionClass($this->metadata->getName());
-
         $context->enter(new ObjectEntry($this->metadata->getName()));
 
-        foreach ($this->metadata->getProperties() as $meta) {
-            $context->enter(new ObjectPropertyEntry($meta->getName()));
-
-            // Fetch property value from object
-            $propertyValue = $this->getValue(
-                property: $reflection->getProperty($meta->getName()),
-                object: $object,
-            );
-
-            $type = $meta->getType();
-
-            if ($type === null) {
-                continue;
-            }
-
-            $result[$meta->getExportName()] = $type->cast($propertyValue, $context);
-
-            $context->leave();
-        }
+        $result = $this->normalizeObject($value, $context);
 
         $context->leave();
 
@@ -98,9 +68,33 @@ class ObjectType extends AsymmetricType
         return (object) $result;
     }
 
-    private function getValue(\ReflectionProperty $property, object $object): mixed
+    /**
+     * @param T $object
+     *
+     * @return array<non-empty-string, mixed>
+     * @throws \Throwable in case of object's property is not accessible
+     */
+    protected function normalizeObject(object $object, LocalContext $context): array
     {
-        return $property->getValue($object);
+        $result = [];
+
+        foreach ($this->metadata->getProperties() as $meta) {
+            $context->enter(new ObjectPropertyEntry($meta->getName()));
+
+            // Skip in case of property has no type definition.
+            if (($type = $meta->findType()) === null) {
+                continue;
+            }
+
+            $result[$meta->getExportName()] = $type->cast(
+                value: $this->accessor->getValue($object, $meta),
+                context: $context,
+            );
+
+            $context->leave();
+        }
+
+        return $result;
     }
 
     protected function isDenormalizable(mixed $value, LocalContext $context): bool
@@ -112,7 +106,7 @@ class ObjectType extends AsymmetricType
      * @return T
      * @throws InvalidValueException
      * @throws MissingFieldValueException
-     * @throws \ReflectionException
+     * @throws \Throwable in case of object's property is not accessible
      */
     public function denormalize(mixed $value, LocalContext $context): object
     {
@@ -128,64 +122,67 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        return $this->denormalizeObject($value, $context);
+        $context->enter(new ObjectEntry($this->metadata->getName()));
+
+        $instance = $this->createInstance();
+
+        $this->denormalizeObject($value, $instance, $context);
+
+        $context->leave();
+
+        return $instance;
+    }
+
+    /**
+     * @return T
+     * @throws \ReflectionException
+     */
+    private function createInstance(): object
+    {
+        /** @var \ReflectionClass<T> $reflection */
+        $reflection = new \ReflectionClass($this->metadata->getName());
+
+        return $reflection->newInstanceWithoutConstructor();
     }
 
     /**
      * @param array<array-key, mixed> $value
      *
-     * @return T
      * @throws MissingFieldValueException
-     * @throws \ReflectionException
+     * @throws \Throwable in case of object's property is not accessible
      */
-    private function denormalizeObject(array $value, LocalContext $context): object
+    private function denormalizeObject(array $value, object $object, LocalContext $context): void
     {
-        $reflection = new \ReflectionClass($this->metadata->getName());
-        $object = $reflection->newInstanceWithoutConstructor();
-
-        $context->enter(new ObjectEntry($this->metadata->getName()));
-
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
-            $property = $reflection->getProperty($meta->getName());
+            switch (true) {
+                // In case of value has been passed
+                case \array_key_exists($meta->getExportName(), $value):
+                    // Skip in case of property has no type definition.
+                    if (($type = $meta->findType()) === null) {
+                        continue 2;
+                    }
 
-            // In case of value has been passed
-            if (\array_key_exists($meta->getExportName(), $value)) {
-                $type = $meta->getType();
+                    $propertyValue = $type->cast($value[$meta->getExportName()], $context);
+                    break;
 
-                if ($type === null) {
-                    continue;
-                }
+                    // In case of property has default argument
+                case $meta->hasDefaultValue():
+                    $propertyValue = $meta->findDefaultValue();
+                    break;
 
-                $propertyValue = $type->cast($value[$meta->getExportName()], $context);
-
-                $this->setValue($property, $object, $propertyValue);
-                $context->leave();
-                continue;
+                default:
+                    throw MissingFieldValueException::becausePropertyValueRequired(
+                        field: $meta->getExportName(),
+                        expected: $this->getTypeStatement($context),
+                        context: $context,
+                    );
             }
 
-            // In case of property has default argument
-            if ($meta->hasDefaultValue()) {
-                $this->setValue($property, $object, $meta->getDefaultValue());
-                $context->leave();
-                continue;
-            }
+            $this->accessor->setValue($object, $meta, $propertyValue);
 
-            throw MissingFieldValueException::becausePropertyValueRequired(
-                field: $meta->getExportName(),
-                expected: $this->getTypeStatement($context),
-                context: $context,
-            );
+            $context->leave();
         }
-
-        $context->leave();
-
-        return $object;
-    }
-
-    private function setValue(\ReflectionProperty $property, object $object, mixed $value): void
-    {
-        $property->setValue($object, $value);
     }
 }

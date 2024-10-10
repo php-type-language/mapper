@@ -42,17 +42,17 @@ final class PropertyTest extends MetadataTestCase
     {
         $property = new PropertyMetadata('foo');
 
-        self::assertNull($property->getDefaultValue());
+        self::assertNull($property->findDefaultValue());
         self::assertFalse($property->hasDefaultValue());
 
         $property->setDefaultValue(0xDEAD_BEEF);
 
-        self::assertSame(0xDEAD_BEEF, $property->getDefaultValue());
+        self::assertSame(0xDEAD_BEEF, $property->findDefaultValue());
         self::assertTrue($property->hasDefaultValue());
 
         $property->removeDefaultValue();
 
-        self::assertNull($property->getDefaultValue());
+        self::assertNull($property->findDefaultValue());
         self::assertFalse($property->hasDefaultValue());
     }
 
@@ -79,22 +79,22 @@ final class PropertyTest extends MetadataTestCase
     {
         $property = new PropertyMetadata('foo');
 
-        self::assertNull($property->getType());
+        self::assertNull($property->findType());
         self::assertFalse($property->hasType());
 
         $property = new PropertyMetadata('foo', $type = new NullType());
 
-        self::assertSame($type, $property->getType());
+        self::assertSame($type, $property->findType());
         self::assertTrue($property->hasType());
 
         $property->setType(new NullType());
 
-        self::assertNotSame($type, $property->getType());
+        self::assertNotSame($type, $property->findType());
         self::assertTrue($property->hasType());
 
         $property->removeType();
 
-        self::assertNull($property->getType());
+        self::assertNull($property->findType());
         self::assertFalse($property->hasType());
     }
 }

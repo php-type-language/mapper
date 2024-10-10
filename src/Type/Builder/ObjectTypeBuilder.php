@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Type\ObjectType;
+use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\ReflectionPropertyAccessor;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -22,6 +24,7 @@ final class ObjectTypeBuilder extends Builder
 {
     public function __construct(
         private readonly DriverInterface $driver = new ReflectionDriver(),
+        private readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
     ) {}
 
     /**
@@ -43,9 +46,11 @@ final class ObjectTypeBuilder extends Builder
         /** @var class-string<T> $class */
         $class = $statement->name->toString();
 
-        return new ObjectType($this->driver->getClassMetadata(
+        $metadata = $this->driver->getClassMetadata(
             class: new \ReflectionClass($class),
             types: $types,
-        ));
+        );
+
+        return new ObjectType($metadata, $this->accessor);
     }
 }

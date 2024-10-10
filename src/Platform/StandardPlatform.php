@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
-use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
 
-class StandardPlatform implements PlatformInterface
+class StandardPlatform extends Platform
 {
     /**
      * @var list<GrammarFeature>
@@ -23,10 +21,6 @@ class StandardPlatform implements PlatformInterface
         GrammarFeature::Hints,
         GrammarFeature::Attributes,
     ];
-
-    public function __construct(
-        private readonly DriverInterface $driver = new AttributeDriver(),
-    ) {}
 
     public function getName(): string
     {
