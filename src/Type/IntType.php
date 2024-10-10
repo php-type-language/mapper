@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -22,55 +19,14 @@ class IntType implements TypeInterface
      */
     public const DEFAULT_TYPE_NAME = 'int';
 
-    protected readonly int $min;
-    protected readonly int $max;
-
     /**
      * @param non-empty-string $name
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(
-        #[TargetTypeName]
         protected readonly string $name = self::DEFAULT_TYPE_NAME,
-        #[TargetTemplateArgument(allowedIdentifiers: ['min', 'max'])]
-        int|Identifier $min = \PHP_INT_MIN,
-        #[TargetTemplateArgument(allowedIdentifiers: ['min', 'max'])]
-        int|Identifier $max = \PHP_INT_MAX,
-    ) {
-        $this->min = $this->formatIdentifier($min);
-        $this->max = $this->formatIdentifier($max);
-
-        if ($this->min > $this->max) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Max value %d cannot be less than min %d',
-                $this->max,
-                $this->min,
-            ));
-        }
-    }
-
-    /**
-     * Converts argument to its {@see int} value.
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function formatIdentifier(int|Identifier $value): int
-    {
-        if (\is_int($value)) {
-            return $value;
-        }
-
-        return match ($value->toString()) {
-            'min' => \PHP_INT_MIN,
-            'max' => \PHP_INT_MAX,
-            default => throw new \InvalidArgumentException(\sprintf(
-                'Invalid "%s" type identifier "%s"',
-                $this->name,
-                $value->toString(),
-            )),
-        };
-    }
+        protected readonly int $min = \PHP_INT_MIN,
+        protected readonly int $max = \PHP_INT_MAX,
+    ) {}
 
     private static function getExpectedArgument(int $value): TemplateArgumentNode
     {
