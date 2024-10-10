@@ -58,6 +58,7 @@ abstract class Builder implements TypeBuilderInterface
 
     /**
      * @param int<0, max> $count
+     *
      * @throws MissingTemplateArgumentsException
      * @throws TooManyTemplateArgumentsException
      */
