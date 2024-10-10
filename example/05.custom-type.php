@@ -6,24 +6,16 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
+use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
-use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Mapper\Type\SimpleType;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 // You can also add your own types.
 
-class MyNonEmptyStringType implements TypeInterface
+class MyNonEmptyStringType extends SimpleType
 {
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        return new NamedTypeNode('non-empty-string');
-    }
-
     public function match(mixed $value, LocalContext $context): bool
     {
         return \is_string($value) && $value !== '';
@@ -37,7 +29,7 @@ class MyNonEmptyStringType implements TypeInterface
 
         throw InvalidValueException::becauseInvalidValueGiven(
             value: $value,
-            expected: 'non-empty-string',
+            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }
@@ -48,7 +40,7 @@ $mapper = new Mapper(new DelegatePlatform(
     delegate: new StandardPlatform(),
     types: [
         // Additional type
-        new NamedTypeBuilder('non-empty-string', MyNonEmptyStringType::class)
+        new SimpleTypeBuilder('non-empty-string', MyNonEmptyStringType::class)
     ],
 ));
 

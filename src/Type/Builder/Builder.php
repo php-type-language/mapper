@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -56,6 +57,17 @@ abstract class Builder implements TypeBuilderInterface
     }
 
     /**
+     * @param int<0, max> $count
+     * @throws MissingTemplateArgumentsException
+     * @throws TooManyTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
+    {
+        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $count);
+        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $count);
+    }
+
+    /**
      * @api
      *
      * @param int<0, max> $max
@@ -86,6 +98,43 @@ abstract class Builder implements TypeBuilderInterface
             passedArgumentsCount: $stmt->arguments->count(),
             minSupportedArgumentsCount: $min ?? $max,
             maxSupportedArgumentsCount: $max,
+            type: $stmt,
+        );
+    }
+
+    /**
+     * @api
+     *
+     * @param int<0, max> $min
+     * @param int<0, max>|null $max
+     *
+     * @throws TooManyTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
+    {
+        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $min + 1, $max);
+    }
+
+    /**
+     * @api
+     *
+     * @param int<0, max> $min
+     * @param int<0, max>|null $max
+     *
+     * @throws MissingTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsGreaterOrEqualThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
+    {
+        $actualArgumentsCount = $stmt->arguments?->count() ?? 0;
+
+        if ($actualArgumentsCount >= $min) {
+            return;
+        }
+
+        throw MissingTemplateArgumentsException::becauseTemplateArgumentsRangeRequired(
+            passedArgumentsCount: $actualArgumentsCount,
+            minSupportedArgumentsCount: $min,
+            maxSupportedArgumentsCount: $max ?? $min,
             type: $stmt,
         );
     }

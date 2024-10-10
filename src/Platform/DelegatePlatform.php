@@ -11,7 +11,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 final class DelegatePlatform implements PlatformInterface
 {
     /**
-     * @param list<TypeBuilderInterface<TypeStatement, TypeInterface>> $types
+     * @param list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
      * @param list<GrammarFeature> $features
      */
     public function __construct(

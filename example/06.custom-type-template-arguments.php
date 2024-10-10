@@ -6,28 +6,49 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Mapper\Type\Builder\NamedTypeBuilder;
 use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Mapper\Type\Builder\Builder;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 // You can also add your own types.
 
-class MyNonEmpty implements TypeInterface
+class MyNonEmptyTypeBuilder extends Builder
+{
+    public function isSupported(TypeStatement $statement): bool
+    {
+        return $statement instanceof NamedTypeNode
+            && $statement->name->toLowerString() === 'non-empty';
+    }
+
+    public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface
+    {
+        $this->expectNoShapeFields($statement);
+        $this->expectTemplateArgumentsCount($statement, 1);
+
+        $innerArgument = $statement->arguments->first();
+
+        return new MyNonEmptyType(
+            type: $types->getByStatement($innerArgument->value),
+        );
+    }
+}
+
+class MyNonEmptyType implements TypeInterface
 {
     public function __construct(
-        #[TargetTemplateArgument]
         private readonly TypeInterface $type,
     ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        // Returns "non-empty<T>" type representation.
         return new NamedTypeNode('non-empty', new TemplateArgumentsListNode([
             new TemplateArgumentNode($this->type->getTypeStatement($context)),
         ]));
@@ -46,7 +67,7 @@ class MyNonEmpty implements TypeInterface
 
         throw InvalidValueException::becauseInvalidValueGiven(
             value: $value,
-            expected: 'non-empty',
+            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }
@@ -54,9 +75,7 @@ class MyNonEmpty implements TypeInterface
 
 $mapper = new Mapper(new DelegatePlatform(
     delegate: new StandardPlatform(),
-    types: [
-        new NamedTypeBuilder('non-empty', MyNonEmpty::class),
-    ]
+    types: [new MyNonEmptyTypeBuilder()],
 ));
 
 var_dump($mapper->normalize('example', 'non-empty<string>'));

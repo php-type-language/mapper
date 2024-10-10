@@ -32,14 +32,6 @@ class ExampleDTO
 
 $mapper = new Mapper();
 
-// Function to replace all internal type names with generic ones.
-$purifier = static function (Name $name): ?Name {
-    return match (true) {
-        \class_exists($name->toString()) => new Name('object'),
-        \enum_exists($name->toString()) => new Name('enum'),
-        default => $name,
-    };
-};
 
 $payload = new ExampleDTO([
     new ChildDTO('first'),
@@ -50,32 +42,17 @@ $payload = new ExampleDTO([
 try {
     $result = $mapper->normalize($payload);
 } catch (MappingException $e) {
-    // Replace all internal type names with generic ones.
-    throw $e->explain($purifier);
+    // Replace all internal type names with common "object" keyword.
+    throw $e->explain(function (Name $name): ?Name {
+        if (\class_exists($name->toString())) {
+            return new Name('object');
+        }
+
+        return null;
+    });
 
     //
     // InvalidValueException: Passed value must be of type object{name: string},
-    //                        but int given at $.children[2]
-    //
-}
-
-
-
-// In addition, you can also completely change the formatting of types. This
-// feature allows you to completely control how the type looks when printed
-// to a string.
-
-try {
-    $result = $mapper->normalize($payload);
-} catch (MappingException $e) {
-    throw $e
-        // Use native PHP types instead of TypeLang types.
-        ->setTypePrinter(new \TypeLang\Printer\NativeTypePrinter())
-        // Replace all internal type names with generic ones.
-        ->explain($purifier);
-
-    //
-    // InvalidValueException: Passed value must be of type object,
-    //                        but int given in $.children[2]
+    //                        but int ("42") given at $.children[2]
     //
 }
