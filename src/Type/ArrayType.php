@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -22,29 +21,16 @@ class ArrayType implements TypeInterface
      */
     public const DEFAULT_TYPE_NAME = 'array';
 
-    protected readonly TypeInterface $key;
-
-    protected readonly TypeInterface $value;
-
     /**
      * @param non-empty-string $name
      */
     public function __construct(
-        #[TargetTypeName]
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
-        #[TargetTemplateArgument]
-        ?TypeInterface $key = null,
-        #[TargetTemplateArgument]
-        ?TypeInterface $value = null,
-    ) {
-        [$this->key, $this->value] = match (true) {
-            $key !== null && $value !== null => [$key, $value],
-            $key === null && $value !== null => [new ArrayKeyType(), $value],
-            $key !== null && $value === null => [new ArrayKeyType(), $key],
-            default => [new ArrayKeyType(), new MixedType()],
-        };
-    }
+        protected readonly string $name = self::DEFAULT_TYPE_NAME,
+        protected readonly TypeInterface $key = new ArrayKeyType(),
+        protected readonly TypeInterface $value = new MixedType(),
+    ) {}
 
+    #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
         if (!$context->isDetailedTypes()) {
@@ -91,6 +77,7 @@ class ArrayType implements TypeInterface
     /**
      * @return array<array-key, mixed>
      * @throws InvalidValueException
+     * @throws TypeNotFoundException
      */
     public function cast(mixed $value, LocalContext $context): array
     {

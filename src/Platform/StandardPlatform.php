@@ -49,7 +49,8 @@ class StandardPlatform extends Platform
         // Adds support for the "array-key" type
         yield new Builder\SimpleTypeBuilder('array-key', Type\SimpleType::class);
 
-        yield new Builder\NamedTypeBuilder('array', Type\ArrayType::class);
+        // Adds support for the "array" type
+        yield new Builder\ArrayTypeBuilder('array');
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();

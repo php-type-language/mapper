@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Type\Context\LocalContext;
 
 class ArrayKeyType extends SimpleType
@@ -30,6 +31,9 @@ class ArrayKeyType extends SimpleType
         return $this->delegate->match($value, $context);
     }
 
+    /**
+     * @throws InvalidValueException
+     */
     public function cast(mixed $value, LocalContext $context): mixed
     {
         return $this->delegate->cast($value, $context);
