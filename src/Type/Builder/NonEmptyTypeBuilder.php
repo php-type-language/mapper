@@ -13,7 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-extends Builder<NamedTypeNode, NonEmpty>
  */
-final class NonEmptyTypeBuilder extends Builder
+class NonEmptyTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string

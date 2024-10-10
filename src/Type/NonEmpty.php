@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Type\Context\LocalContext;
 
-final class NonEmpty extends GenericType
+class NonEmpty extends GenericType
 {
     /**
      * @var non-empty-string
@@ -24,7 +24,7 @@ final class NonEmpty extends GenericType
         parent::__construct($type, $name);
     }
 
-    private function isEmpty(mixed $value): bool
+    protected function isEmpty(mixed $value): bool
     {
         return $value === '' || $value === [] || $value === null;
     }
