@@ -20,7 +20,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * @template T of object
  * @template-extends Builder<NamedTypeNode, ObjectType<T>>
  */
-final class ObjectTypeBuilder extends Builder
+class ObjectTypeBuilder extends Builder
 {
     public function __construct(
         private readonly DriverInterface $driver = new ReflectionDriver(),
@@ -32,16 +32,26 @@ final class ObjectTypeBuilder extends Builder
      */
     public function isSupported(TypeStatement $statement): bool
     {
-        return $statement instanceof NamedTypeNode
-            && !$statement->name->isBuiltin()
-            && \class_exists($statement->name->toString())
-            && !\enum_exists($statement->name->toString());
+        if (!$statement instanceof NamedTypeNode) {
+            return false;
+        }
+
+        /** @var non-empty-string $name */
+        $name = $statement->name->toString();
+
+        if (!\class_exists($name)) {
+            return false;
+        }
+
+        $reflection = new \ReflectionClass($name);
+
+        return $reflection->isInstantiable();
     }
 
     public function build(TypeStatement $statement, RepositoryInterface $types): ObjectType
     {
-        self::assertNoTemplateArguments($statement);
-        self::assertNoShapeFields($statement);
+        $this->expectNoShapeFields($statement);
+        $this->expectNoTemplateArguments($statement);
 
         /** @var class-string<T> $class */
         $class = $statement->name->toString();

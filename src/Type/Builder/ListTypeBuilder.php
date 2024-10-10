@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Type\ListType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -14,12 +13,12 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-extends Builder<NamedTypeNode, ListType>
  */
-final class ListTypeBuilder extends Builder
+class ListTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string
      */
-    private readonly string $lower;
+    protected readonly string $lower;
 
     /**
      * @param non-empty-string $name
@@ -37,22 +36,21 @@ final class ListTypeBuilder extends Builder
 
     public function build(TypeStatement $statement, RepositoryInterface $types): ListType
     {
-        self::assertNoShapeFields($statement);
-        self::assertTemplateArgumentsCount($statement, 1, 0);
-
         if ($statement->arguments === null || $statement->arguments->count() === 0) {
             return new ListType($statement->name->toString());
         }
+
+        $this->expectNoShapeFields($statement);
+        $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
+
+        // The "arguments" has already been checked for non-null
+        assert($statement->arguments !== null);
 
         /** @var TemplateArgumentNode $first */
         $first = $statement->arguments->first();
 
         if ($first->hint !== null) {
-            throw TemplateArgumentHintsNotSupportedException::becauseTemplateArgumentHintsNotSupported(
-                hint: $first->hint,
-                argument: $first,
-                type: $statement,
-            );
+            $this->expectNoTemplateArgumentHint($statement, $first);
         }
 
         return new ListType(

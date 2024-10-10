@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition\Template\Hint;
 
-use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -24,7 +23,6 @@ class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintExc
     protected const CODE_ERROR_LAST = self::CODE_ERROR_TEMPLATE_ARGUMENT_HINTS_NOT_SUPPORTED;
 
     public static function becauseTemplateArgumentHintsNotSupported(
-        Identifier $hint,
         TemplateArgumentNode $argument,
         TypeStatement $type,
         ?\Throwable $previous = null
@@ -33,7 +31,6 @@ class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintExc
             . 'but "{{hint}}" were passed';
 
         return new self(
-            hint: $hint,
             argument: $argument,
             type: $type,
             template: $template,

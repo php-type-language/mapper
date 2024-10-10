@@ -5,30 +5,23 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
-class FloatType implements TypeInterface
+class FloatType extends SimpleType
 {
     /**
      * @var non-empty-string
      */
-    private const DEFAULT_TYPE_NAME = 'float';
+    public const DEFAULT_TYPE_NAME = 'float';
 
     /**
      * @param non-empty-string $name
      */
-    public function __construct(
-        #[TargetTypeName]
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
-    ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
+    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
     {
-        return new NamedTypeNode($this->name);
+        parent::__construct($name);
     }
 
     public function match(mixed $value, LocalContext $context): bool

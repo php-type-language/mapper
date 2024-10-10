@@ -30,29 +30,26 @@ class StandardPlatform extends Platform
     public function getTypes(): iterable
     {
         // Adds support for the "mixed" type
-        yield new Builder\MixedTypeBuilder('mixed');
+        yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
+
+        // Adds support for the "bool" type
+        yield new Builder\SimpleTypeBuilder('bool', Type\BoolType::class);
+
+        // Adds support for the "string" type
+        yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
 
         yield new Builder\NamedTypeBuilder('int', Type\IntType::class);
 
-        // Adds support for the "bool" type
-        yield new Builder\BoolTypeBuilder('bool');
-
-        // Adds support for the "string" type
-        yield new Builder\StringTypeBuilder('string');
-
-        yield new Builder\NamedTypeBuilder('float', Type\FloatType::class);
+        // Adds support for the "float" type
+        yield new Builder\SimpleTypeBuilder('float', Type\FloatType::class);
 
         // Adds support for the "list<T>" type
         yield new Builder\ListTypeBuilder('list');
 
         // Adds support for the "array-key" type
-        yield new Builder\ArrayKeyTypeBuilder('array-key');
+        yield new Builder\SimpleTypeBuilder('array-key', Type\SimpleType::class);
 
         yield new Builder\NamedTypeBuilder('array', Type\ArrayType::class);
-
-        yield new Builder\ObjectNamedTypeBuilder(\DateTimeInterface::class, Type\DateTimeType::class);
-
-        yield new Builder\ObjectNamedTypeBuilder(\BackedEnum::class, Type\BackedEnumType::class);
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
@@ -66,11 +63,20 @@ class StandardPlatform extends Platform
         // Adds support for the integer literal types
         yield new Builder\IntLiteralTypeBuilder();
 
+        // Adds support for the float literal types
+        yield new Builder\FloatLiteralTypeBuilder();
+
         // Adds support for the "T[]" statement
         yield new Builder\TypesListBuilder();
 
         // Adds support for the "T|U" union types
         yield new Builder\UnionTypeBuilder();
+
+        // Adds support for the "DateTime" and "DateTimeImmutable" types
+        yield new Builder\DateTimeTypeBuilder();
+
+        // Adds support for the "BackedEnum" type
+        yield new Builder\BackedEnumTypeBuilder();
 
         // Adds support for the "Path\To\Class" statement
         yield new Builder\ObjectTypeBuilder($this->driver);

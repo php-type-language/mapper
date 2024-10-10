@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
@@ -19,8 +18,8 @@ class BackedEnumType extends AsymmetricType
      * @param class-string<\BackedEnum> $name
      */
     public function __construct(
-        #[TargetTypeName]
         private readonly string $name,
+        private readonly TypeInterface $type,
     ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
@@ -32,15 +31,15 @@ class BackedEnumType extends AsymmetricType
         $cases = [];
 
         foreach ($this->name::cases() as $case) {
-            $cases[] = \is_string($case->value)
-                ? new StringLiteralNode(
-                    value: $case->value,
-                    raw: \sprintf('"%s"', \addcslashes($case->value, '"')),
-                )
-                : new IntLiteralNode($case->value);
+            $cases[] = match (true) {
+                \is_string($case->value) => StringLiteralNode::createFromValue($case->value),
+                \is_int($case->value) => new IntLiteralNode($case->value),
+            };
         }
 
         return match (\count($cases)) {
+            // The number of cases cannot be zero, so
+            // this will most likely not be possible.
             0 => new NamedTypeNode('never'),
             1 => $cases[0],
             default => new UnionTypeNode(...$cases),
@@ -49,7 +48,7 @@ class BackedEnumType extends AsymmetricType
 
     protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
-        return $value instanceof \BackedEnum;
+        return $value instanceof $this->name;
     }
 
     /**
@@ -60,7 +59,7 @@ class BackedEnumType extends AsymmetricType
      */
     public function normalize(mixed $value, LocalContext $context): int|string
     {
-        if (!$value instanceof \BackedEnum) {
+        if (!$value instanceof $this->name) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,
                 expected: $this->getTypeStatement($context),
@@ -73,14 +72,17 @@ class BackedEnumType extends AsymmetricType
 
     protected function isDenormalizable(mixed $value, LocalContext $context): bool
     {
-        if (!\is_int($value) && !\is_string($value)) {
+        $isSupportsType = $this->type->match($value, $context);
+
+        if (!$isSupportsType) {
             return false;
         }
 
-        try {
-            $this->name::from($value);
+        /** @var int|string $denormalized */
+        $denormalized = $this->type->cast($value, $context);
 
-            return true;
+        try {
+            return ($this->name)::tryFrom($denormalized) !== null;
         } catch (\Throwable) {
             return false;
         }
@@ -93,7 +95,9 @@ class BackedEnumType extends AsymmetricType
      */
     public function denormalize(mixed $value, LocalContext $context): \BackedEnum
     {
-        if (!\is_string($value) && !\is_int($value)) {
+        $denormalized = $this->type->cast($value, $context);
+
+        if (!\is_string($denormalized) && !\is_int($denormalized)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,
                 expected: $this->getTypeStatement($context),
@@ -102,7 +106,7 @@ class BackedEnumType extends AsymmetricType
         }
 
         try {
-            $case = $this->name::tryFrom($value);
+            $case = $this->name::tryFrom($denormalized);
         } catch (\TypeError) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,

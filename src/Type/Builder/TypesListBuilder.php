@@ -16,6 +16,13 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 final class TypesListBuilder implements TypeBuilderInterface
 {
+    /**
+     * @param non-empty-string $name
+     */
+    public function __construct(
+        private readonly string $name = ArrayType::DEFAULT_TYPE_NAME,
+    ) {}
+
     public function isSupported(TypeStatement $statement): bool
     {
         return $statement instanceof TypesListNode;
@@ -23,9 +30,8 @@ final class TypesListBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $statement, RepositoryInterface $types): ArrayType
     {
-        return new ArrayType(
-            name: 'array',
-            value: $types->getByStatement($statement->type),
-        );
+        $type = $types->getByStatement($statement->type);
+
+        return new ArrayType($this->name, $type);
     }
 }

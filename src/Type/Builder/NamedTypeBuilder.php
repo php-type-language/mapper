@@ -205,7 +205,6 @@ class NamedTypeBuilder implements TypeBuilderInterface
 
         if ($argument->hint !== null) {
             throw TemplateArgumentHintsNotSupportedException::becauseTemplateArgumentHintsNotSupported(
-                hint: $argument->hint,
                 argument: $argument,
                 type: $type,
             );

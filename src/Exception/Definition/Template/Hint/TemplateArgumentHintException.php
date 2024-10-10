@@ -18,21 +18,30 @@ abstract class TemplateArgumentHintException extends TemplateArgumentHintsExcept
      */
     protected const CODE_ERROR_LAST = parent::CODE_ERROR_LAST;
 
+    protected readonly ?Identifier $hint;
+
     public function __construct(
-        protected readonly Identifier $hint,
         TemplateArgumentNode $argument,
         TypeStatement $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
-        parent::__construct($argument, $type, $template, $code, $previous);
+        $this->hint = $argument->hint;
+
+        parent::__construct(
+            argument: $argument,
+            type: $type,
+            template: $template,
+            code: $code,
+            previous: $previous,
+        );
     }
 
     /**
      * @api
      */
-    public function getArgumentHint(): Identifier
+    public function findArgumentHint(): ?Identifier
     {
         return $this->hint;
     }

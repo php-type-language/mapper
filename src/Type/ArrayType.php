@@ -20,11 +20,11 @@ class ArrayType implements TypeInterface
     /**
      * @var non-empty-string
      */
-    private const DEFAULT_TYPE_NAME = 'array';
+    public const DEFAULT_TYPE_NAME = 'array';
 
-    private readonly TypeInterface $key;
+    protected readonly TypeInterface $key;
 
-    private readonly TypeInterface $value;
+    protected readonly TypeInterface $value;
 
     /**
      * @param non-empty-string $name

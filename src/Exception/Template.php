@@ -87,11 +87,11 @@ final class Template implements \Stringable
         foreach ($this->getPlaceholders() as $placeholder => $value) {
             $replacement = $this->formatValueToString($value);
 
+            $search[] = \sprintf('"%s"', $placeholder);
+            $replace[] = \sprintf('"%s"', \addcslashes($replacement, '"'));
+
             $search[] = $placeholder;
             $replace[] = $replacement;
-
-            $search[] = \sprintf('"%s"', $placeholder);
-            $replace[] = \addcslashes($replacement, '"');
         }
 
         return \str_replace($search, $replace, $this->template);

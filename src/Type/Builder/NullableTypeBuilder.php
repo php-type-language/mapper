@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  *
  * @template-implements TypeBuilderInterface<NullableTypeNode<TypeStatement>, NullableType>
  */
-final class NullableTypeBuilder implements TypeBuilderInterface
+class NullableTypeBuilder implements TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool
     {
@@ -23,6 +23,8 @@ final class NullableTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $statement, RepositoryInterface $types): NullableType
     {
-        return new NullableType($types->getByStatement($statement->type));
+        $type = $types->getByStatement($statement->type);
+
+        return new NullableType($type);
     }
 }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
-use TypeLang\Mapper\Type\Attribute\TargetTypeName;
 use TypeLang\Mapper\Type\Context\Context;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
@@ -18,48 +16,29 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class DateTimeType extends AsymmetricType
 {
     /**
-     * @var class-string<\DateTime|\DateTimeImmutable>
+     * @var non-empty-string
      */
-    private readonly string $class;
+    public const DEFAULT_DATETIME_FORMAT = \DateTimeInterface::RFC3339;
 
     /**
-     * @param class-string<\DateTimeInterface> $name
-     * @param non-empty-string $format
-     *
-     * @throws \InvalidArgumentException
+     * @param non-empty-string $name
+     * @param class-string<\DateTime|\DateTimeImmutable> $class
      */
     public function __construct(
-        #[TargetTypeName]
-        private readonly string $name,
-        #[TargetTemplateArgument]
-        private readonly string $format = \DateTimeInterface::RFC3339,
-    ) {
-        if (!\is_a($this->name, \DateTimeInterface::class, true)) {
-            throw new \InvalidArgumentException(\sprintf(
-                '%s must be a class that implements \DateTimeInterface',
-                $this->name,
-            ));
-        }
-
-        $this->class = match (true) {
-            $this->name === \DateTimeInterface::class,
-            \interface_exists($this->name) => \DateTimeImmutable::class,
-            \is_a($this->name, \DateTime::class, true) => \DateTime::class,
-            default => \DateTimeImmutable::class,
-        };
-    }
+        protected readonly string $name,
+        protected readonly string $class,
+        protected readonly ?string $format = null,
+    ) {}
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        return new NamedTypeNode(
-            name: $this->name,
-            arguments: new TemplateArgumentsListNode([
-                new TemplateArgumentNode(new StringLiteralNode(
-                    value: $this->format,
-                    raw: \sprintf('"%s"', \addcslashes($this->format, '"')),
-                )),
-            ])
-        );
+        if ($this->format === null) {
+            return new NamedTypeNode($this->name);
+        }
+
+        return new NamedTypeNode($this->name, new TemplateArgumentsListNode([
+            new TemplateArgumentNode(StringLiteralNode::createFromValue($this->format)),
+        ]));
     }
 
     protected function isNormalizable(mixed $value, LocalContext $context): bool
@@ -80,7 +59,7 @@ class DateTimeType extends AsymmetricType
             );
         }
 
-        return $value->format($this->format);
+        return $value->format($this->format ?? self::DEFAULT_DATETIME_FORMAT);
     }
 
     protected function isDenormalizable(mixed $value, LocalContext $context): bool
@@ -90,7 +69,7 @@ class DateTimeType extends AsymmetricType
         }
 
         try {
-            return $this->parseDateTime($value, $context) !== null;
+            return $this->tryParseDateTime($value, $context) !== null;
         } catch (\Throwable) {
             return false;
         }
@@ -109,26 +88,27 @@ class DateTimeType extends AsymmetricType
             );
         }
 
-        try {
-            $result = $this->parseDateTime($value, $context);
+        $result = $this->tryParseDateTime($value, $context);
 
-            if ($result instanceof \DateTimeInterface) {
-                return $result;
-            }
-        } catch (\Throwable) {
+        if ($result instanceof \DateTimeInterface) {
+            return $result;
         }
 
         throw InvalidValueException::becauseInvalidValueGiven(
             value: $value,
-            expected: 'string',
+            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }
 
-    private function parseDateTime(string $value, Context $context): ?\DateTimeInterface
+    private function tryParseDateTime(string $value, Context $context): ?\DateTimeInterface
     {
-        if ($context->isStrictTypesEnabled()) {
-            $result = ($this->class)::createFromFormat($this->format, $value);
+        if ($context->isStrictTypesEnabled() && $this->format !== null) {
+            try {
+                $result = ($this->class)::createFromFormat($this->format, $value);
+            } catch (\Throwable) {
+                return null;
+            }
 
             return \is_bool($result) ? null : $result;
         }

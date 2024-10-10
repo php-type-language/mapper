@@ -12,7 +12,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-implements TypeBuilderInterface<IntLiteralNode, IntLiteralType>
  */
-final class IntLiteralTypeBuilder implements TypeBuilderInterface
+class IntLiteralTypeBuilder implements TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool
     {

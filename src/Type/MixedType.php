@@ -6,10 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class MixedType implements TypeInterface
+class MixedType extends SimpleType
 {
     /**
      * @var non-empty-lowercase-string
@@ -20,12 +18,9 @@ class MixedType implements TypeInterface
      * @param non-empty-string $name
      */
     public function __construct(
-        private readonly string $name = self::DEFAULT_TYPE_NAME,
-    ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        return new NamedTypeNode($this->name);
+        string $name = self::DEFAULT_TYPE_NAME,
+    ) {
+        parent::__construct($name);
     }
 
     public function match(mixed $value, LocalContext $context): bool
