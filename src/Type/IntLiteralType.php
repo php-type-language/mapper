@@ -12,7 +12,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class IntLiteralType extends IntType
+class IntLiteralType extends IntType
 {
     /**
      * @param numeric-string $name
