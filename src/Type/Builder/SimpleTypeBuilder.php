@@ -32,6 +32,7 @@ class SimpleTypeBuilder extends Builder
 
     /**
      * @param non-empty-array<non-empty-string>|non-empty-string $names
+     *
      * @return non-empty-list<non-empty-lowercase-string>
      */
     private function formatNames(array|string $names): array

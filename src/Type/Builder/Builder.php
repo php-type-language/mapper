@@ -24,6 +24,7 @@ abstract class Builder implements TypeBuilderInterface
 {
     /**
      * @api
+     *
      * @throws TemplateArgumentsNotSupportedException
      */
     protected function expectNoTemplateArguments(NamedTypeNode $stmt): void
@@ -40,6 +41,7 @@ abstract class Builder implements TypeBuilderInterface
 
     /**
      * @api
+     *
      * @throws ShapeFieldsNotSupportedException
      */
     protected function expectNoShapeFields(NamedTypeNode $stmt): void
@@ -55,8 +57,10 @@ abstract class Builder implements TypeBuilderInterface
 
     /**
      * @api
+     *
      * @param int<0, max> $max
      * @param int<0, max>|null $min
+     *
      * @throws TooManyTemplateArgumentsException
      */
     protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, ?int $min = null): void
@@ -66,8 +70,10 @@ abstract class Builder implements TypeBuilderInterface
 
     /**
      * @api
+     *
      * @param int<0, max> $max
      * @param int<0, max>|null $min
+     *
      * @throws TooManyTemplateArgumentsException
      */
     protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, ?int $min = null): void
@@ -86,6 +92,7 @@ abstract class Builder implements TypeBuilderInterface
 
     /**
      * @api
+     *
      * @throws TemplateArgumentHintsNotSupportedException
      */
     protected function expectNoTemplateArgumentHint(TypeStatement $stmt, TemplateArgumentNode $argument): void

@@ -74,6 +74,7 @@ class BackedEnumTypeBuilder extends Builder
         try {
             /**
              * @var \ReflectionEnum<\BackedEnum> $reflection
+             *
              * @phpstan-ignore-next-line
              */
             $reflection = new \ReflectionEnum($statement->name->toString());

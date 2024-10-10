@@ -20,7 +20,7 @@ class InternalTypeException extends DefinitionException
 
     public static function becauseInternalTypeErrorOccurs(
         TypeStatement $type,
-        string $message = null,
+        ?string $message = null,
         ?\Throwable $previous = null,
     ): self {
         return new self(
