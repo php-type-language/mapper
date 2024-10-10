@@ -19,7 +19,7 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 /**
  * @template-extends Builder<NamedTypeNode, IntType>
  */
-final class IntTypeBuilder extends Builder
+class IntTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string

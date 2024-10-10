@@ -17,7 +17,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-extends Builder<NamedTypeNode, ArrayType>
  */
-final class ArrayTypeBuilder extends Builder
+class ArrayTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string

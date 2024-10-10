@@ -12,7 +12,7 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 /**
  * @template-implements TypeBuilderInterface<UnionTypeNode<TypeStatement>, UnionType>
  */
-final class UnionTypeBuilder implements TypeBuilderInterface
+class UnionTypeBuilder implements TypeBuilderInterface
 {
     public function isSupported(TypeStatement $statement): bool
     {

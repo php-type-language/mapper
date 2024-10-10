@@ -17,7 +17,7 @@ class SimpleTypeBuilder extends Builder
     /**
      * @var non-empty-list<non-empty-lowercase-string>
      */
-    private readonly array $lower;
+    protected readonly array $lower;
 
     /**
      * @param non-empty-array<non-empty-string>|non-empty-string $names

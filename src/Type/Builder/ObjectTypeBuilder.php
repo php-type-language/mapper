@@ -23,8 +23,8 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class ObjectTypeBuilder extends Builder
 {
     public function __construct(
-        private readonly DriverInterface $driver = new ReflectionDriver(),
-        private readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
+        protected readonly DriverInterface $driver = new ReflectionDriver(),
+        protected readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
     ) {}
 
     /**
