@@ -47,6 +47,9 @@ class StandardPlatform extends Platform
         // Adds support for the "list<T>" type
         yield new Builder\ListTypeBuilder('list');
 
+        // Adds support for the "non-empty<T>" type
+        yield new Builder\NonEmptyTypeBuilder('non-empty');
+
         // Adds support for the "array-key" type
         yield new Builder\SimpleTypeBuilder('array-key', Type\SimpleType::class);
 
