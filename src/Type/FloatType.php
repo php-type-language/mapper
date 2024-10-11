@@ -26,10 +26,6 @@ class FloatType extends SimpleType
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToFloat($value);
-        }
-
         return \is_float($value) || \is_int($value);
     }
 
@@ -38,45 +34,17 @@ class FloatType extends SimpleType
      */
     public function cast(mixed $value, LocalContext $context): float
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToFloat($value);
+        if (\is_float($value) || \is_int($value)) {
+            return (float) $value;
         }
 
-        if (!\is_float($value) && !\is_int($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: new UnionTypeNode(
-                    a: new NamedTypeNode('int'),
-                    b: new NamedTypeNode('float'),
-                ),
-                context: $context,
-            );
-        }
-
-        return (float) $value;
-    }
-
-    /**
-     * A method to convert input data to a float representation, if possible.
-     *
-     * If conversion is not possible, it returns the value "as is".
-     */
-    protected function tryCastToFloat(mixed $value): mixed
-    {
-        if ($value instanceof \BackedEnum) {
-            $value = $value->value;
-        }
-
-        return match (true) {
-            \is_array($value),
-            \is_object($value) => $value,
-            \is_string($value) => match (true) {
-                $value === '' => 0.0,
-                \is_numeric($value) => (float) $value,
-                default => 1.0,
-            },
-            // @phpstan-ignore-next-line : Any other type can be converted to float
-            default => (float) $value,
-        };
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: new UnionTypeNode(
+                a: new NamedTypeNode('int'),
+                b: new NamedTypeNode('float'),
+            ),
+            context: $context,
+        );
     }
 }

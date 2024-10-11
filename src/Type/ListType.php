@@ -30,44 +30,19 @@ class ListType implements TypeInterface
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        $child = $context->withDetailedTypes(false);
+
         return new NamedTypeNode(
             name: $this->name,
             arguments: new TemplateArgumentsListNode([
-                new TemplateArgumentNode($this->type->getTypeStatement($context)),
+                new TemplateArgumentNode($this->type->getTypeStatement($child)),
             ]),
-        );
-    }
-
-    /**
-     * @return array<array-key, mixed>
-     * @throws InvalidValueException
-     */
-    private function validateAndCast(mixed $value, LocalContext $context): array
-    {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToList($value);
-        }
-
-        if (\is_array($value)) {
-            return $value;
-        }
-
-        throw InvalidValueException::becauseInvalidValueGiven(
-            value: $value,
-            expected: $this->getTypeStatement($context),
-            context: $context,
         );
     }
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToList($value);
-        } else {
-            return \is_array($value) && \array_is_list($value);
-        }
-
-        return \is_array($value);
+        return \is_array($value) && \array_is_list($value);
     }
 
     /**
@@ -77,9 +52,7 @@ class ListType implements TypeInterface
      */
     public function cast(mixed $value, LocalContext $context): array
     {
-        $value = $this->validateAndCast($value, $context);
-
-        if (!\array_is_list($value)) {
+        if (!\is_array($value) || !\array_is_list($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,
                 expected: $this->getTypeStatement($context),
@@ -98,19 +71,5 @@ class ListType implements TypeInterface
         }
 
         return $result;
-    }
-
-    /**
-     * A method to convert input data to a list<T> representation, if possible.
-     *
-     * If conversion is not possible, it returns the value "as is".
-     */
-    protected function tryCastToList(mixed $value): array
-    {
-        return match (true) {
-            \is_array($value) => $value,
-            $value instanceof \Traversable => \iterator_to_array($value, false),
-            default => [$value],
-        };
     }
 }

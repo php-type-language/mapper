@@ -22,7 +22,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
     final public function __construct(
         private readonly Direction $direction,
         private readonly RepositoryInterface $types,
-        ?bool $strictTypes = null,
         ?bool $objectsAsArrays = null,
         ?bool $detailedTypes = null,
     ) {
@@ -30,7 +29,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
         $this->trace = new MutablePath();
 
         parent::__construct(
-            strictTypes: $strictTypes,
             objectsAsArrays: $objectsAsArrays,
             detailedTypes: $detailedTypes,
         );
@@ -58,7 +56,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
         return new self(
             direction: $local->direction,
             types: $local->types,
-            strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
             detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
         );

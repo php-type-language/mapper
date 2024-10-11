@@ -27,19 +27,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * @api
      *
-     * @see Context::withStrictTypes()
-     */
-    public function withStrictTypes(?bool $enabled = null): self
-    {
-        $self = clone $this;
-        $self->context = $this->context->withStrictTypes($enabled);
-
-        return $self;
-    }
-
-    /**
-     * @api
-     *
      * @see Context::withObjectsAsArrays()
      */
     public function withObjectsAsArrays(?bool $enabled = null): self

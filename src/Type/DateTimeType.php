@@ -103,7 +103,7 @@ class DateTimeType extends AsymmetricType
 
     private function tryParseDateTime(string $value, Context $context): ?\DateTimeInterface
     {
-        if ($context->isStrictTypesEnabled() && $this->format !== null) {
+        if ($this->format !== null) {
             try {
                 $result = ($this->class)::createFromFormat($this->format, $value);
             } catch (\Throwable) {

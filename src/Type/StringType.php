@@ -24,10 +24,6 @@ class StringType extends SimpleType
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToString($value);
-        }
-
         return \is_string($value);
     }
 
@@ -38,10 +34,6 @@ class StringType extends SimpleType
      */
     public function cast(mixed $value, LocalContext $context): string
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToString($value);
-        }
-
         if (\is_string($value)) {
             return $value;
         }
@@ -51,27 +43,5 @@ class StringType extends SimpleType
             expected: $this->getTypeStatement($context),
             context: $context,
         );
-    }
-
-    /**
-     * A method to convert input data to a string representation, if possible.
-     *
-     * If conversion is not possible, it returns the value "as is".
-     */
-    private function tryCastToString(mixed $value): mixed
-    {
-        if ($value instanceof \BackedEnum) {
-            $value = $value->value;
-        }
-
-        return match (true) {
-            $value instanceof \Stringable => (string) $value,
-            \is_array($value),
-            \is_object($value) => $value,
-            $value === true => '1',
-            $value === false => '0',
-            // @phpstan-ignore-next-line : Any other type can be converted to string
-            default => (string) $value,
-        };
     }
 }

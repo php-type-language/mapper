@@ -53,11 +53,9 @@ class IntType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToInt($value);
-        }
-
-        return \is_int($value) && $value >= $this->min && $value <= $this->max;
+        return \is_int($value)
+            && $value >= $this->min
+            && $value <= $this->max;
     }
 
     /**
@@ -67,10 +65,6 @@ class IntType implements TypeInterface
      */
     public function cast(mixed $value, LocalContext $context): int
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToInt($value);
-        }
-
         if (!\is_int($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,
@@ -80,56 +74,21 @@ class IntType implements TypeInterface
         }
 
         if ($value > $this->max) {
-            if ($context->isStrictTypesEnabled()) {
-                throw InvalidValueException::becauseInvalidValueGiven(
-                    value: $value,
-                    expected: $this->getTypeStatement($context),
-                    context: $context,
-                );
-            }
-
-            $value = $this->max;
+            throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
+                context: $context,
+            );
         }
 
         if ($value < $this->min) {
-            if ($context->isStrictTypesEnabled()) {
-                throw InvalidValueException::becauseInvalidValueGiven(
-                    value: $value,
-                    expected: $this->getTypeStatement($context),
-                    context: $context,
-                );
-            }
-
-            $value = $this->min;
+            throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
+                context: $context,
+            );
         }
 
         return $value;
-    }
-
-    /**
-     * A method to convert input data to a int representation, if possible.
-     *
-     * If conversion is not possible, it returns the value "as is".
-     */
-    protected function tryCastToInt(mixed $value): mixed
-    {
-        if ($value instanceof \BackedEnum) {
-            $value = $value->value;
-        }
-
-        return match (true) {
-            \is_array($value),
-            \is_object($value) => $value,
-            $value === \INF => \PHP_INT_MAX,
-            $value === -\INF => \PHP_INT_MIN,
-            \is_string($value) => match (true) {
-                $value === '' => 0,
-                $value[0] === '-' && \ctype_digit(\substr($value, 1)),
-                \ctype_digit($value) => (int) $value,
-                default => 1,
-            },
-            // @phpstan-ignore-next-line : Any other type can be converted to int
-            default => (int) $value,
-        };
     }
 }

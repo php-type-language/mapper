@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\MappingException;
+use TypeLang\Mapper\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
@@ -40,22 +41,20 @@ class UnionType implements TypeInterface
     /**
      * Finds a child supported type from their {@see $types} list by value.
      */
-    protected function findType(mixed $value, LocalContext $context): ?TypeInterface
+    protected function findType(mixed $value, LocalContext $context, bool $match = true): ?TypeInterface
     {
-        $strict = $context->withStrictTypes(true);
+        foreach ($this->types as $index => $type) {
+            $context->enter(new UnionLeafEntry($index));
 
-        foreach ($this->types as $type) {
-            if ($type->match($value, $strict)) {
+            if ($type->match($value, $context)) {
+                if ($match) {
+                    $context->leave();
+                }
+
                 return $type;
             }
-        }
 
-        $nonStrict = $context->withStrictTypes(false);
-
-        foreach ($this->types as $type) {
-            if ($type->match($value, $nonStrict)) {
-                return $type;
-            }
+            $context->leave();
         }
 
         return null;
@@ -63,7 +62,7 @@ class UnionType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        return $this->findType($value, $context) !== null;
+        return $this->findType($value, $context, false) !== null;
     }
 
     /**

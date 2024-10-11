@@ -17,10 +17,6 @@ class NullType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            return true;
-        }
-
         return $value === null;
     }
 
@@ -29,18 +25,14 @@ class NullType implements TypeInterface
      */
     public function cast(mixed $value, LocalContext $context): mixed
     {
-        if (!$context->isStrictTypesEnabled()) {
+        if ($value === null) {
             return null;
         }
 
-        if ($value !== null) {
-            throw InvalidValueException::becauseInvalidValueGiven(
-                value: $value,
-                expected: $this->getTypeStatement($context),
-                context: $context,
-            );
-        }
-
-        return null;
+        throw InvalidValueException::becauseInvalidValueGiven(
+            value: $value,
+            expected: $this->getTypeStatement($context),
+            context: $context,
+        );
     }
 }

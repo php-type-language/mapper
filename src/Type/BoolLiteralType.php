@@ -29,22 +29,14 @@ class BoolLiteralType extends BoolType
     {
         $result = new BoolLiteralNode($this->value, $this->name);
 
-        if ($context->isDetailedTypes()) {
-            return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
-                new TemplateArgumentNode($result),
-            ]));
-        }
-
-        return $result;
+        return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
+            new TemplateArgumentNode($result),
+        ]));
     }
 
     #[\Override]
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
-        }
-
         return $value === $this->value;
     }
 
@@ -56,10 +48,6 @@ class BoolLiteralType extends BoolType
     #[\Override]
     public function cast(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
-        }
-
         if ($value === $this->value) {
             return $value;
         }

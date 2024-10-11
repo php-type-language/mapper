@@ -12,7 +12,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 class ArrayType implements TypeInterface
 {
@@ -33,33 +32,20 @@ class ArrayType implements TypeInterface
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        if (!$context->isDetailedTypes()) {
-            return new NamedTypeNode($this->name);
-        }
+        $child = $context->withDetailedTypes(false);
 
         return new NamedTypeNode(
             name: $this->name,
             arguments: new TemplateArgumentsListNode([
-                new TemplateArgumentNode($this->key->getTypeStatement($context)),
-                new TemplateArgumentNode($this->value->getTypeStatement($context)),
+                new TemplateArgumentNode($this->key->getTypeStatement($child)),
+                new TemplateArgumentNode($this->value->getTypeStatement($child)),
             ]),
-        );
-    }
-
-    /**
-     * @return UnionTypeNode<TypeStatement>
-     */
-    protected function getSupportedKeyType(): UnionTypeNode
-    {
-        return new UnionTypeNode(
-            new NamedTypeNode('string'),
-            new NamedTypeNode('int'),
         );
     }
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$this->matchRootType($value, $context)) {
+        if (!\is_array($value)) {
             return false;
         }
 
@@ -80,25 +66,13 @@ class ArrayType implements TypeInterface
     }
 
     /**
-     * @return ($value is iterable ? true : false)
-     */
-    private function matchRootType(mixed $value, LocalContext $context): bool
-    {
-        if (!$context->isStrictTypesEnabled()) {
-            return \is_iterable($value);
-        }
-
-        return \is_array($value);
-    }
-
-    /**
      * @return array<array-key, mixed>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
      */
     public function cast(mixed $value, LocalContext $context): array
     {
-        if (!$this->matchRootType($value, $context)) {
+        if (!\is_array($value)) {
             throw InvalidValueException::becauseInvalidValueGiven(
                 value: $value,
                 expected: $this->getTypeStatement($context),
@@ -109,14 +83,6 @@ class ArrayType implements TypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            if (!\is_string($index) && !\is_int($index)) {
-                throw InvalidValueException::becauseInvalidValueGiven(
-                    value: $index,
-                    expected: $this->getSupportedKeyType(),
-                    context: $context,
-                );
-            }
-
             $context->enter(new ArrayIndexEntry($index));
 
             $result[$this->key->cast($index, $context)]

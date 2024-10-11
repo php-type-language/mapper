@@ -25,10 +25,6 @@ class BoolType extends SimpleType
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
-        }
-
         return \is_bool($value);
     }
 
@@ -39,10 +35,6 @@ class BoolType extends SimpleType
      */
     public function cast(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToBool($value);
-        }
-
         if (\is_bool($value)) {
             return $value;
         }
@@ -52,20 +44,5 @@ class BoolType extends SimpleType
             expected: 'bool',
             context: $context,
         );
-    }
-
-    /**
-     * A method to convert input data to a bool representation, if possible.
-     *
-     * If conversion is not possible, it returns the value "as is".
-     */
-    protected function tryCastToBool(mixed $value): bool
-    {
-        return match (true) {
-            \is_array($value) => $value !== [],
-            \is_object($value) => true,
-            \is_string($value) => $value !== '',
-            default => (bool) $value,
-        };
     }
 }

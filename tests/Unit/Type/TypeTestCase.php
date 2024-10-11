@@ -48,13 +48,9 @@ abstract class TypeTestCase extends TestCase
 
     protected function expectCastIfNonStrict(mixed $expected, Context $ctx): mixed
     {
-        if ($ctx->isStrictTypesEnabled()) {
-            $this->expectException(MappingException::class);
+        $this->expectException(MappingException::class);
 
-            return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
-        }
-
-        return $expected;
+        return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
     }
 
     protected function expectMappingError(): mixed
@@ -73,8 +69,6 @@ abstract class TypeTestCase extends TestCase
 
     public static function contextDataProvider(): iterable
     {
-        yield 'non-strict' => [new Context(strictTypes: false)];
-        yield 'strict' => [new Context(strictTypes: true)];
         yield 'default' => [new Context()];
     }
 

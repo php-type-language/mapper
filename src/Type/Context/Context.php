@@ -7,11 +7,6 @@ namespace TypeLang\Mapper\Type\Context;
 class Context
 {
     /**
-     * Default value for {@see $strictTypes} option.
-     */
-    public const STRICT_TYPES_DEFAULT_VALUE = true;
-
-    /**
      * Default value for {@see $objectsAsArrays} option.
      */
     public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
@@ -22,11 +17,6 @@ class Context
     public const DETAILED_TYPES_DEFAULT_VALUE = true;
 
     public function __construct(
-        /**
-         * If this option contains {@see false}, then type conversion is
-         * allowed during transformation.
-         */
-        protected ?bool $strictTypes = null,
         /**
          * If this option contains {@see true}, then objects are converted to
          * associative arrays, otherwise anonymous {@see object} will be
@@ -39,32 +29,6 @@ class Context
          */
         protected ?bool $detailedTypes = null,
     ) {}
-
-    /**
-     * Enables or disables strict types checking.
-     *
-     * In case of $enabled is {@see null} a default value will be defined.
-     *
-     * @api
-     */
-    public function withStrictTypes(?bool $enabled = null): static
-    {
-        $self = clone $this;
-        $self->strictTypes = $enabled;
-
-        return $self;
-    }
-
-    /**
-     * Returns current {@see $strictTypes} option or default value
-     * in case of option is not set.
-     *
-     * @api
-     */
-    public function isStrictTypesEnabled(): bool
-    {
-        return $this->strictTypes ?? self::STRICT_TYPES_DEFAULT_VALUE;
-    }
 
     /**
      * Enables or disables object to arrays conversion.
@@ -125,7 +89,6 @@ class Context
         }
 
         return new self(
-            strictTypes: $context->strictTypes ?? $this->strictTypes,
             objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
             detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
         );

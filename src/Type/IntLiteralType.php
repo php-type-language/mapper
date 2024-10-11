@@ -16,8 +16,6 @@ class IntLiteralType extends IntType
 {
     /**
      * @param numeric-string $name
-     *
-     * @throws \InvalidArgumentException
      */
     public function __construct(
         string $name,
@@ -31,32 +29,20 @@ class IntLiteralType extends IntType
     {
         $result = new IntLiteralNode($this->value, $this->name);
 
-        if ($context->isDetailedTypes()) {
-            return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
-                new TemplateArgumentNode($result),
-            ]));
-        }
-
-        return $result;
+        return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([
+            new TemplateArgumentNode($result),
+        ]));
     }
 
     #[\Override]
     public function match(mixed $value, LocalContext $context): bool
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToInt($value);
-        }
-
         return $value === $this->value;
     }
 
     #[\Override]
     public function cast(mixed $value, LocalContext $context): int
     {
-        if (!$context->isStrictTypesEnabled()) {
-            $value = $this->tryCastToInt($value);
-        }
-
         if ($value === $this->value) {
             return $value;
         }
