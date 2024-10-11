@@ -26,11 +26,11 @@ final class ClassMetadata extends Metadata
      * @throws \Exception
      */
     public function __construct(
-        string $name,
+        private readonly string $name,
         iterable $properties = [],
         ?int $createdAt = null,
     ) {
-        parent::__construct($name, $createdAt);
+        parent::__construct($createdAt);
 
         foreach ($properties as $property) {
             $this->addProperty($property);
@@ -66,13 +66,13 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns class name.
+     *
      * @return class-string<T>
      */
-    #[\Override]
     public function getName(): string
     {
-        /** @var class-string<T> */
-        return parent::getName();
+        return $this->name;
     }
 
     /**

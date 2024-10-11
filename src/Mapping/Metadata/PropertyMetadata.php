@@ -11,6 +11,11 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class PropertyMetadata extends Metadata
 {
+    /**
+     * @var non-empty-string
+     */
+    private readonly string $name;
+
     private mixed $defaultValue = null;
 
     private bool $hasDefaultValue = false;
@@ -25,7 +30,9 @@ final class PropertyMetadata extends Metadata
         private ?TypeInterface $type = null,
         ?int $createdAt = null,
     ) {
-        parent::__construct($this->export, $createdAt);
+        $this->name = $this->export;
+
+        parent::__construct($createdAt);
     }
 
     /**
@@ -67,6 +74,18 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
+     * Returns property real name.
+     *
+     * @api
+     *
+     * @return non-empty-string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
      * @api
      *
      * @param non-empty-string $name
@@ -77,6 +96,8 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
+     * Returns property public name.
+     *
      * @api
      *
      * @return non-empty-string

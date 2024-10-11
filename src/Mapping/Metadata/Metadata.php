@@ -8,13 +8,8 @@ abstract class Metadata
 {
     private readonly int $timestamp;
 
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(
-        private readonly string $name,
-        ?int $createdAt = null,
-    ) {
+    public function __construct(?int $createdAt = null)
+    {
         $this->timestamp = $createdAt ?? $this->getCurrentTimestamp();
     }
 
@@ -27,18 +22,6 @@ abstract class Metadata
         } catch (\Throwable) {
             return 0;
         }
-    }
-
-    /**
-     * Returns entry name.
-     *
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**
