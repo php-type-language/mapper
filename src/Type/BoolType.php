@@ -34,7 +34,8 @@ class BoolType extends NamedType
      */
     public function cast(mixed $value, LocalContext $context): bool
     {
-        if (\is_bool($value)) {
+        if ($this->match($value, $context)) {
+            /** @var bool */
             return $value;
         }
 

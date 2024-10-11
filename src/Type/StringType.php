@@ -34,7 +34,8 @@ class StringType extends NamedType
      */
     public function cast(mixed $value, LocalContext $context): string
     {
-        if (\is_string($value)) {
+        if ($this->match($value, $context)) {
+            /** @var string */
             return $value;
         }
 

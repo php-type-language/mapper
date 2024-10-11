@@ -43,7 +43,8 @@ class FloatLiteralType extends FloatType
     #[\Override]
     public function cast(mixed $value, LocalContext $context): float
     {
-        if ($value === (float) $this->value) {
+        if ($this->match($value, $context)) {
+            /** @var float */
             return $value;
         }
 

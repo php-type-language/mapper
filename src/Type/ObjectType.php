@@ -161,6 +161,7 @@ class ObjectType extends AsymmetricType
                 case \array_key_exists($meta->getExportName(), $value):
                     // Skip in case of property has no type definition.
                     if (($type = $meta->findType()) === null) {
+                        $context->leave();
                         continue 2;
                     }
 

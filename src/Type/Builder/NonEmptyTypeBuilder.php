@@ -24,6 +24,8 @@ class NonEmptyTypeBuilder extends NamedTypeBuilder
         /** @var TemplateArgumentNode $inner */
         $inner = $statement->arguments->first();
 
+        $this->expectNoTemplateArgumentHint($statement, $inner);
+
         return new NonEmpty(
             type: $types->getByStatement($inner->value),
             name: $statement->name->toString(),

@@ -7,34 +7,21 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class FloatType extends NamedType
+final class NonEmptyStringType extends NamedType
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_TYPE_NAME = 'float';
-
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
-    {
-        parent::__construct($name);
-    }
-
     public function match(mixed $value, LocalContext $context): bool
     {
-        return \is_float($value) || \is_int($value);
+        return $value !== '' && \is_string($value);
     }
 
     /**
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, LocalContext $context): float
+    public function cast(mixed $value, LocalContext $context): string
     {
         if ($this->match($value, $context)) {
-            /** @var float|int $value */
-            return (float) $value;
+            /** @var class-string */
+            return $value;
         }
 
         throw InvalidValueException::becauseInvalidValueGiven(

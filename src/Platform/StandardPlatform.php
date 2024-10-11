@@ -38,6 +38,15 @@ class StandardPlatform extends Platform
         // Adds support for the "string" type
         yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
 
+        // Adds support for the "non-empty-string" type
+        yield new Builder\SimpleTypeBuilder('non-empty-string', Type\NonEmptyStringType::class);
+
+        // Adds support for the "numeric-string" type
+        yield new Builder\SimpleTypeBuilder('numeric-string', Type\NumericStringType::class);
+
+        // Adds support for the "class-string" type
+        yield new Builder\ClassStringTypeBuilder('class-string');
+
         // Adds support for the "int" type
         yield new Builder\IntTypeBuilder('int');
 

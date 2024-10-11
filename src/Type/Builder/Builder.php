@@ -62,8 +62,8 @@ abstract class Builder implements TypeBuilderInterface
      */
     protected function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
     {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $count);
-        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $count);
+        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $count, $count);
+        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $count, $count);
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TooManyTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, ?int $min = null): void
+    protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
         $this->expectTemplateArgumentsLessOrEqualThan($stmt, $max + 1, $min);
     }
@@ -83,11 +83,11 @@ abstract class Builder implements TypeBuilderInterface
      * @api
      *
      * @param int<0, max> $max
-     * @param int<0, max>|null $min
+     * @param int<0, max> $min
      *
      * @throws TooManyTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, ?int $min = null): void
+    protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
         if ($stmt->arguments === null || $stmt->arguments->count() <= $max) {
             return;
@@ -95,7 +95,7 @@ abstract class Builder implements TypeBuilderInterface
 
         throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
             passedArgumentsCount: $stmt->arguments->count(),
-            minSupportedArgumentsCount: $min ?? $max,
+            minSupportedArgumentsCount: $min,
             maxSupportedArgumentsCount: $max,
             type: $stmt,
         );
@@ -107,11 +107,11 @@ abstract class Builder implements TypeBuilderInterface
      * @param int<0, max> $min
      * @param int<0, max>|null $max
      *
-     * @throws TooManyTemplateArgumentsException
+     * @throws MissingTemplateArgumentsException
      */
     protected function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
     {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $min + 1, $max);
+        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $min + 1, $max);
     }
 
     /**

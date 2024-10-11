@@ -43,7 +43,8 @@ class IntLiteralType extends IntType
     #[\Override]
     public function cast(mixed $value, LocalContext $context): int
     {
-        if ($value === $this->value) {
+        if ($this->match($value, $context)) {
+            /** @var int */
             return $value;
         }
 
