@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class MissingValueException extends MappingException

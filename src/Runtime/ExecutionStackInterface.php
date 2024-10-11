@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Path;
+namespace TypeLang\Mapper\Runtime;
 
-use TypeLang\Mapper\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 
 interface ExecutionStackInterface
 {

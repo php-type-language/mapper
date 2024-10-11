@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Exception\MapperExceptionInterface;
 use TypeLang\Mapper\Exception\Template;
-use TypeLang\Mapper\Path\PathInterface;
+use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

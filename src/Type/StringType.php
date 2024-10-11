@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class StringType extends SimpleType
+class StringType extends NamedType
 {
     /**
      * @var non-empty-string

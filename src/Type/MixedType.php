@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class MixedType extends SimpleType
+class MixedType extends NamedType
 {
     /**
      * @var non-empty-lowercase-string
@@ -17,9 +17,8 @@ class MixedType extends SimpleType
     /**
      * @param non-empty-string $name
      */
-    public function __construct(
-        string $name = self::DEFAULT_TYPE_NAME,
-    ) {
+    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
+    {
         parent::__construct($name);
     }
 

@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Type\NamedType;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
-use TypeLang\Mapper\Type\SimpleType;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<SimpleType>
+ * @template-extends NamedTypeBuilder<NamedType>
  */
 class SimpleTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @param non-empty-array<non-empty-string>|non-empty-string $names
-     * @param class-string<SimpleType> $type
+     * @param class-string<NamedType> $type
      */
     public function __construct(
         array|string $names,
@@ -25,7 +24,7 @@ class SimpleTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(TypeStatement $statement, RepositoryInterface $types): SimpleType
+    public function build(TypeStatement $statement, RepositoryInterface $types): NamedType
     {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);

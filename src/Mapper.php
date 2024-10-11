@@ -7,11 +7,12 @@ namespace TypeLang\Mapper;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Context\Context;
-use TypeLang\Mapper\Type\Context\Direction;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\Context;
+use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
@@ -73,61 +74,71 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * @throws TypeNotFoundException
      */
-    public function normalize(mixed $value, ?string $type = null, ?Context $context = null): mixed
+    public function normalize(mixed $value, ?string $type = null): mixed
     {
-        $concreteType = $type === null
-            ? $this->types->getByValue($value)
-            : $this->types->getByType($type);
+        $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Normalize, $context);
+        $local = $this->createLocalContext(Direction::Normalize);
 
-        return $concreteType->cast($value, $local);
+        return $instance->cast($value, $local);
     }
 
     /**
      * @throws TypeNotFoundException
      */
-    public function isNormalizable(mixed $value, ?string $type = null, ?Context $context = null): bool
+    public function isNormalizable(mixed $value, ?string $type = null): bool
     {
-        $concreteType = $type === null
-            ? $this->types->getByValue($value)
-            : $this->types->getByType($type);
+        $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Normalize, $context);
+        $local = $this->createLocalContext(Direction::Normalize);
 
-        return $concreteType->match($value, $local);
+        return $instance->match($value, $local);
     }
 
     /**
      * @throws TypeNotFoundException
      */
-    public function denormalize(mixed $value, string $type, ?Context $context = null): mixed
+    public function denormalize(mixed $value, string $type): mixed
     {
-        $concreteType = $this->types->getByType($type);
+        $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Denormalize, $context);
+        $local = $this->createLocalContext(Direction::Denormalize);
 
-        return $concreteType->cast($value, $local);
+        return $instance->cast($value, $local);
     }
 
     /**
      * @throws TypeNotFoundException
      */
-    public function isDenormalizable(mixed $value, string $type, ?Context $context = null): bool
+    public function isDenormalizable(mixed $value, string $type): bool
     {
-        $concreteType = $this->types->getByType($type);
+        $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Denormalize, $context);
+        $local = $this->createLocalContext(Direction::Denormalize);
 
-        return $concreteType->match($value, $local);
+        return $instance->match($value, $local);
     }
 
-    private function createLocalContext(Direction $direction, ?Context $context): LocalContext
+    /**
+     * @param non-empty-string|null $type
+     * @throws TypeNotFoundException
+     */
+    private function getType(mixed $value, ?string $type): TypeInterface
     {
-        return LocalContext::fromContext(
+        if ($type === null) {
+            return $this->types->getByValue($value);
+        }
+
+        return $this->types->getByType($type);
+    }
+
+    private function createLocalContext(Direction $direction): LocalContext
+    {
+        return new LocalContext(
             direction: $direction,
             types: $this->types,
-            context: $this->context->with($context),
+            objectsAsArrays: $this->context->isObjectsAsArrays(),
+            detailedTypes: $this->context->isDetailedTypes(),
         );
     }
 }

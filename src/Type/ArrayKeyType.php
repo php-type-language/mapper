@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class ArrayKeyType extends SimpleType
+class ArrayKeyType extends NamedType
 {
     /**
      * @var non-empty-string
@@ -23,7 +23,10 @@ class ArrayKeyType extends SimpleType
     {
         parent::__construct($name);
 
-        $this->delegate = new UnionType([new IntType(), new StringType()]);
+        $this->delegate = new UnionType([
+            new IntType(),
+            new StringType(),
+        ]);
     }
 
     public function match(mixed $value, LocalContext $context): bool

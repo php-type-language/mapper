@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Context;
+namespace TypeLang\Mapper\Runtime\Context;
 
 class Context
 {
@@ -80,17 +80,5 @@ class Context
     public function isDetailedTypes(): bool
     {
         return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
-    }
-
-    public function with(?Context $context): self
-    {
-        if ($context === null) {
-            return $this;
-        }
-
-        return new self(
-            objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
-            detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
-        );
     }
 }

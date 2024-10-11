@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Path\Entry;
+namespace TypeLang\Mapper\Runtime\Path\Entry;
 
 abstract class Entry implements EntryInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Path;
+namespace TypeLang\Mapper\Runtime\Path;
 
 interface PathPrinterInterface
 {

@@ -6,15 +6,15 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
-use TypeLang\Mapper\Type\Context\LocalContext;
-use TypeLang\Mapper\Type\SimpleType;
+use TypeLang\Mapper\Type\NamedType;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 // You can also add your own types.
 
-class MyNonEmptyStringType extends SimpleType
+class MyNonEmptyStringType extends NamedType
 {
     public function match(mixed $value, LocalContext $context): bool
     {

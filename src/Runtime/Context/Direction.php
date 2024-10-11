@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Context;
+namespace TypeLang\Mapper\Runtime\Context;
 
 enum Direction
 {

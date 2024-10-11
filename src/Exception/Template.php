@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception;
 
-use TypeLang\Mapper\Path\JsonPathPrinter;
-use TypeLang\Mapper\Path\PathInterface;
-use TypeLang\Mapper\Path\PathPrinterInterface;
+use TypeLang\Mapper\Runtime\Path\JsonPathPrinter;
+use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Runtime\Path\PathPrinterInterface;
 use TypeLang\Parser\Node\Statement;
 use TypeLang\Parser\Node\Stmt\Shape\FieldNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;

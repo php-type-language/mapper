@@ -2,22 +2,20 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Context;
+namespace TypeLang\Mapper\Runtime\Context;
 
-use TypeLang\Mapper\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Path\ExecutionStackInterface;
-use TypeLang\Mapper\Path\MutablePath;
-use TypeLang\Mapper\Path\PathInterface;
+use TypeLang\Mapper\Runtime\ExecutionStackInterface;
+use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Runtime\Path\MutablePath;
+use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 /**
  * Mutable local bypass context.
  */
-final class LocalContext extends Context implements ExecutionStackInterface
+class LocalContext extends Context implements ExecutionStackInterface
 {
-    private readonly MutablePath $path;
-
-    private readonly MutablePath $trace;
+    protected readonly MutablePath $path;
 
     final public function __construct(
         private readonly Direction $direction,
@@ -26,7 +24,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
         ?bool $detailedTypes = null,
     ) {
         $this->path = new MutablePath();
-        $this->trace = new MutablePath();
 
         parent::__construct(
             objectsAsArrays: $objectsAsArrays,
@@ -34,30 +31,13 @@ final class LocalContext extends Context implements ExecutionStackInterface
         );
     }
 
-    public static function fromContext(
-        Direction $direction,
-        RepositoryInterface $types,
-        ?Context $context,
-    ): self {
-        $instance = new self($direction, $types);
-
-        return $instance->with($context);
-    }
-
-    #[\Override]
-    public function with(?Context $context): self
+    public static function fromContext(Direction $direction, RepositoryInterface $types, Context $context): self
     {
-        if ($context === null) {
-            return $this;
-        }
-
-        $local = $context instanceof self ? $context : $this;
-
         return new self(
-            direction: $local->direction,
-            types: $local->types,
-            objectsAsArrays: $context->objectsAsArrays ?? $this->objectsAsArrays,
-            detailedTypes: $context->detailedTypes ?? $this->detailedTypes,
+            direction: $direction,
+            types: $types,
+            objectsAsArrays: $context->objectsAsArrays,
+            detailedTypes: $context->detailedTypes,
         );
     }
 
@@ -96,14 +76,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
     /**
      * @api
      */
-    public function getTrace(): PathInterface
-    {
-        return $this->trace;
-    }
-
-    /**
-     * @api
-     */
     public function getTypes(): RepositoryInterface
     {
         return $this->types;
@@ -112,7 +84,6 @@ final class LocalContext extends Context implements ExecutionStackInterface
     public function enter(EntryInterface $entry): void
     {
         $this->path->enter($entry);
-        $this->trace->enter($entry);
     }
 
     public function leave(): void

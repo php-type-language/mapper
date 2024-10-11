@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @phpstan-consistent-constructor
  */
-abstract class SimpleType implements TypeInterface
+abstract class NamedType implements TypeInterface
 {
     /**
      * @param non-empty-string $name

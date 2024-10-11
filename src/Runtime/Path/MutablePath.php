@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Path;
+namespace TypeLang\Mapper\Runtime\Path;
 
-use TypeLang\Mapper\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Runtime\ExecutionStackInterface;
+use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 
 class MutablePath extends Path implements ExecutionStackInterface
 {

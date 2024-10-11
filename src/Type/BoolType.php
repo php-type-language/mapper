@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class BoolType extends SimpleType
+class BoolType extends NamedType
 {
     /**
      * @var non-empty-lowercase-string
@@ -17,9 +17,8 @@ class BoolType extends SimpleType
     /**
      * @param non-empty-string $name
      */
-    public function __construct(
-        string $name = self::DEFAULT_TYPE_NAME,
-    ) {
+    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
+    {
         parent::__construct($name);
     }
 
@@ -41,7 +40,7 @@ class BoolType extends SimpleType
 
         throw InvalidValueException::becauseInvalidValueGiven(
             value: $value,
-            expected: 'bool',
+            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

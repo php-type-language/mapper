@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class IntType implements TypeInterface
+class IntType extends NamedType
 {
     /**
      * @var non-empty-string
@@ -23,10 +23,12 @@ class IntType implements TypeInterface
      * @param non-empty-string $name
      */
     public function __construct(
-        protected readonly string $name = self::DEFAULT_TYPE_NAME,
+        string $name = self::DEFAULT_TYPE_NAME,
         protected readonly int $min = \PHP_INT_MIN,
         protected readonly int $max = \PHP_INT_MAX,
-    ) {}
+    ) {
+        parent::__construct($name);
+    }
 
     private static function getExpectedArgument(int $value): TemplateArgumentNode
     {
@@ -39,13 +41,14 @@ class IntType implements TypeInterface
         );
     }
 
+    #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
         if ($this->min === \PHP_INT_MIN && $this->max === \PHP_INT_MAX) {
-            return new NamedTypeNode($this->name);
+            return parent::getTypeStatement($context);
         }
 
-        return new NamedTypeNode($this->name, arguments: new TemplateArgumentsListNode([
+        return new NamedTypeNode($this->name, new TemplateArgumentsListNode([
             self::getExpectedArgument($this->min),
             self::getExpectedArgument($this->max),
         ]));
