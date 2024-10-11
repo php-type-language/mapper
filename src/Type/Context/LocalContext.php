@@ -17,6 +17,8 @@ final class LocalContext extends Context implements ExecutionStackInterface
 {
     private readonly MutablePath $path;
 
+    private readonly MutablePath $trace;
+
     final public function __construct(
         private readonly Direction $direction,
         private readonly RepositoryInterface $types,
@@ -25,6 +27,7 @@ final class LocalContext extends Context implements ExecutionStackInterface
         ?bool $detailedTypes = null,
     ) {
         $this->path = new MutablePath();
+        $this->trace = new MutablePath();
 
         parent::__construct(
             strictTypes: $strictTypes,
@@ -96,6 +99,14 @@ final class LocalContext extends Context implements ExecutionStackInterface
     /**
      * @api
      */
+    public function getTrace(): PathInterface
+    {
+        return $this->trace;
+    }
+
+    /**
+     * @api
+     */
     public function getTypes(): RepositoryInterface
     {
         return $this->types;
@@ -104,6 +115,7 @@ final class LocalContext extends Context implements ExecutionStackInterface
     public function enter(EntryInterface $entry): void
     {
         $this->path->enter($entry);
+        $this->trace->enter($entry);
     }
 
     public function leave(): void

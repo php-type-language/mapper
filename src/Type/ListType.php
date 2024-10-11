@@ -79,6 +79,14 @@ class ListType implements TypeInterface
     {
         $value = $this->validateAndCast($value, $context);
 
+        if (!\array_is_list($value)) {
+            throw InvalidValueException::becauseInvalidValueGiven(
+                value: $value,
+                expected: $this->getTypeStatement($context),
+                context: $context,
+            );
+        }
+
         $result = [];
 
         foreach ($value as $index => $item) {
@@ -97,7 +105,7 @@ class ListType implements TypeInterface
      *
      * If conversion is not possible, it returns the value "as is".
      */
-    protected function tryCastToList(mixed $value): mixed
+    protected function tryCastToList(mixed $value): array
     {
         return match (true) {
             \is_array($value) => $value,

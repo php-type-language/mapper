@@ -100,6 +100,20 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * @throws TypeNotFoundException
      */
+    public function isNormalizable(mixed $value, ?string $type = null, ?Context $context = null): bool
+    {
+        $concreteType = $type === null
+            ? $this->types->getByValue($value)
+            : $this->types->getByType($type);
+
+        $local = $this->createLocalContext(Direction::Normalize, $context);
+
+        return $concreteType->match($value, $local);
+    }
+
+    /**
+     * @throws TypeNotFoundException
+     */
     public function denormalize(mixed $value, string $type, ?Context $context = null): mixed
     {
         $concreteType = $this->types->getByType($type);
@@ -107,6 +121,18 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         $local = $this->createLocalContext(Direction::Denormalize, $context);
 
         return $concreteType->cast($value, $local);
+    }
+
+    /**
+     * @throws TypeNotFoundException
+     */
+    public function isDenormalizable(mixed $value, string $type, ?Context $context = null): bool
+    {
+        $concreteType = $this->types->getByType($type);
+
+        $local = $this->createLocalContext(Direction::Denormalize, $context);
+
+        return $concreteType->match($value, $local);
     }
 
     private function createLocalContext(Direction $direction, ?Context $context): LocalContext

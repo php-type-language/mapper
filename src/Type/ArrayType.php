@@ -59,7 +59,24 @@ class ArrayType implements TypeInterface
 
     public function match(mixed $value, LocalContext $context): bool
     {
-        return $this->matchRootType($value, $context);
+        if (!$this->matchRootType($value, $context)) {
+            return false;
+        }
+
+        foreach ($value as $key => $item) {
+            $context->enter(new ArrayIndexEntry($key));
+
+            $isValidItem = $this->key->match($key, $context)
+                && $this->value->match($value, $context);
+
+            if (!$isValidItem) {
+                return false;
+            }
+
+            $context->leave();
+        }
+
+        return true;
     }
 
     /**

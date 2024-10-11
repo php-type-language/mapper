@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\MappingException;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
@@ -73,7 +74,16 @@ class UnionType implements TypeInterface
         $type = $this->findType($value, $context);
 
         if ($type !== null) {
-            return $type->cast($value, $context);
+            try {
+                return $type->cast($value, $context);
+            } catch (MappingException $e) {
+                throw InvalidValueException::becauseInvalidValueGiven(
+                    value: $value,
+                    expected: $this->getTypeStatement($context),
+                    context: $context,
+                    previous: $e,
+                );
+            }
         }
 
         throw InvalidValueException::becauseInvalidValueGiven(
