@@ -20,26 +20,49 @@ class ArrayType implements TypeInterface
      */
     public const DEFAULT_TYPE_NAME = 'array';
 
+    protected readonly TypeInterface $key;
+    protected readonly bool $isKeyPassed;
+
+    protected readonly TypeInterface $value;
+    protected readonly bool $isValuePassed;
+
     /**
      * @param non-empty-string $name
      */
     public function __construct(
         protected readonly string $name = self::DEFAULT_TYPE_NAME,
-        protected readonly TypeInterface $key = new ArrayKeyType(),
-        protected readonly TypeInterface $value = new MixedType(),
-    ) {}
+        ?TypeInterface $key = null,
+        ?TypeInterface $value = null,
+    ) {
+        $this->key = $key ?? new ArrayKeyType();
+        $this->isKeyPassed = $key !== null;
+
+        $this->value = $value ?? new MixedType();
+        $this->isValuePassed = $value !== null;
+    }
 
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
         $child = $context->withDetailedTypes(false);
 
+        $arguments = [];
+
+        if ($this->isKeyPassed) {
+            $arguments[] = new TemplateArgumentNode(
+                value: $this->key->getTypeStatement($child),
+            );
+        }
+
+        if ($this->isValuePassed) {
+            $arguments[] = new TemplateArgumentNode(
+                value: $this->value->getTypeStatement($child),
+            );
+        }
+
         return new NamedTypeNode(
             name: $this->name,
-            arguments: new TemplateArgumentsListNode([
-                new TemplateArgumentNode($this->key->getTypeStatement($child)),
-                new TemplateArgumentNode($this->value->getTypeStatement($child)),
-            ]),
+            arguments: new TemplateArgumentsListNode($arguments),
         );
     }
 

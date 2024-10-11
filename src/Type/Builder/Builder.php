@@ -16,9 +16,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TStmt of TypeStatement
- *
  * @template-covariant TType of TypeInterface
- *
  * @template-implements TypeBuilderInterface<TStmt, TType>
  */
 abstract class Builder implements TypeBuilderInterface

@@ -17,29 +17,10 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
- * @template-extends Builder<NamedTypeNode, IntType>
+ * @template-extends NamedTypeBuilder<IntType>
  */
-class IntTypeBuilder extends Builder
+class IntTypeBuilder extends NamedTypeBuilder
 {
-    /**
-     * @var non-empty-lowercase-string
-     */
-    protected readonly string $lower;
-
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(string $name = IntType::DEFAULT_TYPE_NAME)
-    {
-        $this->lower = \strtolower($name);
-    }
-
-    public function isSupported(TypeStatement $statement): bool
-    {
-        return $statement instanceof NamedTypeNode
-            && $statement->name->toLowerString() === $this->lower;
-    }
-
     public function build(TypeStatement $statement, RepositoryInterface $types): IntType
     {
         $this->expectNoShapeFields($statement);

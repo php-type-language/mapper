@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Type\Attribute\TargetTemplateArgument;
 use TypeLang\Mapper\Type\Context\LocalContext;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -12,7 +11,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class NullableType implements TypeInterface
 {
     public function __construct(
-        #[TargetTemplateArgument]
         private readonly TypeInterface $parent,
     ) {}
 

@@ -178,6 +178,7 @@ return (new PhpCsFixer\Config())
                 ['internal', 'psalm-internal', 'phpstan-internal'],
                 [
                     'template',
+                    'template-covariant',
                     'template-extends',
                     'extends',
                     'template-implements',
