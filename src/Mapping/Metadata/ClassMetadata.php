@@ -62,10 +62,7 @@ final class ClassMetadata extends Metadata
             $fields[] = $field;
         }
 
-        return new NamedTypeNode(
-            name: $this->getName(),
-            fields: new FieldsListNode($fields),
-        );
+        return new NamedTypeNode($this->getName(), fields: new FieldsListNode($fields));
     }
 
     /**

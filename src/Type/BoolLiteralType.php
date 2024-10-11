@@ -27,6 +27,10 @@ class BoolLiteralType extends BoolType
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if (!$context->isDetailedTypes()) {
+            return parent::getTypeStatement($context);
+        }
+
         $result = new BoolLiteralNode($this->value, $this->name);
 
         return new NamedTypeNode(self::DEFAULT_TYPE_NAME, new TemplateArgumentsListNode([

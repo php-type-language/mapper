@@ -46,6 +46,10 @@ class ArrayType extends NamedType
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
+        if (!$context->isDetailedTypes()) {
+            return parent::getTypeStatement($context);
+        }
+
         $child = $context->withDetailedTypes(false);
 
         $arguments = [];

@@ -64,9 +64,9 @@ class IntTypeBuilder extends NamedTypeBuilder
         if ($value instanceof NamedTypeNode) {
             switch ($value->name->toLowerString()) {
                 case 'min':
-                    return \PHP_INT_MIN;
+                    return IntType::DEFAULT_INT_MIN;
                 case 'max':
-                    return \PHP_INT_MAX;
+                    return IntType::DEFAULT_INT_MAX;
             }
         }
 

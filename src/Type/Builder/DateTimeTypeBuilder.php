@@ -39,11 +39,14 @@ class DateTimeTypeBuilder extends Builder
     public function build(TypeStatement $statement, RepositoryInterface $types): DateTimeType
     {
         $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
 
-        // The "arguments" has already been checked for non-null
-        assert($statement->arguments !== null);
+        if ($statement->arguments === null) {
+            return new DateTimeType(
+                name: $name = $statement->name->toString(),
+                class: $this->getDateTimeClass($name),
+            );
+        }
 
         /** @var TemplateArgumentNode $formatArgument */
         $formatArgument = $statement->arguments->first();

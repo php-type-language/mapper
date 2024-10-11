@@ -14,6 +14,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class IntType extends NamedType
 {
+    public const DEFAULT_INT_MIN = \PHP_INT_MIN;
+    public const DEFAULT_INT_MAX = \PHP_INT_MAX;
+
     /**
      * @var non-empty-string
      */
@@ -24,8 +27,9 @@ class IntType extends NamedType
      */
     public function __construct(
         string $name = self::DEFAULT_TYPE_NAME,
-        protected readonly int $min = \PHP_INT_MIN,
-        protected readonly int $max = \PHP_INT_MAX,
+        protected readonly int $min = self::DEFAULT_INT_MIN,
+        protected readonly int $max = self::DEFAULT_INT_MAX,
+        protected readonly bool $userDefinedRange = true,
     ) {
         parent::__construct($name);
     }
@@ -34,8 +38,8 @@ class IntType extends NamedType
     {
         return new TemplateArgumentNode(
             value: match ($value) {
-                \PHP_INT_MIN => new NamedTypeNode('min'),
-                \PHP_INT_MAX => new NamedTypeNode('max'),
+                self::DEFAULT_INT_MIN => new NamedTypeNode('min'),
+                self::DEFAULT_INT_MAX => new NamedTypeNode('max'),
                 default => new IntLiteralNode($value),
             },
         );
@@ -44,7 +48,11 @@ class IntType extends NamedType
     #[\Override]
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        if ($this->min === \PHP_INT_MIN && $this->max === \PHP_INT_MAX) {
+        if ($this->userDefinedRange === false || !$context->isDetailedTypes()) {
+            return parent::getTypeStatement($context);
+        }
+
+        if ($this->min === self::DEFAULT_INT_MIN && $this->max === self::DEFAULT_INT_MAX) {
             return parent::getTypeStatement($context);
         }
 

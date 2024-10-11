@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context\Context;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -32,11 +31,17 @@ class DateTimeType extends AsymmetricType
 
     public function getTypeStatement(LocalContext $context): TypeStatement
     {
-        if ($this->format === null) {
-            return new NamedTypeNode($this->name);
+        $name = $this->name;
+
+        if ($context->isDenormalization()) {
+            $name = 'datetime-string';
         }
 
-        return new NamedTypeNode($this->name, new TemplateArgumentsListNode([
+        if ($this->format === null || !$context->isDetailedTypes()) {
+            return new NamedTypeNode($name);
+        }
+
+        return new NamedTypeNode($name, new TemplateArgumentsListNode([
             new TemplateArgumentNode(StringLiteralNode::createFromValue($this->format)),
         ]));
     }
@@ -69,7 +74,7 @@ class DateTimeType extends AsymmetricType
         }
 
         try {
-            return $this->tryParseDateTime($value, $context) !== null;
+            return $this->tryParseDateTime($value) !== null;
         } catch (\Throwable) {
             return false;
         }
@@ -88,7 +93,7 @@ class DateTimeType extends AsymmetricType
             );
         }
 
-        $result = $this->tryParseDateTime($value, $context);
+        $result = $this->tryParseDateTime($value);
 
         if ($result instanceof \DateTimeInterface) {
             return $result;
@@ -101,7 +106,7 @@ class DateTimeType extends AsymmetricType
         );
     }
 
-    private function tryParseDateTime(string $value, Context $context): ?\DateTimeInterface
+    private function tryParseDateTime(string $value): ?\DateTimeInterface
     {
         if ($this->format !== null) {
             try {
@@ -113,6 +118,10 @@ class DateTimeType extends AsymmetricType
             return \is_bool($result) ? null : $result;
         }
 
-        return new $this->class($value);
+        try {
+            return new $this->class($value);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 }
