@@ -111,10 +111,10 @@ final class DocBlockDriver extends LoadableDriver
 
     protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
     {
-        foreach ($class->getProperties() as $reflectionProperty) {
-            $property = $class->getPropertyOrCreate($reflectionProperty->getName());
+        foreach ($reflection->getProperties() as $property) {
+            $metadata = $class->getPropertyOrCreate($property->getName());
 
-            $statement = $this->findType($reflection, $property);
+            $statement = $this->findType($reflection, $metadata);
 
             if ($statement !== null) {
                 try {
@@ -122,16 +122,16 @@ final class DocBlockDriver extends LoadableDriver
                 } catch (TypeNotFoundException $e) {
                     throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                         class: $class->getName(),
-                        property: $property->getName(),
+                        property: $metadata->getName(),
                         type: $e->getType(),
                         previous: $e,
                     );
                 }
 
-                $property->setType($type);
+                $metadata->setType($type);
             }
 
-            $class->addProperty($property);
+            $class->addProperty($metadata);
         }
 
         $this->promotedProperties->cleanup();
