@@ -4,13 +4,7 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
 
-require __DIR__ . '/../vendor/autoload.php';
-
-// The mapper allows you to cache information about objects (class metadata).
-// To do this, you simply need to add the appropriate driver to the
-// TypeLang\Mapper\Type\Builder\ObjectTypeBuilder, or specifying an argument
-// to the TypeLang\Mapper\Platform\StandardPlatform which contains this
-// object builder.
+require __DIR__ . '/../../vendor/autoload.php';
 
 class ExampleDTO
 {
@@ -25,7 +19,7 @@ class ExampleDTO
 $cache = new \Symfony\Component\Cache\Psr16Cache(
     pool: new \Symfony\Component\Cache\Adapter\FilesystemAdapter(
         namespace: 'typelang',
-        directory: __DIR__ . '/../var/cache',
+        directory: __DIR__ . '/../../var/cache',
     ),
 );
 

@@ -3,8 +3,11 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\GrammarFeature;
+use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 // The set of types and grammar is defined using a "platform". You can create
 // your own platform, for example, for a specific DB, or use built-in ones.
@@ -12,7 +15,7 @@ require __DIR__ . '/../vendor/autoload.php';
 // For example, let's create a platform that supports only simple types,
 // without generics, union types, shapes, and other things.
 
-class SimplePlatform implements \TypeLang\Mapper\Platform\PlatformInterface
+class SimplePlatform implements PlatformInterface
 {
     public function getName(): string
     {
@@ -23,10 +26,10 @@ class SimplePlatform implements \TypeLang\Mapper\Platform\PlatformInterface
     {
         // The platform will only support objects, that is,
         // references to existing classes.
-        yield new \TypeLang\Mapper\Type\Builder\ObjectTypeBuilder();
+        yield new ObjectTypeBuilder();
     }
 
-    public function isFeatureSupported(\TypeLang\Mapper\Platform\GrammarFeature $feature): bool
+    public function isFeatureSupported(GrammarFeature $feature): bool
     {
         // Disable all grammar features except the main one.
         return false;

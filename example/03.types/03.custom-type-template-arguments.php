@@ -15,44 +15,40 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-// You can also add your own types.
-
+// Create custom type builder
 class MyNonEmptyTypeBuilder extends Builder
 {
     public function isSupported(TypeStatement $statement): bool
     {
+        // Expects type with name "non-empty"
         return $statement instanceof NamedTypeNode
             && $statement->name->toLowerString() === 'non-empty';
     }
 
     public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface
     {
+        // Shape fields not allowed (like: "non-empty{...}")
         $this->expectNoShapeFields($statement);
+        // Expects only template argument (like: "non-empty<T>", but NOT "non-empty<T, U>")
         $this->expectTemplateArgumentsCount($statement, 1);
 
         $innerArgument = $statement->arguments->first();
 
-        return new MyNonEmptyType(
-            type: $types->getByStatement($innerArgument->value),
-        );
+        // inner type of TypeInterface
+        $type = $types->getByStatement($innerArgument->value);
+
+        return new MyNonEmptyType($type);
     }
 }
 
+// Create custom type
 class MyNonEmptyType implements TypeInterface
 {
     public function __construct(
         private readonly TypeInterface $type,
     ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        // Returns "non-empty<T>" type representation.
-        return new NamedTypeNode('non-empty', new TemplateArgumentsListNode([
-            new TemplateArgumentNode($this->type->getTypeStatement($context)),
-        ]));
-    }
 
     public function match(mixed $value, LocalContext $context): bool
     {
@@ -65,16 +61,13 @@ class MyNonEmptyType implements TypeInterface
             return $this->type->cast($value, $context);
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
-            value: $value,
-            expected: $this->getTypeStatement($context),
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($value, $context);
     }
 }
 
 $mapper = new Mapper(new DelegatePlatform(
     delegate: new StandardPlatform(),
+    // Extend by custom "MyNonEmptyTypeBuilder" type builder
     types: [new MyNonEmptyTypeBuilder()],
 ));
 

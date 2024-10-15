@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
 
-require __DIR__ . '/../vendor/autoload.php';
-
-// An example of converting an arbitrary object into primitive data.
-//
-// Please note that the type of the array (ExampleDTO::$children) is not
-// specified, which means it will be normalized "as is".
+require __DIR__ . '/../../vendor/autoload.php';
 
 class ChildDTO
 {
@@ -36,6 +31,7 @@ $result = $mapper->normalize(new ExampleDTO(
 ));
 
 var_dump($result);
+
 //
 // array:1 [
 //   "children" => array:3 [

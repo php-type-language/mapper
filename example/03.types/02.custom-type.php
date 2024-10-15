@@ -8,13 +8,12 @@ use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
-use TypeLang\Mapper\Type\NamedType;
+use TypeLang\Mapper\Type\TypeInterface;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-// You can also add your own types.
-
-class MyNonEmptyStringType extends NamedType
+// Add new type (must implement TypeInterface)
+class MyNonEmptyStringType implements TypeInterface
 {
     public function match(mixed $value, LocalContext $context): bool
     {
@@ -27,34 +26,25 @@ class MyNonEmptyStringType extends NamedType
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
+        throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }
 }
 
-
 $mapper = new Mapper(new DelegatePlatform(
+    // Extend existing platform (StandardPlatform)
     delegate: new StandardPlatform(),
     types: [
         // Additional type
-        new SimpleTypeBuilder('non-empty-string', MyNonEmptyStringType::class)
+        new SimpleTypeBuilder('custom-string', MyNonEmptyStringType::class)
     ],
 ));
 
-$result = $mapper->normalize('example', 'non-empty-string');
+$result = $mapper->normalize(['example', ''], 'list<custom-string>');
 
 var_dump($result);
 //
-// string(7) "example"
-//
-
-$result = $mapper->normalize('', 'non-empty-string');
-
-var_dump($result);
-//
-// InvalidValueException: Passed value must be of type non-empty-string,
-//                        but string given at root
+// InvalidValueException: Passed value "" is invalid at $[1]
 //

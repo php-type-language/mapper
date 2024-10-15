@@ -7,7 +7,7 @@ use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 // The attribute driver is used to specify default types. To specify a specific
 // type, just add the #[MapProperty] attribute.
@@ -29,9 +29,7 @@ class ExampleDTO
     ) {}
 }
 
-$mapper = new Mapper(new StandardPlatform(
-    driver: new AttributeDriver(),
-));
+$mapper = new Mapper();
 
 $result = $mapper->normalize(new ExampleDTO(
     children: [
@@ -40,6 +38,8 @@ $result = $mapper->normalize(new ExampleDTO(
         42,
     ]
 ));
+
+var_dump($result);
 
 //
 // InvalidValueException: Passed value must be of type ChildDTO{name: string},
