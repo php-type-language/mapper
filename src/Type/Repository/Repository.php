@@ -12,10 +12,12 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
+use TypeLang\Parser\Traverser;
 use TypeLang\Parser\TypeResolver;
 
 /**
@@ -95,7 +97,14 @@ class Repository implements RepositoryInterface, \IteratorAggregate
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface
     {
         if ($class !== null) {
+            // Performs Name conversions if the required type is found
+            // in the same namespace as the declared dependency.
+            $statement = $this->resolveFromNamespace($statement, $class);
+
             $uses = $this->references->getUseStatements($class);
+
+            // Additionally performs Name conversions if the required
+            // type was specified in "use" statement.
             $statement = $this->typeResolver->resolveWith($statement, $uses);
         }
 
@@ -106,6 +115,29 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         }
 
         throw TypeNotFoundException::becauseTypeNotDefined($statement);
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     */
+    private function resolveFromNamespace(TypeStatement $statement, \ReflectionClass $class): TypeStatement
+    {
+        return $this->typeResolver->resolve($statement, static function (Name $name) use ($class): ?Name {
+                $namespace = $class->getNamespaceName();
+
+                if ($namespace !== '' && self::entryExists($namespace . '\\' . $name->toString())) {
+                    return (new Name($namespace))->withAdded($name);
+                }
+
+                return null;
+            },
+        );
+    }
+
+    private static function entryExists(string $fqn): bool
+    {
+        return \class_exists($fqn)
+            || \interface_exists($fqn, false);
     }
 
     public function getIterator(): \Traversable
