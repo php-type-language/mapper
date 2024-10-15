@@ -8,6 +8,7 @@ use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Identifier;
@@ -77,7 +78,10 @@ final class ReflectionDriver extends LoadableDriver
             );
         }
 
-        $meta->setType($type);
+        $meta->setTypeInfo(new TypeMetadata(
+            type: $type,
+            statement: $statement,
+        ));
     }
 
     /**

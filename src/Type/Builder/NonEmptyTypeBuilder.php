@@ -28,7 +28,6 @@ class NonEmptyTypeBuilder extends NamedTypeBuilder
 
         return new NonEmpty(
             type: $types->getByStatement($inner->value),
-            name: $statement->name->toString(),
         );
     }
 }

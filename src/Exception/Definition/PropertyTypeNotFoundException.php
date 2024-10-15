@@ -67,7 +67,11 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
             class: $class,
             property: $property,
             type: $type,
-            template: 'Type "{{type}}" for property {{class}}::${{property}} is not registered',
+            template: \sprintf(
+                'Type "{{type}}" for property %s::$%s is not registered',
+                $class,
+                $property,
+            ),
             code: self::CODE_ERROR_PROPERTY_TYPE_NOT_DEFINED,
             previous: $previous,
         );

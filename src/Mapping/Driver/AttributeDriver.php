@@ -8,6 +8,7 @@ use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\MapProperty;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class AttributeDriver extends LoadableDriver
@@ -32,8 +33,10 @@ final class AttributeDriver extends LoadableDriver
             }
 
             if ($attribute->type !== null) {
+                $statement = $types->parse($attribute->type);
+
                 try {
-                    $type = $types->getByType($attribute->type, $reflection);
+                    $type = $types->getByStatement($statement, $reflection);
                 } catch (TypeNotFoundException $e) {
                     throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                         class: $class->getName(),
@@ -43,7 +46,10 @@ final class AttributeDriver extends LoadableDriver
                     );
                 }
 
-                $metadata->setType($type);
+                $metadata->setTypeInfo(new TypeMetadata(
+                    type: $type,
+                    statement: $statement,
+                ));
             }
         }
     }

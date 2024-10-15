@@ -121,6 +121,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @param non-empty-string|null $type
+     *
      * @throws TypeNotFoundException
      */
     private function getType(mixed $value, ?string $type): TypeInterface

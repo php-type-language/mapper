@@ -72,9 +72,14 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         );
     }
 
+    public function parse(string $type): TypeStatement
+    {
+        return $this->parser->parse($type);
+    }
+
     public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface
     {
-        $statement = $this->parser->parse($type);
+        $statement = $this->parse($type);
 
         return $this->getByStatement($statement, $class);
     }

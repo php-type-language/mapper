@@ -33,14 +33,12 @@ class ClassStringTypeBuilder extends NamedTypeBuilder
 
         if ($inner->value instanceof NamedTypeNode) {
             return new ClassStringType(
-                name: $statement->name->toString(),
                 class: $inner->value->name->toString(),
             );
         }
 
         if ($inner->value instanceof StringLiteralNode) {
             return new ClassStringType(
-                name: $statement->name->toString(),
                 // @phpstan-ignore-next-line
                 class: $inner->value->getValue(),
             );

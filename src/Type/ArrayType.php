@@ -8,68 +8,24 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class ArrayType extends NamedType
+class ArrayType implements TypeInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_TYPE_NAME = 'array';
-
     protected readonly TypeInterface $key;
     protected readonly bool $isKeyPassed;
 
     protected readonly TypeInterface $value;
     protected readonly bool $isValuePassed;
 
-    /**
-     * @param non-empty-string $name
-     */
     public function __construct(
-        string $name = self::DEFAULT_TYPE_NAME,
         ?TypeInterface $key = null,
         ?TypeInterface $value = null,
     ) {
-        parent::__construct($name);
-
         $this->key = $key ?? new ArrayKeyType();
         $this->isKeyPassed = $key !== null;
 
         $this->value = $value ?? new MixedType();
         $this->isValuePassed = $value !== null;
-    }
-
-    #[\Override]
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        if (!$context->isDetailedTypes()) {
-            return parent::getTypeStatement($context);
-        }
-
-        $child = $context->withDetailedTypes(false);
-
-        $arguments = [];
-
-        if ($this->isKeyPassed) {
-            $arguments[] = new TemplateArgumentNode(
-                value: $this->key->getTypeStatement($child),
-            );
-        }
-
-        if ($this->isValuePassed) {
-            $arguments[] = new TemplateArgumentNode(
-                value: $this->value->getTypeStatement($child),
-            );
-        }
-
-        return new NamedTypeNode(
-            name: $this->name,
-            arguments: new TemplateArgumentsListNode($arguments),
-        );
     }
 
     public function match(mixed $value, LocalContext $context): bool
@@ -102,9 +58,8 @@ class ArrayType extends NamedType
     public function cast(mixed $value, LocalContext $context): array
     {
         if (!\is_iterable($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
                 context: $context,
             );
         }

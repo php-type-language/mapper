@@ -25,7 +25,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $arguments = $statement->arguments->items ?? [];
 
         return match (\count($arguments)) {
-            0 => $this->buildAsIs($statement),
+            0 => new ArrayType(),
             1 => $this->buildByValue($statement, $types),
             2 => $this->buildByKeyValue($statement, $types),
             default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
@@ -57,7 +57,6 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $value);
 
         return new ArrayType(
-            name: $statement->name->toString(),
             key: $types->getByStatement($key->value),
             value: $types->getByStatement($value->value),
         );
@@ -79,13 +78,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $value);
 
         return new ArrayType(
-            name: $statement->name->toString(),
             value: $types->getByStatement($value->value),
         );
-    }
-
-    private function buildAsIs(NamedTypeNode $statement): ArrayType
-    {
-        return new ArrayType($statement->name->toString());
     }
 }

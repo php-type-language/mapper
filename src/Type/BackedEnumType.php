@@ -6,49 +6,20 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
-use TypeLang\Parser\Node\Literal\IntLiteralNode;
-use TypeLang\Parser\Node\Literal\StringLiteralNode;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 class BackedEnumType extends AsymmetricType
 {
     /**
-     * @param class-string<\BackedEnum> $name
+     * @param class-string<\BackedEnum> $class
      */
     public function __construct(
-        private readonly string $name,
+        private readonly string $class,
         private readonly TypeInterface $type,
     ) {}
 
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        if ($context->isNormalization()) {
-            return new NamedTypeNode($this->name);
-        }
-
-        $cases = [];
-
-        foreach ($this->name::cases() as $case) {
-            $cases[] = match (true) {
-                \is_string($case->value) => StringLiteralNode::createFromValue($case->value),
-                \is_int($case->value) => new IntLiteralNode($case->value),
-            };
-        }
-
-        return match (\count($cases)) {
-            // The number of cases cannot be zero, so
-            // this will most likely not be possible.
-            0 => new NamedTypeNode('never'),
-            1 => $cases[0],
-            default => new UnionTypeNode(...$cases),
-        };
-    }
-
     protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
-        return $value instanceof $this->name;
+        return $value instanceof $this->class;
     }
 
     /**
@@ -59,10 +30,9 @@ class BackedEnumType extends AsymmetricType
      */
     public function normalize(mixed $value, LocalContext $context): int|string
     {
-        if (!$value instanceof $this->name) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+        if (!$value instanceof $this->class) {
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
                 context: $context,
             );
         }
@@ -82,7 +52,7 @@ class BackedEnumType extends AsymmetricType
         $denormalized = $this->type->cast($value, $context);
 
         try {
-            return ($this->name)::tryFrom($denormalized) !== null;
+            return ($this->class)::tryFrom($denormalized) !== null;
         } catch (\Throwable) {
             return false;
         }
@@ -98,26 +68,24 @@ class BackedEnumType extends AsymmetricType
         $denormalized = $this->type->cast($value, $context);
 
         if (!\is_string($denormalized) && !\is_int($denormalized)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
                 context: $context,
             );
         }
 
         try {
-            $case = $this->name::tryFrom($denormalized);
-        } catch (\TypeError) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            $case = $this->class::tryFrom($denormalized);
+        } catch (\TypeError $e) {
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
                 context: $context,
+                previous: $e,
             );
         }
 
-        return $case ?? throw InvalidValueException::becauseInvalidValueGiven(
+        return $case ?? throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

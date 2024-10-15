@@ -21,9 +21,6 @@ class FloatLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $statement, RepositoryInterface $types): FloatLiteralType
     {
-        /** @var numeric-string $name */
-        $name = $statement->raw;
-
-        return new FloatLiteralType($name, $statement->value);
+        return new FloatLiteralType($statement->value);
     }
 }

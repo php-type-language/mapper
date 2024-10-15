@@ -11,6 +11,7 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\Parser;
@@ -128,7 +129,10 @@ final class DocBlockDriver extends LoadableDriver
                     );
                 }
 
-                $metadata->setType($type);
+                $metadata->setTypeInfo(new TypeMetadata(
+                    type: $type,
+                    statement: $statement,
+                ));
             }
 
             $class->addProperty($metadata);

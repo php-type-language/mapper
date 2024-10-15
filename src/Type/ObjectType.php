@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
+use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
@@ -48,9 +51,9 @@ class ObjectType extends AsymmetricType
         $className = $this->metadata->getName();
 
         if (!$value instanceof $className) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueMappingException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
+                expected: $this->metadata->getTypeStatement($context),
                 context: $context,
             );
         }
@@ -81,15 +84,31 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getName()));
 
-            // Skip in case of property has no type definition.
-            if (($type = $meta->findType()) === null) {
-                continue;
+            $info = $meta->findTypeInfo();
+
+            if ($info === null) {
+                throw MissingFieldTypeException::createFromContext(
+                    field: $meta->getName(),
+                    context: $context,
+                );
             }
 
-            $result[$meta->getExportName()] = $type->cast(
-                value: $this->accessor->getValue($object, $meta),
-                context: $context,
-            );
+            $type = $info->getType();
+            $fieldValue = $this->accessor->getValue($object, $meta);
+
+            try {
+                $result[$meta->getExportName()] = $type->cast($fieldValue, $context);
+            } catch (InvalidFieldTypeValueException $e) {
+                throw $e;
+            } catch (\Throwable $e) {
+                throw InvalidFieldTypeValueException::createFromContext(
+                    field: $meta->getExportName(),
+                    value: $fieldValue,
+                    expected: $info->getTypeStatement(),
+                    context: $context,
+                    previous: $e,
+                );
+            }
 
             $context->leave();
         }
@@ -115,9 +134,9 @@ class ObjectType extends AsymmetricType
         }
 
         if (!\is_array($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueMappingException::createFromContext(
                 value: $value,
-                expected: $this->metadata->getName(),
+                expected: $this->metadata->getTypeStatement($context),
                 context: $context,
             );
         }
@@ -159,13 +178,31 @@ class ObjectType extends AsymmetricType
             switch (true) {
                 // In case of value has been passed
                 case \array_key_exists($meta->getExportName(), $value):
-                    // Skip in case of property has no type definition.
-                    if (($type = $meta->findType()) === null) {
-                        $context->leave();
-                        continue 2;
+                    $info = $meta->findTypeInfo();
+
+                    if ($info === null) {
+                        throw MissingFieldTypeException::createFromContext(
+                            field: $meta->getExportName(),
+                            context: $context,
+                        );
                     }
 
-                    $propertyValue = $type->cast($value[$meta->getExportName()], $context);
+                    $type = $info->getType();
+                    $fieldValue = $value[$meta->getExportName()];
+
+                    try {
+                        $propertyValue = $type->cast($fieldValue, $context);
+                    } catch (InvalidFieldTypeValueException $e) {
+                        throw $e;
+                    } catch (\Throwable $e) {
+                        throw InvalidFieldTypeValueException::createFromContext(
+                            field: $meta->getExportName(),
+                            value: $fieldValue,
+                            expected: $info->getTypeStatement(),
+                            context: $context,
+                            previous: $e,
+                        );
+                    }
                     break;
 
                     // In case of property has default argument
@@ -174,9 +211,9 @@ class ObjectType extends AsymmetricType
                     break;
 
                 default:
-                    throw MissingFieldValueException::becausePropertyValueRequired(
-                        field: $meta->getExportName(),
+                    throw MissingFieldValueException::createFromContext(
                         expected: $this->getTypeStatement($context),
+                        field: $meta->getExportName(),
                         context: $context,
                     );
             }

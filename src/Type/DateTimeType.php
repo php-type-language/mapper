@@ -6,11 +6,6 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
-use TypeLang\Parser\Node\Literal\StringLiteralNode;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class DateTimeType extends AsymmetricType
 {
@@ -20,31 +15,12 @@ class DateTimeType extends AsymmetricType
     public const DEFAULT_DATETIME_FORMAT = \DateTimeInterface::RFC3339;
 
     /**
-     * @param non-empty-string $name
      * @param class-string<\DateTime|\DateTimeImmutable> $class
      */
     public function __construct(
-        protected readonly string $name,
         protected readonly string $class,
         protected readonly ?string $format = null,
     ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        $name = $this->name;
-
-        if ($context->isDenormalization()) {
-            $name = 'datetime-string';
-        }
-
-        if ($this->format === null || !$context->isDetailedTypes()) {
-            return new NamedTypeNode($name);
-        }
-
-        return new NamedTypeNode($name, new TemplateArgumentsListNode([
-            new TemplateArgumentNode(StringLiteralNode::createFromValue($this->format)),
-        ]));
-    }
 
     protected function isNormalizable(mixed $value, LocalContext $context): bool
     {
@@ -57,9 +33,8 @@ class DateTimeType extends AsymmetricType
     public function normalize(mixed $value, LocalContext $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: \DateTimeInterface::class,
                 context: $context,
             );
         }
@@ -86,9 +61,8 @@ class DateTimeType extends AsymmetricType
     public function denormalize(mixed $value, LocalContext $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: 'string',
                 context: $context,
             );
         }
@@ -99,9 +73,8 @@ class DateTimeType extends AsymmetricType
             return $result;
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
+        throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

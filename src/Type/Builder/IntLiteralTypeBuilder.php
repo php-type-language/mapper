@@ -21,9 +21,6 @@ class IntLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $statement, RepositoryInterface $types): IntLiteralType
     {
-        /** @var numeric-string $name */
-        $name = $statement->raw;
-
-        return new IntLiteralType($name, $statement->value);
+        return new IntLiteralType($statement->value);
     }
 }

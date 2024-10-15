@@ -6,42 +6,15 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class ListType extends NamedType
+class ListType implements TypeInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_TYPE_NAME = 'list';
-
-    /**
-     * @param non-empty-string $name
-     */
     public function __construct(
-        string $name = self::DEFAULT_TYPE_NAME,
         private readonly TypeInterface $type = new MixedType(),
-    ) {
-        parent::__construct($name);
-    }
-
-    #[\Override]
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        $child = $context->withDetailedTypes(false);
-
-        return new NamedTypeNode(
-            name: $this->name,
-            arguments: new TemplateArgumentsListNode([
-                new TemplateArgumentNode($this->type->getTypeStatement($child)),
-            ]),
-        );
-    }
+    ) {}
 
     public function match(mixed $value, LocalContext $context): bool
     {
@@ -52,13 +25,14 @@ class ListType extends NamedType
      * @return list<mixed>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
+     * @throws RuntimeExceptionInterface
+     * @throws \Throwable
      */
     public function cast(mixed $value, LocalContext $context): array
     {
         if (!\is_iterable($value)) {
-            throw InvalidValueException::becauseInvalidValueGiven(
+            throw InvalidValueException::createFromContext(
                 value: $value,
-                expected: $this->getTypeStatement($context),
                 context: $context,
             );
         }

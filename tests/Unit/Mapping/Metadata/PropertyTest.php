@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Mapping\Metadata;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\NullType;
+use TypeLang\Parser\Node\Literal\NullLiteralNode;
 
 final class PropertyTest extends MetadataTestCase
 {
@@ -80,21 +82,27 @@ final class PropertyTest extends MetadataTestCase
         $property = new PropertyMetadata('foo');
 
         self::assertNull($property->findType());
-        self::assertFalse($property->hasType());
+        self::assertFalse($property->hasTypeInfo());
 
-        $property = new PropertyMetadata('foo', $type = new NullType());
+        $property = new PropertyMetadata('foo', new TypeMetadata(
+            type: $type = new NullType(),
+            statement: new NullLiteralNode(),
+        ));
 
         self::assertSame($type, $property->findType());
-        self::assertTrue($property->hasType());
+        self::assertTrue($property->hasTypeInfo());
 
-        $property->setType(new NullType());
+        $property->setTypeInfo(new TypeMetadata(
+            type: new NullType(),
+            statement: new NullLiteralNode()
+        ));
 
         self::assertNotSame($type, $property->findType());
-        self::assertTrue($property->hasType());
+        self::assertTrue($property->hasTypeInfo());
 
-        $property->removeType();
+        $property->removeTypeInfo();
 
         self::assertNull($property->findType());
-        self::assertFalse($property->hasType());
+        self::assertFalse($property->hasTypeInfo());
     }
 }

@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-final class NonEmptyStringType extends NamedType
+class NonEmptyStringType implements TypeInterface
 {
     public function match(mixed $value, LocalContext $context): bool
     {
@@ -24,9 +24,8 @@ final class NonEmptyStringType extends NamedType
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
+        throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

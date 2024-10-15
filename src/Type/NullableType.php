@@ -5,21 +5,12 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Runtime\Context\LocalContext;
-use TypeLang\Parser\Node\Stmt\NullableTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class NullableType implements TypeInterface
 {
     public function __construct(
         private readonly TypeInterface $parent,
     ) {}
-
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        return new NullableTypeNode(
-            type: $this->parent->getTypeStatement($context),
-        );
-    }
 
     public function match(mixed $value, LocalContext $context): bool
     {

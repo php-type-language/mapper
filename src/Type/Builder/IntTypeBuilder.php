@@ -28,13 +28,11 @@ class IntTypeBuilder extends NamedTypeBuilder
         $arguments = $statement->arguments->items ?? [];
 
         return match (\count($arguments)) {
-            0 => new IntType($statement->name->toString()),
+            0 => new IntType(),
             1 => new IntType(
-                name: $statement->name->toString(),
                 min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
             ),
             2 => new IntType(
-                name: $statement->name->toString(),
                 min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
                 max: $this->fetchTemplateArgumentValue($statement, $arguments[1]),
             ),

@@ -7,21 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class StringType extends NamedType
+class StringType implements TypeInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_TYPE_NAME = 'string';
-
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
-    {
-        parent::__construct($name);
-    }
-
     public function match(mixed $value, LocalContext $context): bool
     {
         return \is_string($value);
@@ -39,9 +26,8 @@ class StringType extends NamedType
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
+        throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

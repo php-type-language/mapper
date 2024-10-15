@@ -7,21 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
-class BoolType extends NamedType
+class BoolType implements TypeInterface
 {
-    /**
-     * @var non-empty-lowercase-string
-     */
-    public const DEFAULT_TYPE_NAME = 'bool';
-
-    /**
-     * @param non-empty-string $name
-     */
-    public function __construct(string $name = self::DEFAULT_TYPE_NAME)
-    {
-        parent::__construct($name);
-    }
-
     public function match(mixed $value, LocalContext $context): bool
     {
         return \is_bool($value);
@@ -39,9 +26,8 @@ class BoolType extends NamedType
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidValueGiven(
+        throw InvalidValueException::createFromContext(
             value: $value,
-            expected: $this->getTypeStatement($context),
             context: $context,
         );
     }

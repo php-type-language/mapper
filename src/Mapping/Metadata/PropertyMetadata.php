@@ -27,7 +27,7 @@ final class PropertyMetadata extends Metadata
      */
     public function __construct(
         private string $export,
-        private ?TypeInterface $type = null,
+        private ?TypeMetadata $type = null,
         ?int $createdAt = null,
     ) {
         $this->name = $this->export;
@@ -42,9 +42,9 @@ final class PropertyMetadata extends Metadata
      */
     public function getTypeStatement(LocalContext $context): ?TypeStatement
     {
-        $type = $this->findType();
+        $info = $this->findTypeInfo();
 
-        return $type?->getTypeStatement($context->withDetailedTypes(false));
+        return $info?->getTypeStatement();
     }
 
     /**
@@ -110,7 +110,7 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function setType(TypeInterface $type): void
+    public function setTypeInfo(TypeMetadata $type): void
     {
         $this->type = $type;
     }
@@ -118,9 +118,17 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function removeType(): void
+    public function removeTypeInfo(): void
     {
         $this->type = null;
+    }
+
+    /**
+     * @api
+     */
+    public function hasTypeInfo(): bool
+    {
+        return $this->type !== null;
     }
 
     /**
@@ -133,15 +141,20 @@ final class PropertyMetadata extends Metadata
      */
     public function findType(): ?TypeInterface
     {
-        return $this->type;
+        return $this->type?->getType();
     }
 
     /**
+     * Note: The prefix "find" is used to indicate that the {@see TypeMetadata}
+     *       definition may be optional and method may return {@see null}.
+     *       The prefix "get" is used when the value is forced to be obtained
+     *       and should throw an exception if the type definition is missing.
+     *
      * @api
      */
-    public function hasType(): bool
+    public function findTypeInfo(): ?TypeMetadata
     {
-        return $this->type !== null;
+        return $this->type;
     }
 
     /**

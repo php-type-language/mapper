@@ -17,7 +17,7 @@ class ListTypeBuilder extends NamedTypeBuilder
     public function build(TypeStatement $statement, RepositoryInterface $types): ListType
     {
         if ($statement->arguments === null || $statement->arguments->count() === 0) {
-            return new ListType($statement->name->toString());
+            return new ListType();
         }
 
         $this->expectNoShapeFields($statement);
@@ -34,7 +34,6 @@ class ListTypeBuilder extends NamedTypeBuilder
         }
 
         return new ListType(
-            name: $statement->name->toString(),
             type: $types->getByStatement($first->value),
         );
     }

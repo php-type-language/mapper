@@ -51,11 +51,11 @@ class ComposerPackageRequiredException extends EnvironmentException
         ?\Throwable $previous = null,
     ): self {
         $template = 'The {{package}} component is required to %s. '
-            . 'Try running "composer require {{package}}"';
+            . 'Try running "composer require %s"';
 
         return new self(
             package: $package,
-            template: \sprintf($template, $purpose),
+            template: \sprintf($template, $purpose, $package),
             code: self::CODE_ERROR_PACKAGE_NOT_INSTALLED,
             previous: $previous,
         );

@@ -60,7 +60,7 @@ class BackedEnumTypeBuilder extends Builder
 
         return new BackedEnumType(
             // @phpstan-ignore-next-line
-            name: $statement->name->toString(),
+            class: $statement->name->toString(),
             type: $types->getByType($type),
         );
     }

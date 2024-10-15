@@ -43,8 +43,9 @@ class DateTimeTypeBuilder extends Builder
 
         if ($statement->arguments === null) {
             return new DateTimeType(
-                name: $name = $statement->name->toString(),
-                class: $this->getDateTimeClass($name),
+                class: $this->getDateTimeClass(
+                    name: $statement->name->toString(),
+                ),
             );
         }
 
@@ -62,8 +63,9 @@ class DateTimeTypeBuilder extends Builder
         }
 
         return new DateTimeType(
-            name: $name = $statement->name->toString(),
-            class: $this->getDateTimeClass($name),
+            class: $this->getDateTimeClass(
+                name: $statement->name->toString(),
+            ),
             format: $formatArgument->value->value,
         );
     }

@@ -8,11 +8,13 @@ use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class MissingFieldValueException extends RuntimeException implements
+class InvalidFieldTypeValueException extends RuntimeException implements
     FieldExceptionInterface,
+    ValueExceptionInterface,
     MappingExceptionInterface
 {
     use FieldProvider;
+    use ValueProvider;
     use TypeProvider;
 
     /**
@@ -29,8 +31,9 @@ class MissingFieldValueException extends RuntimeException implements
      * @param non-empty-string $field
      */
     public function __construct(
-        protected readonly TypeStatement $expected,
         protected readonly string $field,
+        protected readonly mixed $value,
+        protected readonly TypeStatement $expected,
         PathInterface $path,
         string $template,
         int $code = 0,
@@ -48,16 +51,31 @@ class MissingFieldValueException extends RuntimeException implements
      * @param non-empty-string $field
      */
     public static function createFromPath(
-        TypeStatement $expected,
         string $field,
+        mixed $value,
+        TypeStatement $expected,
         PathInterface $path,
-        ?\Throwable $previous = null,
+        ?\Throwable $previous = null
     ): self {
-        $template = 'Object of type {{expected}} requires field {{field}}';
+        $template = 'Passed value of field {{field}} must be of type {{expected}}, but {{value}} given';
+
+        if ($previous instanceof FieldExceptionInterface) {
+            $field = $previous->getField();
+            $path = $previous->getPath();
+
+            if ($previous instanceof ValueExceptionInterface) {
+                $value = $previous->getValue();
+            }
+
+            if ($previous instanceof MappingExceptionInterface) {
+                $expected = $previous->getExpectedType();
+            }
+        }
 
         return new self(
-            expected: $expected,
             field: $field,
+            value: $value,
+            expected: $expected,
             path: $path,
             template: $template,
             code: self::CODE_ERROR_INVALID_VALUE,
@@ -69,14 +87,16 @@ class MissingFieldValueException extends RuntimeException implements
      * @param non-empty-string $field
      */
     public static function createFromContext(
-        TypeStatement $expected,
         string $field,
+        mixed $value,
+        TypeStatement $expected,
         LocalContext $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(
-            expected: $expected,
             field: $field,
+            value: $value,
+            expected: $expected,
             path: clone $context->getPath(),
             previous: $previous,
         );

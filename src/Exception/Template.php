@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Exception;
 use TypeLang\Mapper\Runtime\Path\JsonPathPrinter;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathPrinterInterface;
+use TypeLang\Mapper\Runtime\Value\PrettyValuePrinter;
+use TypeLang\Mapper\Runtime\Value\ValuePrinterInterface;
 use TypeLang\Parser\Node\Statement;
 use TypeLang\Parser\Node\Stmt\Shape\FieldNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -23,12 +25,15 @@ final class Template implements \Stringable
 
     public PathPrinterInterface $paths;
 
+    public ValuePrinterInterface $values;
+
     public function __construct(
         private readonly string $template,
         private readonly \Throwable $context,
     ) {
         $this->types = self::createDefaultTypePrinter();
         $this->paths = self::createDefaultPathPrinter();
+        $this->values = self::createDefaultValuePrinter();
     }
 
     private static function createDefaultTypePrinter(): TypePrinterInterface
@@ -44,6 +49,11 @@ final class Template implements \Stringable
     private static function createDefaultPathPrinter(): PathPrinterInterface
     {
         return new JsonPathPrinter();
+    }
+
+    private static function createDefaultValuePrinter(): ValuePrinterInterface
+    {
+        return new PrettyValuePrinter();
     }
 
     /**
@@ -71,12 +81,7 @@ final class Template implements \Stringable
             $value instanceof TemplateArgumentNode => $this->types->print($value->value),
             $value instanceof FieldNode => $this->types->print($value->type),
             $value instanceof PathInterface => $this->paths->print($value),
-            $value === true => 'true',
-            $value === false => 'false',
-            \is_string($value) => $value,
-            \is_scalar($value),
-            $value instanceof \Stringable => (string) $value,
-            default => \get_debug_type($value),
+            default => $this->values->print($value),
         };
     }
 

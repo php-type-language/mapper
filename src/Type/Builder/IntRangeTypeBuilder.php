@@ -30,7 +30,6 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArguments($statement);
 
         return new IntType(
-            name: $statement->name->toString(),
             min: $this->min,
             max: $this->max,
             userDefinedRange: false,

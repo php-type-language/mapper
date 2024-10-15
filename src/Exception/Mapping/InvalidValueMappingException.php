@@ -8,11 +8,11 @@ use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class MissingFieldValueException extends RuntimeException implements
-    FieldExceptionInterface,
+class InvalidValueMappingException extends RuntimeException implements
+    ValueExceptionInterface,
     MappingExceptionInterface
 {
-    use FieldProvider;
+    use ValueProvider;
     use TypeProvider;
 
     /**
@@ -25,12 +25,9 @@ class MissingFieldValueException extends RuntimeException implements
      */
     protected const CODE_ERROR_LAST = self::CODE_ERROR_INVALID_VALUE;
 
-    /**
-     * @param non-empty-string $field
-     */
     public function __construct(
+        protected readonly mixed $value,
         protected readonly TypeStatement $expected,
-        protected readonly string $field,
         PathInterface $path,
         string $template,
         int $code = 0,
@@ -44,41 +41,35 @@ class MissingFieldValueException extends RuntimeException implements
         );
     }
 
-    /**
-     * @param non-empty-string $field
-     */
     public static function createFromPath(
+        mixed $value,
         TypeStatement $expected,
-        string $field,
         PathInterface $path,
-        ?\Throwable $previous = null,
+        ?\Throwable $prev = null
     ): self {
-        $template = 'Object of type {{expected}} requires field {{field}}';
+        $template = 'Passed value must be of type {{expected}}, but {{value}} given';
 
         return new self(
+            value: $value,
             expected: $expected,
-            field: $field,
             path: $path,
             template: $template,
             code: self::CODE_ERROR_INVALID_VALUE,
-            previous: $previous,
+            previous: $prev,
         );
     }
 
-    /**
-     * @param non-empty-string $field
-     */
     public static function createFromContext(
+        mixed $value,
         TypeStatement $expected,
-        string $field,
         LocalContext $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(
+            value: $value,
             expected: $expected,
-            field: $field,
             path: clone $context->getPath(),
-            previous: $previous,
+            prev: $previous,
         );
     }
 }
