@@ -20,8 +20,6 @@ class UnionType implements TypeInterface
 
     /**
      * Finds a child supported type from their {@see $types} list by value.
-     *
-     * @return TypeInterface
      */
     protected function findType(mixed $value, LocalContext $context, bool $match = true): ?TypeInterface
     {
