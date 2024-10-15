@@ -25,7 +25,7 @@ class BackedEnumTypeBuilder extends Builder
         $enum = $statement->name->toString();
 
         return \enum_exists($statement->name->toString())
-            && \is_subclass_of($enum, \BackedEnum::class, true);
+            && \is_subclass_of($enum, \BackedEnum::class);
     }
 
     /**

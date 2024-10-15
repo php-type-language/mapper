@@ -16,9 +16,9 @@ class MixedType implements TypeInterface
     }
 
     /**
-     * @throws \Throwable
      * @throws TypeNotFoundException
      * @throws RuntimeExceptionInterface
+     * @throws \Throwable
      */
     public function cast(mixed $value, LocalContext $context): mixed
     {

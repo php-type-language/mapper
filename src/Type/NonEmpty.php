@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
 class NonEmpty implements TypeInterface
@@ -26,6 +27,8 @@ class NonEmpty implements TypeInterface
 
     /**
      * @throws InvalidValueException
+     * @throws RuntimeExceptionInterface
+     * @throws \Throwable
      */
     public function cast(mixed $value, LocalContext $context): mixed
     {

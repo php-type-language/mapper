@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
 class BackedEnumType extends AsymmetricType
@@ -40,6 +41,10 @@ class BackedEnumType extends AsymmetricType
         return $value->value;
     }
 
+    /**
+     * @throws \Throwable
+     * @throws RuntimeExceptionInterface
+     */
     protected function isDenormalizable(mixed $value, LocalContext $context): bool
     {
         $isSupportsType = $this->type->match($value, $context);
@@ -62,6 +67,8 @@ class BackedEnumType extends AsymmetricType
      * Converts a scalar representation of an enum to an enum case object.
      *
      * @throws InvalidValueException
+     * @throws RuntimeExceptionInterface
+     * @throws \Throwable
      */
     public function denormalize(mixed $value, LocalContext $context): \BackedEnum
     {

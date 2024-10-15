@@ -21,6 +21,9 @@ class IntLiteralType extends IntType
         return $value === $this->value;
     }
 
+    /**
+     * @throws InvalidValueException
+     */
     #[\Override]
     public function cast(mixed $value, LocalContext $context): int
     {

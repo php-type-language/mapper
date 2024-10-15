@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
@@ -54,6 +55,8 @@ class ArrayType implements TypeInterface
      * @return array<array-key, mixed>
      * @throws InvalidValueException
      * @throws TypeNotFoundException
+     * @throws \Throwable
+     * @throws RuntimeExceptionInterface
      */
     public function cast(mixed $value, LocalContext $context): array
     {

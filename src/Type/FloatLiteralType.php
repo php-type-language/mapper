@@ -19,6 +19,9 @@ class FloatLiteralType extends FloatType
         return $value === (float) $this->value;
     }
 
+    /**
+     * @throws InvalidValueException
+     */
     #[\Override]
     public function cast(mixed $value, LocalContext $context): float
     {

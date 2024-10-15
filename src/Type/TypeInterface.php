@@ -9,6 +9,9 @@ use TypeLang\Mapper\Runtime\Context\LocalContext;
 
 interface TypeInterface
 {
+    /**
+     * Checks that the value matches the selected type
+     */
     public function match(mixed $value, LocalContext $context): bool;
 
     /**

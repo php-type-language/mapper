@@ -12,7 +12,7 @@ use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
+use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode as ArgNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
@@ -29,13 +29,8 @@ class IntTypeBuilder extends NamedTypeBuilder
 
         return match (\count($arguments)) {
             0 => new IntType(),
-            1 => new IntType(
-                min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
-            ),
-            2 => new IntType(
-                min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
-                max: $this->fetchTemplateArgumentValue($statement, $arguments[1]),
-            ),
+            1 => $this->buildWithMinValue($statement, $arguments[0]),
+            2 => $this->buildWithMinMaxValues($statement, $arguments[0], $arguments[1]),
             default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
                 passedArgumentsCount: \count($arguments),
                 minSupportedArgumentsCount: 0,
@@ -49,7 +44,30 @@ class IntTypeBuilder extends NamedTypeBuilder
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    private function fetchTemplateArgumentValue(TypeStatement $statement, TemplateArgumentNode $argument): int
+    private function buildWithMinValue(NamedTypeNode $statement, ArgNode $min): IntType
+    {
+        $value = $this->fetchTemplateArgumentValue($statement, $min);
+
+        return new IntType($value);
+    }
+
+    /**
+     * @throws InvalidTemplateArgumentException
+     * @throws TemplateArgumentHintsNotSupportedException
+     */
+    private function buildWithMinMaxValues(NamedTypeNode $statement, ArgNode $min, ArgNode $max): IntType
+    {
+        $from = $this->fetchTemplateArgumentValue($statement, $min);
+        $to = $this->fetchTemplateArgumentValue($statement, $max);
+
+        return new IntType($from, $to);
+    }
+
+    /**
+     * @throws InvalidTemplateArgumentException
+     * @throws TemplateArgumentHintsNotSupportedException
+     */
+    private function fetchTemplateArgumentValue(TypeStatement $statement, ArgNode $argument): int
     {
         $this->expectNoTemplateArgumentHint($statement, $argument);
 

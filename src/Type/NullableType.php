@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 
 class NullableType implements TypeInterface
@@ -18,6 +19,10 @@ class NullableType implements TypeInterface
             || $this->parent->match($value, $context);
     }
 
+    /**
+     * @throws RuntimeExceptionInterface
+     * @throws \Throwable
+     */
     public function cast(mixed $value, LocalContext $context): mixed
     {
         if ($value === null) {
