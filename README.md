@@ -31,24 +31,48 @@ composer require type-lang/mapper
 ## Quick Start
 
 ```php
+use TypeLang\Mapper\Mapping\MapProperty;
+
 class ExampleObject
 {
     public function __construct(
-        public readonly string $name,
+        #[MapProperty('list<non-empty-string>')]
+        public readonly array $name,
     ) {}
 }
 
 $mapper = new \TypeLang\Mapper\Mapper();
 
-$normalized = $mapper->normalize(new ExampleObject('Example'));
+$result = $mapper->normalize(
+    new ExampleObject(['Example'])
+);
 // Expected Result:
+//
 // array:1 [
-//   "name" => "Example"
+//   "names" => array:1 [
+//     0 => "Example"
+//   ]
 // ]
 
-$denormalized = $mapper->denormalize($normalized, ExampleObject::class);
+
+$result = $mapper->denormalize([
+    'names' => ['first', 'second']
+], ExampleObject::class);
 // Expected Result:
-// ExampleObject {#14
-//   +name: "Example"
+//
+// ExampleObject {#324
+//   +names: array:2 [
+//     0 => "first"
+//     1 => "second"
+//   ]
 // }
+
+
+$result = $mapper->denormalize([
+    'names' => ['first', 'second', ''],
+], ExampleObject::class);
+// Expected Result:
+//
+// InvalidFieldTypeValueException: Passed value of field "names" must be of type
+//   list<non-empty-string>, but array(3)["first", "second", ""] given at $.names[2]
 ```
