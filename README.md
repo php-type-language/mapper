@@ -57,6 +57,50 @@ using the following command in a root of your project:
 composer require type-lang/mapper
 ```
 
+## Benchmarks
+
+Results [here](https://github.com/php-type-language/mapper/actions/workflows/bench.yml) 
+like [this](https://github.com/php-type-language/mapper/actions/runs/11354044353/job/31580400799#step:7:34).
+
+Sample: An object that contains a collection of objects, which contains 
+another collection of objects.
+
+```typescript
+ExampleObject{
+    name: string,
+    items: list<ExampleObject>
+}
+```
+
+Results:
+
+### Denormalization
+
+Denormalization: Transformation from raw payload (array) to concrete object.
+
+| subject                     | revs | its | mem_peak | mode      | rstdev |
+|-----------------------------|------|-----|----------|-----------|--------|
+| benchJmsWithAttributes      | 50   | 20  | 4.466mb  | 32.151μs  | ±1.70% |
+| benchValinorWithPhpStan     | 50   | 20  | 3.870mb  | 119.750μs | ±1.21% |
+| benchSymfonyWithPhpStan     | 50   | 20  | 3.870mb  | 126.807μs | ±1.94% |
+| benchSymfonyWithDocBlock    | 50   | 20  | 3.870mb  | 123.889μs | ±1.35% |
+| benchTypeLangWithDocBlocks  | 50   | 20  | 3.870mb  | 34.175μs  | ±1.61% |
+| benchTypeLangWithAttributes | 50   | 20  | 3.870mb  | 34.379μs  | ±1.77% |
+
+### Normalization
+
+Normalization: Transformation from object to raw payload (array).
+
+| subject                     | revs | its | mem_peak | mode     | rstdev |
+|-----------------------------|------|-----|----------|----------|--------|
+| benchJmsWithAttributes      | 50   | 20  | 3.870mb  | 44.614μs | ±1.92% |
+| benchValinorWithPhpStan     | 50   | 20  | 3.870mb  | 38.229μs | ±1.38% |
+| benchSymfonyWithPhpStan     | 50   | 20  | 3.870mb  | 37.050μs | ±1.20% |
+| benchSymfonyWithDocBlock    | 50   | 20  | 3.870mb  | 37.125μs | ±1.50% |
+| benchTypeLangWithDocBlocks  | 50   | 20  | 3.870mb  | 36.473μs | ±1.69% |
+| benchTypeLangWithAttributes | 50   | 20  | 3.870mb  | 36.735μs | ±1.68% |
+
+
 ## Quick Start
 
 ```php
