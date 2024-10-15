@@ -18,7 +18,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
-use TypeLang\Parser\Traverser;
 use TypeLang\Parser\TypeResolver;
 
 /**
@@ -123,7 +122,9 @@ class Repository implements RepositoryInterface, \IteratorAggregate
      */
     private function resolveFromNamespace(TypeStatement $statement, \ReflectionClass $class): TypeStatement
     {
-        return $this->typeResolver->resolve($statement, static function (Name $name) use ($class): ?Name {
+        return $this->typeResolver->resolve(
+            $statement,
+            static function (Name $name) use ($class): ?Name {
                 $namespace = $class->getNamespaceName();
 
                 if ($namespace !== '' && self::entryExists($namespace . '\\' . $name->toString())) {
