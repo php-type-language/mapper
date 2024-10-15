@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Bench;
 
-use CuyZ\Valinor\Mapper\Source\Source;
-use CuyZ\Valinor\Mapper\TreeMapper;
 use CuyZ\Valinor\MapperBuilder;
 use CuyZ\Valinor\Normalizer\Format;
 use CuyZ\Valinor\Normalizer\Normalizer;
@@ -13,6 +11,7 @@ use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerBuilder;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
+use PhpBench\Attributes\RetryThreshold;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -29,7 +28,7 @@ use TypeLang\Mapper\NormalizerInterface as TypeLangNormalizerInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(100), Warmup(5), Iterations(10)]
+#[Revs(50), Warmup(5), Iterations(20), RetryThreshold(5)]
 #[BeforeMethods('prepare')]
 final class NormalizationBench implements BenchInterface
 {
@@ -105,32 +104,32 @@ final class NormalizationBench implements BenchInterface
         ]));
     }
 
-    public function benchJms(): void
+    public function benchJmsWithAttributes(): void
     {
         $this->jms->toArray($this->payload, type: ExampleRequestDTO::class);
     }
 
-    public function benchValinor(): void
+    public function benchValinorWithPhpStan(): void
     {
         $this->valinor->normalize($this->payload);
     }
 
-    public function benchSymfonyPhpStan(): void
+    public function benchSymfonyWithPhpStan(): void
     {
         $this->symfonyPhpStan->normalize($this->payload);
     }
 
-    public function benchSymfonyDocBlock(): void
+    public function benchSymfonyWithDocBlock(): void
     {
         $this->symfonyDocBlock->normalize($this->payload);
     }
 
-    public function benchTypeLangDocBlock(): void
+    public function benchTypeLangWithDocBlocks(): void
     {
         $this->typeLangDocBlock->normalize($this->payload);
     }
 
-    public function benchTypeLangAttributes(): void
+    public function benchTypeLangWithAttributes(): void
     {
         $this->typeLangDocBlock->normalize($this->payload);
     }

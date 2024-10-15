@@ -6,10 +6,10 @@ namespace TypeLang\Mapper\Tests\Bench;
 
 interface BenchInterface
 {
-    public function benchTypeLangDocBlock(): void;
-    public function benchTypeLangAttributes(): void;
-    public function benchJms(): void;
-    public function benchValinor(): void;
-    public function benchSymfonyPhpStan(): void;
-    public function benchSymfonyDocBlock(): void;
+    public function benchTypeLangWithDocBlocks(): void;
+    public function benchTypeLangWithAttributes(): void;
+    public function benchJmsWithAttributes(): void;
+    public function benchValinorWithPhpStan(): void;
+    public function benchSymfonyWithPhpStan(): void;
+    public function benchSymfonyWithDocBlock(): void;
 }

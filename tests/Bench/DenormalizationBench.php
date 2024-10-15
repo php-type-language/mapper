@@ -11,8 +11,10 @@ use JMS\Serializer\ArrayTransformerInterface;
 use JMS\Serializer\SerializerBuilder;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
+use PhpBench\Attributes\RetryThreshold;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
@@ -27,7 +29,7 @@ use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(100), Warmup(5), Iterations(10)]
+#[Revs(50), Warmup(5), Iterations(20), RetryThreshold(5)]
 #[BeforeMethods('prepare')]
 final class DenormalizationBench implements BenchInterface
 {
@@ -70,16 +72,16 @@ final class DenormalizationBench implements BenchInterface
         $this->typeLangDocBlock = new Mapper(
             platform: new StandardPlatform(
                 driver: new DocBlockDriver(
-                    delegate: new ReflectionDriver()
-                )
+                    delegate: new ReflectionDriver(),
+                ),
             ),
         );
 
         $this->typeLangAttributes = new Mapper(
             platform: new StandardPlatform(
                 driver: new AttributeDriver(
-                    delegate: new ReflectionDriver()
-                )
+                    delegate: new ReflectionDriver(),
+                ),
             ),
         );
 
@@ -101,32 +103,32 @@ final class DenormalizationBench implements BenchInterface
         ]));
     }
 
-    public function benchJms(): void
+    public function benchJmsWithAttributes(): void
     {
         $this->jms->fromArray(self::PAYLOAD, ExampleRequestDTO::class);
     }
 
-    public function benchValinor(): void
+    public function benchValinorWithPhpStan(): void
     {
         $this->valinor->map(ExampleRequestDTO::class, Source::array(self::PAYLOAD));
     }
 
-    public function benchSymfonyPhpStan(): void
+    public function benchSymfonyWithPhpStan(): void
     {
         $this->symfonyPhpStan->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
     }
 
-    public function benchSymfonyDocBlock(): void
+    public function benchSymfonyWithDocBlock(): void
     {
         $this->symfonyDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
     }
 
-    public function benchTypeLangDocBlock(): void
+    public function benchTypeLangWithDocBlocks(): void
     {
         $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
     }
 
-    public function benchTypeLangAttributes(): void
+    public function benchTypeLangWithAttributes(): void
     {
         $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
     }
