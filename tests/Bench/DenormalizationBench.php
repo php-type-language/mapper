@@ -101,16 +101,6 @@ final class DenormalizationBench implements BenchInterface
         ]));
     }
 
-    public function benchTypeLangDocBlock(): void
-    {
-        $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
-    }
-
-    public function benchTypeLangAttributes(): void
-    {
-        $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
-    }
-
     public function benchJms(): void
     {
         $this->jms->fromArray(self::PAYLOAD, ExampleRequestDTO::class);
@@ -129,5 +119,15 @@ final class DenormalizationBench implements BenchInterface
     public function benchSymfonyDocBlock(): void
     {
         $this->symfonyDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
+    }
+
+    public function benchTypeLangDocBlock(): void
+    {
+        $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
+    }
+
+    public function benchTypeLangAttributes(): void
+    {
+        $this->typeLangDocBlock->denormalize(self::PAYLOAD, ExampleRequestDTO::class);
     }
 }

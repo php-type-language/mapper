@@ -105,16 +105,6 @@ final class NormalizationBench implements BenchInterface
         ]));
     }
 
-    public function benchTypeLangDocBlock(): void
-    {
-        $this->typeLangDocBlock->normalize($this->payload);
-    }
-
-    public function benchTypeLangAttributes(): void
-    {
-        $this->typeLangDocBlock->normalize($this->payload);
-    }
-
     public function benchJms(): void
     {
         $this->jms->toArray($this->payload, type: ExampleRequestDTO::class);
@@ -133,5 +123,15 @@ final class NormalizationBench implements BenchInterface
     public function benchSymfonyDocBlock(): void
     {
         $this->symfonyDocBlock->normalize($this->payload);
+    }
+
+    public function benchTypeLangDocBlock(): void
+    {
+        $this->typeLangDocBlock->normalize($this->payload);
+    }
+
+    public function benchTypeLangAttributes(): void
+    {
+        $this->typeLangDocBlock->normalize($this->payload);
     }
 }
