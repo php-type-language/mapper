@@ -1,4 +1,4 @@
-name: codestyle
+name: bench
 
 on:
   push:
@@ -32,5 +32,5 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer update --prefer-dist --no-interaction --no-progress
-      - name: Check Code Style
+      - name: Run Benchmarks
         run: composer bench
