@@ -70,7 +70,7 @@ abstract class Builder implements TypeBuilderInterface
      * @api
      *
      * @param int<0, max> $max
-     * @param int<0, max>|null $min
+     * @param int<0, max> $min
      *
      * @throws TooManyTemplateArgumentsException
      */

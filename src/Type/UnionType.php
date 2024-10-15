@@ -20,24 +20,6 @@ class UnionType implements TypeInterface
     ) {}
 
     /**
-     * @return UnionTypeNode<TypeStatement>|TypeStatement
-     */
-    public function getTypeStatement(LocalContext $context): TypeStatement
-    {
-        $statements = [];
-
-        foreach ($this->types as $type) {
-            $statements[] = $type->getTypeStatement($context);
-        }
-
-        if (\count($statements) === 1) {
-            return \reset($statements);
-        }
-
-        return new UnionTypeNode(...$statements);
-    }
-
-    /**
      * Finds a child supported type from their {@see $types} list by value.
      */
     protected function findType(mixed $value, LocalContext $context, bool $match = true): ?TypeInterface

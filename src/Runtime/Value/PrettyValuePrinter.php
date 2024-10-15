@@ -54,6 +54,7 @@ final class PrettyValuePrinter implements ValuePrinterInterface
 
     /**
      * @param array<array-key, mixed> $values
+     *
      * @return non-empty-string
      */
     private function printArray(array $values, int $depth): string
@@ -77,6 +78,7 @@ final class PrettyValuePrinter implements ValuePrinterInterface
 
     /**
      * @param array<array-key, mixed> $values
+     *
      * @return list<string>
      */
     private function computeKeyValValues(array $values, int $depth): array
@@ -100,6 +102,7 @@ final class PrettyValuePrinter implements ValuePrinterInterface
 
     /**
      * @param list<mixed> $values
+     *
      * @return non-empty-string
      */
     private function printList(array $values, int $depth): string
@@ -119,6 +122,7 @@ final class PrettyValuePrinter implements ValuePrinterInterface
 
     /**
      * @param list<mixed> $values
+     *
      * @return list<string>
      */
     private function computeListValues(array $values, int $depth): array
