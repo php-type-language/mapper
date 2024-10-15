@@ -32,7 +32,6 @@ final class ReflectionDriver extends LoadableDriver
             $metadata = $class->getPropertyOrCreate($property->getName());
 
             $this->fillType($property, $metadata, $types);
-            $this->fillReadonlyModifier($property, $metadata);
             $this->fillDefaultValue($property, $metadata);
         }
     }
@@ -46,15 +45,6 @@ final class ReflectionDriver extends LoadableDriver
         $default = $property->getDefaultValue();
 
         $meta->setDefaultValue($default);
-    }
-
-    private function fillReadonlyModifier(\ReflectionProperty $property, PropertyMetadata $meta): void
-    {
-        if (!$property->isReadOnly()) {
-            return;
-        }
-
-        $meta->markAsReadonly();
     }
 
     /**

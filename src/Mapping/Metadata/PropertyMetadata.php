@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Metadata;
 
 use TypeLang\Mapper\Runtime\Context\LocalContext;
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -19,8 +19,6 @@ final class PropertyMetadata extends Metadata
     private mixed $defaultValue = null;
 
     private bool $hasDefaultValue = false;
-
-    private bool $readonly = false;
 
     /**
      * @param non-empty-string $export
@@ -44,7 +42,17 @@ final class PropertyMetadata extends Metadata
     {
         $info = $this->findTypeInfo();
 
-        return $info?->getTypeStatement();
+        if ($info === null) {
+            return null;
+        }
+
+        $statement = clone $info->getTypeStatement();
+
+        if ($context->isDetailedTypes() || !$statement instanceof NamedTypeNode) {
+            return $statement;
+        }
+
+        return new NamedTypeNode($statement->name);
     }
 
     /**
@@ -132,19 +140,6 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
-     * Note: The prefix "find" is used to indicate that the {@see TypeInterface}
-     *       definition may be optional and method may return {@see null}.
-     *       The prefix "get" is used when the value is forced to be obtained
-     *       and should throw an exception if the type definition is missing.
-     *
-     * @api
-     */
-    public function findType(): ?TypeInterface
-    {
-        return $this->type?->getType();
-    }
-
-    /**
      * Note: The prefix "find" is used to indicate that the {@see TypeMetadata}
      *       definition may be optional and method may return {@see null}.
      *       The prefix "get" is used when the value is forced to be obtained
@@ -194,21 +189,5 @@ final class PropertyMetadata extends Metadata
     public function hasDefaultValue(): bool
     {
         return $this->hasDefaultValue;
-    }
-
-    /**
-     * @api
-     */
-    public function markAsReadonly(bool $readonly = true): void
-    {
-        $this->readonly = $readonly;
-    }
-
-    /**
-     * @api
-     */
-    public function isReadonly(): bool
-    {
-        return $this->readonly;
     }
 }

@@ -19,6 +19,10 @@ use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
 use TypeLang\PHPDoc\Tag\Factory\TagFactory;
 
+/**
+ * Note: This driver requires installed "type-lang/phpdoc" and
+ *       "type-lang/phpdoc-standard-tags" Composer packages.
+ */
 final class DocBlockDriver extends LoadableDriver
 {
     /**

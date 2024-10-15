@@ -105,6 +105,7 @@ class ObjectType extends AsymmetricType
                     field: $meta->getExportName(),
                     value: $fieldValue,
                     expected: $info->getTypeStatement(),
+                    object: $this->metadata->getTypeStatement($context),
                     context: $context,
                     previous: $e,
                 );
@@ -199,6 +200,7 @@ class ObjectType extends AsymmetricType
                             field: $meta->getExportName(),
                             value: $fieldValue,
                             expected: $info->getTypeStatement(),
+                            object: $this->metadata->getTypeStatement($context),
                             context: $context,
                             previous: $e,
                         );

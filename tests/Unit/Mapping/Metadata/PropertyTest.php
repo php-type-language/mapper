@@ -58,38 +58,21 @@ final class PropertyTest extends MetadataTestCase
         self::assertFalse($property->hasDefaultValue());
     }
 
-    public function testReadonlyModifier(): void
-    {
-        $property = new PropertyMetadata('foo');
-
-        self::assertFalse($property->isReadonly());
-
-        $property->markAsReadonly();
-
-        self::assertTrue($property->isReadonly());
-
-        $property->markAsReadonly(false);
-
-        self::assertFalse($property->isReadonly());
-
-        $property->markAsReadonly(true);
-
-        self::assertTrue($property->isReadonly());
-    }
-
     public function testType(): void
     {
         $property = new PropertyMetadata('foo');
 
-        self::assertNull($property->findType());
+        self::assertNull($property->findTypeInfo());
         self::assertFalse($property->hasTypeInfo());
 
         $property = new PropertyMetadata('foo', new TypeMetadata(
             type: $type = new NullType(),
-            statement: new NullLiteralNode(),
+            statement: $statement = new NullLiteralNode(),
         ));
 
-        self::assertSame($type, $property->findType());
+        self::assertNotNull($info = $property->findTypeInfo());
+        self::assertSame($type, $info->getType());
+        self::assertSame($statement, $info->getTypeStatement());
         self::assertTrue($property->hasTypeInfo());
 
         $property->setTypeInfo(new TypeMetadata(
@@ -97,12 +80,14 @@ final class PropertyTest extends MetadataTestCase
             statement: new NullLiteralNode()
         ));
 
-        self::assertNotSame($type, $property->findType());
+        self::assertNotNull($info = $property->findTypeInfo());
+        self::assertNotSame($type, $info->getType());
+        self::assertNotSame($statement, $info->getTypeStatement());
         self::assertTrue($property->hasTypeInfo());
 
         $property->removeTypeInfo();
 
-        self::assertNull($property->findType());
+        self::assertNull($property->findTypeInfo());
         self::assertFalse($property->hasTypeInfo());
     }
 }

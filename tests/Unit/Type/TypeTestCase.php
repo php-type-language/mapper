@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Mapping\MappingException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Runtime\Context\Context;
 use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
@@ -48,14 +48,14 @@ abstract class TypeTestCase extends TestCase
 
     protected function expectCastIfNonStrict(mixed $expected, Context $ctx): mixed
     {
-        $this->expectException(MappingException::class);
+        $this->expectException(RuntimeException::class);
 
         return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
     }
 
     protected function expectMappingError(): mixed
     {
-        $this->expectException(MappingException::class);
+        $this->expectException(RuntimeException::class);
 
         return "<\0MUST_THROW_ERROR(" . __FUNCTION__ . ")\0>";
     }

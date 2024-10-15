@@ -46,10 +46,6 @@ final class ReflectionPropertyAccessor extends PropertyAccessor
 
     public function isWritable(object $object, PropertyMetadata $meta): bool
     {
-        if ($meta->isReadonly()) {
-            return false;
-        }
-
         try {
             $property = $this->getProperty($object, $meta);
 

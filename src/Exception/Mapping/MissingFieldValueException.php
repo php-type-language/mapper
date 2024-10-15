@@ -53,7 +53,7 @@ class MissingFieldValueException extends RuntimeException implements
         PathInterface $path,
         ?\Throwable $previous = null,
     ): self {
-        $template = 'Object of type {{expected}} requires field {{field}}';
+        $template = 'Object of type {{expected}} requires missing field {{field}}';
 
         return new self(
             expected: $expected,

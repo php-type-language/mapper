@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Traverser;
+use TypeLang\Parser\Traverser\TypeMapVisitor;
 
 class InvalidFieldTypeValueException extends RuntimeException implements
     FieldExceptionInterface,
@@ -15,7 +17,9 @@ class InvalidFieldTypeValueException extends RuntimeException implements
 {
     use FieldProvider;
     use ValueProvider;
-    use TypeProvider;
+    use TypeProvider {
+        TypeProvider::explain as private explainExpectedType;
+    }
 
     /**
      * @var int
@@ -34,6 +38,7 @@ class InvalidFieldTypeValueException extends RuntimeException implements
         protected readonly string $field,
         protected readonly mixed $value,
         protected readonly TypeStatement $expected,
+        protected readonly TypeStatement $object,
         PathInterface $path,
         string $template,
         int $code = 0,
@@ -54,28 +59,17 @@ class InvalidFieldTypeValueException extends RuntimeException implements
         string $field,
         mixed $value,
         TypeStatement $expected,
+        TypeStatement $object,
         PathInterface $path,
         ?\Throwable $previous = null
     ): self {
-        $template = 'Passed value of field {{field}} must be of type {{expected}}, but {{value}} given';
-
-        if ($previous instanceof FieldExceptionInterface) {
-            $field = $previous->getField();
-            $path = $previous->getPath();
-
-            if ($previous instanceof ValueExceptionInterface) {
-                $value = $previous->getValue();
-            }
-
-            if ($previous instanceof MappingExceptionInterface) {
-                $expected = $previous->getExpectedType();
-            }
-        }
+        $template = 'Passed value in {{field}} of {{object}} must be of type {{expected}}, but {{value}} given';
 
         return new self(
             field: $field,
             value: $value,
             expected: $expected,
+            object: $object,
             path: $path,
             template: $template,
             code: self::CODE_ERROR_INVALID_VALUE,
@@ -90,6 +84,7 @@ class InvalidFieldTypeValueException extends RuntimeException implements
         string $field,
         mixed $value,
         TypeStatement $expected,
+        TypeStatement $object,
         LocalContext $context,
         ?\Throwable $previous = null,
     ): self {
@@ -97,8 +92,21 @@ class InvalidFieldTypeValueException extends RuntimeException implements
             field: $field,
             value: $value,
             expected: $expected,
+            object: $object,
             path: clone $context->getPath(),
             previous: $previous,
         );
+    }
+
+    public function explain(callable $transform): self
+    {
+        $this->explainExpectedType($transform);
+
+        Traverser::through(
+            visitor: new TypeMapVisitor($transform(...)),
+            nodes: [$this->object],
+        );
+
+        return $this;
     }
 }
