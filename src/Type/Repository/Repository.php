@@ -12,6 +12,7 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\InMemoryCachedParser;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -60,7 +61,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     private function createPlatformParser(PlatformInterface $platform): ParserInterface
     {
-        return new Parser(
+        return new InMemoryCachedParser(new Parser(
             conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
             shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
             callables: $platform->isFeatureSupported(GrammarFeature::Callables),
@@ -71,7 +72,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             list: $platform->isFeatureSupported(GrammarFeature::List),
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
-        );
+        ));
     }
 
     public function parse(string $type): TypeStatement
