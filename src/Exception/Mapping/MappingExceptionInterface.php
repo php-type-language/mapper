@@ -6,9 +6,7 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-interface MappingExceptionInterface extends
-    RuntimeExceptionInterface,
-    AllowsExplainTypeInterface
+interface MappingExceptionInterface extends RuntimeExceptionInterface
 {
     /**
      * Returns the type statement in which the error occurred.

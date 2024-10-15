@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type\ObjectType\PropertyAccessor;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 
-final class ReflectionPropertyAccessor extends PropertyAccessor
+final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 {
     /**
      * @throws \ReflectionException
@@ -23,14 +23,31 @@ final class ReflectionPropertyAccessor extends PropertyAccessor
 
             return $property->getValue($object);
         } catch (\ReflectionException) {
-            return parent::getValue($object, $meta);
+            return null;
         }
     }
 
     public function isReadable(object $object, PropertyMetadata $meta): bool
     {
-        return \property_exists($object, $meta->getName())
-            || $this->delegate->isReadable($object, $meta);
+        if (!\property_exists($object, $meta->getName())) {
+            return false;
+        }
+
+        if (\PHP_VERSION_ID >= 80400) {
+            return $this->isReadableUsingHooks($object, $meta);
+        }
+
+        return true;
+    }
+
+    private function isReadableUsingHooks(object $object, PropertyMetadata $meta): bool
+    {
+        $property = $this->getProperty($object, $meta);
+
+        // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
+        return $property->getHook(\PropertyHookType::Get) !== null
+            // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
+            || $property->getHook(\PropertyHookType::Set) === null;
     }
 
     public function setValue(object $object, PropertyMetadata $meta, mixed $value): void
@@ -40,18 +57,29 @@ final class ReflectionPropertyAccessor extends PropertyAccessor
 
             $property->setValue($object, $value);
         } catch (\ReflectionException) {
-            parent::setValue($object, $meta, $value);
+            return;
         }
     }
 
     public function isWritable(object $object, PropertyMetadata $meta): bool
     {
-        try {
-            $property = $this->getProperty($object, $meta);
-
-            return !$property->isReadOnly();
-        } catch (\ReflectionException) {
-            return parent::isWritable($object, $meta);
+        if (\PHP_VERSION_ID >= 80400) {
+            return $this->isWritableUsingHooks($object, $meta);
         }
+
+        return true;
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    private function isWritableUsingHooks(object $object, PropertyMetadata $meta): bool
+    {
+        $property = $this->getProperty($object, $meta);
+
+        // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
+        return $property->getHook(\PropertyHookType::Get) === null
+            // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
+            || $property->getHook(\PropertyHookType::Set) !== null;
     }
 }

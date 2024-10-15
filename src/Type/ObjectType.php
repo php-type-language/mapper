@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
+use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
+use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
@@ -84,6 +86,10 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getName()));
 
+            if (!$this->accessor->isReadable($object, $meta)) {
+                continue;
+            }
+
             $info = $meta->findTypeInfo();
 
             if ($info === null) {
@@ -94,11 +100,12 @@ class ObjectType extends AsymmetricType
             }
 
             $type = $info->getType();
+
             $fieldValue = $this->accessor->getValue($object, $meta);
 
             try {
                 $result[$meta->getExportName()] = $type->cast($fieldValue, $context);
-            } catch (InvalidFieldTypeValueException $e) {
+            } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
                 throw InvalidFieldTypeValueException::createFromContext(
@@ -176,6 +183,10 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
+            if (!$this->accessor->isWritable($object, $meta)) {
+                continue;
+            }
+
             switch (true) {
                 // In case of value has been passed
                 case \array_key_exists($meta->getExportName(), $value):
@@ -193,7 +204,7 @@ class ObjectType extends AsymmetricType
 
                     try {
                         $propertyValue = $type->cast($fieldValue, $context);
-                    } catch (InvalidFieldTypeValueException $e) {
+                    } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {
                         throw InvalidFieldTypeValueException::createFromContext(

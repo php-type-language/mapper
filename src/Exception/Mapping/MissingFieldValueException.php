@@ -12,8 +12,8 @@ class MissingFieldValueException extends RuntimeException implements
     FieldExceptionInterface,
     MappingExceptionInterface
 {
-    use FieldProvider;
     use TypeProvider;
+    use FieldProvider;
 
     /**
      * @var int
@@ -29,8 +29,8 @@ class MissingFieldValueException extends RuntimeException implements
      * @param non-empty-string $field
      */
     public function __construct(
-        protected readonly TypeStatement $expected,
         protected readonly string $field,
+        protected readonly TypeStatement $expected,
         PathInterface $path,
         string $template,
         int $code = 0,
@@ -56,8 +56,8 @@ class MissingFieldValueException extends RuntimeException implements
         $template = 'Object of type {{expected}} requires missing field {{field}}';
 
         return new self(
-            expected: $expected,
             field: $field,
+            expected: $expected,
             path: $path,
             template: $template,
             code: self::CODE_ERROR_INVALID_VALUE,
@@ -75,8 +75,8 @@ class MissingFieldValueException extends RuntimeException implements
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(
-            expected: $expected,
             field: $field,
+            expected: $expected,
             path: clone $context->getPath(),
             previous: $previous,
         );

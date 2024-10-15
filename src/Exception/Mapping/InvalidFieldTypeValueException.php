@@ -7,19 +7,15 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context\LocalContext;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\Traverser;
-use TypeLang\Parser\Traverser\TypeMapVisitor;
 
 class InvalidFieldTypeValueException extends RuntimeException implements
-    FieldExceptionInterface,
     ValueExceptionInterface,
+    ObjectFieldExceptionInterface,
     MappingExceptionInterface
 {
-    use FieldProvider;
     use ValueProvider;
-    use TypeProvider {
-        TypeProvider::explain as private explainExpectedType;
-    }
+    use ObjectFieldProvider;
+    use TypeProvider;
 
     /**
      * @var int
@@ -96,17 +92,5 @@ class InvalidFieldTypeValueException extends RuntimeException implements
             path: clone $context->getPath(),
             previous: $previous,
         );
-    }
-
-    public function explain(callable $transform): self
-    {
-        $this->explainExpectedType($transform);
-
-        Traverser::through(
-            visitor: new TypeMapVisitor($transform(...)),
-            nodes: [$this->object],
-        );
-
-        return $this;
     }
 }

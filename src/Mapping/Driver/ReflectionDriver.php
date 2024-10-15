@@ -34,6 +34,24 @@ final class ReflectionDriver extends LoadableDriver
             $this->fillType($property, $metadata, $types);
             $this->fillDefaultValue($property, $metadata);
         }
+
+        $constructor = $reflection->getConstructor();
+
+        if ($constructor === null) {
+            return;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if (!$parameter->isPromoted()) {
+                continue;
+            }
+
+            $metadata = $class->getPropertyOrCreate($parameter->getName());
+
+            if ($parameter->isDefaultValueAvailable()) {
+                $metadata->setDefaultValue($parameter->getDefaultValue());
+            }
+        }
     }
 
     private function fillDefaultValue(\ReflectionProperty $property, PropertyMetadata $meta): void

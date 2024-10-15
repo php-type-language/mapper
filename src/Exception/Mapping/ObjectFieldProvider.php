@@ -10,16 +10,18 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * @internal this is an internal library trait, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Exception\Mapping
  *
- * @phpstan-require-implements MappingExceptionInterface
+ * @phpstan-require-implements ObjectFieldExceptionInterface
  *
- * @mixin MappingExceptionInterface
+ * @mixin ObjectFieldExceptionInterface
  */
-trait TypeProvider
+trait ObjectFieldProvider
 {
-    protected readonly TypeStatement $expected;
+    use FieldProvider;
 
-    public function getExpectedType(): TypeStatement
+    protected readonly TypeStatement $object;
+
+    public function getExpectedObject(): TypeStatement
     {
-        return $this->expected;
+        return $this->object;
     }
 }
