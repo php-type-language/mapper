@@ -16,8 +16,37 @@
 
 The best PHP mapper you've ever seen =)
 
-1. You can see some [examples here](/example)
-2. Full documentation in progress...
+You can see some [examples here](/example):
+
+- [01.normalization](/example/01.normalization)
+  - [01.object-normalization](/example/01.normalization/01.object-normalization.php)
+  - [02.date-normalization](/example/01.normalization/02.date-normalization.php)
+  - [03.date-format-normalization](/example/01.normalization/03.date-format-normalization.php)
+  - [04.untyped-object-normalization](/example/01.normalization/04.untyped-object-normalization.php)
+  - [05.typed-object-normalization](/example/01.normalization/05.typed-object-normalization.php)
+  - [06.inherited-types-normalization](/example/01.normalization/06.inherited-types-normalization.php)
+  - [07.collection-types-normalization](/example/01.normalization/07.collection-types-normalization.php)
+  - [08.object-output-normalization](/example/01.normalization/08.object-output-normalization.php)
+- [02.errors](/example/02.errors)
+  - [01.errors-purification](/example/02.errors/01.errors-purification.php)
+  - [02.custom-type-printer](/example/02.errors/02.custom-type-printer.php)
+  - [03.extended-type-printer](/example/02.errors/03.extended-type-printer.php)
+  - [04.custom-path-printer](/example/02.errors/04.custom-path-printer.php)
+  - [05.custom-value-printer](/example/02.errors/05.custom-value-printer.php)
+- [03.types](/example/03.types)
+  - [01.type-platforms](/example/03.types/01.type-platforms.php)
+  - [02.custom-type](/example/03.types/02.custom-type.php)
+  - [03.custom-type-template-arguments](/example/03.types/03.custom-type-template-arguments.php)
+  - [04.custom-platform](/example/03.types/04.custom-platform.php)
+- [04.mapping](/example/04.mapping)
+  - [01.reflection-mapping](/example/04.mapping/01.reflection-mapping.php)
+  - [02.attribute-mapping](/example/04.mapping/02.attribute-mapping.php)
+  - [03.driver-inheritance-mapping](/example/04.mapping/03.driver-inheritance-mapping.php)
+  - [04.phpdoc-mapping](/example/04.mapping/04.phpdoc-mapping.php)
+  - [05.phpdoc-custom-tags-mapping](/example/04.mapping/05.phpdoc-custom-tags-mapping.php)
+  - [06.cache](/example/04.mapping/06.cache.php)
+  
+> Full documentation in progress...
 
 ## Installation
 
