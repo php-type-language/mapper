@@ -66,7 +66,7 @@ class ExampleObject
 {
     public function __construct(
         #[MapProperty('list<non-empty-string>')]
-        public readonly array $name,
+        public readonly array $names,
     ) {}
 }
 
