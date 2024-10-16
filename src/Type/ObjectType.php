@@ -86,12 +86,15 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getName()));
 
+
+            // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta)) {
                 continue;
             }
 
-            $info = $meta->findTypeInfo();
 
+            // Assert that type is present
+            $info = $meta->findTypeInfo();
             if ($info === null) {
                 throw MissingFieldTypeException::createFromContext(
                     field: $meta->getName(),
@@ -99,10 +102,22 @@ class ObjectType extends AsymmetricType
                 );
             }
 
-            $type = $info->getType();
 
             $fieldValue = $this->accessor->getValue($object, $meta);
 
+
+            // Skip the property when condition is matched
+            $skip = $meta->findSkipCondition();
+            if ($skip !== null) {
+                $condition = $skip->getType();
+
+                // Skip when condition is matched
+                if ($condition->match($fieldValue, $context)) {
+                    continue;
+                }
+            }
+
+            $type = $info->getType();
             try {
                 $result[$meta->getExportName()] = $type->cast($fieldValue, $context);
             } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
@@ -183,6 +198,7 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
+            // Skip the property when not writable
             if (!$this->accessor->isWritable($object, $meta)) {
                 continue;
             }
@@ -190,6 +206,7 @@ class ObjectType extends AsymmetricType
             switch (true) {
                 // In case of value has been passed
                 case \array_key_exists($meta->getExportName(), $value):
+                    // Assert that type is present
                     $info = $meta->findTypeInfo();
 
                     if ($info === null) {
@@ -199,8 +216,8 @@ class ObjectType extends AsymmetricType
                         );
                     }
 
-                    $type = $info->getType();
                     $fieldValue = $value[$meta->getExportName()];
+                    $type = $info->getType();
 
                     try {
                         $propertyValue = $type->cast($fieldValue, $context);
