@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\MapType;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -22,7 +22,7 @@ class ChildDTO
 class ExampleDTO
 {
     public function __construct(
-        #[MapProperty('list<ChildDTO>')]
+        #[MapType('list<ChildDTO>')]
         public readonly array $children = [],
     ) {}
 }

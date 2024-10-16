@@ -20,6 +20,8 @@ final class PropertyMetadata extends Metadata
 
     private bool $hasDefaultValue = false;
 
+    private ?TypeMetadata $skipWhen = null;
+
     /**
      * @param non-empty-string $export
      */
@@ -150,6 +152,43 @@ final class PropertyMetadata extends Metadata
     public function findTypeInfo(): ?TypeMetadata
     {
         return $this->type;
+    }
+
+    /**
+     * @api
+     */
+    public function setSkipCondition(TypeMetadata $type): void
+    {
+        $this->skipWhen = $type;
+    }
+
+    /**
+     * @api
+     */
+    public function removeSkipCondition(): void
+    {
+        $this->skipWhen = null;
+    }
+
+    /**
+     * @api
+     */
+    public function hasSkipCondition(): bool
+    {
+        return $this->skipWhen !== null;
+    }
+
+    /**
+     * Note: The prefix "find" is used to indicate that the {@see TypeMetadata}
+     *       definition may be optional and method may return {@see null}.
+     *       The prefix "get" is used when the value is forced to be obtained
+     *       and should throw an exception if the type definition is missing.
+     *
+     * @api
+     */
+    public function findSkipCondition(): ?TypeMetadata
+    {
+        return $this->skipWhen;
     }
 
     /**

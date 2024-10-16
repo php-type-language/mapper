@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Parser\Node\Name;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -12,7 +12,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 class ExampleDTO
 {
     public function __construct(
-        #[MapProperty(type: 'list<ExampleDTO>')]
+        #[MapType(type: 'list<ExampleDTO>')]
         public readonly array $values = [],
     ) {}
 }

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\MapType;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -11,7 +11,7 @@ class ExampleDTO
 {
     public function __construct(
         public readonly int $value1 = 0,
-        #[MapProperty('int<min, 0>')]
+        #[MapType('int<min, 0>')]
         public readonly int $value2 = 0,
     ) {}
 }

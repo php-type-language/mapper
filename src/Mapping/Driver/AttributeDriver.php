@@ -6,9 +6,11 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\MapName;
+use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\SkipWhen;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 
 final class AttributeDriver extends LoadableDriver
@@ -17,41 +19,66 @@ final class AttributeDriver extends LoadableDriver
     protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
     {
         foreach ($reflection->getProperties() as $property) {
-            $attribute = $this->findPropertyAttribute(
-                property: $property,
-                class: MapProperty::class,
-            );
-
-            if ($attribute === null) {
-                continue;
-            }
-
             $metadata = $class->getPropertyOrCreate($property->getName());
 
-            if ($attribute->name !== null) {
+            // -----------------------------------------------------------------
+            //  Apply property type
+            // -----------------------------------------------------------------
+
+            $attribute = $this->findPropertyAttribute($property, MapType::class);
+
+            if ($attribute !== null) {
+                $type = $this->createType($attribute->type, $property, $types);
+
+                $metadata->setTypeInfo($type);
+            }
+
+            // -----------------------------------------------------------------
+            //  Apply property name
+            // -----------------------------------------------------------------
+
+            $attribute = $this->findPropertyAttribute($property, MapName::class);
+
+            if ($attribute !== null) {
                 $metadata->setExportName($attribute->name);
             }
 
-            if ($attribute->type !== null) {
-                $statement = $types->parse($attribute->type);
+            // -----------------------------------------------------------------
+            //  Apply skip condition
+            // -----------------------------------------------------------------
 
-                try {
-                    $type = $types->getByStatement($statement, $reflection);
-                } catch (TypeNotFoundException $e) {
-                    throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                        class: $class->getName(),
-                        property: $property->getName(),
-                        type: $e->getType(),
-                        previous: $e,
-                    );
-                }
+            $attribute = $this->findPropertyAttribute($property, SkipWhen::class);
 
-                $metadata->setTypeInfo(new TypeMetadata(
-                    type: $type,
-                    statement: $statement,
-                ));
+            if ($attribute !== null) {
+                $type = $this->createType($attribute->type, $property, $types);
+
+                $metadata->setSkipCondition($type);
             }
         }
+    }
+
+    /**
+     * @param non-empty-string $type
+     * @throws PropertyTypeNotFoundException
+     */
+    private function createType(string $type, \ReflectionProperty $property, RepositoryInterface $types): TypeMetadata
+    {
+        $statement = $types->parse($type);
+
+        $class = $property->getDeclaringClass();
+
+        try {
+            $instance = $types->getByStatement($statement, $class);
+        } catch (TypeNotFoundException $e) {
+            throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
+                class: $class->getName(),
+                property: $property->getName(),
+                type: $e->getType(),
+                previous: $e,
+            );
+        }
+
+        return new TypeMetadata($instance, $statement);
     }
 
     /**

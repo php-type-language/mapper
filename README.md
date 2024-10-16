@@ -102,12 +102,12 @@ Normalization: Transformation from object to raw payload (array).
 ## Quick Start
 
 ```php
-use TypeLang\Mapper\Mapping\MapProperty;
+use TypeLang\Mapper\Mapping\MapType;
 
 class ExampleObject
 {
     public function __construct(
-        #[MapProperty('list<non-empty-string>')]
+        #[MapType('list<non-empty-string>')]
         public readonly array $names,
     ) {}
 }
