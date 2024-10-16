@@ -86,12 +86,10 @@ class ObjectType extends AsymmetricType
         foreach ($this->metadata->getProperties() as $meta) {
             $context->enter(new ObjectPropertyEntry($meta->getName()));
 
-
             // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta)) {
                 continue;
             }
-
 
             // Assert that type is present
             $info = $meta->findTypeInfo();
@@ -102,9 +100,7 @@ class ObjectType extends AsymmetricType
                 );
             }
 
-
             $fieldValue = $this->accessor->getValue($object, $meta);
-
 
             // Skip the property when condition is matched
             $skip = $meta->findSkipCondition();

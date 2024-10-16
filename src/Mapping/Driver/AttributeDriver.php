@@ -59,6 +59,7 @@ final class AttributeDriver extends LoadableDriver
 
     /**
      * @param non-empty-string $type
+     *
      * @throws PropertyTypeNotFoundException
      */
     private function createType(string $type, \ReflectionProperty $property, RepositoryInterface $types): TypeMetadata
