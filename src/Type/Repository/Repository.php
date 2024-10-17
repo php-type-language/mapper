@@ -88,6 +88,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
     {
         $statement = $this->parse($type);
 
+        // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
         return $this->memory[$statement]
             ??= $this->getByStatement($statement, $class);
     }
