@@ -22,7 +22,7 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
-#[Revs(50), Warmup(5), Iterations(10), RetryThreshold(5), BeforeMethods('prepare')]
+#[Revs(50), Warmup(5), Iterations(30), RetryThreshold(5), BeforeMethods('prepare')]
 final class RawDenormalizationBench extends DenormalizationBench
 {
     public function prepare(): void
@@ -44,7 +44,6 @@ final class RawDenormalizationBench extends DenormalizationBench
         );
 
         $this->jms = (new SerializerBuilder())
-            ->enableEnumSupport()
             ->build();
 
         $this->valinor = (new MapperBuilder())

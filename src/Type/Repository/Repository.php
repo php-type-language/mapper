@@ -33,6 +33,11 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     private readonly TypeResolver $typeResolver;
 
+    /**
+     * @var \WeakMap<TypeStatement, TypeInterface>
+     */
+    private readonly \WeakMap $memory;
+
     public function __construct(
         PlatformInterface $platform = new StandardPlatform(),
         private readonly ReferencesReaderInterface $references = new NativeReferencesReader(),
@@ -40,6 +45,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         $this->typeResolver = new TypeResolver();
         $this->parser = $this->createPlatformParser($platform);
         $this->builders = $this->getTypeBuilders($platform);
+        $this->memory = new \WeakMap();
     }
 
     /**
@@ -59,7 +65,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     private function createPlatformParser(PlatformInterface $platform): ParserInterface
     {
-        return new Parser(
+        return new InMemoryCachedParser(new Parser(
             conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
             shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
             callables: $platform->isFeatureSupported(GrammarFeature::Callables),
@@ -70,7 +76,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             list: $platform->isFeatureSupported(GrammarFeature::List),
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
-        );
+        ));
     }
 
     public function parse(string $type): TypeStatement
@@ -82,7 +88,8 @@ class Repository implements RepositoryInterface, \IteratorAggregate
     {
         $statement = $this->parse($type);
 
-        return $this->getByStatement($statement, $class);
+        return $this->memory[$statement]
+            ??= $this->getByStatement($statement, $class);
     }
 
     public function getByValue(mixed $value, ?\ReflectionClass $class = null): TypeInterface

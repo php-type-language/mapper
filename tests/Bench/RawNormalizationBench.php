@@ -24,7 +24,7 @@ use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(50), Warmup(5), Iterations(10), RetryThreshold(5), BeforeMethods('prepare')]
+#[Revs(50), Warmup(5), Iterations(30), RetryThreshold(5), BeforeMethods('prepare')]
 final class RawNormalizationBench extends NormalizationBench
 {
     public function prepare(): void
@@ -68,7 +68,6 @@ final class RawNormalizationBench extends NormalizationBench
         );
 
         $this->jms = (new SerializerBuilder())
-            ->enableEnumSupport()
             ->build();
 
         $this->valinor = (new MapperBuilder())
