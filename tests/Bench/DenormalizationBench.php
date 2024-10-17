@@ -6,34 +6,14 @@ namespace TypeLang\Mapper\Tests\Bench;
 
 use CuyZ\Valinor\Mapper\Source\Source;
 use CuyZ\Valinor\Mapper\TreeMapper;
-use CuyZ\Valinor\MapperBuilder;
 use JMS\Serializer\ArrayTransformerInterface;
-use JMS\Serializer\SerializerBuilder;
-use PhpBench\Attributes\BeforeMethods;
-use PhpBench\Attributes\Iterations;
-use PhpBench\Attributes\RetryThreshold;
-use PhpBench\Attributes\Revs;
-use PhpBench\Attributes\Warmup;
-use PHPUnit\Framework\Assert;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\PropertyInfo\Extractor\PhpStanExtractor;
-use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface as SymfonyDenormalizerInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use TypeLang\Mapper\DenormalizerInterface as TypeLangDenormalizerInterface;
-use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
-use TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
-use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
-use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(50), Warmup(5), Iterations(20), RetryThreshold(5)]
-#[BeforeMethods('prepare')]
-final class DenormalizationBench implements BenchInterface
+abstract class DenormalizationBench implements BenchInterface
 {
-    private const PAYLOAD = [
+    protected const PAYLOAD = [
         'name' => 'Example1',
         'items' => [
             [
@@ -55,53 +35,17 @@ final class DenormalizationBench implements BenchInterface
         ],
     ];
 
-    private readonly TypeLangDenormalizerInterface $typeLangDocBlock;
+    protected TypeLangDenormalizerInterface $typeLangDocBlock;
 
-    private readonly TypeLangDenormalizerInterface $typeLangAttributes;
+    protected TypeLangDenormalizerInterface $typeLangAttributes;
 
-    private readonly ArrayTransformerInterface $jms;
+    protected ArrayTransformerInterface $jms;
 
-    private readonly TreeMapper $valinor;
+    protected TreeMapper $valinor;
 
-    private readonly SymfonyDenormalizerInterface $symfonyPhpStan;
+    protected SymfonyDenormalizerInterface $symfonyPhpStan;
 
-    private readonly SymfonyDenormalizerInterface $symfonyDocBlock;
-
-    public function prepare(): void
-    {
-        $this->typeLangDocBlock = new Mapper(
-            platform: new StandardPlatform(
-                driver: new DocBlockDriver(
-                    delegate: new ReflectionDriver(),
-                ),
-            ),
-        );
-
-        $this->typeLangAttributes = new Mapper(
-            platform: new StandardPlatform(
-                driver: new AttributeDriver(
-                    delegate: new ReflectionDriver(),
-                ),
-            ),
-        );
-
-        $this->jms = (new SerializerBuilder())
-            ->enableEnumSupport()
-            ->build();
-
-        $this->valinor = (new MapperBuilder())
-            ->mapper();
-
-        $this->symfonyPhpStan = (new Serializer([
-            new ArrayDenormalizer(),
-            new ObjectNormalizer(propertyTypeExtractor: new PhpStanExtractor()),
-        ]));
-
-        $this->symfonyDocBlock = (new Serializer([
-            new ArrayDenormalizer(),
-            new ObjectNormalizer(propertyTypeExtractor: new PhpDocExtractor()),
-        ]));
-    }
+    protected SymfonyDenormalizerInterface $symfonyDocBlock;
 
     public function benchJmsWithAttributes(): void
     {

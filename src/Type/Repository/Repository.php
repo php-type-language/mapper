@@ -12,7 +12,6 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\InMemoryCachedParser;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -60,7 +59,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
 
     private function createPlatformParser(PlatformInterface $platform): ParserInterface
     {
-        return new InMemoryCachedParser(new Parser(
+        return new Parser(
             conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
             shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
             callables: $platform->isFeatureSupported(GrammarFeature::Callables),
@@ -71,7 +70,7 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             list: $platform->isFeatureSupported(GrammarFeature::List),
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
-        ));
+        );
     }
 
     public function parse(string $type): TypeStatement
@@ -127,8 +126,25 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             static function (Name $name) use ($class): ?Name {
                 $namespace = $class->getNamespaceName();
 
+                // Replace "namespace\ClassName" sequences to current
+                // namespace of the class.
+                if (!$name->isSimple()) {
+                    $first = $name->getFirstPart();
+
+                    if ($first->toLowerString() === 'namespace') {
+                        // Return name AS IS in case of namespace is global
+                        if ($namespace === '') {
+                            return $name->slice(1);
+                        }
+
+                        return (new Name($namespace))
+                            ->withAdded($name->slice(1));
+                    }
+                }
+
                 if ($namespace !== '' && self::entryExists($namespace . '\\' . $name->toString())) {
-                    return (new Name($namespace))->withAdded($name);
+                    return (new Name($namespace))
+                        ->withAdded($name);
                 }
 
                 return null;

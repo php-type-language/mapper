@@ -17,7 +17,13 @@ abstract class LoadableDriver extends Driver
     /**
      * @var array<class-string, ClassMetadata<object>>
      */
-    private array $metadata = [];
+    private static array $metadata = [];
+
+    public function __construct(
+        DriverInterface $delegate = new NullDriver(),
+    ) {
+        parent::__construct($delegate);
+    }
 
     /**
      * @template TArg of object
@@ -25,21 +31,24 @@ abstract class LoadableDriver extends Driver
      * @param \ReflectionClass<TArg> $class
      *
      * @return ClassMetadata<TArg>
-     * @throws DefinitionException in case of type cannot be defined
      * @throws \Throwable in case of internal error occurred
      */
     public function getClassMetadata(\ReflectionClass $class, RepositoryInterface $types): ClassMetadata
     {
-        if (isset($this->metadata[$class->getName()])) {
+        if (isset(self::$metadata[$class->getName()])) {
             /** @var ClassMetadata<TArg> */
-            return $this->metadata[$class->getName()];
+            return self::$metadata[$class->getName()];
         }
 
-        $this->metadata[$class->getName()] = $metadata = parent::getClassMetadata($class, $types);
+        self::$metadata[$class->getName()] = $metadata = parent::getClassMetadata($class, $types);
 
         $this->load($class, $metadata, $types);
 
-        return $metadata;
+        try {
+            return $metadata;
+        } finally {
+            self::$metadata = [];
+        }
     }
 
     /**
