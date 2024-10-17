@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
+use TypeLang\Mapper\Mapping\Driver\InMemoryCachedDriver;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 
 abstract class Platform implements PlatformInterface
@@ -14,7 +15,9 @@ abstract class Platform implements PlatformInterface
 
     public function __construct(?DriverInterface $driver = null)
     {
-        $this->driver = $driver ?? $this->createDefaultMetadataDriver();
+        $this->driver = new InMemoryCachedDriver(
+            delegate: $driver ?? $this->createDefaultMetadataDriver(),
+        );
     }
 
     protected function createDefaultMetadataDriver(): DriverInterface
