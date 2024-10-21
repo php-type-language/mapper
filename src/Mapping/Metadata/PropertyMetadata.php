@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -40,7 +40,7 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(ContextInterface $context): ?TypeStatement
+    public function getTypeStatement(Context $context): ?TypeStatement
     {
         $info = $this->findTypeInfo();
 
@@ -62,7 +62,7 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getFieldNode(ContextInterface $context): ?NamedFieldNode
+    public function getFieldNode(Context $context): ?NamedFieldNode
     {
         $statement = $this->getTypeStatement($context);
 

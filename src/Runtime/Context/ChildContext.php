@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Context;
 
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
@@ -14,9 +14,9 @@ use TypeLang\Mapper\Runtime\Repository\Repository;
 final class ChildContext extends Context
 {
     public function __construct(
-        private readonly ContextInterface $parent,
+        private readonly Context $parent,
         private readonly EntryInterface $entry,
-        Direction $direction,
+        DirectionInterface $direction,
         Repository $types,
         ConfigurationInterface $config,
     ) {
@@ -28,7 +28,7 @@ final class ChildContext extends Context
     }
 
     /**
-     * @return iterable<array-key, ContextInterface>
+     * @return iterable<array-key, Context>
      */
     private function getStack(): iterable
     {

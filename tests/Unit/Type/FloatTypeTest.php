@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\FloatType;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -17,7 +17,7 @@ final class FloatTypeTest extends TypeTestCase
         return new FloatType();
     }
 
-    protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String => $this->expectCastIfNonStrict(1.0, $ctx),

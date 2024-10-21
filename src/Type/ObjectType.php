@@ -14,7 +14,7 @@ use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -31,12 +31,12 @@ class ObjectType extends AsymmetricType
         private readonly PropertyAccessorInterface $accessor,
     ) {}
 
-    public function getTypeStatement(ContextInterface $context): TypeStatement
+    public function getTypeStatement(Context $context): TypeStatement
     {
         return $this->metadata->getTypeStatement($context);
     }
 
-    protected function isNormalizable(mixed $value, ContextInterface $context): bool
+    protected function isNormalizable(mixed $value, Context $context): bool
     {
         $class = $this->metadata->getName();
 
@@ -48,7 +48,7 @@ class ObjectType extends AsymmetricType
      * @throws InvalidValueException
      * @throws \Throwable
      */
-    public function normalize(mixed $value, ContextInterface $context): object|array
+    public function normalize(mixed $value, Context $context): object|array
     {
         $className = $this->metadata->getName();
 
@@ -77,7 +77,7 @@ class ObjectType extends AsymmetricType
      * @return array<non-empty-string, mixed>
      * @throws \Throwable in case of object's property is not accessible
      */
-    protected function normalizeObject(object $object, ContextInterface $context): array
+    protected function normalizeObject(object $object, Context $context): array
     {
         $result = [];
 
@@ -131,7 +131,7 @@ class ObjectType extends AsymmetricType
         return $result;
     }
 
-    protected function isDenormalizable(mixed $value, ContextInterface $context): bool
+    protected function isDenormalizable(mixed $value, Context $context): bool
     {
         return \is_object($value) || \is_array($value);
     }
@@ -142,7 +142,7 @@ class ObjectType extends AsymmetricType
      * @throws MissingFieldValueException
      * @throws \Throwable in case of object's property is not accessible
      */
-    public function denormalize(mixed $value, ContextInterface $context): object
+    public function denormalize(mixed $value, Context $context): object
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -183,7 +183,7 @@ class ObjectType extends AsymmetricType
      * @throws MissingFieldValueException
      * @throws \Throwable in case of object's property is not accessible
      */
-    private function denormalizeObject(array $value, object $object, ContextInterface $context): void
+    private function denormalizeObject(array $value, object $object, Context $context): void
     {
         foreach ($this->metadata->getProperties() as $meta) {
             $entrance = $context->enter(new ObjectPropertyEntry($meta->getExportName()));

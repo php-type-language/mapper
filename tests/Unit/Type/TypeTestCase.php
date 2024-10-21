@@ -11,7 +11,7 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Runtime\RootContext;
 use TypeLang\Mapper\Tests\Unit\TestCase;
@@ -34,19 +34,19 @@ abstract class TypeTestCase extends TestCase
 
     abstract protected function getType(): TypeInterface;
 
-    abstract protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed;
+    abstract protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed;
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
+    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return $this->getCastExpectation($value, $type, $ctx);
     }
 
-    protected function getDenormalizationExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
+    protected function getDenormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return $this->getCastExpectation($value, $type, $ctx);
     }
 
-    protected function expectCastIfNonStrict(mixed $expected, ContextInterface $ctx): mixed
+    protected function expectCastIfNonStrict(mixed $expected, Context $ctx): mixed
     {
         $this->expectException(RuntimeException::class);
 
@@ -147,14 +147,14 @@ abstract class TypeTestCase extends TestCase
         }
     }
 
-    protected function normalize(mixed $value, ContextInterface $context): mixed
+    protected function normalize(mixed $value, Context $context): mixed
     {
         $type = $this->getType();
 
         return $type->cast($value, $context);
     }
 
-    protected function denormalize(mixed $value, ContextInterface $context): mixed
+    protected function denormalize(mixed $value, Context $context): mixed
     {
         $type = $this->getType();
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -17,7 +17,7 @@ final class IntTypeTest extends TypeTestCase
         return new IntType();
     }
 
-    protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
     {
         return match ($type) {
             ValueType::String => $this->expectCastIfNonStrict(1, $ctx),
