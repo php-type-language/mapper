@@ -10,10 +10,14 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
+use TypeLang\Mapper\Runtime\EvolvableConfigurationInterface;
 use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class Mapper implements NormalizerInterface, DenormalizerInterface
+final class Mapper implements
+    NormalizerInterface,
+    DenormalizerInterface,
+    EvolvableConfigurationInterface
 {
     private readonly Repository $types;
 
@@ -24,11 +28,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         $this->types = new Repository($this->platform);
     }
 
-    /**
-     * @api
-     *
-     * @see Configuration::withObjectsAsArrays()
-     */
     public function withObjectsAsArrays(?bool $enabled = null): self
     {
         $self = clone $this;
@@ -37,11 +36,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $self;
     }
 
-    /**
-     * @api
-     *
-     * @see Configuration::withDetailedTypes()
-     */
     public function withDetailedTypes(?bool $enabled = null): self
     {
         $self = clone $this;
