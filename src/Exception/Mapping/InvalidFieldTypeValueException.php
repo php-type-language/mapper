@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Runtime\ContextInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class InvalidFieldTypeValueException extends RuntimeException implements
@@ -81,7 +81,7 @@ class InvalidFieldTypeValueException extends RuntimeException implements
         mixed $value,
         TypeStatement $expected,
         TypeStatement $object,
-        Context $context,
+        ContextInterface $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

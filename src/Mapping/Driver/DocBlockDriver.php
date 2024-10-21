@@ -12,7 +12,7 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\Parser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
@@ -114,7 +114,7 @@ final class DocBlockDriver extends LoadableDriver
         return $this->classProperties->findType($property);
     }
 
-    protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
+    protected function load(\ReflectionClass $reflection, ClassMetadata $class, Repository $types): void
     {
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());

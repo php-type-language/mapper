@@ -12,9 +12,9 @@ use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Runtime\ContextInterface;
 use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -31,12 +31,12 @@ class ObjectType extends AsymmetricType
         private readonly PropertyAccessorInterface $accessor,
     ) {}
 
-    public function getTypeStatement(Context $context): TypeStatement
+    public function getTypeStatement(ContextInterface $context): TypeStatement
     {
         return $this->metadata->getTypeStatement($context);
     }
 
-    protected function isNormalizable(mixed $value, Context $context): bool
+    protected function isNormalizable(mixed $value, ContextInterface $context): bool
     {
         $class = $this->metadata->getName();
 
@@ -48,7 +48,7 @@ class ObjectType extends AsymmetricType
      * @throws InvalidValueException
      * @throws \Throwable
      */
-    public function normalize(mixed $value, Context $context): object|array
+    public function normalize(mixed $value, ContextInterface $context): object|array
     {
         $className = $this->metadata->getName();
 
@@ -60,11 +60,9 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        $context->enter(new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter(new ObjectEntry($this->metadata->getName()));
 
-        $result = $this->normalizeObject($value, $context);
-
-        $context->leave();
+        $result = $this->normalizeObject($value, $entrance);
 
         if ($context->isObjectsAsArrays()) {
             return $result;
@@ -79,12 +77,12 @@ class ObjectType extends AsymmetricType
      * @return array<non-empty-string, mixed>
      * @throws \Throwable in case of object's property is not accessible
      */
-    protected function normalizeObject(object $object, Context $context): array
+    protected function normalizeObject(object $object, ContextInterface $context): array
     {
         $result = [];
 
         foreach ($this->metadata->getProperties() as $meta) {
-            $context->enter(new ObjectPropertyEntry($meta->getName()));
+            $entrance = $context->enter(new ObjectPropertyEntry($meta->getName()));
 
             // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta)) {
@@ -96,7 +94,7 @@ class ObjectType extends AsymmetricType
             if ($info === null) {
                 throw MissingFieldTypeException::createFromContext(
                     field: $meta->getName(),
-                    context: $context,
+                    context: $entrance,
                 );
             }
 
@@ -108,14 +106,14 @@ class ObjectType extends AsymmetricType
                 $condition = $skip->getType();
 
                 // Skip when condition is matched
-                if ($condition->match($fieldValue, $context)) {
+                if ($condition->match($fieldValue, $entrance)) {
                     continue;
                 }
             }
 
             $type = $info->getType();
             try {
-                $result[$meta->getExportName()] = $type->cast($fieldValue, $context);
+                $result[$meta->getExportName()] = $type->cast($fieldValue, $entrance);
             } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
@@ -123,19 +121,17 @@ class ObjectType extends AsymmetricType
                     field: $meta->getExportName(),
                     value: $fieldValue,
                     expected: $info->getTypeStatement(),
-                    object: $this->metadata->getTypeStatement($context),
-                    context: $context,
+                    object: $this->metadata->getTypeStatement($entrance),
+                    context: $entrance,
                     previous: $e,
                 );
             }
-
-            $context->leave();
         }
 
         return $result;
     }
 
-    protected function isDenormalizable(mixed $value, Context $context): bool
+    protected function isDenormalizable(mixed $value, ContextInterface $context): bool
     {
         return \is_object($value) || \is_array($value);
     }
@@ -146,7 +142,7 @@ class ObjectType extends AsymmetricType
      * @throws MissingFieldValueException
      * @throws \Throwable in case of object's property is not accessible
      */
-    public function denormalize(mixed $value, Context $context): object
+    public function denormalize(mixed $value, ContextInterface $context): object
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -160,13 +156,11 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        $context->enter(new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter(new ObjectEntry($this->metadata->getName()));
 
         $instance = $this->createInstance();
 
-        $this->denormalizeObject($value, $instance, $context);
-
-        $context->leave();
+        $this->denormalizeObject($value, $instance, $entrance);
 
         return $instance;
     }
@@ -189,10 +183,10 @@ class ObjectType extends AsymmetricType
      * @throws MissingFieldValueException
      * @throws \Throwable in case of object's property is not accessible
      */
-    private function denormalizeObject(array $value, object $object, Context $context): void
+    private function denormalizeObject(array $value, object $object, ContextInterface $context): void
     {
         foreach ($this->metadata->getProperties() as $meta) {
-            $context->enter(new ObjectPropertyEntry($meta->getExportName()));
+            $entrance = $context->enter(new ObjectPropertyEntry($meta->getExportName()));
 
             // Skip the property when not writable
             if (!$this->accessor->isWritable($object, $meta)) {
@@ -208,7 +202,7 @@ class ObjectType extends AsymmetricType
                     if ($info === null) {
                         throw MissingFieldTypeException::createFromContext(
                             field: $meta->getExportName(),
-                            context: $context,
+                            context: $entrance,
                         );
                     }
 
@@ -216,7 +210,7 @@ class ObjectType extends AsymmetricType
                     $type = $info->getType();
 
                     try {
-                        $propertyValue = $type->cast($fieldValue, $context);
+                        $propertyValue = $type->cast($fieldValue, $entrance);
                     } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {
@@ -224,8 +218,8 @@ class ObjectType extends AsymmetricType
                             field: $meta->getExportName(),
                             value: $fieldValue,
                             expected: $info->getTypeStatement(),
-                            object: $this->metadata->getTypeStatement($context),
-                            context: $context,
+                            object: $this->metadata->getTypeStatement($entrance),
+                            context: $entrance,
                             previous: $e,
                         );
                     }
@@ -238,15 +232,13 @@ class ObjectType extends AsymmetricType
 
                 default:
                     throw MissingFieldValueException::createFromContext(
-                        expected: $this->getTypeStatement($context),
+                        expected: $this->getTypeStatement($entrance),
                         field: $meta->getExportName(),
-                        context: $context,
+                        context: $entrance,
                     );
             }
 
             $this->accessor->setValue($object, $meta, $propertyValue);
-
-            $context->leave();
         }
     }
 }

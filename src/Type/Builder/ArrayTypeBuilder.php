@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\ArrayType;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -18,7 +18,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class ArrayTypeBuilder extends NamedTypeBuilder
 {
-    public function build(TypeStatement $statement, RepositoryInterface $types): ArrayType
+    public function build(TypeStatement $statement, Repository $types): ArrayType
     {
         $this->expectNoShapeFields($statement);
 
@@ -41,7 +41,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
      */
-    private function buildByKeyValue(NamedTypeNode $statement, RepositoryInterface $types): ArrayType
+    private function buildByKeyValue(NamedTypeNode $statement, Repository $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 
@@ -66,7 +66,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    private function buildByValue(NamedTypeNode $statement, RepositoryInterface $types): ArrayType
+    private function buildByValue(NamedTypeNode $statement, Repository $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 

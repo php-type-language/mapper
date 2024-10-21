@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -44,7 +44,7 @@ final class ClassMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(Context $context): TypeStatement
+    public function getTypeStatement(ContextInterface $context): TypeStatement
     {
         if (!$context->isDetailedTypes()) {
             return new NamedTypeNode($this->getName());

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class IntType implements TypeInterface
 {
@@ -18,7 +18,7 @@ class IntType implements TypeInterface
         protected readonly bool $userDefinedRange = true,
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         return \is_int($value)
             && $value >= $this->min
@@ -30,7 +30,7 @@ class IntType implements TypeInterface
      *
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, Context $context): int
+    public function cast(mixed $value, ContextInterface $context): int
     {
         if (!\is_int($value) || $value > $this->max || $value < $this->min) {
             throw InvalidValueException::createFromContext(

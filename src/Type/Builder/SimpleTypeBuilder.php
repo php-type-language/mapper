@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -24,7 +24,7 @@ class SimpleTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface
+    public function build(TypeStatement $statement, Repository $types): TypeInterface
     {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);

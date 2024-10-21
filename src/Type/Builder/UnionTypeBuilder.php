@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\UnionType;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
@@ -19,7 +19,7 @@ class UnionTypeBuilder implements TypeBuilderInterface
         return $statement instanceof UnionTypeNode;
     }
 
-    public function build(TypeStatement $statement, RepositoryInterface $types): UnionType
+    public function build(TypeStatement $statement, Repository $types): UnionType
     {
         $result = [];
 

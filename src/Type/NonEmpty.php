@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class NonEmpty implements TypeInterface
 {
@@ -19,7 +19,7 @@ class NonEmpty implements TypeInterface
         return $value === '' || $value === [] || $value === null;
     }
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         return !$this->isEmpty($value)
             && $this->type->match($value, $context);
@@ -30,7 +30,7 @@ class NonEmpty implements TypeInterface
      * @throws RuntimeExceptionInterface
      * @throws \Throwable
      */
-    public function cast(mixed $value, Context $context): mixed
+    public function cast(mixed $value, ContextInterface $context): mixed
     {
         if (!$this->isEmpty($value)) {
             return $this->type->cast($value, $context);

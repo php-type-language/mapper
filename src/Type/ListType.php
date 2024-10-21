@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class ListType implements TypeInterface
 {
@@ -16,7 +16,7 @@ class ListType implements TypeInterface
         private readonly TypeInterface $type = new MixedType(),
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         return \is_array($value) && \array_is_list($value);
     }
@@ -28,7 +28,7 @@ class ListType implements TypeInterface
      * @throws RuntimeExceptionInterface
      * @throws \Throwable
      */
-    public function cast(mixed $value, Context $context): array
+    public function cast(mixed $value, ContextInterface $context): array
     {
         if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext(
@@ -40,11 +40,9 @@ class ListType implements TypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $context->enter(new ArrayIndexEntry($index));
+            $entrance = $context->enter(new ArrayIndexEntry($index));
 
-            $result[] = $this->type->cast($item, $context);
-
-            $context->leave();
+            $result[] = $this->type->cast($item, $entrance);
         }
 
         return $result;

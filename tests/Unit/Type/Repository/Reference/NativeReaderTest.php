@@ -6,11 +6,11 @@ namespace TypeLang\Mapper\Tests\Unit\Type\Repository\Reference;
 
 use PHPUnit\Framework\Attributes\Before;
 use PHPUnit\Framework\Attributes\Group;
+use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Tests\Unit\Type\Repository\Reference\Stub\ClassWithGroupUsesStub;
 use TypeLang\Mapper\Tests\Unit\Type\Repository\Reference\Stub\MultipleNamespacesClassStub;
 use TypeLang\Mapper\Tests\Unit\Type\Repository\Reference\Stub\SimpleClassStub;
-use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
-use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 
 #[Group('unit'), Group('type-lang/mapper')]
 final class NativeReaderTest extends ReferenceTestCase

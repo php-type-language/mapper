@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type\Repository\Reference;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
+use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
 
 #[Group('unit'), Group('type-lang/mapper')]
 final class InterfaceCompatibilityTest extends ReferenceTestCase

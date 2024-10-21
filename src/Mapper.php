@@ -10,14 +10,13 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Type\Repository\Repository;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\RootContext;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
-    private readonly RepositoryInterface $types;
+    private readonly Repository $types;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
@@ -67,7 +66,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      *
      * @api
      */
-    public function getTypes(): RepositoryInterface
+    public function getTypes(): Repository
     {
         return $this->types;
     }
@@ -81,7 +80,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->cast($value, new Context(
+        return $instance->cast($value, new RootContext(
             direction: Direction::Normalize,
             types: $this->types,
             config: $this->config,
@@ -90,12 +89,13 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @throws TypeNotFoundException
+     * @throws \Throwable
      */
     public function isNormalizable(mixed $value, ?string $type = null): bool
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->match($value, new Context(
+        return $instance->match($value, new RootContext(
             direction: Direction::Normalize,
             types: $this->types,
             config: $this->config,
@@ -111,7 +111,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->cast($value, new Context(
+        return $instance->cast($value, new RootContext(
             direction: Direction::Denormalize,
             types: $this->types,
             config: $this->config,
@@ -120,12 +120,13 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @throws TypeNotFoundException
+     * @throws \Throwable
      */
     public function isDenormalizable(mixed $value, string $type): bool
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->match($value, new Context(
+        return $instance->match($value, new RootContext(
             direction: Direction::Denormalize,
             types: $this->types,
             config: $this->config,
@@ -136,6 +137,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @param non-empty-string|null $type
      *
      * @throws TypeNotFoundException
+     * @throws \Throwable
      */
     private function getType(mixed $value, ?string $type): TypeInterface
     {
@@ -144,14 +146,5 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         }
 
         return $this->types->getByType($type);
-    }
-
-    private function createLocalContext(Direction $direction): Context
-    {
-        return new Context(
-            direction: $direction,
-            types: $this->types,
-            config: $this->config,
-        );
     }
 }

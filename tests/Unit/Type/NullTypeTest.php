@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 use TypeLang\Mapper\Type\NullType;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -18,7 +17,7 @@ final class NullTypeTest extends TypeTestCase
         return new NullType();
     }
 
-    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
     {
         return match ($type) {
             ValueType::String,

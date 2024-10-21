@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class FloatLiteralType extends FloatType
 {
@@ -14,7 +14,7 @@ class FloatLiteralType extends FloatType
     ) {}
 
     #[\Override]
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         return $value === (float) $this->value;
     }
@@ -23,7 +23,7 @@ class FloatLiteralType extends FloatType
      * @throws InvalidValueException
      */
     #[\Override]
-    public function cast(mixed $value, Context $context): float
+    public function cast(mixed $value, ContextInterface $context): float
     {
         if ($this->match($value, $context)) {
             /** @var float */

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Repository;
+namespace TypeLang\Mapper\Runtime\Repository;
 
 use JetBrains\PhpStorm\Language;
 use Phplrt\Contracts\Source\SourceExceptionInterface;

@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class ArrayType implements TypeInterface
 {
@@ -29,23 +29,21 @@ class ArrayType implements TypeInterface
         $this->isValuePassed = $value !== null;
     }
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         if (!\is_array($value)) {
             return false;
         }
 
         foreach ($value as $key => $item) {
-            $context->enter(new ArrayIndexEntry($key));
+            $entrance = $context->enter(new ArrayIndexEntry($key));
 
-            $isValidItem = $this->key->match($key, $context)
-                && $this->value->match($value, $context);
+            $isValidItem = $this->key->match($key, $entrance)
+                && $this->value->match($value, $entrance);
 
             if (!$isValidItem) {
                 return false;
             }
-
-            $context->leave();
         }
 
         return true;
@@ -58,7 +56,7 @@ class ArrayType implements TypeInterface
      * @throws \Throwable
      * @throws RuntimeExceptionInterface
      */
-    public function cast(mixed $value, Context $context): array
+    public function cast(mixed $value, ContextInterface $context): array
     {
         if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext(
@@ -70,12 +68,10 @@ class ArrayType implements TypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $context->enter(new ArrayIndexEntry($index));
+            $entrance = $context->enter(new ArrayIndexEntry($index));
 
-            $result[$this->key->cast($index, $context)]
-                = $this->value->cast($item, $context);
-
-            $context->leave();
+            $result[$this->key->cast($index, $entrance)]
+                = $this->value->cast($item, $entrance);
         }
 
         return $result;

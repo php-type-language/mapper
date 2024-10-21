@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\NullType;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -25,7 +25,7 @@ class NullTypeBuilder extends Builder
             && $statement->name->toLowerString() === 'null';
     }
 
-    public function build(TypeStatement $statement, RepositoryInterface $types): NullType
+    public function build(TypeStatement $statement, Repository $types): NullType
     {
         /** @var NamedTypeNode|NullLiteralNode $statement : PhpStorm autocomplete */
         if ($statement instanceof NullLiteralNode) {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
@@ -20,7 +20,7 @@ final class MixedTypeTest extends TypeTestCase
         return new MixedType();
     }
 
-    protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
     {
         return match ($type) {
             ValueType::String,

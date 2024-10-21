@@ -11,20 +11,20 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\RootContext;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\UnitEnum;
-use TypeLang\Mapper\Type\Repository\Repository;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly RepositoryInterface $types;
+    protected readonly Repository $types;
 
     #[Before]
     protected function setUpDefaultRegistry(): void
@@ -34,19 +34,19 @@ abstract class TypeTestCase extends TestCase
 
     abstract protected function getType(): TypeInterface;
 
-    abstract protected function getCastExpectation(mixed $value, ValueType $type, Context $ctx): mixed;
+    abstract protected function getCastExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed;
 
-    protected function getNormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getNormalizationExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
     {
         return $this->getCastExpectation($value, $type, $ctx);
     }
 
-    protected function getDenormalizationExpectation(mixed $value, ValueType $type, Context $ctx): mixed
+    protected function getDenormalizationExpectation(mixed $value, ValueType $type, ContextInterface $ctx): mixed
     {
         return $this->getCastExpectation($value, $type, $ctx);
     }
 
-    protected function expectCastIfNonStrict(mixed $expected, Context $ctx): mixed
+    protected function expectCastIfNonStrict(mixed $expected, ContextInterface $ctx): mixed
     {
         $this->expectException(RuntimeException::class);
 
@@ -109,7 +109,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testNormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = new Context(Direction::Normalize, $this->types, $config);
+        $local = new RootContext(Direction::Normalize, $this->types, $config);
 
         $expected = $this->getNormalizationExpectation($value, $type, $local);
 
@@ -121,7 +121,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testDenormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = new Context(Direction::Denormalize, $this->types, $config);
+        $local = new RootContext(Direction::Denormalize, $this->types, $config);
 
         $expected = $this->getDenormalizationExpectation($value, $type, $local);
 
@@ -147,14 +147,14 @@ abstract class TypeTestCase extends TestCase
         }
     }
 
-    protected function normalize(mixed $value, Context $context): mixed
+    protected function normalize(mixed $value, ContextInterface $context): mixed
     {
         $type = $this->getType();
 
         return $type->cast($value, $context);
     }
 
-    protected function denormalize(mixed $value, Context $context): mixed
+    protected function denormalize(mixed $value, ContextInterface $context): mixed
     {
         $type = $this->getType();
 

@@ -2,16 +2,17 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\Repository;
+namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\Repository\Reference\NativeReferencesReader;
-use TypeLang\Mapper\Type\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Exception\ParserExceptionInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -22,7 +23,7 @@ use TypeLang\Parser\TypeResolver;
 /**
  * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
  */
-class Repository implements RepositoryInterface, \IteratorAggregate
+final class Repository implements \IteratorAggregate, \Countable
 {
     /**
      * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>
@@ -79,11 +80,24 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         ));
     }
 
+    /**
+     * @param non-empty-string $type
+     *
+     * @throws ParserExceptionInterface
+     * @throws \Throwable
+     */
     public function parse(string $type): TypeStatement
     {
         return $this->parser->parse($type);
     }
 
+    /**
+     * @param non-empty-string $type
+     * @param \ReflectionClass<object>|null $context
+     *
+     * @throws TypeNotFoundException in case of type cannot be loaded
+     * @throws \Throwable
+     */
     public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parse($type);
@@ -93,14 +107,26 @@ class Repository implements RepositoryInterface, \IteratorAggregate
             ??= $this->getByStatement($statement, $context);
     }
 
+    /**
+     * @param \ReflectionClass<object>|null $context
+     *
+     * @throws TypeNotFoundException in case of type cannot be loaded
+     * @throws \Throwable
+     */
     public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         // @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
         $statement = new NamedTypeNode(\get_debug_type($value));
 
-        return $this->getByStatement($statement);
+        return $this->getByStatement($statement, $context);
     }
 
+    /**
+     * @param \ReflectionClass<object>|null $context
+     *
+     * @throws TypeNotFoundException in case of type cannot be loaded
+     * @throws \Throwable
+     */
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         if ($context !== null) {

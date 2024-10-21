@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class ClassStringType implements TypeInterface
 {
@@ -16,7 +16,7 @@ class ClassStringType implements TypeInterface
         private readonly ?string $class = null,
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         $isValidString = $value !== '' && \is_string($value);
 
@@ -34,7 +34,7 @@ class ClassStringType implements TypeInterface
     /**
      * @throws InvalidValueException
      */
-    public function cast(mixed $value, Context $context): string
+    public function cast(mixed $value, ContextInterface $context): string
     {
         if ($this->match($value, $context)) {
             /** @var class-string */

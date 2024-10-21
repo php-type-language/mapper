@@ -11,12 +11,12 @@ use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\SkipWhen;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 
 final class AttributeDriver extends LoadableDriver
 {
     #[\Override]
-    protected function load(\ReflectionClass $reflection, ClassMetadata $class, RepositoryInterface $types): void
+    protected function load(\ReflectionClass $reflection, ClassMetadata $class, Repository $types): void
     {
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());
@@ -62,7 +62,7 @@ final class AttributeDriver extends LoadableDriver
      *
      * @throws PropertyTypeNotFoundException
      */
-    private function createType(string $type, \ReflectionProperty $property, RepositoryInterface $types): TypeMetadata
+    private function createType(string $type, \ReflectionProperty $property, Repository $types): TypeMetadata
     {
         $statement = $types->parse($type);
 

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
 
 class BackedEnumType extends AsymmetricType
 {
@@ -18,7 +18,7 @@ class BackedEnumType extends AsymmetricType
         private readonly TypeInterface $type,
     ) {}
 
-    protected function isNormalizable(mixed $value, Context $context): bool
+    protected function isNormalizable(mixed $value, ContextInterface $context): bool
     {
         return $value instanceof $this->class;
     }
@@ -29,7 +29,7 @@ class BackedEnumType extends AsymmetricType
      *
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, Context $context): int|string
+    public function normalize(mixed $value, ContextInterface $context): int|string
     {
         if (!$value instanceof $this->class) {
             throw InvalidValueException::createFromContext(
@@ -45,7 +45,7 @@ class BackedEnumType extends AsymmetricType
      * @throws \Throwable
      * @throws RuntimeExceptionInterface
      */
-    protected function isDenormalizable(mixed $value, Context $context): bool
+    protected function isDenormalizable(mixed $value, ContextInterface $context): bool
     {
         $isSupportsType = $this->type->match($value, $context);
 
@@ -70,7 +70,7 @@ class BackedEnumType extends AsymmetricType
      * @throws RuntimeExceptionInterface
      * @throws \Throwable
      */
-    public function denormalize(mixed $value, Context $context): \BackedEnum
+    public function denormalize(mixed $value, ContextInterface $context): \BackedEnum
     {
         $denormalized = $this->type->cast($value, $context);
 

@@ -6,9 +6,9 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\ContextInterface;
+use TypeLang\Mapper\Runtime\Repository\Repository;
 use TypeLang\Mapper\Type\Builder\Builder;
-use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -25,7 +25,7 @@ class MyNonEmptyTypeBuilder extends Builder
             && $statement->name->toLowerString() === 'non-empty';
     }
 
-    public function build(TypeStatement $statement, RepositoryInterface $types): TypeInterface
+    public function build(TypeStatement $statement, Repository $types): TypeInterface
     {
         // Shape fields not allowed (like: "non-empty{...}")
         $this->expectNoShapeFields($statement);
@@ -48,12 +48,12 @@ class MyNonEmptyType implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, ContextInterface $context): bool
     {
         return !empty($value);
     }
 
-    public function cast(mixed $value, Context $context): mixed
+    public function cast(mixed $value, ContextInterface $context): mixed
     {
         if (!empty($value)) {
             return $this->type->cast($value, $context);
