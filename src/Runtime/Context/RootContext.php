@@ -9,7 +9,7 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Repository\Repository;
 
 /**
- * @internal this is an internal library class, please do not use it in your code.
+ * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper
  */
 final class RootContext extends Context

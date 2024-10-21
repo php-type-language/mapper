@@ -12,9 +12,9 @@ use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Exception;
 use TypeLang\Mapper\Runtime\Path\JsonPathPrinter;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathPrinterInterface;
-use TypeLang\Mapper\Runtime\Value\PrettyValuePrinter;
+use TypeLang\Mapper\Runtime\Value\JsonValuePrinter;
 use TypeLang\Mapper\Runtime\Value\ValuePrinterInterface;
 use TypeLang\Parser\Node\Statement;
 use TypeLang\Parser\Node\Stmt\Shape\FieldNode;
@@ -53,7 +53,7 @@ final class Template implements \Stringable
 
     private static function createDefaultValuePrinter(): ValuePrinterInterface
     {
-        return new PrettyValuePrinter();
+        return new JsonValuePrinter();
     }
 
     /**

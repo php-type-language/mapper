@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
 class ArrayType implements TypeInterface
 {

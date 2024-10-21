@@ -63,7 +63,7 @@ abstract class Context implements
     }
 
     /**
-     * @deprecated will be rewritten to direct types repository access.
+     * @deprecated will be rewritten to direct types repository access
      */
     public function getTypes(): Repository
     {

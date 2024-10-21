@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Value;
 
-final class PrettyValuePrinter implements ValuePrinterInterface
+final class JsonValuePrinter implements ValuePrinterInterface
 {
     public const DEFAULT_MAX_ITEMS_COUNT = 3;
 
-    public const DEFAULT_MAX_DEPTH = 1;
+    public const DEFAULT_MAX_DEPTH = 2;
 
     public function __construct(
         private readonly int $maxItemsCount = self::DEFAULT_MAX_ITEMS_COUNT,
@@ -32,21 +32,14 @@ final class PrettyValuePrinter implements ValuePrinterInterface
 
     private function printObject(object $object, int $depth = 0): string
     {
-        $name = 'object';
-
-        if (!$object instanceof \stdClass) {
-            $name .= '<' . $object::class . '>';
-        }
-
         if ($depth >= $this->maxDepth) {
-            return $name . '{...}';
+            return '{...}';
         }
 
         $values = \get_object_vars($object);
         $result = $this->computeKeyValValues($values, $depth + 1);
 
-        return \vsprintf('%s{%s%s}', [
-            $name,
+        return \vsprintf('{%s%s}', [
             \implode(', ', $result),
             $this->getArraySuffix(\count($values)),
         ]);
@@ -64,15 +57,14 @@ final class PrettyValuePrinter implements ValuePrinterInterface
         }
 
         if ($depth >= $this->maxDepth) {
-            return \sprintf('array(%d){...}', \count($values));
+            return '{...}';
         }
 
         $result = $this->computeKeyValValues($values, $depth + 1);
 
-        return \vsprintf('array(%d){%s%s}', [
-            $count = \count($values),
+        return \vsprintf('{%s%s}', [
             \implode(', ', $result),
-            $this->getArraySuffix($count),
+            $this->getArraySuffix(\count($values)),
         ]);
     }
 
@@ -108,15 +100,14 @@ final class PrettyValuePrinter implements ValuePrinterInterface
     private function printList(array $values, int $depth): string
     {
         if ($depth >= $this->maxDepth) {
-            return \sprintf('array(%d)[...]', \count($values));
+            return '[...]';
         }
 
         $result = $this->computeListValues($values, $depth + 1);
 
-        return \vsprintf('array(%d)[%s%s]', [
-            $count = \count($values),
+        return \vsprintf('[%s%s]', [
             \implode(', ', $result),
-            $this->getArraySuffix($count),
+            $this->getArraySuffix(\count($values)),
         ]);
     }
 
