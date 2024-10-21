@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -62,7 +62,7 @@ class InvalidValueMappingException extends RuntimeException implements
     public static function createFromContext(
         mixed $value,
         TypeStatement $expected,
-        LocalContext $context,
+        Context $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

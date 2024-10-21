@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 
 class DateTimeType extends AsymmetricType
 {
@@ -22,7 +22,7 @@ class DateTimeType extends AsymmetricType
         protected readonly ?string $format = null,
     ) {}
 
-    protected function isNormalizable(mixed $value, LocalContext $context): bool
+    protected function isNormalizable(mixed $value, Context $context): bool
     {
         return $value instanceof \DateTimeInterface;
     }
@@ -30,7 +30,7 @@ class DateTimeType extends AsymmetricType
     /**
      * @throws InvalidValueException
      */
-    public function normalize(mixed $value, LocalContext $context): string
+    public function normalize(mixed $value, Context $context): string
     {
         if (!$value instanceof \DateTimeInterface) {
             throw InvalidValueException::createFromContext(
@@ -42,7 +42,7 @@ class DateTimeType extends AsymmetricType
         return $value->format($this->format ?? self::DEFAULT_DATETIME_FORMAT);
     }
 
-    protected function isDenormalizable(mixed $value, LocalContext $context): bool
+    protected function isDenormalizable(mixed $value, Context $context): bool
     {
         if (!\is_string($value)) {
             return false;
@@ -58,7 +58,7 @@ class DateTimeType extends AsymmetricType
     /**
      * @throws InvalidValueException
      */
-    public function denormalize(mixed $value, LocalContext $context): \DateTimeInterface
+    public function denormalize(mixed $value, Context $context): \DateTimeInterface
     {
         if (!\is_string($value)) {
             throw InvalidValueException::createFromContext(

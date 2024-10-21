@@ -8,9 +8,9 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Context\Context;
+use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Repository\Repository;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -21,7 +21,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
-        private Context $context = new Context(),
+        private Configuration $config = new Configuration(),
     ) {
         $this->types = new Repository($this->platform);
     }
@@ -29,12 +29,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * @api
      *
-     * @see Context::withObjectsAsArrays()
+     * @see Configuration::withObjectsAsArrays()
      */
     public function withObjectsAsArrays(?bool $enabled = null): self
     {
         $self = clone $this;
-        $self->context = $this->context->withObjectsAsArrays($enabled);
+        $self->config = $this->config->withObjectsAsArrays($enabled);
 
         return $self;
     }
@@ -42,12 +42,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     /**
      * @api
      *
-     * @see Context::withDetailedTypes()
+     * @see Configuration::withDetailedTypes()
      */
     public function withDetailedTypes(?bool $enabled = null): self
     {
         $self = clone $this;
-        $self->context = $this->context->withDetailedTypes($enabled);
+        $self->config = $this->config->withDetailedTypes($enabled);
 
         return $self;
     }
@@ -81,9 +81,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Normalize);
-
-        return $instance->cast($value, $local);
+        return $instance->cast($value, new Context(
+            direction: Direction::Normalize,
+            types: $this->types,
+            config: $this->config,
+        ));
     }
 
     /**
@@ -93,9 +95,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Normalize);
-
-        return $instance->match($value, $local);
+        return $instance->match($value, new Context(
+            direction: Direction::Normalize,
+            types: $this->types,
+            config: $this->config,
+        ));
     }
 
     /**
@@ -107,9 +111,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Denormalize);
-
-        return $instance->cast($value, $local);
+        return $instance->cast($value, new Context(
+            direction: Direction::Denormalize,
+            types: $this->types,
+            config: $this->config,
+        ));
     }
 
     /**
@@ -119,9 +125,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        $local = $this->createLocalContext(Direction::Denormalize);
-
-        return $instance->match($value, $local);
+        return $instance->match($value, new Context(
+            direction: Direction::Denormalize,
+            types: $this->types,
+            config: $this->config,
+        ));
     }
 
     /**
@@ -138,13 +146,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $this->types->getByType($type);
     }
 
-    private function createLocalContext(Direction $direction): LocalContext
+    private function createLocalContext(Direction $direction): Context
     {
-        return new LocalContext(
+        return new Context(
             direction: $direction,
             types: $this->types,
-            objectsAsArrays: $this->context->isObjectsAsArrays(),
-            detailedTypes: $this->context->isDetailedTypes(),
+            config: $this->config,
         );
     }
 }

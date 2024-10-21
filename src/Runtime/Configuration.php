@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Context;
+namespace TypeLang\Mapper\Runtime;
 
-class Context
+final class Configuration implements ConfigurationInterface
 {
     /**
      * Default value for {@see $objectsAsArrays} option.
@@ -37,7 +37,7 @@ class Context
      *
      * @api
      */
-    public function withObjectsAsArrays(?bool $enabled = null): static
+    public function withObjectsAsArrays(?bool $enabled = null): self
     {
         $self = clone $this;
         $self->objectsAsArrays = $enabled;
@@ -63,7 +63,7 @@ class Context
      *
      * @api
      */
-    public function withDetailedTypes(?bool $enabled = null): static
+    public function withDetailedTypes(?bool $enabled = null): self
     {
         $self = clone $this;
         $self->detailedTypes = $enabled;

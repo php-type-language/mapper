@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 class MissingFieldTypeException extends RuntimeException implements
@@ -62,7 +62,7 @@ class MissingFieldTypeException extends RuntimeException implements
      */
     public static function createFromContext(
         string $field,
-        LocalContext $context,
+        Context $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

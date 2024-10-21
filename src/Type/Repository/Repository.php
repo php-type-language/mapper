@@ -84,16 +84,16 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         return $this->parser->parse($type);
     }
 
-    public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface
+    public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parse($type);
 
         // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
         return $this->memory[$statement]
-            ??= $this->getByStatement($statement, $class);
+            ??= $this->getByStatement($statement, $context);
     }
 
-    public function getByValue(mixed $value, ?\ReflectionClass $class = null): TypeInterface
+    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         // @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
         $statement = new NamedTypeNode(\get_debug_type($value));
@@ -101,14 +101,14 @@ class Repository implements RepositoryInterface, \IteratorAggregate
         return $this->getByStatement($statement);
     }
 
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface
+    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        if ($class !== null) {
+        if ($context !== null) {
             // Performs Name conversions if the required type is found
             // in the same namespace as the declared dependency.
-            $statement = $this->resolveFromNamespace($statement, $class);
+            $statement = $this->resolveFromNamespace($statement, $context);
 
-            $uses = $this->references->getUseStatements($class);
+            $uses = $this->references->getUseStatements($context);
 
             // Additionally performs Name conversions if the required
             // type was specified in "use" statement.

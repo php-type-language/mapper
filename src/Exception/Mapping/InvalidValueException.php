@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 class InvalidValueException extends RuntimeException implements ValueExceptionInterface
@@ -54,7 +54,7 @@ class InvalidValueException extends RuntimeException implements ValueExceptionIn
 
     public static function createFromContext(
         mixed $value,
-        LocalContext $context,
+        Context $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

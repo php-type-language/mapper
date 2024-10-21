@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Unit\Type;
 
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Runtime\Context\Context;
+use TypeLang\Mapper\Runtime\Configuration;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\NullType;
 use TypeLang\Mapper\Type\TypeInterface;
 

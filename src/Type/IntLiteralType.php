@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 
 class IntLiteralType extends IntType
 {
@@ -16,7 +16,7 @@ class IntLiteralType extends IntType
     }
 
     #[\Override]
-    public function match(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, Context $context): bool
     {
         return $value === $this->value;
     }
@@ -25,7 +25,7 @@ class IntLiteralType extends IntType
      * @throws InvalidValueException
      */
     #[\Override]
-    public function cast(mixed $value, LocalContext $context): int
+    public function cast(mixed $value, Context $context): int
     {
         if ($this->match($value, $context)) {
             /** @var int */

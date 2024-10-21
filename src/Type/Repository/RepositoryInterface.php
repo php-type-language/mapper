@@ -16,11 +16,11 @@ interface RepositoryInterface extends \Traversable, \Countable
 {
     /**
      * @param non-empty-string $type
-     * @param \ReflectionClass<object>|null $class
+     * @param \ReflectionClass<object>|null $context
      *
      * @throws TypeNotFoundException in case of type cannot be loaded
      */
-    public function getByType(string $type, ?\ReflectionClass $class = null): TypeInterface;
+    public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface;
 
     /**
      * @param non-empty-string $type
@@ -28,18 +28,18 @@ interface RepositoryInterface extends \Traversable, \Countable
     public function parse(string $type): TypeStatement;
 
     /**
-     * @param \ReflectionClass<object>|null $class
+     * @param \ReflectionClass<object>|null $context
      *
      * @throws TypeNotFoundException in case of type cannot be loaded
      */
-    public function getByValue(mixed $value, ?\ReflectionClass $class = null): TypeInterface;
+    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface;
 
     /**
-     * @param \ReflectionClass<object>|null $class
+     * @param \ReflectionClass<object>|null $context
      *
      * @throws TypeNotFoundException in case of type cannot be loaded
      */
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $class = null): TypeInterface;
+    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface;
 
     /**
      * @return int<0, max>

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\UnionLeafEntry;
 
 class UnionType implements TypeInterface
@@ -21,7 +21,7 @@ class UnionType implements TypeInterface
     /**
      * Finds a child supported type from their {@see $types} list by value.
      */
-    protected function findType(mixed $value, LocalContext $context, bool $match = true): ?TypeInterface
+    protected function findType(mixed $value, Context $context, bool $match = true): ?TypeInterface
     {
         foreach ($this->types as $index => $type) {
             $context->enter(new UnionLeafEntry($index));
@@ -40,7 +40,7 @@ class UnionType implements TypeInterface
         return null;
     }
 
-    public function match(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, Context $context): bool
     {
         return $this->findType($value, $context, false) !== null;
     }
@@ -50,7 +50,7 @@ class UnionType implements TypeInterface
      * @throws RuntimeExceptionInterface
      * @throws \Throwable
      */
-    public function cast(mixed $value, LocalContext $context): mixed
+    public function cast(mixed $value, Context $context): mixed
     {
         $type = $this->findType($value, $context);
 

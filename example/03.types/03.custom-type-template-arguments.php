@@ -6,13 +6,11 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Builder\Builder;
 use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -50,12 +48,12 @@ class MyNonEmptyType implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, Context $context): bool
     {
         return !empty($value);
     }
 
-    public function cast(mixed $value, LocalContext $context): mixed
+    public function cast(mixed $value, Context $context): mixed
     {
         if (!empty($value)) {
             return $this->type->cast($value, $context);

@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
-use TypeLang\Mapper\Runtime\Context\LocalContext;
+use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
 class ArrayType implements TypeInterface
@@ -29,7 +29,7 @@ class ArrayType implements TypeInterface
         $this->isValuePassed = $value !== null;
     }
 
-    public function match(mixed $value, LocalContext $context): bool
+    public function match(mixed $value, Context $context): bool
     {
         if (!\is_array($value)) {
             return false;
@@ -58,7 +58,7 @@ class ArrayType implements TypeInterface
      * @throws \Throwable
      * @throws RuntimeExceptionInterface
      */
-    public function cast(mixed $value, LocalContext $context): array
+    public function cast(mixed $value, Context $context): array
     {
         if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext(
