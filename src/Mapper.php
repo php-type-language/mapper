@@ -9,9 +9,8 @@ use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Repository\Repository;
-use TypeLang\Mapper\Runtime\RootContext;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
@@ -80,10 +79,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->cast($value, new RootContext(
-            direction: Direction::Normalize,
-            types: $this->types,
+        return $instance->cast($value, RootContext::forNormalization(
             config: $this->config,
+            types: $this->types,
         ));
     }
 
@@ -95,10 +93,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->match($value, new RootContext(
-            direction: Direction::Normalize,
-            types: $this->types,
+        return $instance->match($value, RootContext::forNormalization(
             config: $this->config,
+            types: $this->types,
         ));
     }
 
@@ -111,10 +108,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->cast($value, new RootContext(
-            direction: Direction::Denormalize,
-            types: $this->types,
+        return $instance->cast($value, RootContext::forDenormalization(
             config: $this->config,
+            types: $this->types,
         ));
     }
 
@@ -126,10 +122,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $instance = $this->getType($value, $type);
 
-        return $instance->match($value, new RootContext(
-            direction: Direction::Denormalize,
-            types: $this->types,
+        return $instance->match($value, RootContext::forDenormalization(
             config: $this->config,
+            types: $this->types,
         ));
     }
 

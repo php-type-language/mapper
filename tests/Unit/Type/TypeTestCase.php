@@ -10,10 +10,10 @@ use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Repository\Repository;
-use TypeLang\Mapper\Runtime\RootContext;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
@@ -109,7 +109,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testNormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = new RootContext(Direction::Normalize, $this->types, $config);
+        $local = RootContext::forNormalization($config, $this->types);
 
         $expected = $this->getNormalizationExpectation($value, $type, $local);
 
@@ -121,7 +121,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testDenormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = new RootContext(Direction::Denormalize, $this->types, $config);
+        $local = RootContext::forDenormalization($config, $this->types);
 
         $expected = $this->getDenormalizationExpectation($value, $type, $local);
 

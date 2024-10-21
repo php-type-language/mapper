@@ -13,7 +13,7 @@ use TypeLang\Mapper\Runtime\Repository\Repository;
 
 final class ChildContext extends Context
 {
-    public function __construct(
+    protected function __construct(
         private readonly Context $parent,
         private readonly EntryInterface $entry,
         DirectionInterface $direction,

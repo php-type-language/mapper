@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use TypeLang\Mapper\Runtime\Context\ChildContext;
-use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
@@ -18,7 +17,7 @@ abstract class Context implements
     PathProviderInterface,
     DirectionInterface
 {
-    public function __construct(
+    protected function __construct(
         protected readonly DirectionInterface $direction,
         protected readonly Repository $types,
         protected readonly ConfigurationInterface $config,
