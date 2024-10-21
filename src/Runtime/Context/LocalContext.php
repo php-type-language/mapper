@@ -13,7 +13,9 @@ use TypeLang\Mapper\Type\Repository\RepositoryInterface;
 /**
  * Mutable local bypass context.
  */
-class LocalContext extends Context implements ExecutionStackInterface
+class LocalContext extends Context implements
+    ExecutionStackInterface,
+    DirectionInterface
 {
     protected readonly MutablePath $path;
 
