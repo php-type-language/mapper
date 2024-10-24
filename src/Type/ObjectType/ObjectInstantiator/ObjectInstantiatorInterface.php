@@ -10,9 +10,10 @@ interface ObjectInstantiatorInterface
 {
     /**
      * @template T of object
-     * @param ClassMetadata<T> $class
-     * @return T
      *
+     * @param ClassMetadata<T> $class
+     *
+     * @return T
      * @throws \Throwable occurs for some reason when creating an object
      */
     public function instantiate(ClassMetadata $class): object;

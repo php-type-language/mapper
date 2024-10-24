@@ -61,10 +61,11 @@ final class AttributeDriver extends LoadableDriver
      * @param non-empty-string $type
      *
      * @throws PropertyTypeNotFoundException
+     * @throws \Throwable
      */
     private function createType(string $type, \ReflectionProperty $property, TypeRepository $types): TypeMetadata
     {
-        $statement = $types->parse($type);
+        $statement = $types->getStatementByType($type);
 
         $class = $property->getDeclaringClass();
 

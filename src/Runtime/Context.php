@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime;
 
+use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
+    TypeRepositoryInterface,
     ConfigurationInterface,
     PathProviderInterface,
+    TypeParserInterface,
     DirectionInterface
 {
     protected function __construct(
@@ -63,11 +69,28 @@ abstract class Context implements
         return new Path();
     }
 
-    /**
-     * @deprecated will be rewritten to direct types repository access
-     */
-    public function getTypes(): TypeRepository
+    public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->types;
+        return $this->types->getByType($type, $context);
+    }
+
+    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    {
+        return $this->types->getByValue($value, $context);
+    }
+
+    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    {
+        return $this->types->getByStatement($statement, $context);
+    }
+
+    public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
+    {
+        return $this->types->getStatementByValue($type);
+    }
+
+    public function getStatementByValue(mixed $value): TypeStatement
+    {
+        return $this->types->getStatementByValue($value);
     }
 }

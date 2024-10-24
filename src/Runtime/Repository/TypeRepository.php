@@ -4,35 +4,32 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
+use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
-use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
+use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Exception\ParserExceptionInterface;
-use TypeLang\Parser\Node\Name;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\Parser;
-use TypeLang\Parser\ParserInterface;
-use TypeLang\Parser\TypeResolver;
 
 /**
  * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
  */
-final class TypeRepository implements \IteratorAggregate, \Countable
+final class TypeRepository implements
+    TypeRepositoryInterface,
+    TypeParserInterface,
+    \IteratorAggregate,
+    \Countable
 {
     /**
      * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>
      */
     protected array $builders = [];
 
-    private readonly ParserInterface $parser;
-
-    private readonly TypeResolver $typeResolver;
+    private readonly TypeParserInterface $parser;
 
     /**
      * @var \WeakMap<TypeStatement, TypeInterface>
@@ -41,10 +38,13 @@ final class TypeRepository implements \IteratorAggregate, \Countable
 
     public function __construct(
         PlatformInterface $platform = new StandardPlatform(),
-        private readonly ReferencesReaderInterface $references = new NativeReferencesReader(),
+        private readonly ReferencesResolver $references = new ReferencesResolver(),
     ) {
-        $this->typeResolver = new TypeResolver();
-        $this->parser = $this->createPlatformParser($platform);
+        $this->parser = new InMemoryTypeParser(
+            delegate: TypeParser::createFromPlatform(
+                platform: $platform,
+            ),
+        );
         $this->builders = $this->getTypeBuilders($platform);
         $this->memory = new \WeakMap();
     }
@@ -64,132 +64,48 @@ final class TypeRepository implements \IteratorAggregate, \Countable
         };
     }
 
-    private function createPlatformParser(PlatformInterface $platform): ParserInterface
+    public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
     {
-        return new InMemoryCachedParser(new Parser(
-            conditional: $platform->isFeatureSupported(GrammarFeature::Conditional),
-            shapes: $platform->isFeatureSupported(GrammarFeature::Shapes),
-            callables: $platform->isFeatureSupported(GrammarFeature::Callables),
-            literals: $platform->isFeatureSupported(GrammarFeature::Literals),
-            generics: $platform->isFeatureSupported(GrammarFeature::Generics),
-            union: $platform->isFeatureSupported(GrammarFeature::Union),
-            intersection: $platform->isFeatureSupported(GrammarFeature::Intersection),
-            list: $platform->isFeatureSupported(GrammarFeature::List),
-            hints: $platform->isFeatureSupported(GrammarFeature::Hints),
-            attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
-        ));
+        return $this->parser->getStatementByType($type);
     }
 
-    /**
-     * @param non-empty-string $type
-     *
-     * @throws ParserExceptionInterface
-     * @throws \Throwable
-     */
-    public function parse(string $type): TypeStatement
+    public function getStatementByValue(mixed $value): TypeStatement
     {
-        return $this->parser->parse($type);
+        return $this->parser->getStatementByValue($value);
     }
 
-    /**
-     * @param non-empty-string $type
-     * @param \ReflectionClass<object>|null $context
-     *
-     * @throws TypeNotFoundException in case of type cannot be loaded
-     * @throws \Throwable
-     */
     public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
     {
-        $statement = $this->parse($type);
-
-        // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
-        return $this->memory[$statement]
-            ??= $this->getByStatement($statement, $context);
-    }
-
-    /**
-     * @param \ReflectionClass<object>|null $context
-     *
-     * @throws TypeNotFoundException in case of type cannot be loaded
-     * @throws \Throwable
-     */
-    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
-    {
-        // @phpstan-ignore-next-line : False-positive, the 'get_debug_type' method returns a non-empty string
-        $statement = new NamedTypeNode(\get_debug_type($value));
+        $statement = $this->parser->getStatementByType($type);
 
         return $this->getByStatement($statement, $context);
     }
 
-    /**
-     * @param \ReflectionClass<object>|null $context
-     *
-     * @throws TypeNotFoundException in case of type cannot be loaded
-     * @throws \Throwable
-     */
+    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    {
+        $statement = $this->parser->getStatementByValue($value);
+
+        return $this->getByStatement($statement, $context);
+    }
+
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
+        if (isset($this->memory[$statement])) {
+            return $this->memory[$statement];
+        }
+
         if ($context !== null) {
-            // Performs Name conversions if the required type is found
-            // in the same namespace as the declared dependency.
-            $statement = $this->resolveFromNamespace($statement, $context);
-
-            $uses = $this->references->getUseStatements($context);
-
-            // Additionally performs Name conversions if the required
-            // type was specified in "use" statement.
-            $statement = $this->typeResolver->resolveWith($statement, $uses);
+            $statement = $this->references->resolve($statement, $context);
         }
 
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
-                return $factory->build($statement, $this);
+                // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
+                return $this->memory[$statement] = $factory->build($statement, $this);
             }
         }
 
         throw TypeNotFoundException::becauseTypeNotDefined($statement);
-    }
-
-    /**
-     * @param \ReflectionClass<object> $class
-     */
-    private function resolveFromNamespace(TypeStatement $statement, \ReflectionClass $class): TypeStatement
-    {
-        return $this->typeResolver->resolve(
-            $statement,
-            static function (Name $name) use ($class): ?Name {
-                $namespace = $class->getNamespaceName();
-
-                // Replace "namespace\ClassName" sequences to current
-                // namespace of the class.
-                if (!$name->isSimple()) {
-                    $first = $name->getFirstPart();
-
-                    if ($first->toLowerString() === 'namespace') {
-                        // Return name AS IS in case of namespace is global
-                        if ($namespace === '') {
-                            return $name->slice(1);
-                        }
-
-                        return (new Name($namespace))
-                            ->withAdded($name->slice(1));
-                    }
-                }
-
-                if ($namespace !== '' && self::entryExists($namespace . '\\' . $name->toString())) {
-                    return (new Name($namespace))
-                        ->withAdded($name);
-                }
-
-                return null;
-            },
-        );
-    }
-
-    private static function entryExists(string $fqn): bool
-    {
-        return \class_exists($fqn)
-            || \interface_exists($fqn, false);
     }
 
     public function getIterator(): \Traversable

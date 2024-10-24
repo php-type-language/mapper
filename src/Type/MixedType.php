@@ -22,8 +22,7 @@ class MixedType implements TypeInterface
      */
     public function cast(mixed $value, Context $context): mixed
     {
-        return $context->getTypes()
-            ->getByValue($value)
+        return $context->getByValue($value)
             ->cast($value, $context);
     }
 }
