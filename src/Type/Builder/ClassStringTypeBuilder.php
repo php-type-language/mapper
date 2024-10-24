@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\ClassStringType;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -17,7 +17,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class ClassStringTypeBuilder extends NamedTypeBuilder
 {
-    public function build(TypeStatement $statement, Repository $types): ClassStringType
+    public function build(TypeStatement $statement, TypeRepository $types): ClassStringType
     {
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1);

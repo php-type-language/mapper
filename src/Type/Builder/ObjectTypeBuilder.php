@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\ObjectType\ObjectInstantiator\ObjectInstantiatorInterface;
 use TypeLang\Mapper\Type\ObjectType\ObjectInstantiator\ReflectionObjectInstantiator;
@@ -51,7 +51,7 @@ class ObjectTypeBuilder extends Builder
         return $reflection->isInstantiable();
     }
 
-    public function build(TypeStatement $statement, Repository $types): ObjectType
+    public function build(TypeStatement $statement, TypeRepository $types): ObjectType
     {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);

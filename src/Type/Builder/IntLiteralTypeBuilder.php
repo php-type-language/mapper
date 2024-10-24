@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\IntLiteralType;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -19,7 +19,7 @@ class IntLiteralTypeBuilder implements TypeBuilderInterface
         return $statement instanceof IntLiteralNode;
     }
 
-    public function build(TypeStatement $statement, Repository $types): IntLiteralType
+    public function build(TypeStatement $statement, TypeRepository $types): IntLiteralType
     {
         return new IntLiteralType($statement->value);
     }

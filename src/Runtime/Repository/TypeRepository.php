@@ -23,7 +23,7 @@ use TypeLang\Parser\TypeResolver;
 /**
  * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
  */
-final class Repository implements \IteratorAggregate, \Countable
+final class TypeRepository implements \IteratorAggregate, \Countable
 {
     /**
      * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>

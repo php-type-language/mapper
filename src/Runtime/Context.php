@@ -10,7 +10,8 @@ use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Type\TypeInterface;
 
 abstract class Context implements
     ConfigurationInterface,
@@ -19,7 +20,7 @@ abstract class Context implements
 {
     protected function __construct(
         protected readonly DirectionInterface $direction,
-        protected readonly Repository $types,
+        protected readonly TypeRepository $types,
         protected readonly ConfigurationInterface $config,
     ) {}
 
@@ -65,7 +66,7 @@ abstract class Context implements
     /**
      * @deprecated will be rewritten to direct types repository access
      */
-    public function getTypes(): Repository
+    public function getTypes(): TypeRepository
     {
         return $this->types;
     }

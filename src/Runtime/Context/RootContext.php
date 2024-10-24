@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Runtime\Context;
 
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 
 /**
  * @internal this is an internal library class, please do not use it in your code
@@ -14,7 +14,7 @@ use TypeLang\Mapper\Runtime\Repository\Repository;
  */
 final class RootContext extends Context
 {
-    public static function forNormalization(ConfigurationInterface $config, Repository $types): self
+    public static function forNormalization(ConfigurationInterface $config, TypeRepository $types): self
     {
         return new self(
             direction: Direction::Normalize,
@@ -23,7 +23,7 @@ final class RootContext extends Context
         );
     }
 
-    public static function forDenormalization(ConfigurationInterface $config, Repository $types): self
+    public static function forDenormalization(ConfigurationInterface $config, TypeRepository $types): self
     {
         return new self(
             direction: Direction::Denormalize,

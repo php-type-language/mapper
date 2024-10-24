@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 
 /**
  * Implements each driver that can supplement or modify existing
@@ -33,7 +33,7 @@ abstract class LoadableDriver extends Driver
      * @return ClassMetadata<TArg>
      * @throws \Throwable in case of internal error occurred
      */
-    public function getClassMetadata(\ReflectionClass $class, Repository $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, TypeRepository $types): ClassMetadata
     {
         if (isset(self::$metadata[$class->getName()])) {
             /** @var ClassMetadata<TArg> */
@@ -63,6 +63,6 @@ abstract class LoadableDriver extends Driver
     abstract protected function load(
         \ReflectionClass $reflection,
         ClassMetadata $class,
-        Repository $types,
+        TypeRepository $types,
     ): void;
 }

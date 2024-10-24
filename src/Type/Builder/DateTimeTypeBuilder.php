@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\DateTimeType;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -36,7 +36,7 @@ class DateTimeTypeBuilder extends Builder
         return $name;
     }
 
-    public function build(TypeStatement $statement, Repository $types): DateTimeType
+    public function build(TypeStatement $statement, TypeRepository $types): DateTimeType
     {
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);

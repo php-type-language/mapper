@@ -9,7 +9,7 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Name;
@@ -22,7 +22,7 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 final class ReflectionDriver extends LoadableDriver
 {
     #[\Override]
-    protected function load(\ReflectionClass $reflection, ClassMetadata $class, Repository $types): void
+    protected function load(\ReflectionClass $reflection, ClassMetadata $class, TypeRepository $types): void
     {
         foreach ($reflection->getProperties() as $property) {
             if (!self::isValidProperty($property)) {
@@ -69,7 +69,7 @@ final class ReflectionDriver extends LoadableDriver
      * @throws PropertyTypeNotFoundException
      * @throws \InvalidArgumentException
      */
-    private function fillType(\ReflectionProperty $property, PropertyMetadata $meta, Repository $types): void
+    private function fillType(\ReflectionProperty $property, PropertyMetadata $meta, TypeRepository $types): void
     {
         $statement = $this->getTypeStatement($property);
 

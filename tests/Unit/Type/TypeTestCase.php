@@ -13,7 +13,7 @@ use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\RootContext;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
@@ -24,12 +24,12 @@ use TypeLang\Mapper\Type\TypeInterface;
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly Repository $types;
+    protected readonly TypeRepository $types;
 
     #[Before]
     protected function setUpDefaultRegistry(): void
     {
-        $this->types = new Repository();
+        $this->types = new TypeRepository();
     }
 
     abstract protected function getType(): TypeInterface;

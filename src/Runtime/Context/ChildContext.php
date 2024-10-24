@@ -9,7 +9,7 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 
 final class ChildContext extends Context
 {
@@ -17,7 +17,7 @@ final class ChildContext extends Context
         private readonly Context $parent,
         private readonly EntryInterface $entry,
         DirectionInterface $direction,
-        Repository $types,
+        TypeRepository $types,
         ConfigurationInterface $config,
     ) {
         parent::__construct(

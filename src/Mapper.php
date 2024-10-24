@@ -11,7 +11,7 @@ use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\EvolvableConfigurationInterface;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements
@@ -19,13 +19,13 @@ final class Mapper implements
     DenormalizerInterface,
     EvolvableConfigurationInterface
 {
-    private readonly Repository $types;
+    private readonly TypeRepository $types;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private Configuration $config = new Configuration(),
     ) {
-        $this->types = new Repository($this->platform);
+        $this->types = new TypeRepository($this->platform);
     }
 
     public function withObjectsAsArrays(?bool $enabled = null): self
@@ -59,7 +59,7 @@ final class Mapper implements
      *
      * @api
      */
-    public function getTypes(): Repository
+    public function getTypes(): TypeRepository
     {
         return $this->types;
     }

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use Psr\SimpleCache\CacheInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Repository\Repository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 
 final class Psr16CachedDriver extends CachedDriver
 {
@@ -19,7 +19,7 @@ final class Psr16CachedDriver extends CachedDriver
         parent::__construct($prefix, $ttl, $delegate);
     }
 
-    public function getClassMetadata(\ReflectionClass $class, Repository $types): ClassMetadata
+    public function getClassMetadata(\ReflectionClass $class, TypeRepository $types): ClassMetadata
     {
         $index = $this->getKey($class);
 
