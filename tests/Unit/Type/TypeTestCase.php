@@ -109,7 +109,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testNormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = RootContext::forNormalization($config, $this->types);
+        $local = RootContext::forNormalization($value, $config, $this->types);
 
         $expected = $this->getNormalizationExpectation($value, $type, $local);
 
@@ -121,7 +121,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testDenormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = RootContext::forDenormalization($config, $this->types);
+        $local = RootContext::forDenormalization($value, $config, $this->types);
 
         $expected = $this->getDenormalizationExpectation($value, $type, $local);
 

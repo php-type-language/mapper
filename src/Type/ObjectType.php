@@ -62,7 +62,7 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        $entrance = $context->enter(new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
 
         $result = $this->normalizeObject($value, $entrance);
 
@@ -84,7 +84,7 @@ class ObjectType extends AsymmetricType
         $result = [];
 
         foreach ($this->metadata->getProperties() as $meta) {
-            $entrance = $context->enter(new ObjectPropertyEntry($meta->getName()));
+            $entrance = $context->enter($object, new ObjectPropertyEntry($meta->getName()));
 
             // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta)) {
@@ -158,7 +158,7 @@ class ObjectType extends AsymmetricType
             );
         }
 
-        $entrance = $context->enter(new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
 
         $instance = $this->instantiator->instantiate($this->metadata);
 
@@ -176,7 +176,7 @@ class ObjectType extends AsymmetricType
     private function denormalizeObject(array $value, object $object, Context $context): void
     {
         foreach ($this->metadata->getProperties() as $meta) {
-            $entrance = $context->enter(new ObjectPropertyEntry($meta->getExportName()));
+            $entrance = $context->enter($value, new ObjectPropertyEntry($meta->getExportName()));
 
             // Skip the property when not writable
             if (!$this->accessor->isWritable($object, $meta)) {

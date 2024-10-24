@@ -25,6 +25,7 @@ abstract class Context implements
     DirectionInterface
 {
     protected function __construct(
+        protected readonly mixed $value,
         protected readonly DirectionInterface $direction,
         protected readonly TypeRepository $types,
         protected readonly ConfigurationInterface $config,
@@ -33,15 +34,21 @@ abstract class Context implements
     /**
      * Creates new child context.
      */
-    public function enter(EntryInterface $entry): self
+    public function enter(mixed $value, EntryInterface $entry): self
     {
         return new ChildContext(
             parent: $this,
             entry: $entry,
+            value: $value,
             direction: $this->direction,
             types: $this->types,
             config: $this->config,
         );
+    }
+
+    public function getValue(): mixed
+    {
+        return $this->value;
     }
 
     public function isObjectsAsArrays(): bool

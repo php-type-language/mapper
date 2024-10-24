@@ -36,7 +36,7 @@ class ArrayType implements TypeInterface
         }
 
         foreach ($value as $key => $item) {
-            $entrance = $context->enter(new ArrayIndexEntry($key));
+            $entrance = $context->enter($item, new ArrayIndexEntry($key));
 
             $isValidItem = $this->key->match($key, $entrance)
                 && $this->value->match($value, $entrance);
@@ -68,7 +68,7 @@ class ArrayType implements TypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $entrance = $context->enter(new ArrayIndexEntry($index));
+            $entrance = $context->enter($item, new ArrayIndexEntry($index));
 
             $result[$this->key->cast($index, $entrance)]
                 = $this->value->cast($item, $entrance);

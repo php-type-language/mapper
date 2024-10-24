@@ -40,7 +40,7 @@ class ListType implements TypeInterface
         $result = [];
 
         foreach ($value as $index => $item) {
-            $entrance = $context->enter(new ArrayIndexEntry($index));
+            $entrance = $context->enter($item, new ArrayIndexEntry($index));
 
             $result[] = $this->type->cast($item, $entrance);
         }

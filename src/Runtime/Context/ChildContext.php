@@ -16,15 +16,25 @@ final class ChildContext extends Context
     protected function __construct(
         private readonly Context $parent,
         private readonly EntryInterface $entry,
+        mixed $value,
         DirectionInterface $direction,
         TypeRepository $types,
         ConfigurationInterface $config,
     ) {
         parent::__construct(
+            value: $value,
             direction: $direction,
             types: $types,
             config: $config,
         );
+    }
+
+    /**
+     * @api
+     */
+    public function getParent(): Context
+    {
+        return $this->parent;
     }
 
     /**

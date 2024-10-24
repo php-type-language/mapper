@@ -24,7 +24,7 @@ class UnionType implements TypeInterface
     protected function findType(mixed $value, Context $context): ?TypeInterface
     {
         foreach ($this->types as $index => $type) {
-            $entrance = $context->enter(new UnionLeafEntry($index));
+            $entrance = $context->enter($value, new UnionLeafEntry($index));
 
             if ($type->match($value, $entrance)) {
                 return $type;

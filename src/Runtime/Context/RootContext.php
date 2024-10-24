@@ -14,18 +14,20 @@ use TypeLang\Mapper\Runtime\Repository\TypeRepository;
  */
 final class RootContext extends Context
 {
-    public static function forNormalization(ConfigurationInterface $config, TypeRepository $types): self
+    public static function forNormalization(mixed $value, ConfigurationInterface $config, TypeRepository $types): self
     {
         return new self(
+            value: $value,
             direction: Direction::Normalize,
             types: $types,
             config: $config,
         );
     }
 
-    public static function forDenormalization(ConfigurationInterface $config, TypeRepository $types): self
+    public static function forDenormalization(mixed $value, ConfigurationInterface $config, TypeRepository $types): self
     {
         return new self(
+            value: $value,
             direction: Direction::Denormalize,
             types: $types,
             config: $config,

@@ -74,6 +74,7 @@ final class Mapper implements
         $instance = $this->getType($value, $type);
 
         return $instance->cast($value, RootContext::forNormalization(
+            value: $value,
             config: $this->config,
             types: $this->types,
         ));
@@ -88,6 +89,7 @@ final class Mapper implements
         $instance = $this->getType($value, $type);
 
         return $instance->match($value, RootContext::forNormalization(
+            value: $value,
             config: $this->config,
             types: $this->types,
         ));
@@ -103,6 +105,7 @@ final class Mapper implements
         $instance = $this->getType($value, $type);
 
         return $instance->cast($value, RootContext::forDenormalization(
+            value: $value,
             config: $this->config,
             types: $this->types,
         ));
@@ -117,6 +120,7 @@ final class Mapper implements
         $instance = $this->getType($value, $type);
 
         return $instance->match($value, RootContext::forDenormalization(
+            value: $value,
             config: $this->config,
             types: $this->types,
         ));
