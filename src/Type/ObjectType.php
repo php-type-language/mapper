@@ -15,6 +15,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Type\ObjectType\ObjectInstantiator\ObjectInstantiatorInterface;
 use TypeLang\Mapper\Type\ObjectType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -29,6 +30,7 @@ class ObjectType extends AsymmetricType
     public function __construct(
         private readonly ClassMetadata $metadata,
         private readonly PropertyAccessorInterface $accessor,
+        private readonly ObjectInstantiatorInterface $instantiator,
     ) {}
 
     public function getTypeStatement(Context $context): TypeStatement
@@ -158,23 +160,11 @@ class ObjectType extends AsymmetricType
 
         $entrance = $context->enter(new ObjectEntry($this->metadata->getName()));
 
-        $instance = $this->createInstance();
+        $instance = $this->instantiator->instantiate($this->metadata);
 
         $this->denormalizeObject($value, $instance, $entrance);
 
         return $instance;
-    }
-
-    /**
-     * @return T
-     * @throws \ReflectionException
-     */
-    private function createInstance(): object
-    {
-        /** @var \ReflectionClass<T> $reflection */
-        $reflection = new \ReflectionClass($this->metadata->getName());
-
-        return $reflection->newInstanceWithoutConstructor();
     }
 
     /**
