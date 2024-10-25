@@ -6,31 +6,36 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Runtime\Context;
 
-abstract class AsymmetricType implements TypeInterface
+/**
+ * @template TNormalization of TypeInterface
+ * @template TDenormalization of TypeInterface
+ */
+class AsymmetricType implements TypeInterface
 {
+    /**
+     * @param TNormalization $normalizer
+     * @param TDenormalization $denormalizer
+     */
+    public function __construct(
+        protected readonly TypeInterface $normalizer,
+        protected readonly TypeInterface $denormalizer,
+    ) {}
+
     public function match(mixed $value, Context $context): bool
     {
         if ($context->isDenormalization()) {
-            return $this->isDenormalizable($value, $context);
+            return $this->denormalizer->match($value, $context);
         }
 
-        return $this->isNormalizable($value, $context);
+        return $this->normalizer->match($value, $context);
     }
-
-    abstract protected function isNormalizable(mixed $value, Context $context): bool;
-
-    abstract protected function isDenormalizable(mixed $value, Context $context): bool;
 
     public function cast(mixed $value, Context $context): mixed
     {
         if ($context->isDenormalization()) {
-            return $this->denormalize($value, $context);
+            return $this->denormalizer->cast($value, $context);
         }
 
-        return $this->normalize($value, $context);
+        return $this->normalizer->cast($value, $context);
     }
-
-    abstract protected function normalize(mixed $value, Context $context): mixed;
-
-    abstract protected function denormalize(mixed $value, Context $context): mixed;
 }

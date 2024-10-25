@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\ClassStringType;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
@@ -17,6 +20,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class ClassStringTypeBuilder extends NamedTypeBuilder
 {
+    /**
+     * @inheritDoc
+     *
+     * @throws InvalidTemplateArgumentException
+     * @throws ShapeFieldsNotSupportedException
+     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TooManyTemplateArgumentsException
+     */
     public function build(TypeStatement $statement, TypeRepository $types): ClassStringType
     {
         $this->expectNoShapeFields($statement);

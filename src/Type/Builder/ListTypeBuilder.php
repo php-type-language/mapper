@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\ListType;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -14,6 +18,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class ListTypeBuilder extends NamedTypeBuilder
 {
+    /**
+     * @inheritDoc
+     *
+     * @throws ShapeFieldsNotSupportedException
+     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TooManyTemplateArgumentsException
+     * @throws TypeNotFoundException
+     * @throws \Throwable
+     */
     public function build(TypeStatement $statement, TypeRepository $types): ListType
     {
         if ($statement->arguments === null || $statement->arguments->count() === 0) {

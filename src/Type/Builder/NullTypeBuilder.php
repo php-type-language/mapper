@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\NullType;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
@@ -25,9 +27,14 @@ class NullTypeBuilder extends Builder
             && $statement->name->toLowerString() === 'null';
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @throws ShapeFieldsNotSupportedException
+     * @throws TemplateArgumentsNotSupportedException
+     */
     public function build(TypeStatement $statement, TypeRepository $types): NullType
     {
-        /** @var NamedTypeNode|NullLiteralNode $statement : PhpStorm autocomplete */
         if ($statement instanceof NullLiteralNode) {
             return new NullType();
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
@@ -18,6 +19,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class ArrayTypeBuilder extends NamedTypeBuilder
 {
+    /**
+     * @inheritDoc
+     *
+     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TooManyTemplateArgumentsException
+     * @throws TypeNotFoundException
+     * @throws ShapeFieldsNotSupportedException
+     */
     public function build(TypeStatement $statement, TypeRepository $types): ArrayType
     {
         $this->expectNoShapeFields($statement);
@@ -40,6 +49,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     /**
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
+     * @throws \Throwable
      */
     private function buildByKeyValue(NamedTypeNode $statement, TypeRepository $types): ArrayType
     {
@@ -63,8 +73,9 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     }
 
     /**
-     * @throws TypeNotFoundException
      * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TypeNotFoundException
+     * @throws \Throwable
      */
     private function buildByValue(NamedTypeNode $statement, TypeRepository $types): ArrayType
     {
