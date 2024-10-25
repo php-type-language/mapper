@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
+use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
@@ -69,7 +70,7 @@ final class Mapper implements
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function normalize(mixed $value, ?string $type = null): mixed
+    public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
         $instance = $this->getType($value, $type);
 
@@ -84,7 +85,7 @@ final class Mapper implements
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function isNormalizable(mixed $value, ?string $type = null): bool
+    public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
     {
         $instance = $this->getType($value, $type);
 
@@ -100,7 +101,7 @@ final class Mapper implements
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function denormalize(mixed $value, string $type): mixed
+    public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
     {
         $instance = $this->getType($value, $type);
 
@@ -115,7 +116,7 @@ final class Mapper implements
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function isDenormalizable(mixed $value, string $type): bool
+    public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
     {
         $instance = $this->getType($value, $type);
 

@@ -76,7 +76,7 @@ abstract class Context implements
         return new Path();
     }
 
-    public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
+    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
     {
         return $this->types->getByType($type, $context);
     }

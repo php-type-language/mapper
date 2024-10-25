@@ -74,7 +74,7 @@ final class TypeRepository implements
         return $this->parser->getStatementByValue($value);
     }
 
-    public function getByType(string $type, ?\ReflectionClass $context = null): TypeInterface
+    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parser->getStatementByType($type);
 
