@@ -8,7 +8,7 @@ use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class InMemoryTypeRepository implements TypeRepositoryInterface
+final class InMemoryTypeRepository extends TypeRepositoryDecorator
 {
     /**
      * @var \WeakMap<TypeStatement, TypeInterface>
@@ -16,8 +16,10 @@ final class InMemoryTypeRepository implements TypeRepositoryInterface
     private readonly \WeakMap $types;
 
     public function __construct(
-        private readonly TypeRepositoryInterface $delegate,
+        TypeRepositoryInterface $delegate,
     ) {
+        parent::__construct($delegate);
+
         $this->types = new \WeakMap();
     }
 

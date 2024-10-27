@@ -28,7 +28,8 @@ final class LoggableType implements TypeInterface
 
         return [
             'value' => $value,
-            'type' => $this->delegate::class . '#' . \spl_object_id($this->delegate),
+            'type' => $this->delegate,
+            'type_name' => $this->delegate::class . '#' . \spl_object_id($this->delegate),
             'path' => $path->toArray(),
         ];
     }
@@ -36,16 +37,16 @@ final class LoggableType implements TypeInterface
     public function match(mixed $value, Context $context): bool
     {
         $this->logger->debug(
-            'Matching the value {value} using type {type}',
+            'Matching the value by the type {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
         $result = $this->delegate->match($value, $context);
 
-        $this->logger->info(
+        $this->logger->debug(
             $result === true
-                ? '[matched] The value {value} will be matched using type {type}'
-                : '[not-matched] The value {value} will NOT be matched using type {type}',
+                ? '[matched] The value will be matched by the type {type_name}'
+                : '[not-matched] The value will NOT be matched by the type {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
@@ -55,21 +56,21 @@ final class LoggableType implements TypeInterface
     public function cast(mixed $value, Context $context): mixed
     {
         $this->logger->debug(
-            'Casting the value {value} using type {type}',
+            'Casting the value using type {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
         try {
             $result = $this->delegate->cast($value, $context);
         } catch (\Throwable $e) {
-            $this->logger->error('Casting of the value {value} using type {type} was failed', [
+            $this->logger->error('Casting of the value using type {type_name} was failed', [
                 ...$this->getLoggerArguments($value, $context),
                 'error' => $e,
             ]);
             throw $e;
         }
 
-        $this->logger->info('The value {value} will be casted into {result} using type {type}', [
+        $this->logger->debug('The value will be casted by the type {type_name}', [
             ...$this->getLoggerArguments($value, $context),
             'result' => $result,
         ]);

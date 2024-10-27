@@ -23,7 +23,7 @@ final class LoggableTypeParser implements TypeParserInterface
 
         $statement = $this->delegate->getStatementByDefinition($definition);
 
-        $this->logger->info('Fetched an AST statement by the definition "{definition}"', [
+        $this->logger->info('An AST statement was fetched by the definition "{definition}"', [
             'definition' => $definition,
             'statement' => $statement,
         ]);
@@ -39,7 +39,7 @@ final class LoggableTypeParser implements TypeParserInterface
 
         $statement = $this->delegate->getStatementByValue($value);
 
-        $this->logger->info('Fetched an AST statement by the value "{value}"', [
+        $this->logger->info('An AST statement was fetched by the value "{value}"', [
             'value' => $value,
             'statement' => $statement,
         ]);

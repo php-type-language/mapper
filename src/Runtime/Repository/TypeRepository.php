@@ -12,12 +12,16 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class TypeRepository implements TypeRepositoryInterface
+final class TypeRepository implements
+    TypeRepositoryInterface,
+    InnerTypeRepositoryContainerInterface
 {
     /**
      * @var list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
      */
-    protected array $builders = [];
+    private array $builders = [];
+
+    private TypeRepositoryInterface $inner;
 
     /**
      * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
@@ -27,11 +31,17 @@ final class TypeRepository implements TypeRepositoryInterface
         iterable $types = [],
         private readonly ReferencesResolver $references = new ReferencesResolver(),
     ) {
+        $this->inner = $this;
         $this->builders = match (true) {
             $types instanceof \Traversable => \iterator_to_array($types, false),
             \array_is_list($types) => $types,
             default => \array_values($types),
         };
+    }
+
+    public function setInnerContext(TypeRepositoryInterface $inner): void
+    {
+        $this->inner = $inner;
     }
 
     /**
@@ -72,7 +82,7 @@ final class TypeRepository implements TypeRepositoryInterface
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
                 // @phpstan-ignore-next-line : Statement expects a bottom type (never), but TypeStatement passed
-                return $factory->build($statement, $this, $this->parser);
+                return $factory->build($statement, $this->inner, $this->parser);
             }
         }
 

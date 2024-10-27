@@ -10,12 +10,14 @@ use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository\LoggableType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class LoggableTypeRepository implements TypeRepositoryInterface
+final class LoggableTypeRepository extends TypeRepositoryDecorator
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly TypeRepositoryInterface $delegate,
-    ) {}
+        TypeRepositoryInterface $delegate,
+    ) {
+        parent::__construct($delegate);
+    }
 
     public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
@@ -26,9 +28,10 @@ final class LoggableTypeRepository implements TypeRepositoryInterface
 
         $result = $this->delegate->getTypeByDefinition($definition, $context);
 
-        $this->logger->info('Fetched the type {type} by the definition "{definition}"', [
+        $this->logger->info('The {type_name} was fetched by the definition "{definition}"', [
             'definition' => $definition,
-            'type' => $result::class . '#' . \spl_object_id($result),
+            'type' => $result,
+            'type_name' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 
@@ -44,9 +47,10 @@ final class LoggableTypeRepository implements TypeRepositoryInterface
 
         $result = $this->delegate->getTypeByValue($value, $context);
 
-        $this->logger->info('Fetched the type {type} by the value "{value}"', [
+        $this->logger->info('The {type_name} was fetched by the value "{value}"', [
             'value' => $value,
-            'type' => $result::class . '#' . \spl_object_id($result),
+            'type' => $result,
+            'type_name' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 
@@ -55,16 +59,19 @@ final class LoggableTypeRepository implements TypeRepositoryInterface
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        $this->logger->debug('Fetching the type by the AST statement "{statement}"', [
+        $this->logger->debug('Fetching the type by the AST statement {statement_name}', [
             'statement' => $statement,
+            'statement_name' => $statement::class . '#' . \spl_object_id($statement),
             'context' => $context,
         ]);
 
         $result = $this->delegate->getTypeByStatement($statement, $context);
 
-        $this->logger->info('Fetched the type {type} by the AST statement "{statement}"', [
+        $this->logger->info('The {type_name} was fetched by the AST statement {statement_name}', [
             'statement' => $statement,
-            'type' => $result::class . '#' . \spl_object_id($result),
+            'statement_name' => $statement::class . '#' . \spl_object_id($statement),
+            'type' => $result,
+            'type_name' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 

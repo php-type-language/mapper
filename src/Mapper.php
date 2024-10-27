@@ -37,33 +37,29 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createTypeParser(PlatformInterface $platform): TypeParserInterface
     {
-        $parser = new InMemoryTypeParser(
-            delegate: TypeParser::createFromPlatform(
-                platform: $platform,
-            ),
+        $parser = TypeParser::createFromPlatform(
+            platform: $platform,
         );
 
         if (($logger = $this->config->getLogger()) !== null) {
             $parser = new LoggableTypeParser($logger, $parser);
         }
 
-        return $parser;
+        return new InMemoryTypeParser($parser);
     }
 
     private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
     {
-        $repository = new InMemoryTypeRepository(
-            delegate: TypeRepository::createFromPlatform(
-                platform: $platform,
-                parser: $this->parser,
-            ),
+        $repository = TypeRepository::createFromPlatform(
+            platform: $platform,
+            parser: $this->parser,
         );
 
         if (($logger = $this->config->getLogger()) !== null) {
             $repository = new LoggableTypeRepository($logger, $repository);
         }
 
-        return $repository;
+        return new InMemoryTypeRepository($repository);
     }
 
     /**
