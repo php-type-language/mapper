@@ -13,10 +13,12 @@ use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
 use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -41,6 +43,10 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             platform: $platform,
         );
 
+        if (($tracer = $this->config->getTracer()) !== null) {
+            $parser = new TraceableTypeParser($tracer, $parser);
+        }
+
         if (($logger = $this->config->getLogger()) !== null) {
             $parser = new LoggableTypeParser($logger, $parser);
         }
@@ -54,6 +60,10 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             platform: $platform,
             parser: $this->parser,
         );
+
+        if (($tracer = $this->config->getTracer()) !== null) {
+            $repository = new TraceableTypeRepository($tracer, $repository);
+        }
 
         if (($logger = $this->config->getLogger()) !== null) {
             $repository = new LoggableTypeRepository($logger, $repository);

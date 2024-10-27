@@ -10,7 +10,7 @@ use TypeLang\Mapper\Runtime\Tracing\SymfonyStopwatchTracer\SymfonyStopwatchSpan;
 final class SymfonyStopwatchTracer implements TracerInterface
 {
     public function __construct(
-        private readonly Stopwatch $stopwatch,
+        public readonly Stopwatch $stopwatch,
     ) {}
 
     public function start(string $name): SpanInterface
