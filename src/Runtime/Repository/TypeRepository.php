@@ -15,14 +15,7 @@ use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-/**
- * @template-implements \IteratorAggregate<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>>
- */
-final class TypeRepository implements
-    TypeRepositoryInterface,
-    TypeParserInterface,
-    \IteratorAggregate,
-    \Countable
+final class TypeRepository implements TypeRepositoryInterface, TypeParserInterface
 {
     /**
      * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>
@@ -106,15 +99,5 @@ final class TypeRepository implements
         }
 
         throw TypeNotFoundException::becauseTypeNotDefined($statement);
-    }
-
-    public function getIterator(): \Traversable
-    {
-        return new \ArrayIterator($this->builders);
-    }
-
-    public function count(): int
-    {
-        return \count($this->builders);
     }
 }
