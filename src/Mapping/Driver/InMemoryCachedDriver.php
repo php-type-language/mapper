@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class InMemoryCachedDriver extends Driver
 {
@@ -14,10 +15,13 @@ final class InMemoryCachedDriver extends Driver
      */
     private array $memory = [];
 
-    public function getClassMetadata(\ReflectionClass $class, TypeRepository $types): ClassMetadata
-    {
+    public function getClassMetadata(
+        \ReflectionClass $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ClassMetadata {
         // @phpstan-ignore-next-line : class-string<T> key contains ClassMetadata<T> instance
         return $this->memory[$class->name]
-            ??= parent::getClassMetadata($class, $types);
+            ??= parent::getClassMetadata($class, $types, $parser);
     }
 }

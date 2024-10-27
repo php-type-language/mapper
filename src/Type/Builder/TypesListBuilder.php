@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ArrayType;
 use TypeLang\Parser\Node\Stmt\TypesListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -21,8 +22,11 @@ class TypesListBuilder implements TypeBuilderInterface
         return $statement instanceof TypesListNode;
     }
 
-    public function build(TypeStatement $statement, TypeRepository $types): ArrayType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ArrayType {
         $type = $types->getByStatement($statement->type);
 
         return new ArrayType($type);

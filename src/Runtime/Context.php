@@ -12,7 +12,6 @@ use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -27,7 +26,8 @@ abstract class Context implements
     protected function __construct(
         protected readonly mixed $value,
         protected readonly DirectionInterface $direction,
-        protected readonly TypeRepository $types,
+        protected readonly TypeRepositoryInterface $types,
+        protected readonly TypeParserInterface $parser,
         protected readonly ConfigurationInterface $config,
     ) {}
 
@@ -42,6 +42,7 @@ abstract class Context implements
             value: $value,
             direction: $this->direction,
             types: $this->types,
+            parser: $this->parser,
             config: $this->config,
         );
     }
@@ -93,11 +94,11 @@ abstract class Context implements
 
     public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
     {
-        return $this->types->getStatementByValue($type);
+        return $this->parser->getStatementByValue($type);
     }
 
     public function getStatementByValue(mixed $value): TypeStatement
     {
-        return $this->types->getStatementByValue($value);
+        return $this->parser->getStatementByValue($value);
     }
 }

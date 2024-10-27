@@ -6,7 +6,8 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\NullType;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -28,13 +29,14 @@ class NullTypeBuilder extends Builder
     }
 
     /**
-     * @inheritDoc
-     *
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentsNotSupportedException
      */
-    public function build(TypeStatement $statement, TypeRepository $types): NullType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): NullType {
         if ($statement instanceof NullLiteralNode) {
             return new NullType();
         }

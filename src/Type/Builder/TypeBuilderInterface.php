@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -27,5 +28,9 @@ interface TypeBuilderInterface
      * @throws DefinitionException in case of building error
      * @throws \Throwable in case of any internal error
      */
-    public function build(TypeStatement $statement, TypeRepository $types): TypeInterface;
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): TypeInterface;
 }

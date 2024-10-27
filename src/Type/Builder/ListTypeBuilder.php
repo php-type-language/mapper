@@ -8,7 +8,8 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ListType;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -19,16 +20,17 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class ListTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @inheritDoc
-     *
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function build(TypeStatement $statement, TypeRepository $types): ListType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ListType {
         if ($statement->arguments === null || $statement->arguments->count() === 0) {
             return new ListType();
         }

@@ -9,11 +9,15 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
+use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\RootContext;
+use TypeLang\Mapper\Runtime\Parser\TypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
@@ -24,12 +28,25 @@ use TypeLang\Mapper\Type\TypeInterface;
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TypeTestCase extends TestCase
 {
-    protected readonly TypeRepository $types;
+    protected readonly PlatformInterface $platform;
+
+    protected readonly TypeRepositoryInterface $types;
+
+    protected readonly TypeParserInterface $parser;
 
     #[Before]
     protected function setUpDefaultRegistry(): void
     {
-        $this->types = new TypeRepository();
+        $this->platform = new StandardPlatform();
+
+        $this->parser = TypeParser::createFromPlatform(
+            platform: $this->platform,
+        );
+
+        $this->types = TypeRepository::createFromPlatform(
+            platform: $this->platform,
+            parser: $this->parser,
+        );
     }
 
     abstract protected function getType(): TypeInterface;
@@ -109,7 +126,12 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testNormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = RootContext::forNormalization($value, $config, $this->types);
+        $local = RootContext::forNormalization(
+            value: $value,
+            config: $config,
+            parser: $this->parser,
+            types: $this->types,
+        );
 
         $expected = $this->getNormalizationExpectation($value, $type, $local);
 
@@ -121,7 +143,12 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('valuesDataProvider')]
     public function testDenormalization(mixed $value, ValueType $type, Configuration $config): void
     {
-        $local = RootContext::forDenormalization($value, $config, $this->types);
+        $local = RootContext::forDenormalization(
+            value: $value,
+            config: $config,
+            parser: $this->parser,
+            types: $this->types,
+        );
 
         $expected = $this->getDenormalizationExpectation($value, $type, $local);
 

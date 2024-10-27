@@ -11,13 +11,18 @@ use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\SkipWhen;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class AttributeDriver extends LoadableDriver
 {
     #[\Override]
-    protected function load(\ReflectionClass $reflection, ClassMetadata $class, TypeRepository $types): void
-    {
+    protected function load(
+        \ReflectionClass $reflection,
+        ClassMetadata $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): void {
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());
 
@@ -28,7 +33,7 @@ final class AttributeDriver extends LoadableDriver
             $attribute = $this->findPropertyAttribute($property, MapType::class);
 
             if ($attribute !== null) {
-                $type = $this->createType($attribute->type, $property, $types);
+                $type = $this->createType($attribute->type, $property, $types, $parser);
 
                 $metadata->setTypeInfo($type);
             }
@@ -50,7 +55,7 @@ final class AttributeDriver extends LoadableDriver
             $attribute = $this->findPropertyAttribute($property, SkipWhen::class);
 
             if ($attribute !== null) {
-                $type = $this->createType($attribute->type, $property, $types);
+                $type = $this->createType($attribute->type, $property, $types, $parser);
 
                 $metadata->setSkipCondition($type);
             }
@@ -63,9 +68,13 @@ final class AttributeDriver extends LoadableDriver
      * @throws PropertyTypeNotFoundException
      * @throws \Throwable
      */
-    private function createType(string $type, \ReflectionProperty $property, TypeRepository $types): TypeMetadata
-    {
-        $statement = $types->getStatementByType($type);
+    private function createType(
+        string $type,
+        \ReflectionProperty $property,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): TypeMetadata {
+        $statement = $parser->getStatementByType($type);
 
         $class = $property->getDeclaringClass();
 

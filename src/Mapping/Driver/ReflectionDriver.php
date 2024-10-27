@@ -9,7 +9,8 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Name;
@@ -22,8 +23,12 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 final class ReflectionDriver extends LoadableDriver
 {
     #[\Override]
-    protected function load(\ReflectionClass $reflection, ClassMetadata $class, TypeRepository $types): void
-    {
+    protected function load(
+        \ReflectionClass $reflection,
+        ClassMetadata $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): void {
         foreach ($reflection->getProperties() as $property) {
             if (!self::isValidProperty($property)) {
                 continue;
@@ -68,9 +73,13 @@ final class ReflectionDriver extends LoadableDriver
     /**
      * @throws PropertyTypeNotFoundException
      * @throws \InvalidArgumentException
+     * @throws \Throwable
      */
-    private function fillType(\ReflectionProperty $property, PropertyMetadata $meta, TypeRepository $types): void
-    {
+    private function fillType(
+        \ReflectionProperty $property,
+        PropertyMetadata $meta,
+        TypeRepositoryInterface $types,
+    ): void {
         $statement = $this->getTypeStatement($property);
 
         try {

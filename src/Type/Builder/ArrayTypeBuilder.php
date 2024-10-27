@@ -8,7 +8,8 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ArrayType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -20,15 +21,16 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class ArrayTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @inheritDoc
-     *
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws TypeNotFoundException
      * @throws ShapeFieldsNotSupportedException
      */
-    public function build(TypeStatement $statement, TypeRepository $types): ArrayType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ArrayType {
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];
@@ -51,7 +53,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByKeyValue(NamedTypeNode $statement, TypeRepository $types): ArrayType
+    private function buildByKeyValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 
@@ -77,7 +79,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByValue(NamedTypeNode $statement, TypeRepository $types): ArrayType
+    private function buildByValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 

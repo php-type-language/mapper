@@ -12,7 +12,12 @@ use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\EvolvableConfigurationInterface;
+use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements
@@ -20,13 +25,26 @@ final class Mapper implements
     DenormalizerInterface,
     EvolvableConfigurationInterface
 {
-    private readonly TypeRepository $types;
+    private readonly TypeRepositoryInterface $types;
+
+    private readonly TypeParserInterface $parser;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private Configuration $config = new Configuration(),
     ) {
-        $this->types = new TypeRepository($this->platform);
+        $this->parser = new InMemoryTypeParser(
+            delegate: TypeParser::createFromPlatform(
+                platform: $platform,
+            ),
+        );
+
+        $this->types = new InMemoryTypeRepository(
+            delegate: TypeRepository::createFromPlatform(
+                platform: $platform,
+                parser: $this->parser,
+            ),
+        );
     }
 
     public function withObjectsAsArrays(?bool $enabled = null): self
@@ -60,9 +78,19 @@ final class Mapper implements
      *
      * @api
      */
-    public function getTypes(): TypeRepository
+    public function getTypes(): TypeRepositoryInterface
     {
         return $this->types;
+    }
+
+    /**
+     * Returns current types parser.
+     *
+     * @api
+     */
+    public function getParser(): TypeParserInterface
+    {
+        return $this->parser;
     }
 
     /**
@@ -77,6 +105,7 @@ final class Mapper implements
         return $instance->cast($value, RootContext::forNormalization(
             value: $value,
             config: $this->config,
+            parser: $this->parser,
             types: $this->types,
         ));
     }
@@ -92,6 +121,7 @@ final class Mapper implements
         return $instance->match($value, RootContext::forNormalization(
             value: $value,
             config: $this->config,
+            parser: $this->parser,
             types: $this->types,
         ));
     }
@@ -108,6 +138,7 @@ final class Mapper implements
         return $instance->cast($value, RootContext::forDenormalization(
             value: $value,
             config: $this->config,
+            parser: $this->parser,
             types: $this->types,
         ));
     }
@@ -123,6 +154,7 @@ final class Mapper implements
         return $instance->match($value, RootContext::forDenormalization(
             value: $value,
             config: $this->config,
+            parser: $this->parser,
             types: $this->types,
         ));
     }

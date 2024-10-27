@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 abstract class Driver implements DriverInterface
 {
@@ -13,8 +14,11 @@ abstract class Driver implements DriverInterface
         private readonly DriverInterface $delegate = new NullDriver(),
     ) {}
 
-    public function getClassMetadata(\ReflectionClass $class, TypeRepository $types): ClassMetadata
-    {
-        return $this->delegate->getClassMetadata($class, $types);
+    public function getClassMetadata(
+        \ReflectionClass $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ClassMetadata {
+        return $this->delegate->getClassMetadata($class, $types, $parser);
     }
 }

@@ -8,7 +8,8 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
@@ -23,15 +24,16 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 class IntTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @inheritDoc
-     *
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws ShapeFieldsNotSupportedException
      */
-    public function build(TypeStatement $statement, TypeRepository $types): IntType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): IntType {
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];

@@ -22,8 +22,6 @@ final class ClassMetadata extends Metadata
     /**
      * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
-     *
-     * @throws \Exception
      */
     public function __construct(
         private readonly string $name,

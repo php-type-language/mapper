@@ -9,7 +9,8 @@ use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotS
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\NonEmpty;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -20,8 +21,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class NonEmptyTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @inheritDoc
-     *
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws MissingTemplateArgumentsException
@@ -29,8 +28,11 @@ class NonEmptyTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function build(TypeStatement $statement, TypeRepository $types): NonEmpty
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): NonEmpty {
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsCount($statement, 1);
 

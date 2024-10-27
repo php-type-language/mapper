@@ -7,64 +7,46 @@ namespace TypeLang\Mapper\Runtime\Repository;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class TypeRepository implements TypeRepositoryInterface, TypeParserInterface
+final class TypeRepository implements TypeRepositoryInterface
 {
     /**
-     * @var list<TypeBuilderInterface<TypeStatement, TypeInterface>>
+     * @var list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
      */
     protected array $builders = [];
 
-    private readonly TypeParserInterface $parser;
-
     /**
-     * @var \WeakMap<TypeStatement, TypeInterface>
+     * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
      */
-    private readonly \WeakMap $memory;
-
     public function __construct(
-        PlatformInterface $platform = new StandardPlatform(),
+        private readonly TypeParserInterface $parser,
+        iterable $types = [],
         private readonly ReferencesResolver $references = new ReferencesResolver(),
     ) {
-        $this->parser = new InMemoryTypeParser(
-            delegate: TypeParser::createFromPlatform(
-                platform: $platform,
-            ),
-        );
-        $this->builders = $this->getTypeBuilders($platform);
-        $this->memory = new \WeakMap();
-    }
-
-    /**
-     * @return list<TypeBuilderInterface<TypeStatement, TypeInterface>>
-     */
-    private function getTypeBuilders(PlatformInterface $platform): array
-    {
-        /** @var iterable<array-key, TypeBuilderInterface<TypeStatement, TypeInterface>> $builders */
-        $builders = $platform->getTypes();
-
-        return match (true) {
-            $builders instanceof \Traversable => \iterator_to_array($builders, false),
-            \array_is_list($builders) => $builders,
-            default => \array_values($builders),
+        $this->builders = match (true) {
+            $types instanceof \Traversable => \iterator_to_array($types, false),
+            \array_is_list($types) => $types,
+            default => \array_values($types),
         };
     }
 
-    public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
-    {
-        return $this->parser->getStatementByType($type);
-    }
-
-    public function getStatementByValue(mixed $value): TypeStatement
-    {
-        return $this->parser->getStatementByValue($value);
+    /**
+     * TODO should me moved to an external factory class
+     */
+    public static function createFromPlatform(
+        PlatformInterface $platform,
+        TypeParserInterface $parser,
+        ReferencesResolver $references = new ReferencesResolver(),
+    ): self {
+        return new self(
+            parser: $parser,
+            types: $platform->getTypes(),
+            references: $references,
+        );
     }
 
     public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
@@ -83,18 +65,14 @@ final class TypeRepository implements TypeRepositoryInterface, TypeParserInterfa
 
     public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        if (isset($this->memory[$statement])) {
-            return $this->memory[$statement];
-        }
-
         if ($context !== null) {
             $statement = $this->references->resolve($statement, $context);
         }
 
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
-                // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
-                return $this->memory[$statement] = $factory->build($statement, $this);
+                // @phpstan-ignore-next-line : Statement expects a bottom type (never), but TypeStatement passed
+                return $factory->build($statement, $this, $this->parser);
             }
         }
 

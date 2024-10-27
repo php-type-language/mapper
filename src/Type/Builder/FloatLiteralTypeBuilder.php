@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\FloatLiteralType;
 use TypeLang\Parser\Node\Literal\FloatLiteralNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -19,8 +20,11 @@ class FloatLiteralTypeBuilder implements TypeBuilderInterface
         return $statement instanceof FloatLiteralNode;
     }
 
-    public function build(TypeStatement $statement, TypeRepository $types): FloatLiteralType
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): FloatLiteralType {
         return new FloatLiteralType($statement->value);
     }
 }

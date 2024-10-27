@@ -6,7 +6,8 @@ namespace TypeLang\Mapper\Mapping\Driver;
 
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 /**
  * Implements each driver that can supplement or modify existing
@@ -33,16 +34,20 @@ abstract class LoadableDriver extends Driver
      * @return ClassMetadata<TArg>
      * @throws \Throwable in case of internal error occurred
      */
-    public function getClassMetadata(\ReflectionClass $class, TypeRepository $types): ClassMetadata
-    {
+    public function getClassMetadata(
+        \ReflectionClass $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ClassMetadata {
         if (isset(self::$metadata[$class->getName()])) {
             /** @var ClassMetadata<TArg> */
             return self::$metadata[$class->getName()];
         }
 
-        self::$metadata[$class->getName()] = $metadata = parent::getClassMetadata($class, $types);
+        self::$metadata[$class->getName()] = $metadata
+            = parent::getClassMetadata($class, $types, $parser);
 
-        $this->load($class, $metadata, $types);
+        $this->load($class, $metadata, $types, $parser);
 
         try {
             return $metadata;
@@ -63,6 +68,7 @@ abstract class LoadableDriver extends Driver
     abstract protected function load(
         \ReflectionClass $reflection,
         ClassMetadata $class,
-        TypeRepository $types,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): void;
 }
