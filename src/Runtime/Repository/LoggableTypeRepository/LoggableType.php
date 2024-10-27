@@ -37,16 +37,16 @@ final class LoggableType implements TypeInterface
     public function match(mixed $value, Context $context): bool
     {
         $this->logger->debug(
-            'Matching the value by the type {type_name}',
+            'Matching by the {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
         $result = $this->delegate->match($value, $context);
 
-        $this->logger->debug(
+        $this->logger->info(
             $result === true
-                ? '[matched] The value will be matched by the type {type_name}'
-                : '[not-matched] The value will NOT be matched by the type {type_name}',
+                ? 'Matched by the {type_name}'
+                : 'Not matched by the {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
@@ -56,21 +56,21 @@ final class LoggableType implements TypeInterface
     public function cast(mixed $value, Context $context): mixed
     {
         $this->logger->debug(
-            'Casting the value using type {type_name}',
+            'Casting by the {type_name}',
             $this->getLoggerArguments($value, $context),
         );
 
         try {
             $result = $this->delegate->cast($value, $context);
         } catch (\Throwable $e) {
-            $this->logger->error('Casting of the value using type {type_name} was failed', [
+            $this->logger->error('Casting by the {type_name} was failed', [
                 ...$this->getLoggerArguments($value, $context),
                 'error' => $e,
             ]);
             throw $e;
         }
 
-        $this->logger->debug('The value will be casted by the type {type_name}', [
+        $this->logger->info('Casted by the {type_name}', [
             ...$this->getLoggerArguments($value, $context),
             'result' => $result,
         ]);
