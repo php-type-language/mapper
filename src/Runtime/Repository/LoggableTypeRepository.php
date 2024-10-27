@@ -5,76 +5,69 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use JetBrains\PhpStorm\Language;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository\LoggableType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class LoggableTypeRepository implements
-    TypeRepositoryInterface,
-    LoggerAwareInterface
+final class LoggableTypeRepository implements TypeRepositoryInterface
 {
-    use LoggerAwareTrait;
-
     public function __construct(
+        private readonly LoggerInterface $logger,
         private readonly TypeRepositoryInterface $delegate,
-        ?LoggerInterface $logger = null,
-    ) {
-        $this->logger = $logger;
-    }
+    ) {}
 
     public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
-        $this->logger?->debug('Fetching the type from the definition "{definition}"', [
+        $this->logger->debug('Fetching the type by the definition "{definition}"', [
             'definition' => $definition,
             'context' => $context,
         ]);
 
         $result = $this->delegate->getTypeByDefinition($definition, $context);
 
-        $this->logger?->info('Fetched the type {type} from the definition "{definition}"', [
+        $this->logger->info('Fetched the type {type} by the definition "{definition}"', [
             'definition' => $definition,
-            'type' => $result,
+            'type' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 
-        return $result;
+        return new LoggableType($this->logger, $result);
     }
 
     public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
-        $this->logger?->debug('Fetching the type from the value "{value}"', [
+        $this->logger->debug('Fetching the type by the value "{value}"', [
             'value' => $value,
             'context' => $context,
         ]);
 
         $result = $this->delegate->getTypeByValue($value, $context);
 
-        $this->logger?->info('Fetched the type {type} from the value "{value}"', [
+        $this->logger->info('Fetched the type {type} by the value "{value}"', [
             'value' => $value,
-            'type' => $result,
+            'type' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 
-        return $result;
+        return new LoggableType($this->logger, $result);
     }
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        $this->logger?->debug('Fetching the type from the AST statement "{statement}"', [
+        $this->logger->debug('Fetching the type by the AST statement "{statement}"', [
             'statement' => $statement,
             'context' => $context,
         ]);
 
         $result = $this->delegate->getTypeByStatement($statement, $context);
 
-        $this->logger?->info('Fetched the type {type} from the AST statement "{statement}"', [
+        $this->logger->info('Fetched the type {type} by the AST statement "{statement}"', [
             'statement' => $statement,
-            'type' => $result,
+            'type' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
 
-        return $result;
+        return new LoggableType($this->logger, $result);
     }
 }

@@ -44,7 +44,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         );
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $parser = new LoggableTypeParser($parser, $logger);
+            $parser = new LoggableTypeParser($logger, $parser);
         }
 
         return $parser;
@@ -60,7 +60,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         );
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $repository = new LoggableTypeRepository($repository, $logger);
+            $repository = new LoggableTypeRepository($logger, $repository);
         }
 
         return $repository;
