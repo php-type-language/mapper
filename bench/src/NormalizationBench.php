@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Bench;
+namespace TypeLang\Mapper\Bench;
 
 use CuyZ\Valinor\Normalizer\Normalizer;
 use JMS\Serializer\ArrayTransformerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface as SymfonyNormalizerInterface;
 use TypeLang\Mapper\NormalizerInterface as TypeLangNormalizerInterface;
-use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
+use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 abstract class NormalizationBench implements BenchInterface
 {

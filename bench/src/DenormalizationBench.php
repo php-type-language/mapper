@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Bench;
+namespace TypeLang\Mapper\Bench;
 
 use CuyZ\Valinor\Mapper\Source\Source;
 use CuyZ\Valinor\Mapper\TreeMapper;
 use JMS\Serializer\ArrayTransformerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface as SymfonyDenormalizerInterface;
 use TypeLang\Mapper\DenormalizerInterface as TypeLangDenormalizerInterface;
-use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
+use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 abstract class DenormalizationBench implements BenchInterface
 {

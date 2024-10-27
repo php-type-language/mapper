@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Bench;
+namespace TypeLang\Mapper\Bench;
 
 use CuyZ\Valinor\MapperBuilder;
 use CuyZ\Valinor\Normalizer\Format;
@@ -29,7 +29,7 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
 use TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO;
+use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 #[Revs(50), Warmup(5), Iterations(30), RetryThreshold(5), BeforeMethods('prepare')]
 final class CachedNormalizationBench extends NormalizationBench

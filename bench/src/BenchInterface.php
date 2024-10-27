@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Bench;
+namespace TypeLang\Mapper\Bench;
 
 interface BenchInterface
 {

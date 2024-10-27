@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Bench\Stub;
+namespace TypeLang\Mapper\Bench\Stub;
 
 use JMS\Serializer\Annotation\Type;
 use TypeLang\Mapper\Mapping\MapType;
@@ -15,7 +15,7 @@ final readonly class ExampleRequestDTO
          * @var list<ExampleRequestDTO>
          */
         #[MapType('list<ExampleRequestDTO>')]
-        #[Type('array<TypeLang\Mapper\Tests\Bench\Stub\ExampleRequestDTO>')]
+        #[Type('array<TypeLang\Mapper\Bench\Stub\ExampleRequestDTO>')]
         public array $items = [],
     ) {}
 }

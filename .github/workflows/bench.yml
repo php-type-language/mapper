@@ -24,13 +24,15 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-      - name: Validate Composer
-        run: composer validate
       - name: Install Dependencies
         uses: nick-invision/retry@v2
         with:
           timeout_minutes: 5
           max_attempts: 5
-          command: composer update --prefer-dist --no-interaction --no-progress
+          command: |
+            cd bench
+            composer update --prefer-dist --no-interaction --no-progress
       - name: Run Benchmarks
-        run: composer bench
+        run: |
+          cd bench
+          composer bench
