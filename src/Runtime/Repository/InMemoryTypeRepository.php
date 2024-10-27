@@ -21,20 +21,20 @@ final class InMemoryTypeRepository implements TypeRepositoryInterface
         $this->types = new \WeakMap();
     }
 
-    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->delegate->getByType($type, $context);
+        return $this->delegate->getTypeByDefinition($definition, $context);
     }
 
-    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->delegate->getByValue($value, $context);
+        return $this->delegate->getTypeByValue($value, $context);
     }
 
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
         return $this->types[$statement]
-            ??= $this->delegate->getByStatement($statement, $context);
+            ??= $this->delegate->getTypeByStatement($statement, $context);
     }
 }

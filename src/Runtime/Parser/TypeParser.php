@@ -39,9 +39,9 @@ final class TypeParser implements TypeParserInterface
         ));
     }
 
-    public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
+    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        return $this->parser->parse(new Source($type));
+        return $this->parser->parse(new Source($definition));
     }
 
     public function getStatementByValue(mixed $value): TypeStatement

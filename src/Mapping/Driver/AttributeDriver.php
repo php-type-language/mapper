@@ -74,12 +74,12 @@ final class AttributeDriver extends LoadableDriver
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeMetadata {
-        $statement = $parser->getStatementByType($type);
+        $statement = $parser->getStatementByDefinition($type);
 
         $class = $property->getDeclaringClass();
 
         try {
-            $instance = $types->getByStatement($statement, $class);
+            $instance = $types->getTypeByStatement($statement, $class);
         } catch (TypeNotFoundException $e) {
             throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                 class: $class->getName(),

@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime;
 
-final class Configuration implements ConfigurationInterface, EvolvableConfigurationInterface
+use Psr\Log\LoggerInterface;
+
+final class Configuration implements
+    ConfigurationInterface,
+    EvolvableConfigurationInterface
 {
     /**
      * Default value for {@see $objectsAsArrays} option.
@@ -22,12 +26,18 @@ final class Configuration implements ConfigurationInterface, EvolvableConfigurat
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        protected ?bool $objectsAsArrays = null,
+        private ?bool $objectsAsArrays = null,
         /**
          * If this option contains {@see true}, then all composite types will
          * be displayed along with detailed fields/values.
          */
-        protected ?bool $detailedTypes = null,
+        private ?bool $detailedTypes = null,
+        /**
+         * If this option contains {@see LoggerInterface}, then logger
+         * will be enabled. Otherwise logger will be disabled in case of
+         * argument contain {@see null}.
+         */
+        private ?LoggerInterface $logger = null,
     ) {}
 
     public function withObjectsAsArrays(?bool $enabled = null): self
@@ -54,5 +64,18 @@ final class Configuration implements ConfigurationInterface, EvolvableConfigurat
     public function isDetailedTypes(): bool
     {
         return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
+    }
+
+    public function withLogger(?LoggerInterface $logger = null): self
+    {
+        $self = clone $this;
+        $self->logger = $logger;
+
+        return $self;
+    }
+
+    public function getLogger(): ?LoggerInterface
+    {
+        return $this->logger;
     }
 }

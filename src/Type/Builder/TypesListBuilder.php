@@ -27,7 +27,7 @@ class TypesListBuilder implements TypeBuilderInterface
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ArrayType {
-        $type = $types->getByStatement($statement->type);
+        $type = $types->getTypeByStatement($statement->type);
 
         return new ArrayType($type);
     }

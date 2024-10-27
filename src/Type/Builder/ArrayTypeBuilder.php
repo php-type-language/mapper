@@ -69,8 +69,8 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $value);
 
         return new ArrayType(
-            key: $types->getByStatement($key->value),
-            value: $types->getByStatement($value->value),
+            key: $types->getTypeByStatement($key->value),
+            value: $types->getTypeByStatement($value->value),
         );
     }
 
@@ -91,7 +91,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $value);
 
         return new ArrayType(
-            value: $types->getByStatement($value->value),
+            value: $types->getTypeByStatement($value->value),
         );
     }
 }

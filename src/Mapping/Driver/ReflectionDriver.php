@@ -83,7 +83,7 @@ final class ReflectionDriver extends LoadableDriver
         $statement = $this->getTypeStatement($property);
 
         try {
-            $type = $types->getByStatement($statement);
+            $type = $types->getTypeByStatement($statement);
         } catch (TypeNotFoundException $e) {
             $class = $property->getDeclaringClass();
 

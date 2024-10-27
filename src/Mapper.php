@@ -11,19 +11,17 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
-use TypeLang\Mapper\Runtime\EvolvableConfigurationInterface;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
+use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class Mapper implements
-    NormalizerInterface,
-    DenormalizerInterface,
-    EvolvableConfigurationInterface
+final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
     private readonly TypeRepositoryInterface $types;
 
@@ -31,36 +29,41 @@ final class Mapper implements
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
-        private Configuration $config = new Configuration(),
+        private readonly Configuration $config = new Configuration(),
     ) {
-        $this->parser = new InMemoryTypeParser(
+        $this->parser = $this->createTypeParser($platform);
+        $this->types = $this->createTypeRepository($platform);
+    }
+
+    private function createTypeParser(PlatformInterface $platform): TypeParserInterface
+    {
+        $parser = new InMemoryTypeParser(
             delegate: TypeParser::createFromPlatform(
                 platform: $platform,
             ),
         );
 
-        $this->types = new InMemoryTypeRepository(
+        if (($logger = $this->config->getLogger()) !== null) {
+            $parser = new LoggableTypeParser($parser, $logger);
+        }
+
+        return $parser;
+    }
+
+    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
+    {
+        $repository = new InMemoryTypeRepository(
             delegate: TypeRepository::createFromPlatform(
                 platform: $platform,
                 parser: $this->parser,
             ),
         );
-    }
 
-    public function withObjectsAsArrays(?bool $enabled = null): self
-    {
-        $self = clone $this;
-        $self->config = $this->config->withObjectsAsArrays($enabled);
+        if (($logger = $this->config->getLogger()) !== null) {
+            $repository = new LoggableTypeRepository($repository, $logger);
+        }
 
-        return $self;
-    }
-
-    public function withDetailedTypes(?bool $enabled = null): self
-    {
-        $self = clone $this;
-        $self->config = $this->config->withDetailedTypes($enabled);
-
-        return $self;
+        return $repository;
     }
 
     /**
@@ -168,9 +171,9 @@ final class Mapper implements
     private function getType(mixed $value, ?string $type): TypeInterface
     {
         if ($type === null) {
-            return $this->types->getByValue($value);
+            return $this->types->getTypeByValue($value);
         }
 
-        return $this->types->getByType($type);
+        return $this->types->getTypeByDefinition($type);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use JetBrains\PhpStorm\Language;
+use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -62,6 +63,11 @@ abstract class Context implements
         return $this->config->isDetailedTypes();
     }
 
+    public function getLogger(): ?LoggerInterface
+    {
+        return $this->config->getLogger();
+    }
+
     public function isNormalization(): bool
     {
         return $this->direction->isNormalization();
@@ -77,24 +83,24 @@ abstract class Context implements
         return new Path();
     }
 
-    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->types->getByType($type, $context);
+        return $this->types->getTypeByDefinition($definition, $context);
     }
 
-    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->types->getByValue($value, $context);
+        return $this->types->getTypeByValue($value, $context);
     }
 
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        return $this->types->getByStatement($statement, $context);
+        return $this->types->getTypeByStatement($statement, $context);
     }
 
-    public function getStatementByType(#[Language('PHP')] string $type): TypeStatement
+    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        return $this->parser->getStatementByValue($type);
+        return $this->parser->getStatementByValue($definition);
     }
 
     public function getStatementByValue(mixed $value): TypeStatement

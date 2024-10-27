@@ -49,21 +49,21 @@ final class TypeRepository implements TypeRepositoryInterface
         );
     }
 
-    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
-        $statement = $this->parser->getStatementByType($type);
+        $statement = $this->parser->getStatementByDefinition($definition);
 
-        return $this->getByStatement($statement, $context);
+        return $this->getTypeByStatement($statement, $context);
     }
 
-    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parser->getStatementByValue($value);
 
-        return $this->getByStatement($statement, $context);
+        return $this->getTypeByStatement($statement, $context);
     }
 
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         if ($context !== null) {
             $statement = $this->references->resolve($statement, $context);

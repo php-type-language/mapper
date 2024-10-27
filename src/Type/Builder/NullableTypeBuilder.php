@@ -27,7 +27,7 @@ class NullableTypeBuilder implements TypeBuilderInterface
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): NullableType {
-        $type = $types->getByStatement($statement->type);
+        $type = $types->getTypeByStatement($statement->type);
 
         return new NullableType($type);
     }

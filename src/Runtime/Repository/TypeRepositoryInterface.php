@@ -12,13 +12,17 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 interface TypeRepositoryInterface
 {
     /**
-     * @param non-empty-string $type
+     * @param non-empty-string $definition
      * @param \ReflectionClass<object>|null $context
      *
      * @throws TypeNotFoundException in case of type cannot be loaded
      * @throws \Throwable in case of any internal error occurs
      */
-    public function getByType(#[Language('PHP')] string $type, ?\ReflectionClass $context = null): TypeInterface;
+    public function getTypeByDefinition(
+        #[Language('PHP')]
+        string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeInterface;
 
     /**
      * @param \ReflectionClass<object>|null $context
@@ -26,7 +30,10 @@ interface TypeRepositoryInterface
      * @throws TypeNotFoundException in case of type cannot be loaded
      * @throws \Throwable in case of any internal error occurs
      */
-    public function getByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface;
+    public function getTypeByValue(
+        mixed $value,
+        ?\ReflectionClass $context = null,
+    ): TypeInterface;
 
     /**
      * @param \ReflectionClass<object>|null $context
@@ -34,5 +41,8 @@ interface TypeRepositoryInterface
      * @throws TypeNotFoundException in case of type cannot be loaded
      * @throws \Throwable in case of any internal error occurs
      */
-    public function getByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface;
+    public function getTypeByStatement(
+        TypeStatement $statement,
+        ?\ReflectionClass $context = null,
+    ): TypeInterface;
 }

@@ -7,7 +7,8 @@ use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\Builder\Builder;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -25,8 +26,11 @@ class MyNonEmptyTypeBuilder extends Builder
             && $statement->name->toLowerString() === 'non-empty';
     }
 
-    public function build(TypeStatement $statement, TypeRepository $types): TypeInterface
-    {
+    public function build(
+        TypeStatement $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): TypeInterface {
         // Shape fields not allowed (like: "non-empty{...}")
         $this->expectNoShapeFields($statement);
         // Expects only template argument (like: "non-empty<T>", but NOT "non-empty<T, U>")
@@ -35,7 +39,7 @@ class MyNonEmptyTypeBuilder extends Builder
         $innerArgument = $statement->arguments->first();
 
         // inner type of TypeInterface
-        $type = $types->getByStatement($innerArgument->value);
+        $type = $types->getTypeByStatement($innerArgument->value);
 
         return new MyNonEmptyType($type);
     }

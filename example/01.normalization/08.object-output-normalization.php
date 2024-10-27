@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Runtime\Configuration;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -20,8 +21,11 @@ class ItemsResultDTO
     ) {}
 }
 
-$mapper = (new Mapper())
-    ->withObjectsAsArrays(false);
+$mapper = new Mapper(
+    config: new Configuration(
+        objectsAsArrays: true,
+    ),
+);
 
 $value = new ItemsResultDTO([
     'key1' => new ItemDTO(value: 'first'),

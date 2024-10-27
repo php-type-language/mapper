@@ -49,7 +49,7 @@ class ListTypeBuilder extends NamedTypeBuilder
         }
 
         return new ListType(
-            type: $types->getByStatement($first->value),
+            type: $types->getTypeByStatement($first->value),
         );
     }
 }

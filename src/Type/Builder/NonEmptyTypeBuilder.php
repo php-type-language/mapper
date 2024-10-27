@@ -44,7 +44,7 @@ class NonEmptyTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $inner);
 
         return new NonEmpty(
-            type: $types->getByStatement($inner->value),
+            type: $types->getTypeByStatement($inner->value),
         );
     }
 }

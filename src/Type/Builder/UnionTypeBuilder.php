@@ -28,7 +28,7 @@ class UnionTypeBuilder implements TypeBuilderInterface
         $result = [];
 
         foreach ($statement->statements as $leaf) {
-            $result[] = $types->getByStatement($leaf);
+            $result[] = $types->getTypeByStatement($leaf);
         }
 
         return new UnionType($result);
