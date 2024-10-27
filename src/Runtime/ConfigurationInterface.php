@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 
 interface ConfigurationInterface
 {
@@ -24,4 +25,9 @@ interface ConfigurationInterface
      * Returns the currently used logger.
      */
     public function getLogger(): ?LoggerInterface;
+
+    /**
+     * Return the currently used application tracer.
+     */
+    public function getTracer(): ?TracerInterface;
 }

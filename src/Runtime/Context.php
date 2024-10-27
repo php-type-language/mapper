@@ -14,6 +14,7 @@ use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -66,6 +67,11 @@ abstract class Context implements
     public function getLogger(): ?LoggerInterface
     {
         return $this->config->getLogger();
+    }
+
+    public function getTracer(): ?TracerInterface
+    {
+        return $this->config->getTracer();
     }
 
     public function isNormalization(): bool

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 
 final class Configuration implements
     ConfigurationInterface,
@@ -38,6 +39,12 @@ final class Configuration implements
          * argument contain {@see null}.
          */
         private ?LoggerInterface $logger = null,
+        /**
+         * If this option contains {@see TracerInterface}, then an application
+         * tracing will be enabled using given tracer. Otherwise an application
+         * tracing will be disabled in case of argument contain {@see null}.
+         */
+        private ?TracerInterface $tracer = null,
     ) {}
 
     public function withObjectsAsArrays(?bool $enabled = null): self
@@ -77,5 +84,18 @@ final class Configuration implements
     public function getLogger(): ?LoggerInterface
     {
         return $this->logger;
+    }
+
+    public function withTracer(?TracerInterface $tracer = null): self
+    {
+        $self = clone $this;
+        $self->tracer = $tracer;
+
+        return $self;
+    }
+
+    public function getTracer(): ?TracerInterface
+    {
+        return $this->tracer;
     }
 }

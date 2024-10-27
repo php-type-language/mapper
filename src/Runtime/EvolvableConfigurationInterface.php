@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 
 interface EvolvableConfigurationInterface
 {
@@ -23,8 +24,15 @@ interface EvolvableConfigurationInterface
     public function withDetailedTypes(?bool $enabled = null): self;
 
     /**
-     * Enables (in case of logger instance is present) or disables
-     * (in case of logger is {@see null}) logger.
+     * Enables logging using passed instance in case of {@see LoggerInterface}
+     * instance is present or disables it in case of logger is {@see null}.
      */
     public function withLogger(?LoggerInterface $logger = null): self;
+
+    /**
+     * Enables application tracing using passed instance in case of
+     * {@see TracerInterface} instance is present or disables it in case of
+     * tracer is {@see null}.
+     */
+    public function withTracer(?TracerInterface $tracer = null): self;
 }
