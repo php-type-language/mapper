@@ -72,7 +72,7 @@ final class TraceableType implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        $span = $this->tracer->start(\vsprintf('Type matching [%s at %s]', [
+        $span = $this->tracer->start(\vsprintf('Type matching %s at "%s"', [
             $this->name,
             self::getCurrentPath($context),
         ]));
@@ -94,7 +94,7 @@ final class TraceableType implements TypeInterface
 
     public function cast(mixed $value, Context $context): mixed
     {
-        $span = $this->tracer->start(\vsprintf('Type casting [%s at %s]', [
+        $span = $this->tracer->start(\vsprintf('Type casting %s at "%s"', [
             $this->name,
             self::getCurrentPath($context),
         ]));
