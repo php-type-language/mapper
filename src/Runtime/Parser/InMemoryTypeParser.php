@@ -35,12 +35,17 @@ final class InMemoryTypeParser implements TypeParserInterface
     {
         $this->cleanup();
 
-        return $this->types[$definition] ??= $this->delegate->getStatementByDefinition($definition);
+        return $this->types[$definition]
+            ??= $this->delegate->getStatementByDefinition($definition);
     }
 
     public function getStatementByValue(mixed $value): TypeStatement
     {
-        return $this->delegate->getStatementByValue($value);
+        $this->cleanup();
+
+        // @phpstan-ignore-next-line : get_debug_type always returns a non-empty-string
+        return $this->types[\get_debug_type($value)]
+            ??= $this->delegate->getStatementByValue($value);
     }
 
     private function cleanup(): void
