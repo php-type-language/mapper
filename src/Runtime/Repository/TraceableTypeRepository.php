@@ -24,10 +24,14 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         string $definition,
         ?\ReflectionClass $context = null,
     ): TypeInterface {
-        $span = $this->tracer->start('type-lang::fetching');
+        $span = $this->tracer->start(\sprintf('Fetching by definition [%s]', $definition));
 
         try {
+            $span->setAttribute('value', $definition);
+
             $result = $this->delegate->getTypeByDefinition($definition, $context);
+
+            $span->setAttribute('result', $result);
         } finally {
             $span->stop();
         }
@@ -37,10 +41,14 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
 
     public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
-        $span = $this->tracer->start('type-lang::fetching');
+        $span = $this->tracer->start(\sprintf('Fetching by value [%s]', \get_debug_type($value)));
 
         try {
+            $span->setAttribute('value', $value);
+
             $result = $this->delegate->getTypeByValue($value, $context);
+
+            $span->setAttribute('result', $result);
         } finally {
             $span->stop();
         }
@@ -50,10 +58,14 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
-        $span = $this->tracer->start('type-lang::fetching');
+        $span = $this->tracer->start(\sprintf('Fetching by statement "%s"', \get_debug_type($statement)));
 
         try {
+            $span->setAttribute('value', $statement);
+
             $result = $this->delegate->getTypeByStatement($statement, $context);
+
+            $span->setAttribute('result', $result);
         } finally {
             $span->stop();
         }

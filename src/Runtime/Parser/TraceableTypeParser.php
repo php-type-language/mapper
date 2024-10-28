@@ -17,10 +17,16 @@ final class TraceableTypeParser implements TypeParserInterface
 
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        $span = $this->tracer->start('type-lang::parsing');
+        $span = $this->tracer->start(\sprintf('Parsing by definition [%s]', $definition));
 
         try {
-            return $this->delegate->getStatementByDefinition($definition);
+            $span->setAttribute('value', $definition);
+
+            $result = $this->delegate->getStatementByDefinition($definition);
+
+            $span->setAttribute('result', $result);
+
+            return $result;
         } finally {
             $span->stop();
         }
@@ -28,10 +34,16 @@ final class TraceableTypeParser implements TypeParserInterface
 
     public function getStatementByValue(mixed $value): TypeStatement
     {
-        $span = $this->tracer->start('type-lang::parsing');
+        $span = $this->tracer->start(\sprintf('Parsing by value [%s]', \get_debug_type($value)));
 
         try {
-            return $this->delegate->getStatementByValue($value);
+            $span->setAttribute('value', $value);
+
+            $result = $this->delegate->getStatementByValue($value);
+
+            $span->setAttribute('result', $result);
+
+            return $result;
         } finally {
             $span->stop();
         }
