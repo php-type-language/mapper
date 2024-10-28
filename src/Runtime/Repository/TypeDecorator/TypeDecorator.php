@@ -14,7 +14,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 abstract class TypeDecorator implements TypeDecoratorInterface
 {
     public function __construct(
-        private readonly TypeInterface $delegate,
+        protected readonly TypeInterface $delegate,
     ) {}
 
     public function getDecoratedType(): TypeInterface
@@ -34,5 +34,13 @@ abstract class TypeDecorator implements TypeDecoratorInterface
     public function cast(mixed $value, Context $context): mixed
     {
         return $this->delegate->cast($value, $context);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function __serialize(): array
+    {
+        return ['delegate' => $this->delegate];
     }
 }

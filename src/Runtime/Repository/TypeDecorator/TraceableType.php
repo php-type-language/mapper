@@ -21,7 +21,7 @@ final class TraceableType extends TypeDecorator
     private readonly string $name;
 
     public function __construct(
-        private readonly TracerInterface $tracer,
+        private readonly ?TracerInterface $tracer,
         TypeInterface $delegate,
     ) {
         parent::__construct($delegate);
@@ -61,6 +61,10 @@ final class TraceableType extends TypeDecorator
 
     public function match(mixed $value, Context $context): bool
     {
+        if ($this->tracer === null) {
+            return parent::match($value, $context);
+        }
+
         $span = $this->tracer->start(\sprintf('Match %s', $this->name));
 
         try {
@@ -80,6 +84,10 @@ final class TraceableType extends TypeDecorator
 
     public function cast(mixed $value, Context $context): mixed
     {
+        if ($this->tracer === null) {
+            return parent::cast($value, $context);
+        }
+
         $span = $this->tracer->start(\sprintf('Cast %s', $this->name));
 
         try {
