@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime\Parser;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class InMemoryTypeParser implements TypeParserInterface
+final class InMemoryTypeParserRuntime implements TypeParserRuntimeInterface
 {
     /**
      * @var array<non-empty-string, TypeStatement>
@@ -15,7 +15,7 @@ final class InMemoryTypeParser implements TypeParserInterface
     private array $types = [];
 
     public function __construct(
-        private readonly TypeParserInterface $delegate,
+        private readonly TypeParserRuntimeInterface $delegate,
         /**
          * Limit on the number of statements stored in RAM.
          *
@@ -37,15 +37,6 @@ final class InMemoryTypeParser implements TypeParserInterface
 
         return $this->types[$definition]
             ??= $this->delegate->getStatementByDefinition($definition);
-    }
-
-    public function getStatementByValue(mixed $value): TypeStatement
-    {
-        $this->cleanup();
-
-        // @phpstan-ignore-next-line : get_debug_type always returns a non-empty-string
-        return $this->types[\get_debug_type($value)]
-            ??= $this->delegate->getStatementByValue($value);
     }
 
     private function cleanup(): void

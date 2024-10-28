@@ -11,11 +11,12 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
-use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
-use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
-use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
+use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParserRuntime;
+use TypeLang\Mapper\Runtime\Parser\LoggableTypeParserRuntime;
+use TypeLang\Mapper\Runtime\Parser\TraceableTypeParserRuntime;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserRuntime;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
@@ -39,19 +40,19 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createTypeParser(PlatformInterface $platform): TypeParserInterface
     {
-        $parser = TypeParser::createFromPlatform(
-            platform: $platform,
-        );
+        $runtime = TypeParserRuntime::createFromPlatform($platform);
 
         if (($tracer = $this->config->getTracer()) !== null) {
-            $parser = new TraceableTypeParser($tracer, $parser);
+            $runtime = new TraceableTypeParserRuntime($tracer, $runtime);
         }
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $parser = new LoggableTypeParser($logger, $parser);
+            $runtime = new LoggableTypeParserRuntime($logger, $runtime);
         }
 
-        return new InMemoryTypeParser($parser);
+        return new TypeParser(new InMemoryTypeParserRuntime(
+            delegate: $runtime,
+        ));
     }
 
     private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
