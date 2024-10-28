@@ -63,14 +63,14 @@ final class TypeRepository implements
     {
         $statement = $this->parser->getStatementByDefinition($definition);
 
-        return $this->getTypeByStatement($statement, $context);
+        return $this->inner->getTypeByStatement($statement, $context);
     }
 
     public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parser->getStatementByValue($value);
 
-        return $this->getTypeByStatement($statement, $context);
+        return $this->inner->getTypeByStatement($statement, $context);
     }
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface

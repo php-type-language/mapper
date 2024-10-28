@@ -19,6 +19,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
         parent::__construct($delegate);
     }
 
+    #[\Override]
     public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
         $this->logger->debug('Fetching the type by the definition "{definition}"', [
@@ -26,7 +27,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'context' => $context,
         ]);
 
-        $result = $this->delegate->getTypeByDefinition($definition, $context);
+        $result = parent::getTypeByDefinition($definition, $context);
 
         $this->logger->info('The {type_name} was fetched by the definition "{definition}"', [
             'definition' => $definition,
@@ -38,6 +39,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
         return new LoggableType($this->logger, $result);
     }
 
+    #[\Override]
     public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         $this->logger->debug('Fetching the type by the value "{value}"', [
@@ -45,7 +47,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'context' => $context,
         ]);
 
-        $result = $this->delegate->getTypeByValue($value, $context);
+        $result = parent::getTypeByValue($value, $context);
 
         $this->logger->info('The {type_name} was fetched by the value "{value}"', [
             'value' => $value,
@@ -57,6 +59,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
         return new LoggableType($this->logger, $result);
     }
 
+    #[\Override]
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         $this->logger->debug('Fetching the type by the AST statement {statement_name}', [
@@ -65,7 +68,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'context' => $context,
         ]);
 
-        $result = $this->delegate->getTypeByStatement($statement, $context);
+        $result = parent::getTypeByStatement($statement, $context);
 
         $this->logger->info('The {type_name} was fetched by the AST statement {statement_name}', [
             'statement' => $statement,

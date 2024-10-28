@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -23,20 +22,10 @@ final class InMemoryTypeRepository extends TypeRepositoryDecorator
         $this->types = new \WeakMap();
     }
 
-    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
-    {
-        return $this->delegate->getTypeByDefinition($definition, $context);
-    }
-
-    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
-    {
-        return $this->delegate->getTypeByValue($value, $context);
-    }
-
+    #[\Override]
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
-        return $this->types[$statement]
-            ??= $this->delegate->getTypeByStatement($statement, $context);
+        return $this->types[$statement] ??= parent::getTypeByStatement($statement, $context);
     }
 }

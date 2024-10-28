@@ -19,6 +19,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         parent::__construct($delegate);
     }
 
+    #[\Override]
     public function getTypeByDefinition(
         #[Language('PHP')]
         string $definition,
@@ -29,7 +30,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         try {
             $span->setAttribute('value', $definition);
 
-            $result = $this->delegate->getTypeByDefinition($definition, $context);
+            $result = parent::getTypeByDefinition($definition, $context);
 
             $span->setAttribute('result', $result);
         } finally {
@@ -39,6 +40,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         return new TraceableType($this->tracer, $result);
     }
 
+    #[\Override]
     public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
     {
         $span = $this->tracer->start(\sprintf('Fetching by value [%s]', \get_debug_type($value)));
@@ -46,7 +48,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         try {
             $span->setAttribute('value', $value);
 
-            $result = $this->delegate->getTypeByValue($value, $context);
+            $result = parent::getTypeByValue($value, $context);
 
             $span->setAttribute('result', $result);
         } finally {
@@ -56,6 +58,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         return new TraceableType($this->tracer, $result);
     }
 
+    #[\Override]
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         $span = $this->tracer->start(\sprintf('Fetching by statement "%s"', \get_debug_type($statement)));
@@ -63,7 +66,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         try {
             $span->setAttribute('value', $statement);
 
-            $result = $this->delegate->getTypeByStatement($statement, $context);
+            $result = parent::getTypeByStatement($statement, $context);
 
             $span->setAttribute('result', $result);
         } finally {
