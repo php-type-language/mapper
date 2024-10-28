@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository\TypeDecorator;
 
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -29,22 +30,11 @@ final class TraceableType extends TypeDecorator
 
         $inner = $this->getDecoratedType();
 
-        $this->name = self::getShortName($inner::class)
-            . '#' . \spl_object_id($inner)
-            . ' as "' . $this->definition . '"';
-    }
-
-    /**
-     * @param non-empty-string $fqn
-     *
-     * @return non-empty-string
-     */
-    private static function getShortName(string $fqn): string
-    {
-        /** @var non-empty-list<non-empty-string> $parts */
-        $parts = \explode('\\', $fqn);
-
-        return \end($parts);
+        $this->name = \vsprintf('"%s" using %s#%d', [
+            \addcslashes($this->definition, '"'),
+            $inner::class,
+            \spl_object_id($inner),
+        ]);
     }
 
     private static function getPath(Context $context): PathInterface
@@ -55,10 +45,10 @@ final class TraceableType extends TypeDecorator
     private static function getDirection(Context $context): Context\DirectionInterface
     {
         if ($context->isNormalization()) {
-            return Context\Direction::Normalize;
+            return Direction::Normalize;
         }
 
-        return Context\Direction::Denormalize;
+        return Direction::Denormalize;
     }
 
     public function match(mixed $value, Context $context): bool
