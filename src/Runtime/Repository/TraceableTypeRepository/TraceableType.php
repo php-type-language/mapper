@@ -56,7 +56,7 @@ final class TraceableType implements TypeInterface
         }
 
         /** @var list<non-empty-string> */
-        return $result;
+        return \array_reverse($result);
     }
 
     private static function getCurrentPath(Context $context): string
@@ -79,6 +79,8 @@ final class TraceableType implements TypeInterface
 
         try {
             $span->setAttribute('value', $value);
+            $span->setAttribute('direction', $context->isNormalization() ? 'normalization' : 'denormalization');
+            $span->setAttribute('path', self::getPath($context));
 
             $result = $this->delegate->match($value, $context);
 
@@ -99,6 +101,8 @@ final class TraceableType implements TypeInterface
 
         try {
             $span->setAttribute('value', $value);
+            $span->setAttribute('direction', $context->isNormalization() ? 'normalization' : 'denormalization');
+            $span->setAttribute('path', self::getPath($context));
 
             $result = $this->delegate->cast($value, $context);
 
