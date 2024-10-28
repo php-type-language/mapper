@@ -27,17 +27,15 @@ final class Psr16CachedDriver extends CachedDriver
     ): ClassMetadata {
         $index = $this->getKey($class);
 
-        $result = $this->cache->get(
-            $index,
-            fn(): ClassMetadata
-            => parent::getClassMetadata($class, $types, $parser)
-        );
+        $result = $this->cache->get($index);
 
-        if ($result instanceof \Closure) {
-            $result = $result();
-
-            $this->cache->set($index, $result, $this->ttl);
+        if ($result instanceof ClassMetadata) {
+            return $result;
         }
+
+        $result = parent::getClassMetadata($class, $types, $parser);
+
+        $this->cache->set($index, $result, $this->ttl);
 
         return $result;
     }

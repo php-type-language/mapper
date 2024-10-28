@@ -36,11 +36,12 @@ abstract class TypeDecorator implements TypeDecoratorInterface
         return $this->delegate->cast($value, $context);
     }
 
-    /**
-     * @return array<array-key, mixed>
-     */
     public function __serialize(): array
     {
-        return ['delegate' => $this->delegate];
+        throw new \LogicException(<<<'MESSAGE'
+            Cannot serialize a type decorator.
+
+            Please disable cache in case you are using debug mode.
+            MESSAGE);
     }
 }

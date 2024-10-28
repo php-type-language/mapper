@@ -15,7 +15,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 final class LoggableType extends TypeDecorator
 {
     public function __construct(
-        private readonly ?LoggerInterface $logger,
+        private readonly LoggerInterface $logger,
         TypeInterface $delegate,
     ) {
         parent::__construct($delegate);
@@ -39,10 +39,6 @@ final class LoggableType extends TypeDecorator
 
     public function match(mixed $value, Context $context): bool
     {
-        if ($this->logger === null) {
-            return parent::match($value, $context);
-        }
-
         $this->logger->debug(
             'Matching by the {type_name}',
             $this->getLoggerArguments($value, $context),
@@ -62,10 +58,6 @@ final class LoggableType extends TypeDecorator
 
     public function cast(mixed $value, Context $context): mixed
     {
-        if ($this->logger === null) {
-            return parent::cast($value, $context);
-        }
-
         $this->logger->debug(
             'Casting by the {type_name}',
             $this->getLoggerArguments($value, $context),

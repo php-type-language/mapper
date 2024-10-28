@@ -58,7 +58,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createTypeRepository(PlatformInterface $platform): TypeRepositoryFacadeInterface
     {
-        $runtime = TypeRepository::createFromPlatform($platform, $this->parser);
+        $runtime = new InMemoryTypeRepository(
+            delegate: TypeRepository::createFromPlatform(
+                platform: $platform,
+                parser: $this->parser,
+            )
+        );
 
         if (($tracer = $this->config->getTracer()) !== null) {
             $runtime = new TraceableTypeRepository($tracer, $runtime);
@@ -70,7 +75,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
         return new TypeRepositoryFacade(
             parser: $this->parser,
-            runtime: new InMemoryTypeRepository($runtime),
+            runtime: $runtime,
         );
     }
 
