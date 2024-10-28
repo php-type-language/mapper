@@ -15,6 +15,9 @@ abstract class TypeRepositoryDecorator implements TypeRepositoryDecoratorInterfa
         $this->setTypeRepository($this);
     }
 
+    /**
+     * @internal internal method for passing the root calling context
+     */
     public function setTypeRepository(TypeRepositoryInterface $parent): void
     {
         if ($this->delegate instanceof TypeRepositoryDecoratorInterface) {

@@ -11,6 +11,10 @@ class NumericStringType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool
     {
+        if ($context->isNormalization()) {
+            return \is_string($value);
+        }
+
         return \is_string($value) && \is_numeric($value);
     }
 

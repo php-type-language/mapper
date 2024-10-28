@@ -31,13 +31,25 @@ final class TypeRepository implements
         private readonly ReferencesResolver $references = new ReferencesResolver(),
     ) {
         $this->context = $this;
-        $this->builders = match (true) {
+        $this->builders = self::toArrayList($types);
+    }
+
+    /**
+     * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
+     * @return list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
+     */
+    private static function toArrayList(iterable $types): array
+    {
+        return match (true) {
             $types instanceof \Traversable => \iterator_to_array($types, false),
             \array_is_list($types) => $types,
             default => \array_values($types),
         };
     }
 
+    /**
+     * @internal internal method for passing the root calling context
+     */
     public function setTypeRepository(TypeRepositoryInterface $parent): void
     {
         $this->context = $parent;

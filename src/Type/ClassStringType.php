@@ -18,6 +18,10 @@ class ClassStringType implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
+        if ($context->isNormalization()) {
+            return \is_string($value);
+        }
+
         $isValidString = $value !== '' && \is_string($value);
 
         if (!$isValidString) {
