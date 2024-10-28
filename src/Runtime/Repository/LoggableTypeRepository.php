@@ -9,11 +9,11 @@ use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository\LoggableType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class LoggableTypeRepositoryRuntime implements TypeRepositoryRuntimeInterface
+final class LoggableTypeRepository implements TypeRepositoryInterface
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly TypeRepositoryRuntimeInterface $delegate,
+        private readonly TypeRepositoryInterface $delegate,
     ) {}
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface

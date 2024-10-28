@@ -14,12 +14,12 @@ use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Context\RootContext;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacade;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntime;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntime;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
@@ -32,24 +32,24 @@ abstract class TypeTestCase extends TestCase
 {
     protected readonly PlatformInterface $platform;
 
-    protected readonly TypeRepositoryInterface $types;
+    protected readonly TypeRepositoryFacadeInterface $types;
 
-    protected readonly TypeParserInterface $parser;
+    protected readonly TypeParserFacadeInterface $parser;
 
     #[Before]
     protected function setUpDefaultRegistry(): void
     {
         $this->platform = new StandardPlatform();
 
-        $this->parser = new TypeParser(
-            runtime: TypeParserRuntime::createFromPlatform(
+        $this->parser = new TypeParserFacade(
+            runtime: TypeParser::createFromPlatform(
                 platform: $this->platform,
             )
         );
 
-        $this->types = new TypeRepository(
+        $this->types = new TypeRepositoryFacade(
             parser: $this->parser,
-            runtime: TypeRepositoryRuntime::createFromPlatform(
+            runtime: TypeRepository::createFromPlatform(
                 platform: $this->platform,
                 parser: $this->parser,
             ),

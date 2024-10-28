@@ -6,11 +6,11 @@ namespace TypeLang\Mapper\Runtime\Context;
 
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 
 final class ChildContext extends Context
 {
@@ -19,8 +19,8 @@ final class ChildContext extends Context
         private readonly EntryInterface $entry,
         mixed $value,
         DirectionInterface $direction,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        TypeRepositoryFacadeInterface $types,
+        TypeParserFacadeInterface $parser,
         ConfigurationInterface $config,
     ) {
         parent::__construct(

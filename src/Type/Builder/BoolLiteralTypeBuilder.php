@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\BoolLiteralType;
 use TypeLang\Parser\Node\Literal\BoolLiteralNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -22,8 +22,8 @@ class BoolLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): BoolLiteralType {
         return new BoolLiteralType($statement->value);
     }

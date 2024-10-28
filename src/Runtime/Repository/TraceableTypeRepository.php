@@ -9,11 +9,11 @@ use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class TraceableTypeRepositoryRuntime implements TypeRepositoryRuntimeInterface
+final class TraceableTypeRepository implements TypeRepositoryInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,
-        private readonly TypeRepositoryRuntimeInterface $delegate,
+        private readonly TypeRepositoryInterface $delegate,
     ) {}
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface

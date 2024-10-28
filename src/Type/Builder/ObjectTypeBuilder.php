@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\ObjectType\ObjectInstantiator\ObjectInstantiatorInterface;
 use TypeLang\Mapper\Type\ObjectType\ObjectInstantiator\ReflectionObjectInstantiator;
@@ -54,8 +54,8 @@ class ObjectTypeBuilder extends Builder
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): ObjectType {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);

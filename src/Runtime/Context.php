@@ -8,28 +8,28 @@ use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
-    TypeRepositoryInterface,
+    TypeRepositoryFacadeInterface,
     ConfigurationInterface,
     PathProviderInterface,
-    TypeParserInterface,
+    TypeParserFacadeInterface,
     DirectionInterface
 {
     protected function __construct(
         protected readonly mixed $value,
         protected readonly DirectionInterface $direction,
-        protected readonly TypeRepositoryInterface $types,
-        protected readonly TypeParserInterface $parser,
+        protected readonly TypeRepositoryFacadeInterface $types,
+        protected readonly TypeParserFacadeInterface $parser,
         protected readonly ConfigurationInterface $config,
     ) {}
 

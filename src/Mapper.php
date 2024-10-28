@@ -11,25 +11,25 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
-use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParserRuntime;
-use TypeLang\Mapper\Runtime\Parser\LoggableTypeParserRuntime;
-use TypeLang\Mapper\Runtime\Parser\TraceableTypeParserRuntime;
+use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
+use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacade;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntime;
-use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepositoryRuntime;
-use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepositoryRuntime;
-use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepositoryRuntime;
+use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntime;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
-    private readonly TypeRepositoryInterface $types;
+    private readonly TypeRepositoryFacadeInterface $types;
 
-    private readonly TypeParserInterface $parser;
+    private readonly TypeParserFacadeInterface $parser;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
@@ -39,38 +39,38 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         $this->types = $this->createTypeRepository($platform);
     }
 
-    private function createTypeParser(PlatformInterface $platform): TypeParserInterface
+    private function createTypeParser(PlatformInterface $platform): TypeParserFacadeInterface
     {
-        $runtime = TypeParserRuntime::createFromPlatform($platform);
+        $runtime = TypeParser::createFromPlatform($platform);
 
         if (($tracer = $this->config->getTracer()) !== null) {
-            $runtime = new TraceableTypeParserRuntime($tracer, $runtime);
+            $runtime = new TraceableTypeParser($tracer, $runtime);
         }
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $runtime = new LoggableTypeParserRuntime($logger, $runtime);
+            $runtime = new LoggableTypeParser($logger, $runtime);
         }
 
-        return new TypeParser(new InMemoryTypeParserRuntime(
+        return new TypeParserFacade(new InMemoryTypeParser(
             delegate: $runtime,
         ));
     }
 
-    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
+    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryFacadeInterface
     {
-        $runtime = TypeRepositoryRuntime::createFromPlatform($platform, $this->parser);
+        $runtime = TypeRepository::createFromPlatform($platform, $this->parser);
 
         if (($tracer = $this->config->getTracer()) !== null) {
-            $runtime = new TraceableTypeRepositoryRuntime($tracer, $runtime);
+            $runtime = new TraceableTypeRepository($tracer, $runtime);
         }
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $runtime = new LoggableTypeRepositoryRuntime($logger, $runtime);
+            $runtime = new LoggableTypeRepository($logger, $runtime);
         }
 
-        return new TypeRepository(
+        return new TypeRepositoryFacade(
             parser: $this->parser,
-            runtime: new InMemoryTypeRepositoryRuntime($runtime),
+            runtime: new InMemoryTypeRepository($runtime),
         );
     }
 
@@ -89,7 +89,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      *
      * @api
      */
-    public function getTypes(): TypeRepositoryInterface
+    public function getTypes(): TypeRepositoryFacadeInterface
     {
         return $this->types;
     }
@@ -99,7 +99,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      *
      * @api
      */
-    public function getParser(): TypeParserInterface
+    public function getParser(): TypeParserFacadeInterface
     {
         return $this->parser;
     }

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\InternalTypeException;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\BackedEnumType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -52,8 +52,8 @@ class BackedEnumTypeBuilder extends Builder
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): BackedEnumType {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);

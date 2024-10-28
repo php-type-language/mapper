@@ -9,8 +9,8 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Name;
@@ -26,8 +26,8 @@ final class ReflectionDriver extends LoadableDriver
     protected function load(
         \ReflectionClass $reflection,
         ClassMetadata $class,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): void {
         foreach ($reflection->getProperties() as $property) {
             if (!self::isValidProperty($property)) {
@@ -78,7 +78,7 @@ final class ReflectionDriver extends LoadableDriver
     private function fillType(
         \ReflectionProperty $property,
         PropertyMetadata $meta,
-        TypeRepositoryRuntimeInterface $types,
+        TypeRepositoryInterface $types,
     ): void {
         $statement = $this->getTypeStatement($property);
 

@@ -8,11 +8,11 @@ use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class LoggableTypeParserRuntime implements TypeParserRuntimeInterface
+final class LoggableTypeParser implements TypeParserInterface
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly TypeParserRuntimeInterface $delegate,
+        private readonly TypeParserInterface $delegate,
     ) {}
 
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement

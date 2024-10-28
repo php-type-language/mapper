@@ -8,11 +8,11 @@ use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class TraceableTypeParserRuntime implements TypeParserRuntimeInterface
+final class TraceableTypeParser implements TypeParserInterface
 {
     public function __construct(
         private readonly TracerInterface $tracer,
-        private readonly TypeParserRuntimeInterface $delegate,
+        private readonly TypeParserInterface $delegate,
     ) {}
 
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement

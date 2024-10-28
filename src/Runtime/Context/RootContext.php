@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Runtime\Context;
 
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 
 /**
  * @internal this is an internal library class, please do not use it in your code
@@ -18,8 +18,8 @@ final class RootContext extends Context
     public static function forNormalization(
         mixed $value,
         ConfigurationInterface $config,
-        TypeParserInterface $parser,
-        TypeRepositoryInterface $types,
+        TypeParserFacadeInterface $parser,
+        TypeRepositoryFacadeInterface $types,
     ): self {
         return new self(
             value: $value,
@@ -33,8 +33,8 @@ final class RootContext extends Context
     public static function forDenormalization(
         mixed $value,
         ConfigurationInterface $config,
-        TypeParserInterface $parser,
-        TypeRepositoryInterface $types,
+        TypeParserFacadeInterface $parser,
+        TypeRepositoryFacadeInterface $types,
     ): self {
         return new self(
             value: $value,

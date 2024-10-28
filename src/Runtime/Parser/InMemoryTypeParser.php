@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime\Parser;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class InMemoryTypeParserRuntime implements TypeParserRuntimeInterface
+final class InMemoryTypeParser implements TypeParserInterface
 {
     /**
      * @var array<non-empty-string, TypeStatement>
@@ -15,7 +15,7 @@ final class InMemoryTypeParserRuntime implements TypeParserRuntimeInterface
     private array $types = [];
 
     public function __construct(
-        private readonly TypeParserRuntimeInterface $delegate,
+        private readonly TypeParserInterface $delegate,
         /**
          * Limit on the number of statements stored in RAM.
          *

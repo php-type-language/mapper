@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime\Repository;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class InMemoryTypeRepositoryRuntime implements TypeRepositoryRuntimeInterface
+final class InMemoryTypeRepository implements TypeRepositoryInterface
 {
     /**
      * @var \WeakMap<TypeStatement, TypeInterface>
@@ -15,7 +15,7 @@ final class InMemoryTypeRepositoryRuntime implements TypeRepositoryRuntimeInterf
     private readonly \WeakMap $types;
 
     public function __construct(
-        private readonly TypeRepositoryRuntimeInterface $delegate,
+        private readonly TypeRepositoryInterface $delegate,
     ) {
         $this->types = new \WeakMap();
     }

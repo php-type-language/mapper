@@ -8,8 +8,8 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ClassStringType;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -29,8 +29,8 @@ class ClassStringTypeBuilder extends NamedTypeBuilder
      */
     public function build(
         TypeStatement $statement,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): ClassStringType {
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1);

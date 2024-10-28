@@ -11,8 +11,8 @@ use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\SkipWhen;
-use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class AttributeDriver extends LoadableDriver
 {
@@ -20,8 +20,8 @@ final class AttributeDriver extends LoadableDriver
     protected function load(
         \ReflectionClass $reflection,
         ClassMetadata $class,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): void {
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());
@@ -71,8 +71,8 @@ final class AttributeDriver extends LoadableDriver
     private function createType(
         string $type,
         \ReflectionProperty $property,
-        TypeRepositoryRuntimeInterface $types,
-        TypeParserRuntimeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): TypeMetadata {
         $statement = $parser->getStatementByDefinition($type);
 
