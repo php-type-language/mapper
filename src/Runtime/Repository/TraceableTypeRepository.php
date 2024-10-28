@@ -21,7 +21,10 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
     ) {
         parent::__construct($delegate);
 
-        $this->printer = new PrettyPrinter();
+        $this->printer = new PrettyPrinter(
+            wrapUnionType: false,
+            multilineShape: \PHP_INT_MAX,
+        );
     }
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
@@ -44,6 +47,10 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
             return $result;
         }
 
-        return new TraceableType($this->tracer, $result);
+        return new TraceableType(
+            definition: $this->printer->print($statement),
+            tracer: $this->tracer,
+            delegate: $result,
+        );
     }
 }

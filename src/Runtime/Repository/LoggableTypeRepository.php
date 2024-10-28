@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Runtime\Repository;
 
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeDecorator\LoggableType;
+use TypeLang\Mapper\Runtime\Repository\TypeDecorator\TypeDecoratorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -27,13 +28,17 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'context' => $context,
         ]);
 
-        $result = parent::getTypeByStatement($statement, $context);
+        $type = $result = parent::getTypeByStatement($statement, $context);
+
+        if ($type instanceof TypeDecoratorInterface) {
+            $type = $type->getDecoratedType();
+        }
 
         $this->logger->info('The {type_name} was fetched by the AST statement {statement_name}', [
             'statement' => $statement,
             'statement_name' => $statement::class . '#' . \spl_object_id($statement),
-            'type' => $result,
-            'type_name' => $result::class . '#' . \spl_object_id($result),
+            'type' => $type,
+            'type_name' => $type::class . '#' . \spl_object_id($type),
             'context' => $context,
         ]);
 

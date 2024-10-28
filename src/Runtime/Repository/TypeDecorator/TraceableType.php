@@ -21,6 +21,7 @@ final class TraceableType extends TypeDecorator
     private readonly string $name;
 
     public function __construct(
+        private readonly string $definition,
         private readonly TracerInterface $tracer,
         TypeInterface $delegate,
     ) {
@@ -29,7 +30,8 @@ final class TraceableType extends TypeDecorator
         $inner = $this->getDecoratedType();
 
         $this->name = self::getShortName($inner::class)
-            . '#' . \spl_object_id($inner);
+            . '#' . \spl_object_id($inner)
+            . ' as "' . $this->definition . '"';
     }
 
     /**
