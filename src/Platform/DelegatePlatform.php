@@ -11,14 +11,27 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 final class DelegatePlatform implements PlatformInterface
 {
     /**
-     * @param list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
-     * @param list<GrammarFeature> $features
+     * @var list<GrammarFeature>
+     */
+    private readonly array $features;
+
+    /**
+     * @var list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
+     */
+    private readonly array $types;
+
+    /**
+     * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
+     * @param iterable<array-key, GrammarFeature> $features
      */
     public function __construct(
         private readonly PlatformInterface $delegate,
-        private readonly array $types = [],
-        private readonly array $features = [],
-    ) {}
+        iterable $types = [],
+        iterable $features = [],
+    ) {
+        $this->types = \array_values([...$types]);
+        $this->features = \array_values([...$features]);
+    }
 
     public function getName(): string
     {
