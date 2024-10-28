@@ -37,6 +37,10 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
             $span->stop();
         }
 
+        if ($result instanceof TraceableType) {
+            return $result;
+        }
+
         return new TraceableType($this->tracer, $result);
     }
 
@@ -55,6 +59,10 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
             $span->stop();
         }
 
+        if ($result instanceof TraceableType) {
+            return $result;
+        }
+
         return new TraceableType($this->tracer, $result);
     }
 
@@ -71,6 +79,10 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
             $span->setAttribute('result', $result);
         } finally {
             $span->stop();
+        }
+
+        if ($result instanceof TraceableType) {
+            return $result;
         }
 
         return new TraceableType($this->tracer, $result);

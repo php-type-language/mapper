@@ -36,6 +36,10 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'context' => $context,
         ]);
 
+        if ($result instanceof LoggableType) {
+            return $result;
+        }
+
         return new LoggableType($this->logger, $result);
     }
 
@@ -55,6 +59,10 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'type_name' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
+
+        if ($result instanceof LoggableType) {
+            return $result;
+        }
 
         return new LoggableType($this->logger, $result);
     }
@@ -77,6 +85,10 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'type_name' => $result::class . '#' . \spl_object_id($result),
             'context' => $context,
         ]);
+
+        if ($result instanceof LoggableType) {
+            return $result;
+        }
 
         return new LoggableType($this->logger, $result);
     }
