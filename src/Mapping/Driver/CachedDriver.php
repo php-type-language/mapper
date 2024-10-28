@@ -40,7 +40,7 @@ abstract class CachedDriver extends Driver
      */
     protected static function getKeyValue(\ReflectionClass $class): string
     {
-        return \str_replace("\\\0", '_', $class->getName());
+        return \str_replace(['\\', "\0"], '_', $class->getName());
     }
 
     /**
