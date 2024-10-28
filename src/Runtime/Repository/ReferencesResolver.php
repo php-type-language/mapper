@@ -14,7 +14,7 @@ use TypeLang\Parser\TypeResolver;
  * Responsible for finding and replacing all external name dependencies
  * in a statement.
  *
- * @internal this is an internal library class, please do not use it in your code.
+ * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Runtime\Repository
  */
 final class ReferencesResolver

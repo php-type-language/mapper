@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
+namespace TypeLang\Mapper\Runtime\Repository\TypeDecorator;
 
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context;
@@ -12,12 +12,14 @@ use TypeLang\Mapper\Type\TypeInterface;
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Runtime\Repository
  */
-final class LoggableType implements TypeInterface
+final class LoggableType extends TypeDecorator
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly TypeInterface $delegate,
-    ) {}
+        TypeInterface $delegate,
+    ) {
+        parent::__construct($delegate);
+    }
 
     /**
      * @return array<array-key, mixed>
@@ -25,11 +27,12 @@ final class LoggableType implements TypeInterface
     private function getLoggerArguments(mixed $value, Context $context): array
     {
         $path = $context->getPath();
+        $delegate = $this->getDecoratedType();
 
         return [
             'value' => $value,
-            'type' => $this->delegate,
-            'type_name' => $this->delegate::class . '#' . \spl_object_id($this->delegate),
+            'type' => $delegate,
+            'type_name' => $delegate::class . '#' . \spl_object_id($delegate),
             'path' => $path->toArray(),
         ];
     }
@@ -41,7 +44,7 @@ final class LoggableType implements TypeInterface
             $this->getLoggerArguments($value, $context),
         );
 
-        $result = $this->delegate->match($value, $context);
+        $result = parent::match($value, $context);
 
         $this->logger->info(
             $result === true
@@ -61,7 +64,7 @@ final class LoggableType implements TypeInterface
         );
 
         try {
-            $result = $this->delegate->cast($value, $context);
+            $result = parent::cast($value, $context);
         } catch (\Throwable $e) {
             $this->logger->error('Casting by the {type_name} was failed', [
                 ...$this->getLoggerArguments($value, $context),

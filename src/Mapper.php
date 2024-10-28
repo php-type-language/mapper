@@ -14,15 +14,15 @@ use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
 use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
 use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacade;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface

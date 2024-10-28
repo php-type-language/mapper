@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository\TraceableType;
+use TypeLang\Mapper\Runtime\Repository\TypeDecorator\TraceableType;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class TraceableTypeRepository implements TypeRepositoryInterface
+final class TraceableTypeRepository extends TypeRepositoryDecorator
 {
     public function __construct(
         private readonly TracerInterface $tracer,
-        private readonly TypeRepositoryInterface $delegate,
-    ) {}
+        TypeRepositoryInterface $delegate,
+    ) {
+        parent::__construct($delegate);
+    }
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
@@ -23,7 +25,7 @@ final class TraceableTypeRepository implements TypeRepositoryInterface
         try {
             $span->setAttribute('value', $statement);
 
-            $result = $this->delegate->getTypeByStatement($statement, $context);
+            $result = parent::getTypeByStatement($statement, $context);
 
             $span->setAttribute('result', $result);
         } finally {
