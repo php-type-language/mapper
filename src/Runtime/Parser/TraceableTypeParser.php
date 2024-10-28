@@ -20,13 +20,7 @@ final class TraceableTypeParser implements TypeParserInterface
         $span = $this->tracer->start(\sprintf('Parse "%s"', $definition));
 
         try {
-            $span->setAttribute('value', $definition);
-
-            $result = $this->delegate->getStatementByDefinition($definition);
-
-            $span->setAttribute('result', $result);
-
-            return $result;
+            return $this->delegate->getStatementByDefinition($definition);
         } finally {
             $span->stop();
         }

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository\TypeDecorator;
 
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -28,27 +26,21 @@ final class TraceableType extends TypeDecorator
     ) {
         parent::__construct($delegate);
 
+        $this->name = $this->getSpanTitle();
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getSpanTitle(): string
+    {
         $inner = $this->getDecoratedType();
 
-        $this->name = \vsprintf('"%s" using %s#%d', [
+        return \vsprintf('"%s" using %s#%d', [
             \addcslashes($this->definition, '"'),
             $inner::class,
             \spl_object_id($inner),
         ]);
-    }
-
-    private static function getPath(Context $context): PathInterface
-    {
-        return $context->getPath();
-    }
-
-    private static function getDirection(Context $context): Context\DirectionInterface
-    {
-        if ($context->isNormalization()) {
-            return Direction::Normalize;
-        }
-
-        return Direction::Denormalize;
     }
 
     public function match(mixed $value, Context $context): bool
@@ -56,15 +48,7 @@ final class TraceableType extends TypeDecorator
         $span = $this->tracer->start(\sprintf('Match %s', $this->name));
 
         try {
-            $span->setAttribute('value', $value);
-            $span->setAttribute('direction', self::getDirection($context));
-            $span->setAttribute('path', self::getPath($context));
-
-            $result = parent::match($value, $context);
-
-            $span->setAttribute('result', $result);
-
-            return $result;
+            return parent::match($value, $context);
         } finally {
             $span->stop();
         }
@@ -75,15 +59,7 @@ final class TraceableType extends TypeDecorator
         $span = $this->tracer->start(\sprintf('Cast %s', $this->name));
 
         try {
-            $span->setAttribute('value', $value);
-            $span->setAttribute('direction', self::getDirection($context));
-            $span->setAttribute('path', self::getPath($context));
-
-            $result = parent::cast($value, $context);
-
-            $span->setAttribute('result', $result);
-
-            return $result;
+            return parent::cast($value, $context);
         } finally {
             $span->stop();
         }

@@ -34,11 +34,7 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         ]));
 
         try {
-            $span->setAttribute('value', $statement);
-
             $result = parent::getTypeByStatement($statement, $context);
-
-            $span->setAttribute('result', $result);
         } finally {
             $span->stop();
         }

@@ -17,12 +17,6 @@ final class SymfonyStopwatchSpan implements SpanInterface
         private readonly StopwatchEvent $event,
     ) {}
 
-    public function setAttribute(string $key, mixed $value): void
-    {
-        // Do nothing
-        // Symfony stopwatch does not support attributes
-    }
-
     public function stop(): void
     {
         $this->event->stop();
