@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime\Repository;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class InMemoryTypeRepository extends TypeRepositoryDecorator
+final class InMemoryTypeRepositoryRuntime implements TypeRepositoryRuntimeInterface
 {
     /**
      * @var \WeakMap<TypeStatement, TypeInterface>
@@ -15,17 +15,15 @@ final class InMemoryTypeRepository extends TypeRepositoryDecorator
     private readonly \WeakMap $types;
 
     public function __construct(
-        TypeRepositoryInterface $delegate,
+        private readonly TypeRepositoryRuntimeInterface $delegate,
     ) {
-        parent::__construct($delegate);
-
         $this->types = new \WeakMap();
     }
 
-    #[\Override]
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
-        return $this->types[$statement] ??= parent::getTypeByStatement($statement, $context);
+        return $this->types[$statement]
+            ??= $this->delegate->getTypeByStatement($statement, $context);
     }
 }

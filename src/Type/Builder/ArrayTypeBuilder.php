@@ -8,8 +8,8 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
 use TypeLang\Mapper\Type\ArrayType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -28,8 +28,8 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      */
     public function build(
         TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        TypeRepositoryRuntimeInterface $types,
+        TypeParserRuntimeInterface $parser,
     ): ArrayType {
         $this->expectNoShapeFields($statement);
 
@@ -53,7 +53,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByKeyValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
+    private function buildByKeyValue(NamedTypeNode $statement, TypeRepositoryRuntimeInterface $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 
@@ -79,7 +79,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
+    private function buildByValue(NamedTypeNode $statement, TypeRepositoryRuntimeInterface $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 

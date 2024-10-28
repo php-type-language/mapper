@@ -16,8 +16,10 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserRuntime;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntime;
 use TypeLang\Mapper\Tests\Unit\TestCase;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\IntBackedEnum;
 use TypeLang\Mapper\Tests\Unit\Type\Stub\StringableObject;
@@ -39,13 +41,18 @@ abstract class TypeTestCase extends TestCase
     {
         $this->platform = new StandardPlatform();
 
-        $this->parser = TypeParser::createFromPlatform(
-            platform: $this->platform,
+        $this->parser = new TypeParser(
+            runtime: TypeParserRuntime::createFromPlatform(
+                platform: $this->platform,
+            )
         );
 
-        $this->types = TypeRepository::createFromPlatform(
-            platform: $this->platform,
+        $this->types = new TypeRepository(
             parser: $this->parser,
+            runtime: TypeRepositoryRuntime::createFromPlatform(
+                platform: $this->platform,
+                parser: $this->parser,
+            ),
         );
     }
 

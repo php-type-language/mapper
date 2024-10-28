@@ -7,9 +7,8 @@ namespace TypeLang\Mapper\Runtime\Repository;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-interface TypeRepositoryInterface
+interface TypeRepositoryInterface extends TypeRepositoryRuntimeInterface
 {
     /**
      * @param non-empty-string $definition
@@ -32,17 +31,6 @@ interface TypeRepositoryInterface
      */
     public function getTypeByValue(
         mixed $value,
-        ?\ReflectionClass $context = null,
-    ): TypeInterface;
-
-    /**
-     * @param \ReflectionClass<object>|null $context
-     *
-     * @throws TypeNotFoundException in case of type cannot be loaded
-     * @throws \Throwable in case of any internal error occurs
-     */
-    public function getTypeByStatement(
-        TypeStatement $statement,
         ?\ReflectionClass $context = null,
     ): TypeInterface;
 }

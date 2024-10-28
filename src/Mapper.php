@@ -17,11 +17,12 @@ use TypeLang\Mapper\Runtime\Parser\TraceableTypeParserRuntime;
 use TypeLang\Mapper\Runtime\Parser\TypeParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserRuntime;
-use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepositoryRuntime;
+use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepositoryRuntime;
+use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepositoryRuntime;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntime;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
@@ -57,20 +58,20 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
     {
-        $repository = TypeRepository::createFromPlatform(
-            platform: $platform,
-            parser: $this->parser,
-        );
+        $runtime = TypeRepositoryRuntime::createFromPlatform($platform, $this->parser);
 
         if (($tracer = $this->config->getTracer()) !== null) {
-            $repository = new TraceableTypeRepository($tracer, $repository);
+            $runtime = new TraceableTypeRepositoryRuntime($tracer, $runtime);
         }
 
         if (($logger = $this->config->getLogger()) !== null) {
-            $repository = new LoggableTypeRepository($logger, $repository);
+            $runtime = new LoggableTypeRepositoryRuntime($logger, $runtime);
         }
 
-        return new InMemoryTypeRepository($repository);
+        return new TypeRepository(
+            parser: $this->parser,
+            runtime: new InMemoryTypeRepositoryRuntime($runtime),
+        );
     }
 
     /**

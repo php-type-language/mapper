@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserRuntimeInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryRuntimeInterface;
 use TypeLang\Mapper\Type\NullableType;
 use TypeLang\Parser\Node\Stmt\NullableTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -24,8 +24,8 @@ class NullableTypeBuilder implements TypeBuilderInterface
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        TypeRepositoryRuntimeInterface $types,
+        TypeParserRuntimeInterface $parser,
     ): NullableType {
         $type = $types->getTypeByStatement($statement->type);
 
