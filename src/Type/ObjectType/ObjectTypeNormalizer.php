@@ -96,11 +96,11 @@ class ObjectTypeNormalizer implements TypeInterface
 
             // Skip the property when condition is matched
             $skip = $meta->findSkipCondition();
-            if ($skip !== null) {
-                $condition = $skip->getType();
 
-                // Skip when condition is matched
-                if ($condition->match($fieldValue, $entrance)) {
+            if ($skip !== null) {
+                $nodes = $skip->getNodes();
+
+                if ((bool) $nodes->evaluate([], ['this' => $object])) {
                     continue;
                 }
             }

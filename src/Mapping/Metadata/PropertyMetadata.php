@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
@@ -20,7 +21,7 @@ final class PropertyMetadata extends Metadata
 
     private bool $hasDefaultValue = false;
 
-    private ?TypeMetadata $skipWhen = null;
+    private ?ParsedExpression $skipWhen = null;
 
     /**
      * @param non-empty-string $export
@@ -157,9 +158,9 @@ final class PropertyMetadata extends Metadata
     /**
      * @api
      */
-    public function setSkipCondition(TypeMetadata $type): void
+    public function setSkipCondition(ParsedExpression $expression): void
     {
-        $this->skipWhen = $type;
+        $this->skipWhen = $expression;
     }
 
     /**
@@ -179,14 +180,14 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
-     * Note: The prefix "find" is used to indicate that the {@see TypeMetadata}
+     * Note: The prefix "find" is used to indicate that the {@see ParsedExpression}
      *       definition may be optional and method may return {@see null}.
      *       The prefix "get" is used when the value is forced to be obtained
      *       and should throw an exception if the type definition is missing.
      *
      * @api
      */
-    public function findSkipCondition(): ?TypeMetadata
+    public function findSkipCondition(): ?ParsedExpression
     {
         return $this->skipWhen;
     }

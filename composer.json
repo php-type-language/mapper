@@ -31,6 +31,7 @@
         "phpunit/phpunit": "^10.5|^11.0",
         "rector/rector": "^1.1",
         "symfony/cache": "^5.4|^6.0|^7.0",
+        "symfony/expression-language": "^5.4|^6.0|^7.0",
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",

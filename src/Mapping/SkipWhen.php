@@ -11,6 +11,6 @@ class SkipWhen
         /**
          * @var non-empty-string
          */
-        public readonly string $type,
+        public readonly string $expr,
     ) {}
 }
