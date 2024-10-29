@@ -2,34 +2,66 @@ Feature: Test FloatType
     Background:
         Given type "TypeLang\Mapper\Type\FloatType"
 
-    Scenario: Normalization: Matching
-         When match when normalize
-         Then type "Int" must be matched
-          And type "Float" must be matched
-          And type "Inf" must be matched
-          And type "Nan" must be matched
-          And other types must not be matched
-
-    Scenario: Normalization: Casting
+    Scenario: Matching
          When normalize
-         Then type "Int" is 3735928559.0
-          And type "Float" is 42.0
-          And type "Inf" is inf
-          And type "Nan" is nan
-          And other types must fail
-
-    Scenario: Denormalization: Matching
-        When match when denormalize
-        Then type "Int" must be matched
-         And type "Float" must be matched
-         And type "Inf" must be matched
-         And type "Nan" must be matched
-         And other types must not be matched
-
-    Scenario: Denormalization: Casting
+         Then matching returns the following values:
+            | 42            | true  |
+            | 42.1          | true  |
+            | INF           | true  |
+            | NAN           | true  |
+            | "string"      | false |
+            | null          | false |
+            | (object)[]    | false |
+            | []            | false |
+            | true          | false |
+            | false         | false |
          When denormalize
-         Then type "Int" is 3735928559.0
-          And type "Float" is 42.0
-          And type "Inf" is inf
-          And type "Nan" is nan
-          And other types must fail
+         Then matching returns the following values:
+            | 42            | true  |
+            | 42.1          | true  |
+            | INF           | true  |
+            | NAN           | true  |
+            | "string"      | false |
+            | null          | false |
+            | (object)[]    | false |
+            | []            | false |
+            | true          | false |
+            | false         | false |
+
+    Scenario: Casting
+        When normalize
+        Then casting returns the following values:
+            | 42            | 42.0                                      |
+            | 42.1          | 42.1                                      |
+            | .1            | 0.1                                       |
+            | -.1           | -0.1                                      |
+            | 1.            | 1.0                                       |
+            | -1.           | -1.0                                      |
+            | 1e10          | 10000000000.0                             |
+            | INF           | INF                                       |
+            | -INF          | -INF                                      |
+            | NAN           | NAN                                       |
+            | "string"      | <error: Passed value "string" is invalid> |
+            | null          | <error: Passed value null is invalid>     |
+            | (object)[]    | <error: Passed value {} is invalid>       |
+            | []            | <error: Passed value [] is invalid>       |
+            | true          | <error: Passed value true is invalid>     |
+            | false         | <error: Passed value false is invalid>    |
+        When denormalize
+        Then casting returns the following values:
+            | 42            | 42.0                                      |
+            | 42.1          | 42.1                                      |
+            | .1            | 0.1                                       |
+            | -.1           | -0.1                                      |
+            | 1.            | 1.0                                       |
+            | -1.           | -1.0                                      |
+            | 1e10          | 10000000000.0                             |
+            | INF           | INF                                       |
+            | -INF          | -INF                                      |
+            | NAN           | NAN                                       |
+            | "string"      | <error: Passed value "string" is invalid> |
+            | null          | <error: Passed value null is invalid>     |
+            | (object)[]    | <error: Passed value {} is invalid>       |
+            | []            | <error: Passed value [] is invalid>       |
+            | true          | <error: Passed value true is invalid>     |
+            | false         | <error: Passed value false is invalid>    |

@@ -2,26 +2,54 @@ Feature: Test BoolType
     Background:
         Given type "TypeLang\Mapper\Type\BoolType"
 
-    Scenario: Normalization: Matching
-         When match when normalize
-         Then type "True" must be matched
-          And type "False" must be matched
-          And other types must not be matched
-
-    Scenario: Normalization: Casting
+    Scenario: Matching
          When normalize
-         Then type "True" is true
-          And type "False" is false
-          And other types must fail
-
-    Scenario: Denormalization: Matching
-        When match when denormalize
-        Then type "True" must be matched
-         And type "False" must be matched
-         And other types must not be matched
-
-    Scenario: Denormalization: Casting
+         Then matching returns the following values:
+            | 42            | false |
+            | 42.1          | false |
+            | INF           | false |
+            | NAN           | false |
+            | "string"      | false |
+            | null          | false |
+            | (object)[]    | false |
+            | []            | false |
+            | true          | true  |
+            | false         | true  |
          When denormalize
-         Then type "True" is true
-          And type "False" is false
-          And other types must fail
+         Then matching returns the following values:
+            | 42            | false |
+            | 42.1          | false |
+            | INF           | false |
+            | NAN           | false |
+            | "string"      | false |
+            | null          | false |
+            | (object)[]    | false |
+            | []            | false |
+            | true          | true  |
+            | false         | true  |
+
+    Scenario: Casting
+        When normalize
+        Then casting returns the following values:
+            | 42            | <error: Passed value 42 is invalid>       |
+            | 42.1          | <error: Passed value 42.1 is invalid>     |
+            | INF           | <error: Passed value INF is invalid>      |
+            | NAN           | <error: Passed value NAN is invalid>      |
+            | "string"      | <error: Passed value "string" is invalid> |
+            | null          | <error: Passed value null is invalid>     |
+            | (object)[]    | <error: Passed value {} is invalid>       |
+            | []            | <error: Passed value [] is invalid>       |
+            | true          | true                                      |
+            | false         | false                                     |
+        When denormalize
+        Then casting returns the following values:
+            | 42            | <error: Passed value 42 is invalid>       |
+            | 42.1          | <error: Passed value 42.1 is invalid>     |
+            | INF           | <error: Passed value INF is invalid>      |
+            | NAN           | <error: Passed value NAN is invalid>      |
+            | "string"      | <error: Passed value "string" is invalid> |
+            | null          | <error: Passed value null is invalid>     |
+            | (object)[]    | <error: Passed value {} is invalid>       |
+            | []            | <error: Passed value [] is invalid>       |
+            | true          | true                                      |
+            | false         | false                                     |

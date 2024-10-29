@@ -5,9 +5,10 @@ default:
         - '%paths.base%/tests/Feature'
       contexts:
         # Executors
-        - TypeLang\Mapper\Tests\Context\Execution\MapperContext
+        - TypeLang\Mapper\Tests\Context\Execution\MapTypeContext
         # Providers
         - TypeLang\Mapper\Tests\Context\Provider\ConfigurationContext
+        - TypeLang\Mapper\Tests\Context\Provider\MappingContext
         - TypeLang\Mapper\Tests\Context\Provider\MetadataContext
         - TypeLang\Mapper\Tests\Context\Provider\PlatformContext
         - TypeLang\Mapper\Tests\Context\Provider\TypeContext
