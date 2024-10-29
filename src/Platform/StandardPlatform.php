@@ -33,19 +33,19 @@ class StandardPlatform extends Platform
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
 
         // Adds support for the "bool" type
-        yield new Builder\SimpleTypeBuilder('bool', Type\BoolType::class);
+        yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);
 
         // Adds support for the "string" type
         yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
 
         // Adds support for the "int" type
-        yield new Builder\IntTypeBuilder('int');
+        yield new Builder\SimpleTypeBuilder(['int', 'integer'], Type\IntType::class);
 
         // Adds support for the "float" type
-        yield new Builder\SimpleTypeBuilder('float', Type\FloatType::class);
+        yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
 
         // Adds support for the "array" type
-        yield new Builder\ArrayTypeBuilder('array');
+        yield new Builder\SimpleTypeBuilder('array', Type\ArrayType::class);
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
@@ -73,6 +73,9 @@ class StandardPlatform extends Platform
 
         // Adds support for the "BackedEnum" type
         yield new Builder\BackedEnumTypeBuilder();
+
+        // Adds support for the "UnitEnum" type
+        yield new Builder\UnitEnumTypeBuilder();
 
         // Adds support for the "Path\To\Class" statement
         yield new Builder\ObjectTypeBuilder($this->driver);
