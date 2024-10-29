@@ -173,6 +173,7 @@ final class AttributeDriver extends LoadableDriver
     /**
      * @template TAttribute of object
      *
+     * @param \ReflectionClass<object> $class
      * @param class-string<TAttribute> $attr
      *
      * @return TAttribute|null

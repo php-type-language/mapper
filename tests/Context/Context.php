@@ -9,7 +9,6 @@ use Behat\Behat\Context\Environment\InitializedContextEnvironment;
 use Behat\Behat\Context\Exception\ContextNotFoundException;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Hook\BeforeScenario;
-use PHPUnit\Framework\TestCase;
 use PHPUnit\TextUI\Configuration\Builder;
 
 abstract class Context implements ContextInterface
@@ -18,7 +17,6 @@ abstract class Context implements ContextInterface
 
     /**
      * @api
-     * @throws ContextNotFoundException
      */
     #[BeforeScenario]
     public function gatherEnvironment(BeforeScenarioScope $scope): void

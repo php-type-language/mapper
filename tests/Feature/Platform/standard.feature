@@ -1,5 +1,5 @@
-Feature: Checking for presence and conformity of
-    type definitions in the Standard Platform
+Feature: Checking for presence of type definitions in the Standard Platform
+
     Background:
         Given platform "TypeLang\Mapper\Platform\StandardPlatform"
 
@@ -7,223 +7,43 @@ Feature: Checking for presence and conformity of
         Given type statement "<type>"
         Then the type must be defined
         Examples:
-            | type                              | reason               |
-            | int                               | PHPStan Compat (2.x) |
-            | integer                           | PHPStan Compat (2.x) |
-            | positive-int                      | PHPStan Compat (2.x) |
-            | negative-int                      | PHPStan Compat (2.x) |
-            | non-positive-int                  | PHPStan Compat (2.x) |
-            | non-negative-int                  | PHPStan Compat (2.x) |
-            | non-zero-int                      | PHPStan Compat (2.x) |
-            | string                            | PHPStan Compat (2.x) |
-            | lowercase-string                  | PHPStan Compat (2.x) |
-            | literal-string                    | PHPStan Compat (2.x) |
-            | class-string                      | PHPStan Compat (2.x) |
-            | interface-string                  | PHPStan Compat (2.x) |
-            | trait-string                      | PHPStan Compat (2.x) |
-            | enum-string                       | PHPStan Compat (2.x) |
-            | callable-string                   | PHPStan Compat (2.x) |
-            | array-key                         | PHPStan Compat (2.x) |
-            | scalar                            | PHPStan Compat (2.x) |
-            | empty-scalar                      | PHPStan Compat (2.x) |
-            | non-empty-scalar                  | PHPStan Compat (2.x) |
-            | number                            | PHPStan Compat (2.x) |
-            | numeric                           | PHPStan Compat (2.x) |
-            | numeric-string                    | PHPStan Compat (2.x) |
-            | non-empty-string                  | PHPStan Compat (2.x) |
-            | non-empty-lowercase-string        | PHPStan Compat (2.x) |
-            | truthy-string                     | PHPStan Compat (2.x) |
-            | non-falsy-string                  | PHPStan Compat (2.x) |
-            | non-empty-literal-string          | PHPStan Compat (2.x) |
-            | bool                              | PHPStan Compat (2.x) |
-            | boolean                           | PHPStan Compat (2.x) |
-            | true                              | PHPStan Compat (2.x) |
-            | false                             | PHPStan Compat (2.x) |
-            | null                              | PHPStan Compat (2.x) |
-            | float                             | PHPStan Compat (2.x) |
-            | double                            | PHPStan Compat (2.x) |
-            | array                             | PHPStan Compat (2.x) |
-            | associative-array                 | PHPStan Compat (2.x) |
-            | non-empty-array                   | PHPStan Compat (2.x) |
-            | iterable                          | PHPStan Compat (2.x) |
-            | callable                          | PHPStan Compat (2.x) |
-            | pure-callable                     | PHPStan Compat (2.x) |
-            | pure-closure                      | PHPStan Compat (2.x) |
-            | resource                          | PHPStan Compat (2.x) |
-            | open-resource                     | PHPStan Compat (2.x) |
-            | closed-resource                   | PHPStan Compat (2.x) |
-            | mixed                             | PHPStan Compat (2.x) |
-            | non-empty-mixed                   | PHPStan Compat (2.x) |
-            | void                              | PHPStan Compat (2.x) |
-            | object                            | PHPStan Compat (2.x) |
-            | callable-object                   | PHPStan Compat (2.x) |
-            | callable-array                    | PHPStan Compat (2.x) |
-            | never                             | PHPStan Compat (2.x) |
-            | noreturn                          | PHPStan Compat (2.x) |
-            | never-return                      | PHPStan Compat (2.x) |
-            | never-returns                     | PHPStan Compat (2.x) |
-            | no-return                         | PHPStan Compat (2.x) |
-            | list                              | PHPStan Compat (2.x) |
-            | non-empty-list                    | PHPStan Compat (2.x) |
-            | empty                             | PHPStan Compat (2.x) |
-            | __stringandstringable             | PHPStan Compat (2.x) |
-            | self                              | PHPStan Compat (2.x) |
-            | static                            | PHPStan Compat (2.x) |
-            | parent                            | PHPStan Compat (2.x) |
-            | key-of                            | PHPStan Compat (2.x) |
-            | value-of                          | PHPStan Compat (2.x) |
-            | int-mask-of                       | PHPStan Compat (2.x) |
-            | int-mask                          | PHPStan Compat (2.x) |
-            | __benevolent                      | PHPStan Compat (2.x) |
-            | template-type                     | PHPStan Compat (2.x) |
-            | new                               | PHPStan Compat (2.x) |
-            | int                               | Psalm Compat (5.x)   |
-            | float                             | Psalm Compat (5.x)   |
-            | string                            | Psalm Compat (5.x)   |
-            | bool                              | Psalm Compat (5.x)   |
-            | void                              | Psalm Compat (5.x)   |
-            | array-key                         | Psalm Compat (5.x)   |
-            | iterable                          | Psalm Compat (5.x)   |
-            | never                             | Psalm Compat (5.x)   |
-            | never-return                      | Psalm Compat (5.x)   |
-            | never-returns                     | Psalm Compat (5.x)   |
-            | no-return                         | Psalm Compat (5.x)   |
-            | empty                             | Psalm Compat (5.x)   |
-            | object                            | Psalm Compat (5.x)   |
-            | callable                          | Psalm Compat (5.x)   |
-            | pure-callable                     | Psalm Compat (5.x)   |
-            | array                             | Psalm Compat (5.x)   |
-            | associative-array                 | Psalm Compat (5.x)   |
-            | non-empty-array                   | Psalm Compat (5.x)   |
-            | callable-array                    | Psalm Compat (5.x)   |
-            | list                              | Psalm Compat (5.x)   |
-            | non-empty-list                    | Psalm Compat (5.x)   |
-            | non-empty-string                  | Psalm Compat (5.x)   |
-            | truthy-string                     | Psalm Compat (5.x)   |
-            | non-falsy-string                  | Psalm Compat (5.x)   |
-            | lowercase-string                  | Psalm Compat (5.x)   |
-            | non-empty-lowercase-string        | Psalm Compat (5.x)   |
-            | resource                          | Psalm Compat (5.x)   |
-            | resource (closed)                 | Psalm Compat (5.x)   |
-            | closed-resource                   | Psalm Compat (5.x)   |
-            | positive-int                      | Psalm Compat (5.x)   |
-            | non-positive-int                  | Psalm Compat (5.x)   |
-            | negative-int                      | Psalm Compat (5.x)   |
-            | non-negative-int                  | Psalm Compat (5.x)   |
-            | numeric                           | Psalm Compat (5.x)   |
-            | true                              | Psalm Compat (5.x)   |
-            | false                             | Psalm Compat (5.x)   |
-            | scalar                            | Psalm Compat (5.x)   |
-            | null                              | Psalm Compat (5.x)   |
-            | mixed                             | Psalm Compat (5.x)   |
-            | callable-object                   | Psalm Compat (5.x)   |
-            | stringable-object                 | Psalm Compat (5.x)   |
-            | class-string                      | Psalm Compat (5.x)   |
-            | interface-string                  | Psalm Compat (5.x)   |
-            | enum-string                       | Psalm Compat (5.x)   |
-            | trait-string                      | Psalm Compat (5.x)   |
-            | callable-string                   | Psalm Compat (5.x)   |
-            | numeric-string                    | Psalm Compat (5.x)   |
-            | literal-string                    | Psalm Compat (5.x)   |
-            | non-empty-literal-string          | Psalm Compat (5.x)   |
-            | literal-int                       | Psalm Compat (5.x)   |
-            | $this                             | Psalm Compat (5.x)   |
-            | non-empty-scalar                  | Psalm Compat (5.x)   |
-            | empty-scalar                      | Psalm Compat (5.x)   |
-            | non-empty-mixed                   | Psalm Compat (5.x)   |
-            | Closure                           | Psalm Compat (5.x)   |
-            | traversable                       | Psalm Compat (5.x)   |
-            | countable                         | Psalm Compat (5.x)   |
-            | arrayaccess                       | Psalm Compat (5.x)   |
-            | pure-closure                      | Psalm Compat (5.x)   |
-            | boolean                           | Psalm Compat (5.x)   |
-            | integer                           | Psalm Compat (5.x)   |
-            | double                            | Psalm Compat (5.x)   |
-            | real                              | Psalm Compat (5.x)   |
-            | self                              | Psalm Compat (5.x)   |
-            | static                            | Psalm Compat (5.x)   |
-            | key-of                            | Psalm Compat (5.x)   |
-            | value-of                          | Psalm Compat (5.x)   |
-            | properties-of                     | Psalm Compat (5.x)   |
-            | public-properties-of              | Psalm Compat (5.x)   |
-            | protected-properties-of           | Psalm Compat (5.x)   |
-            | private-properties-of             | Psalm Compat (5.x)   |
-            | non-empty-countable               | Psalm Compat (5.x)   |
-            | class-string-map                  | Psalm Compat (5.x)   |
-            | open-resource                     | Psalm Compat (5.x)   |
-            | arraylike-object                  | Psalm Compat (5.x)   |
-            | int-mask                          | Psalm Compat (5.x)   |
-            | int-mask-of                       | Psalm Compat (5.x)   |
-            | closure                           | Phan Compat (5.x)    |
-            | callable                          | Phan Compat (5.x)    |
-            | callable-object                   | Phan Compat (5.x)    |
-            | callable-string                   | Phan Compat (5.x)    |
-            | callable-array                    | Phan Compat (5.x)    |
-            | lowercase-string                  | Phan Compat (5.x)    |
-            | numeric-string                    | Phan Compat (5.x)    |
-            | class-string                      | Phan Compat (5.x)    |
-            | list                              | Phan Compat (5.x)    |
-            | associative-array                 | Phan Compat (5.x)    |
-            | non-empty-associative-array       | Phan Compat (5.x)    |
-            | non-empty-array                   | Phan Compat (5.x)    |
-            | non-empty-list                    | Phan Compat (5.x)    |
-            | non-empty-string                  | Phan Compat (5.x)    |
-            | non-empty-lowercase-string        | Phan Compat (5.x)    |
-            | non-zero-int                      | Phan Compat (5.x)    |
-            | integer                           | Phan Compat (5.x)    |
-            | string                            | Phan Compat (5.x)    |
-            | NULL                              | Phan Compat (5.x)    |
-            | double                            | Phan Compat (5.x)    |
-            | object                            | Phan Compat (5.x)    |
-            | boolean                           | Phan Compat (5.x)    |
-            | array                             | Phan Compat (5.x)    |
-            | resource                          | Phan Compat (5.x)    |
-            | array                             | Phan Compat (5.x)    |
-            | non-empty-array                   | Phan Compat (5.x)    |
-            | associative-array                 | Phan Compat (5.x)    |
-            | non-empty-associative-array       | Phan Compat (5.x)    |
-            | list                              | Phan Compat (5.x)    |
-            | non-empty-list                    | Phan Compat (5.x)    |
-            | iterable                          | Phan Compat (5.x)    |
-            | class-string                      | Phan Compat (5.x)    |
-            | phan-intersection-type            | Phan Compat (5.x)    |
-            | array                             | Phan Compat (5.x)    |
-            | array-key                         | Phan Compat (5.x)    |
-            | associative-array                 | Phan Compat (5.x)    |
-            | bool                              | Phan Compat (5.x)    |
-            | callable                          | Phan Compat (5.x)    |
-            | callable-array                    | Phan Compat (5.x)    |
-            | callable-object                   | Phan Compat (5.x)    |
-            | callable-string                   | Phan Compat (5.x)    |
-            | class-string                      | Phan Compat (5.x)    |
-            | closure                           | Phan Compat (5.x)    |
-            | false                             | Phan Compat (5.x)    |
-            | float                             | Phan Compat (5.x)    |
-            | int                               | Phan Compat (5.x)    |
-            | list                              | Phan Compat (5.x)    |
-            | phan-intersection-type            | Phan Compat (5.x)    |
-            | mixed                             | Phan Compat (5.x)    |
-            | non-empty-mixed                   | Phan Compat (5.x)    |
-            | non-null-mixed                    | Phan Compat (5.x)    |
-            | non-empty-array                   | Phan Compat (5.x)    |
-            | non-empty-associative-array       | Phan Compat (5.x)    |
-            | non-empty-list                    | Phan Compat (5.x)    |
-            | non-empty-lowercase-string        | Phan Compat (5.x)    |
-            | non-empty-string                  | Phan Compat (5.x)    |
-            | non-zero-int                      | Phan Compat (5.x)    |
-            | null                              | Phan Compat (5.x)    |
-            | object                            | Phan Compat (5.x)    |
-            | resource                          | Phan Compat (5.x)    |
-            | scalar                            | Phan Compat (5.x)    |
-            | string                            | Phan Compat (5.x)    |
-            | lowercase-string                  | Phan Compat (5.x)    |
-            | numeric-string                    | Phan Compat (5.x)    |
-            | true                              | Phan Compat (5.x)    |
-            | void                              | Phan Compat (5.x)    |
-            | never                             | Phan Compat (5.x)    |
-            | no-return                         | Phan Compat (5.x)    |
-            | never-return                      | Phan Compat (5.x)    |
-            | never-returns                     | Phan Compat (5.x)    |
-            | iterable                          | Phan Compat (5.x)    |
-            | static                            | Phan Compat (5.x)    |
-            | $this                             | Phan Compat (5.x)    |
+            | type                                                             | reason         |
+            | self                                                             | PHP 5.0+       |
+            | parent                                                           | PHP 5.0+       |
+
+            | array                                                            | PHP 5.1+       |
+            | TypeLang\Mapper\Tests\Feature\Platform\Stub\ObjectStub           | PHP 5.1+       |
+            | TypeLang\Mapper\Tests\Feature\Platform\Stub\InterfaceStub        | PHP 5.1+       |
+
+            | callable                                                         | PHP 5.4+       |
+
+            | int                                                              | PHP 7.0+       |
+            | integer                                                          | PHP 7.0+ alias |
+            | bool                                                             | PHP 7.0+       |
+            | boolean                                                          | PHP 7.0+ alias |
+            | float                                                            | PHP 7.0+       |
+            | real                                                             | PHP 7.0+ alias |
+            | double                                                           | PHP 7.0+ alias |
+            | string                                                           | PHP 7.0+       |
+
+            | void                                                             | PHP 7.1+       |
+            | ?int                                                             | PHP 7.1+       |
+            | iterable                                                         | PHP 7.1+       |
+
+            | object                                                           | PHP 7.2+       |
+
+            | int\|false                                                       | PHP 8.0+       |
+            | static                                                           | PHP 8.0+       |
+            | mixed                                                            | PHP 8.0+       |
+
+            | never                                                            | PHP 8.1+       |
+            | int&string                                                       | PHP 8.1+       |
+            | TypeLang\Mapper\Tests\Feature\Platform\Stub\UnitEnumStub         | PHP 8.1+       |
+            | TypeLang\Mapper\Tests\Feature\Platform\Stub\IntBackedEnumStub    | PHP 8.1+       |
+            | TypeLang\Mapper\Tests\Feature\Platform\Stub\StringBackedEnumStub | PHP 8.1+       |
+
+            | null                                                             | PHP 8.2+       |
+            | false                                                            | PHP 8.2+       |
+            | true                                                             | PHP 8.2+       |
+            | int\|(true&int)                                                  | PHP 8.2+       |
+

@@ -38,35 +38,11 @@ class StandardPlatform extends Platform
         // Adds support for the "string" type
         yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
 
-        // Adds support for the "non-empty-string" type
-        yield new Builder\SimpleTypeBuilder('non-empty-string', Type\NonEmptyStringType::class);
-
-        // Adds support for the "numeric-string" type
-        yield new Builder\SimpleTypeBuilder('numeric-string', Type\NumericStringType::class);
-
-        // Adds support for the "class-string" type
-        yield new Builder\ClassStringTypeBuilder('class-string');
-
         // Adds support for the "int" type
         yield new Builder\IntTypeBuilder('int');
 
-        // Additional int ranges
-        yield new Builder\IntRangeTypeBuilder('positive-int', 1, Type\IntType::DEFAULT_INT_MAX);
-        yield new Builder\IntRangeTypeBuilder('non-negative-int', 0, Type\IntType::DEFAULT_INT_MAX);
-        yield new Builder\IntRangeTypeBuilder('negative-int', Type\IntType::DEFAULT_INT_MIN, -1);
-        yield new Builder\IntRangeTypeBuilder('non-positive-int', Type\IntType::DEFAULT_INT_MIN, 0);
-
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder('float', Type\FloatType::class);
-
-        // Adds support for the "list<T>" type
-        yield new Builder\ListTypeBuilder('list');
-
-        // Adds support for the "non-empty<T>" type
-        yield new Builder\NonEmptyTypeBuilder('non-empty');
-
-        // Adds support for the "array-key" type
-        yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
 
         // Adds support for the "array" type
         yield new Builder\ArrayTypeBuilder('array');

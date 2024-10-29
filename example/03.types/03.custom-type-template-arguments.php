@@ -7,8 +7,8 @@ use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\Builder\Builder;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -28,8 +28,8 @@ class MyNonEmptyTypeBuilder extends Builder
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryFacadeInterface $types,
-        TypeParserFacadeInterface $parser,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
     ): TypeInterface {
         // Shape fields not allowed (like: "non-empty{...}")
         $this->expectNoShapeFields($statement);

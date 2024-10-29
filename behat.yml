@@ -19,6 +19,7 @@ default:
         - TypeLang\Mapper\Tests\Context\Provider\TypeRepositoryContext
         # Utils
         - TypeLang\Mapper\Tests\Context\Support\VarDumperContext
+        - TypeLang\Mapper\Tests\Context\Support\MarkersContext
 
   extensions:
     TypeLang\Mapper\Tests\Extension\ContextArgumentTransformerExtension:
