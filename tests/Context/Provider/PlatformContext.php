@@ -47,6 +47,16 @@ final class PlatformContext extends Context
         return $this->current = $platform;
     }
 
+    #[Given('/^platform "(?P<platform>[a-zA-Z0-9_\x80-\xff\\\\]+?)"$/')]
+    public function givenPlatform(string $platform): void
+    {
+        // @phpstan-ignore-next-line
+        $this->setCurrent(new $platform(
+            $this->from(MetadataContext::class)
+                ->getDriver(),
+        ));
+    }
+
     #[Given('no platform')]
     #[Given('empty platform')]
     public function givenEmptyPlatform(): void

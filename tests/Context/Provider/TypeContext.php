@@ -9,6 +9,7 @@ use PHPUnit\Framework\Assert;
 use TypeLang\Mapper\Tests\Context\Context;
 use TypeLang\Mapper\Tests\Extension\ContextArgumentTransformerExtension\AsTestingContext;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @api
@@ -18,6 +19,8 @@ use TypeLang\Mapper\Type\TypeInterface;
 final class TypeContext extends Context
 {
     private ?TypeInterface $current = null;
+
+    private ?TypeStatement $statement = null;
 
     /**
      * @api
@@ -37,14 +40,41 @@ final class TypeContext extends Context
         return $this->current = $type;
     }
 
-    #[Given('/^type "(?P<type>[a-zA-Z0-9_\x80-\xff\\\\]+?)"$/')]
-    public function givenType(string $type): void
+    /**
+     * @api
+     */
+    public function getStatement(): TypeStatement
     {
-        $this->givenTypeWith($type);
+        Assert::assertNotNull($this->statement, 'Type statement is not set');
+
+        return $this->statement;
     }
 
-    #[Given('/^type "(?P<type>[a-zA-Z0-9_\x80-\xff\\\\]+?)" with (?P<args>.+?)$/')]
-    public function givenTypeWith(string $type, string $args = '{}'): void
+    /**
+     * @api
+     */
+    public function setStatement(TypeStatement $type): TypeStatement
+    {
+        return $this->statement = $type;
+    }
+
+    #[Given('/^type statement "(?P<type>.+?)"$/')]
+    public function givenTypeStatement(string $type): void
+    {
+        $parser = $this->from(TypeParserContext::class)
+            ->getCurrent();
+
+        $this->setStatement($parser->getStatementByDefinition($type));
+    }
+
+    #[Given('/^type "(?P<class>[a-zA-Z0-9_\x80-\xff\\\\]+?)"$/')]
+    public function givenType(string $class): void
+    {
+        $this->givenTypeWith($class);
+    }
+
+    #[Given('/^type "(?P<class>[a-zA-Z0-9_\x80-\xff\\\\]+?)" with (?P<args>.+?)$/')]
+    public function givenTypeWith(string $class, string $args = '{}'): void
     {
         try {
             $arguments = \json_decode($args, true, flags: \JSON_THROW_ON_ERROR);
@@ -53,6 +83,6 @@ final class TypeContext extends Context
         }
 
         // @phpstan-ignore-next-line
-        $this->setCurrent(new $type(...$arguments));
+        $this->setCurrent(new $class(...$arguments));
     }
 }

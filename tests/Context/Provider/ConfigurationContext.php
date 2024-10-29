@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Context\Provider;
 
-use PHPUnit\Framework\Assert;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Tests\Context\Context;

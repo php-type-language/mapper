@@ -5,7 +5,10 @@ default:
         - '%paths.base%/tests/Feature'
       contexts:
         # Executors
-        - TypeLang\Mapper\Tests\Context\Execution\MapTypeContext
+        - TypeLang\Mapper\Tests\Context\Assert\TypeCastAssertions
+        - TypeLang\Mapper\Tests\Context\Assert\TypeMatchAssertions
+        - TypeLang\Mapper\Tests\Context\Assert\TypeStatementAssertions
+        - TypeLang\Mapper\Tests\Context\Assert\ValueAssertions
         # Providers
         - TypeLang\Mapper\Tests\Context\Provider\ConfigurationContext
         - TypeLang\Mapper\Tests\Context\Provider\MappingContext
