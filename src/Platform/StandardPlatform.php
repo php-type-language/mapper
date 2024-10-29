@@ -31,6 +31,7 @@ class StandardPlatform extends Platform
     {
         // Adds support for the "mixed" type
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
+        yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
 
         // Adds support for the "bool" type
         yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);

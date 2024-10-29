@@ -46,7 +46,7 @@ class UnitEnumTypeDenormalizer implements TypeInterface
         }
 
         try {
-            /** @var \UnitEnum */
+            // @phpstan-ignore-next-line
             return \constant($this->class . '::' . $value);
         } catch (\Error $e) {
             throw InvalidValueException::createFromContext(

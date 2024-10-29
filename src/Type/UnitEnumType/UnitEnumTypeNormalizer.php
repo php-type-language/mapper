@@ -30,13 +30,13 @@ class UnitEnumTypeNormalizer implements TypeInterface
      */
     public function cast(mixed $value, Context $context): string
     {
-        if (!$value instanceof $this->class) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+        if ($value instanceof $this->class) {
+            return $value->name;
         }
 
-        return $value->name;
+        throw InvalidValueException::createFromContext(
+            value: $value,
+            context: $context,
+        );
     }
 }

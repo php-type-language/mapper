@@ -21,7 +21,7 @@ class BoolType implements TypeInterface
      */
     public function cast(mixed $value, Context $context): bool
     {
-        if ($this->match($value, $context)) {
+        if (\is_bool($value)) {
             /** @var bool */
             return $value;
         }

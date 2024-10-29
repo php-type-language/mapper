@@ -4,13 +4,29 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-class ArrayKeyType extends UnionType
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Runtime\Context;
+
+class ArrayKeyType implements TypeInterface
 {
-    public function __construct()
+    public function match(mixed $value, Context $context): bool
     {
-        parent::__construct([
-            new IntType(),
-            new StringType(),
-        ]);
+        return \is_string($value) || \is_int($value);
+    }
+
+    /**
+     * @throws InvalidValueException
+     */
+    public function cast(mixed $value, Context $context): string|int
+    {
+        if (\is_string($value) || \is_int($value)) {
+            /** @var string|int */
+            return $value;
+        }
+
+        throw InvalidValueException::createFromContext(
+            value: $value,
+            context: $context,
+        );
     }
 }
