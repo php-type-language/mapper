@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping;
 
+use JetBrains\PhpStorm\Language;
+
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class SkipWhen
 {
@@ -11,6 +13,7 @@ class SkipWhen
         /**
          * @var non-empty-string
          */
+        #[Language('JavaScript')]
         public readonly string $expr,
     ) {}
 }

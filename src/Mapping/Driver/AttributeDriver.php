@@ -13,6 +13,7 @@ use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\SkipWhen;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
@@ -69,6 +70,16 @@ final class AttributeDriver extends LoadableDriver
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): void {
+        // -----------------------------------------------------------------
+        //  Apply normalization logic
+        // -----------------------------------------------------------------
+
+        $attribute = $this->findClassAttribute($reflection, NormalizeAsArray::class);
+
+        if ($attribute !== null) {
+            $class->shouldNormalizeAsArray($attribute->enabled);
+        }
+
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());
 
@@ -143,13 +154,32 @@ final class AttributeDriver extends LoadableDriver
     /**
      * @template TAttribute of object
      *
-     * @param class-string<TAttribute> $class
+     * @param class-string<TAttribute> $attr
      *
      * @return TAttribute|null
      */
-    private function findPropertyAttribute(\ReflectionProperty $property, string $class): ?object
+    private function findPropertyAttribute(\ReflectionProperty $property, string $attr): ?object
     {
-        $attributes = $property->getAttributes($class, \ReflectionAttribute::IS_INSTANCEOF);
+        $attributes = $property->getAttributes($attr, \ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($attributes as $attribute) {
+            /** @var TAttribute */
+            return $attribute->newInstance();
+        }
+
+        return null;
+    }
+
+    /**
+     * @template TAttribute of object
+     *
+     * @param class-string<TAttribute> $attr
+     *
+     * @return TAttribute|null
+     */
+    private function findClassAttribute(\ReflectionClass $class, string $attr): ?object
+    {
+        $attributes = $class->getAttributes($attr, \ReflectionAttribute::IS_INSTANCEOF);
 
         foreach ($attributes as $attribute) {
             /** @var TAttribute */

@@ -19,6 +19,8 @@ final class ClassMetadata extends Metadata
      */
     private array $properties = [];
 
+    private ?bool $normalizeAsArray = null;
+
     /**
      * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
@@ -75,6 +77,22 @@ final class ClassMetadata extends Metadata
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * @api
+     */
+    public function isNormalizeAsArray(): ?bool
+    {
+        return $this->normalizeAsArray;
+    }
+
+    /**
+     * @api
+     */
+    public function shouldNormalizeAsArray(?bool $enabled = null): void
+    {
+        $this->normalizeAsArray = $enabled;
     }
 
     /**
