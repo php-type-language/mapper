@@ -10,15 +10,26 @@ use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
+ * Represents an abstraction over general information about a class.
+ *
  * @template T of object
  */
 final class ClassMetadata extends Metadata
 {
     /**
+     * Contains a list of class fields available for
+     * normalization and denormalization.
+     *
      * @var array<non-empty-string, PropertyMetadata>
      */
     private array $properties = [];
 
+    /**
+     * Contains a {@see bool} flag that is responsible for converting the
+     * object into an associative {@see array} during normalization.
+     *
+     * If {@see null}, then the system setting should be used.
+     */
     private ?bool $normalizeAsArray = null;
 
     /**
@@ -39,6 +50,8 @@ final class ClassMetadata extends Metadata
 
     /**
      * Dynamically creates AST class representation.
+     *
+     * Required to print type information in exceptions.
      *
      * @api
      *
@@ -70,7 +83,7 @@ final class ClassMetadata extends Metadata
     }
 
     /**
-     * Returns class name.
+     * Returns full qualified class name.
      *
      * @return class-string<T>
      */
@@ -80,6 +93,17 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns information about the normalization method of an object.
+     *
+     * - Returns {@see true} if the object should be normalized as
+     *   an associative {@see array}.
+     *
+     * - Returns {@see false} if the object should be normalized as an
+     *   anonymous {@see object}.
+     *
+     * - Returns {@see null} if the system settings for this option
+     *   should be used.
+     *
      * @api
      */
     public function isNormalizeAsArray(): ?bool
@@ -88,6 +112,8 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Forces the object normalization option.
+     *
      * @api
      */
     public function shouldNormalizeAsArray(?bool $enabled = null): void
@@ -96,6 +122,9 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Adds {@see PropertyMetadata} property information to
+     * the {@see ClassMetadata} instance.
+     *
      * @api
      */
     public function addProperty(PropertyMetadata $property): void
@@ -104,6 +133,10 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns {@see PropertyMetadata} information about the property.
+     *
+     * If it was previously absent, it creates a new one.
+     *
      * @api
      *
      * @param non-empty-string $name
@@ -114,6 +147,10 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns {@see PropertyMetadata} information about a property,
+     * or returns {@see null} if no such property has been registered
+     * in the {@see ClassMetadata} instance.
+     *
      * @api
      *
      * @param non-empty-string $name
@@ -124,6 +161,10 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns {@see true} if the {@see PropertyMetadata} property information
+     * was registered in the {@see ClassMetadata} instance
+     * and {@see false} otherwise.
+     *
      * @api
      *
      * @param non-empty-string $name
@@ -134,6 +175,8 @@ final class ClassMetadata extends Metadata
     }
 
     /**
+     * Returns a list of registered {@see PropertyMetadata} properties.
+     *
      * @return list<PropertyMetadata>
      */
     public function getProperties(): array

@@ -98,9 +98,12 @@ class ObjectTypeNormalizer implements TypeInterface
             $skip = $meta->findSkipCondition();
 
             if ($skip !== null) {
-                $nodes = $skip->getNodes();
+                $expression = $skip->getExpression();
+                $variable = $skip->getContextVariableName();
 
-                if ((bool) $nodes->evaluate([], ['this' => $object])) {
+                $nodes = $expression->getNodes();
+
+                if ((bool) $nodes->evaluate([], [$variable => $object])) {
                     continue;
                 }
             }

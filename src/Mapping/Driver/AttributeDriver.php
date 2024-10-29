@@ -12,6 +12,7 @@ use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ExpressionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\SkipWhen;
@@ -90,9 +91,12 @@ final class AttributeDriver extends LoadableDriver
             $attribute = $this->findPropertyAttribute($property, MapType::class);
 
             if ($attribute !== null) {
-                $type = $this->createType($attribute->type, $property, $types, $parser);
-
-                $metadata->setTypeInfo($type);
+                $metadata->setTypeInfo($this->createType(
+                    type: $attribute->type,
+                    property: $property,
+                    types: $types,
+                    parser: $parser,
+                ));
             }
 
             // -----------------------------------------------------------------
@@ -112,11 +116,12 @@ final class AttributeDriver extends LoadableDriver
             $attribute = $this->findPropertyAttribute($property, SkipWhen::class);
 
             if ($attribute !== null) {
-                $expression = $this->createExpression($attribute->expr, [
-                    'this',
-                ]);
-
-                $metadata->setSkipCondition($expression);
+                $metadata->setSkipCondition(new ExpressionMetadata(
+                    expression: $this->createExpression($attribute->expr, [
+                        $attribute->context,
+                    ]),
+                    context: $attribute->context,
+                ));
             }
         }
     }
