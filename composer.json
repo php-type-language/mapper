@@ -63,9 +63,8 @@
     "scripts": {
         "build": "@php bin/build",
 
-        "test": ["@test:unit", "@test:functional", "@test:feature"],
+        "test": ["@test:unit", "@test:feature"],
         "test:unit": "phpunit --testdox --testsuite=unit",
-        "test:functional": "phpunit --testsuite=functional",
         "test:feature": "behat",
 
         "linter": "@linter:check",

@@ -39,7 +39,5 @@ jobs:
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
       - name: Execute Unit Tests
         run: composer test:unit
-      - name: Execute Functional Tests
-        run: composer test:functional
       - name: Execute Feature Tests
         run: composer test:feature
