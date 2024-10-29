@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -26,7 +26,7 @@ final class TypeRepository implements
      * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
      */
     public function __construct(
-        private readonly TypeParserFacadeInterface $parser,
+        private readonly TypeParserInterface $parser,
         iterable $types = [],
         private readonly ReferencesResolver $references = new ReferencesResolver(),
     ) {
@@ -36,6 +36,7 @@ final class TypeRepository implements
 
     /**
      * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
+     *
      * @return list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
      */
     private static function toArrayList(iterable $types): array
@@ -60,7 +61,7 @@ final class TypeRepository implements
      */
     public static function createFromPlatform(
         PlatformInterface $platform,
-        TypeParserFacadeInterface $parser,
+        TypeParserInterface $parser,
         ReferencesResolver $references = new ReferencesResolver(),
     ): self {
         return new self(

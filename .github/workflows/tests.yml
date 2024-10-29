@@ -41,3 +41,5 @@ jobs:
         run: composer test:unit
       - name: Execute Functional Tests
         run: composer test:functional
+      - name: Execute Feature Tests
+        run: composer test:feature

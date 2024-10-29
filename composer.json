@@ -21,6 +21,7 @@
         }
     },
     "require-dev": {
+        "behat/behat": "^3.14",
         "friendsofphp/php-cs-fixer": "^3.53",
         "jetbrains/phpstorm-attributes": "^1.0",
         "monolog/monolog": "^3.7",
@@ -30,6 +31,7 @@
         "phpunit/phpunit": "^10.5|^11.0",
         "rector/rector": "^1.1",
         "symfony/cache": "^5.4|^6.0|^7.0",
+        "symfony/property-access": "^7.1",
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
         "type-lang/phpdoc": "^1.0",
@@ -61,9 +63,10 @@
     "scripts": {
         "build": "@php bin/build",
 
-        "test": ["@test:unit", "@test:functional"],
+        "test": ["@test:unit", "@test:functional", "@test:feature"],
         "test:unit": "phpunit --testdox --testsuite=unit",
         "test:functional": "phpunit --testsuite=functional",
+        "test:feature": "behat",
 
         "linter": "@linter:check",
         "linter:check": "phpstan analyse --configuration phpstan.neon",
