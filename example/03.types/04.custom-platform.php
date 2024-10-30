@@ -5,7 +5,7 @@ declare(strict_types=1);
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Builder\ObjectTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ClassTypeBuilder;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -26,7 +26,7 @@ class SimplePlatform implements PlatformInterface
     {
         // The platform will only support objects, that is,
         // references to existing classes.
-        yield new ObjectTypeBuilder();
+        yield new ClassTypeBuilder();
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

@@ -18,10 +18,11 @@
         "phpdocumentor/reflection-docblock": "^5.4",
         "phpdocumentor/type-resolver": "^1.8",
         "symfony/cache": "^5.4|^6.0|^7.0",
-        "symfony/property-access": "^7.1",
-        "symfony/serializer": "^7.1",
+        "symfony/property-access": "^5.4|^6.0|^7.1",
+        "symfony/serializer": "^5.4|^6.0|^7.1",
         "type-lang/phpdoc": "^1.0",
-        "type-lang/phpdoc-standard-tags": "^1.0"
+        "type-lang/phpdoc-standard-tags": "^1.0",
+        "symfony/var-dumper": "^7.1"
     },
     "scripts": {
         "bench": "phpbench run --report=grouped"

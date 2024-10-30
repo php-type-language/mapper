@@ -31,7 +31,6 @@ class StandardPlatform extends Platform
     {
         // Adds support for the "mixed" type
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
-        yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
 
         // Adds support for the "bool" type
         yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);
@@ -40,13 +39,26 @@ class StandardPlatform extends Platform
         yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
 
         // Adds support for the "int" type
-        yield new Builder\SimpleTypeBuilder(['int', 'integer'], Type\IntType::class);
+        yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
 
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
 
         // Adds support for the "array" type
-        yield new Builder\SimpleTypeBuilder('array', Type\ArrayType::class);
+        yield new Builder\ArrayTypeBuilder([
+            'array',
+            'iterable',
+            \Iterator::class,
+            \Generator::class,
+            \Traversable::class,
+            \IteratorAggregate::class,
+        ]);
+
+        // Adds support for the "object" type
+        yield new Builder\ObjectTypeBuilder([
+            'object',
+            \stdClass::class,
+        ]);
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
@@ -79,7 +91,7 @@ class StandardPlatform extends Platform
         yield new Builder\UnitEnumTypeBuilder();
 
         // Adds support for the "Path\To\Class" statement
-        yield new Builder\ObjectTypeBuilder($this->driver);
+        yield new Builder\ClassTypeBuilder($this->driver);
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

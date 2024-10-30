@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ObjectType\PropertyAccessor;
+namespace TypeLang\Mapper\Type\ClassType\PropertyAccessor;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 

@@ -62,7 +62,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             delegate: TypeRepository::createFromPlatform(
                 platform: $platform,
                 parser: $this->parser,
-            )
+            ),
         );
 
         if (($tracer = $this->config->getTracer()) !== null) {
@@ -188,5 +188,19 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         }
 
         return $this->types->getTypeByDefinition($type);
+    }
+
+    /**
+     * @param class-string|object $class
+     * @throws TypeNotFoundException
+     * @throws \Throwable
+     */
+    public function warmup(string|object $class): void
+    {
+        if (\is_object($class)) {
+            $class = $class::class;
+        }
+
+        $this->types->getTypeByDefinition($class);
     }
 }

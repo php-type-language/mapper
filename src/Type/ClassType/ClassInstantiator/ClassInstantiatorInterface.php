@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ObjectType\ObjectInstantiator;
+namespace TypeLang\Mapper\Type\ClassType\ClassInstantiator;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
-interface ObjectInstantiatorInterface
+interface ClassInstantiatorInterface
 {
     /**
      * @template T of object
