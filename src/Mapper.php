@@ -192,6 +192,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     /**
      * @param class-string|object $class
+     *
      * @throws TypeNotFoundException
      * @throws \Throwable
      */

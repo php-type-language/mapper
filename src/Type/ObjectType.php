@@ -12,7 +12,8 @@ use TypeLang\Mapper\Type\ObjectType\ObjectTypeNormalizer;
  */
 class ObjectType extends AsymmetricType
 {
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(
             normalizer: new ObjectTypeNormalizer(),
             denormalizer: new ObjectTypeDenormalizer(),
