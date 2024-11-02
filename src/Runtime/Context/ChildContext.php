@@ -62,6 +62,6 @@ final class ChildContext extends Context
             }
         }
 
-        return new Path($entries);
+        return new Path(\array_reverse($entries));
     }
 }
