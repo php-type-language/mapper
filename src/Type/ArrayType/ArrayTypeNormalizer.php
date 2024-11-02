@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\ArrayType;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Exception\Mapping\InvalidKeyException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context;
@@ -43,20 +44,26 @@ class ArrayTypeNormalizer implements TypeInterface
 
         $result = [];
 
-        foreach ($value as $index => $item) {
+        $index = 0;
+        foreach ($value as $key => $item) {
+            $keyEntrance = $context->enter($item, new ArrayIndexEntry($index));
+
+            $key = $this->key->cast($key, $keyEntrance);
+
             // An output PHP array keys cannot physically contain
             // anything other than int or float
-            if (!\is_string($index) && !\is_int($index)) {
+            if (!\is_string($key) && !\is_int($key)) {
                 throw InvalidValueException::createFromContext(
                     value: $value,
-                    context: $context,
+                    context: $keyEntrance,
                 );
             }
 
-            $entrance = $context->enter($item, new ArrayIndexEntry($index));
+            $valueEntrance = $context->enter($item, new ArrayIndexEntry($key));
 
-            $result[$this->key->cast($index, $entrance)]
-                = $this->value->cast($item, $entrance);
+            $result[$key] = $this->value->cast($item, $valueEntrance);
+
+            ++$index;
         }
 
         return $result;
