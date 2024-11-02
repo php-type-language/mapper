@@ -12,22 +12,10 @@ use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
 class ArrayType implements TypeInterface
 {
-    protected readonly TypeInterface $key;
-    protected readonly bool $isKeyPassed;
-
-    protected readonly TypeInterface $value;
-    protected readonly bool $isValuePassed;
-
     public function __construct(
-        ?TypeInterface $key = null,
-        ?TypeInterface $value = null,
-    ) {
-        $this->key = $key ?? new ArrayKeyType();
-        $this->isKeyPassed = $key !== null;
-
-        $this->value = $value ?? new MixedType();
-        $this->isValuePassed = $value !== null;
-    }
+        protected readonly TypeInterface $key = new ArrayKeyType(),
+        protected readonly TypeInterface $value = new MixedType(),
+    ) {}
 
     public function match(mixed $value, Context $context): bool
     {
