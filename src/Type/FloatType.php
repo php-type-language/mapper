@@ -19,8 +19,7 @@ class FloatType implements TypeInterface
      */
     public function cast(mixed $value, Context $context): float
     {
-        if ($this->match($value, $context)) {
-            /** @var float|int $value */
+        if (\is_float($value) || \is_int($value)) {
             return (float) $value;
         }
 
