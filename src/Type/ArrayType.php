@@ -19,27 +19,7 @@ class ArrayType implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        if (!\is_iterable($value)) {
-            return false;
-        }
-
-        // Force return true if the iterator does not allow rewinding.
-        if ($value instanceof \Generator) {
-            return true;
-        }
-
-        foreach ($value as $key => $item) {
-            $entrance = $context->enter($item, new ArrayIndexEntry($key));
-
-            $isValidItem = $this->key->match($key, $entrance)
-                && $this->value->match($value, $entrance);
-
-            if (!$isValidItem) {
-                return false;
-            }
-        }
-
-        return true;
+        return \is_iterable($value);
     }
 
     /**
