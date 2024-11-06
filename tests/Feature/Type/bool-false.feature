@@ -1,9 +1,9 @@
-Feature: Checking the "BoolType" type behavior
+Feature: Checking the FALSE "BoolLiteralType" type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\BoolType"
+        Given type "TypeLang\Mapper\Type\BoolLiteralType" with [false]
 
-    Scenario Outline: Matching "<value>" by the BoolType
+    Scenario Outline: Matching "<value>" by the BoolLiteralType
         When normalize
         Then match of "<value>" must return <is_matched>
         When denormalize
@@ -27,7 +27,7 @@ Feature: Checking the "BoolType" type behavior
             | "false"                                               | false      |
             | ""                                                    | false      |
             | null                                                  | false      |
-            | true                                                  | true       |
+            | true                                                  | false      |
             | false                                                 | true       |
             | []                                                    | false      |
             | [1]                                                   | false      |
@@ -36,7 +36,7 @@ Feature: Checking the "BoolType" type behavior
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
 
-    Scenario Outline: Normalize "<value>" by the BoolType
+    Scenario Outline: Normalize "<value>" by the BoolLiteralType
         When normalize
         Then cast of "<value>" must return <result>
         # Can be converted to a false:
@@ -48,34 +48,34 @@ Feature: Checking the "BoolType" type behavior
         # - null
         # Otherwise true
         Examples:
-            | value                                                 | result |
-            | 1                                                     | true   |
-            | -1                                                    | true   |
-            | 0                                                     | false  |
-            | 42                                                    | true   |
-            | 42.1                                                  | true   |
-            | 1.0                                                   | true   |
-            | 0.0                                                   | false  |
-            | -1.0                                                  | true   |
-            | INF                                                   | true   |
-            | NAN                                                   | true   |
-            | "1"                                                   | true   |
-            | "0"                                                   | false  |
-            | "string"                                              | true   |
-            | "true"                                                | true   |
-            | "false"                                               | true   |
-            | ""                                                    | false  |
-            | null                                                  | false  |
-            | true                                                  | true   |
-            | false                                                 | false  |
-            | []                                                    | false  |
-            | [1]                                                   | true   |
-            | (object)[]                                            | true   |
-            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | true   |
-            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | true   |
-            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | true   |
+            | value                                                 | result                                                                 |
+            | 1                                                     | <error: Passed value 1 is invalid>                                     |
+            | -1                                                    | <error: Passed value -1 is invalid>                                    |
+            | 0                                                     | false                                                                  |
+            | 42                                                    | <error: Passed value 42 is invalid>                                    |
+            | 42.1                                                  | <error: Passed value 42.1 is invalid>                                  |
+            | 1.0                                                   | <error: Passed value 1 is invalid>                                     |
+            | 0.0                                                   | false                                                                  |
+            | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
+            | INF                                                   | <error: Passed value INF is invalid>                                   |
+            | NAN                                                   | <error: Passed value NAN is invalid>                                   |
+            | "1"                                                   | <error: Passed value "1" is invalid>                                   |
+            | "0"                                                   | false                                                                  |
+            | "string"                                              | <error: Passed value "string" is invalid>                              |
+            | "true"                                                | <error: Passed value "true" is invalid>                                |
+            | "false"                                               | <error: Passed value "false" is invalid>                               |
+            | ""                                                    | false                                                                  |
+            | null                                                  | false                                                                  |
+            | true                                                  | <error: Passed value true is invalid>                                  |
+            | false                                                 | false                                                                  |
+            | []                                                    | false                                                                  |
+            | [1]                                                   | <error: Passed value [1] is invalid>                                   |
+            | (object)[]                                            | <error: Passed value {} is invalid>                                    |
+            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
+            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
+            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |
 
-    Scenario Outline: Denormalize "<value>" by the BoolType
+    Scenario Outline: Denormalize "<value>" by the BoolLiteralType
         When denormalize
         Then cast of "<value>" must return <result>
         Examples:
@@ -97,7 +97,7 @@ Feature: Checking the "BoolType" type behavior
             | "false"                                               | <error: Passed value "false" is invalid>                               |
             | ""                                                    | <error: Passed value "" is invalid>                                    |
             | null                                                  | <error: Passed value null is invalid>                                  |
-            | true                                                  | true                                                                   |
+            | true                                                  | <error: Passed value true is invalid>                                  |
             | false                                                 | false                                                                  |
             | []                                                    | <error: Passed value [] is invalid>                                    |
             | [1]                                                   | <error: Passed value [1] is invalid>                                   |

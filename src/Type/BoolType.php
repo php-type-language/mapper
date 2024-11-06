@@ -37,11 +37,24 @@ class BoolType implements TypeInterface
 
     protected function convertToBool(mixed $value): bool
     {
+        //
+        // Each value should be checked EXPLICITLY, instead
+        // of converting to a bool like `(bool) $value`.
+        //
+        // This will avoid implicit behavior, such as when an empty
+        // SimpleXMLElement is cast to false, instead of being
+        // converted to true like any other object:
+        //
+        // ```
+        // (bool) new \SimpleXMLElement('<xml />'); // -> false (WTF?)
+        // ```
+        //
         return $value !== ''
+            && $value !== '0'
             && $value !== []
             && $value !== null
-            && $value !== '0'
             && $value !== 0
-            && $value !== 0.0;
+            && $value !== 0.0
+            && $value !== false;
     }
 }

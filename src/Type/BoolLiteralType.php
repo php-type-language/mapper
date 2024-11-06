@@ -7,26 +7,28 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
-class BoolLiteralType implements TypeInterface
+class BoolLiteralType extends BoolType
 {
     public function __construct(
         private readonly bool $value,
     ) {}
 
+    #[\Override]
     public function match(mixed $value, Context $context): bool
     {
         return $value === $this->value;
     }
 
-    /**
-     * Converts incoming value to the bool (in case of strict types is disabled).
-     *
-     * @throws InvalidValueException
-     */
+    #[\Override]
     public function cast(mixed $value, Context $context): bool
     {
         if ($value === $this->value) {
             return $value;
+        }
+
+        if (!$context->isStrictTypesEnabled()
+            && $this->convertToBool($value) === $this->value) {
+            return $this->value;
         }
 
         throw InvalidValueException::createFromContext(
