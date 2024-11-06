@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Context;
 
+use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
@@ -21,6 +22,15 @@ final class RootContext extends Context
         TypeParserFacadeInterface $parser,
         TypeRepositoryFacadeInterface $types,
     ): self {
+        if ($config instanceof Configuration) {
+            // Disable strict-types for denormalization if option is not set
+            if (!$config->isStrictTypesOptionDefined()) {
+                $config = $config->withStrictTypes(false);
+            }
+
+            // ...
+        }
+
         return new self(
             value: $value,
             direction: Direction::Normalize,
@@ -36,6 +46,15 @@ final class RootContext extends Context
         TypeParserFacadeInterface $parser,
         TypeRepositoryFacadeInterface $types,
     ): self {
+        if ($config instanceof Configuration) {
+            // Enable strict-types for normalization if option is not set
+            if (!$config->isStrictTypesOptionDefined()) {
+                $config = $config->withStrictTypes(true);
+            }
+
+            // ...
+        }
+
         return new self(
             value: $value,
             direction: Direction::Denormalize,

@@ -7,9 +7,7 @@ namespace TypeLang\Mapper\Runtime;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 
-final class Configuration implements
-    ConfigurationInterface,
-    EvolvableConfigurationInterface
+final class Configuration implements ConfigurationInterface
 {
     /**
      * Default value for {@see $objectsAsArrays} option.
@@ -20,6 +18,11 @@ final class Configuration implements
      * Default value for {@see $detailedTypes} option.
      */
     public const DETAILED_TYPES_DEFAULT_VALUE = true;
+
+    /**
+     * Default value for {@see $strictTypes} option.
+     */
+    public const STRICT_TYPES_DEFAULT_VALUE = true;
 
     public function __construct(
         /**
@@ -34,6 +37,11 @@ final class Configuration implements
          */
         private ?bool $detailedTypes = null,
         /**
+         * If this option contains {@see true}, then strict types will
+         * be enabled.
+         */
+        private ?bool $strictTypes = null,
+        /**
          * If this option contains {@see LoggerInterface}, then logger
          * will be enabled. Otherwise logger will be disabled in case of
          * argument contain {@see null}.
@@ -47,6 +55,13 @@ final class Configuration implements
         private ?TracerInterface $tracer = null,
     ) {}
 
+    /**
+     * Enables or disables object to arrays conversion.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
     public function withObjectsAsArrays(?bool $enabled = null): self
     {
         $self = clone $this;
@@ -60,6 +75,23 @@ final class Configuration implements
         return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
 
+    /**
+     * Returns {@see true} in case option is user-defined.
+     *
+     * @api
+     */
+    public function isObjectsAsArraysOptionDefined(): bool
+    {
+        return $this->objectsAsArrays !== null;
+    }
+
+    /**
+     * Enables or disables detailed types in exceptions.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
     public function withDetailedTypes(?bool $enabled = null): self
     {
         $self = clone $this;
@@ -73,6 +105,52 @@ final class Configuration implements
         return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
     }
 
+    /**
+     * Returns {@see true} in case option is user-defined.
+     *
+     * @api
+     */
+    public function isDetailedTypesOptionDefined(): bool
+    {
+        return $this->detailedTypes !== null;
+    }
+
+    /**
+     * Enables or disables strict types in casting.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
+    public function withStrictTypes(?bool $enabled = null): self
+    {
+        $self = clone $this;
+        $self->strictTypes = $enabled;
+
+        return $self;
+    }
+
+    public function isStrictTypesEnabled(): bool
+    {
+        return $this->strictTypes ?? self::STRICT_TYPES_DEFAULT_VALUE;
+    }
+
+    /**
+     * Returns {@see true} in case option is user-defined.
+     *
+     * @api
+     */
+    public function isStrictTypesOptionDefined(): bool
+    {
+        return $this->strictTypes !== null;
+    }
+
+    /**
+     * Enables logging using passed instance in case of {@see LoggerInterface}
+     * instance is present or disables it in case of logger is {@see null}.
+     *
+     * @api
+     */
     public function withLogger(?LoggerInterface $logger = null): self
     {
         $self = clone $this;
@@ -86,6 +164,13 @@ final class Configuration implements
         return $this->logger;
     }
 
+    /**
+     * Enables application tracing using passed instance in case of
+     * {@see TracerInterface} instance is present or disables it in case of
+     * tracer is {@see null}.
+     *
+     * @api
+     */
     public function withTracer(?TracerInterface $tracer = null): self
     {
         $self = clone $this;

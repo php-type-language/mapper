@@ -64,6 +64,11 @@ abstract class Context implements
         return $this->config->isDetailedTypes();
     }
 
+    public function isStrictTypesEnabled(): bool
+    {
+        return $this->config->isStrictTypesEnabled();
+    }
+
     public function getLogger(): ?LoggerInterface
     {
         return $this->config->getLogger();
