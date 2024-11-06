@@ -13,6 +13,7 @@ Feature: Checking the "StringType" type behavior
             | 42         | false      |
             | 42.1       | false      |
             | INF        | false      |
+            | -INF       | false      |
             | NAN        | false      |
             | "string"   | true       |
             | null       | false      |
@@ -21,9 +22,25 @@ Feature: Checking the "StringType" type behavior
             | true       | false      |
             | false      | false      |
 
-    Scenario Outline: Casting "<value>" by the StringType
+    Scenario Outline: Normalize "<value>" by the StringType
         When normalize
         Then cast of "<value>" must return <result>
+        Examples:
+            | value                | result                              |
+            | 42                   | "42"                                |
+            | -9223372036854775808 | "-9.2233720368548E+18"              |
+            | 42.1                 | "42.1"                              |
+            | INF                  | "inf"                               |
+            | -INF                 | "-inf"                              |
+            | NAN                  | "nan"                               |
+            | "string"             | "string"                            |
+            | null                 | ""                                  |
+            | (object)[]           | <error: Passed value {} is invalid> |
+            | []                   | <error: Passed value [] is invalid> |
+            | true                 | "true"                              |
+            | false                | "false"                             |
+
+    Scenario Outline: Denormalize "<value>" by the StringType
         When denormalize
         Then cast of "<value>" must return <result>
         Examples:
@@ -32,6 +49,7 @@ Feature: Checking the "StringType" type behavior
             | -9223372036854775808 | <error: Passed value -9.2233720368548E+18 is invalid> |
             | 42.1                 | <error: Passed value 42.1 is invalid>                 |
             | INF                  | <error: Passed value INF is invalid>                  |
+            | -INF                 | <error: Passed value -INF is invalid>                 |
             | NAN                  | <error: Passed value NAN is invalid>                  |
             | "string"             | "string"                                              |
             | null                 | <error: Passed value null is invalid>                 |
