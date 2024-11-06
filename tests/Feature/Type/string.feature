@@ -25,7 +25,6 @@ Feature: Checking the "StringType" type behavior
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
 
-
     Scenario Outline: Normalize "<value>" by the StringType
         When normalize
         Then cast of "<value>" must return <result>

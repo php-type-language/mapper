@@ -22,13 +22,26 @@ class BoolType implements TypeInterface
     public function cast(mixed $value, Context $context): bool
     {
         if (\is_bool($value)) {
-            /** @var bool */
             return $value;
+        }
+
+        if (!$context->isStrictTypesEnabled()) {
+            return $this->convertToBool($value);
         }
 
         throw InvalidValueException::createFromContext(
             value: $value,
             context: $context,
         );
+    }
+
+    protected function convertToBool(mixed $value): bool
+    {
+        return $value !== ''
+            && $value !== []
+            && $value !== null
+            && $value !== '0'
+            && $value !== 0
+            && $value !== 0.0;
     }
 }

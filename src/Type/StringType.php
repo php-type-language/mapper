@@ -28,12 +28,11 @@ class StringType implements TypeInterface
     public function cast(mixed $value, Context $context): string
     {
         if (\is_string($value)) {
-            /** @var string */
             return $value;
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            return $this->tryCast($value, $context);
+            return $this->convertToString($value, $context);
         }
 
         throw InvalidValueException::createFromContext(
@@ -45,7 +44,7 @@ class StringType implements TypeInterface
     /**
      * @throws InvalidValueException
      */
-    private function tryCast(mixed $value, Context $context): string
+    protected function convertToString(mixed $value, Context $context): string
     {
         return match (true) {
             $value === null => static::NULL_TO_STRING,
