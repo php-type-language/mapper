@@ -9,11 +9,11 @@ use TypeLang\Mapper\Runtime\Context;
 
 class StringType implements TypeInterface
 {
-    protected const NULL_TO_STRING  = '';
-    protected const TRUE_TO_STRING  = 'true';
+    protected const NULL_TO_STRING = '';
+    protected const TRUE_TO_STRING = 'true';
     protected const FALSE_TO_STRING = 'false';
-    protected const NAN_TO_STRING   = 'nan';
-    protected const INF_TO_STRING   = 'inf';
+    protected const NAN_TO_STRING = 'nan';
+    protected const INF_TO_STRING = 'inf';
 
     public function match(mixed $value, Context $context): bool
     {
