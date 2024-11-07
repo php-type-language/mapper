@@ -1,9 +1,9 @@
-Feature: Checking the TRUE "BoolLiteralType" type behavior
+Feature: Checking the "true" (TypeLang\Mapper\Type\BoolLiteralType) type behavior
 
     Background:
         Given type "TypeLang\Mapper\Type\BoolLiteralType" with [true]
 
-    Scenario Outline: Matching "<value>" by the BoolLiteralType
+    Scenario Outline: Matching "<value>"
         When normalize
         Then match of "<value>" must return <is_matched>
         When denormalize
@@ -19,6 +19,7 @@ Feature: Checking the TRUE "BoolLiteralType" type behavior
             | 0.0                                                   | false      |
             | -1.0                                                  | false      |
             | INF                                                   | false      |
+            | -INF                                                  | false      |
             | NAN                                                   | false      |
             | "1"                                                   | false      |
             | "0"                                                   | false      |
@@ -36,17 +37,9 @@ Feature: Checking the TRUE "BoolLiteralType" type behavior
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
 
-    Scenario Outline: Normalize "<value>" by the BoolLiteralType
+    Scenario Outline: Normalize "<value>"
         When normalize
         Then cast of "<value>" must return <result>
-        # Can be converted to a false:
-        # - int(0)
-        # - float(0.0)
-        # - string("0")
-        # - empty string ("")
-        # - empty array ([])
-        # - null
-        # Otherwise true
         Examples:
             | value                                                 | result                                 |
             | 1                                                     | true                                   |
@@ -58,6 +51,7 @@ Feature: Checking the TRUE "BoolLiteralType" type behavior
             | 0.0                                                   | <error: Passed value 0 is invalid>     |
             | -1.0                                                  | true                                   |
             | INF                                                   | true                                   |
+            | -INF                                                  | true                                   |
             | NAN                                                   | true                                   |
             | "1"                                                   | true                                   |
             | "0"                                                   | <error: Passed value "0" is invalid>   |
@@ -75,7 +69,7 @@ Feature: Checking the TRUE "BoolLiteralType" type behavior
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | true                                   |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | true                                   |
 
-    Scenario Outline: Denormalize "<value>" by the BoolLiteralType
+    Scenario Outline: Denormalize "<value>"
         When denormalize
         Then cast of "<value>" must return <result>
         Examples:
@@ -89,6 +83,7 @@ Feature: Checking the TRUE "BoolLiteralType" type behavior
             | 0.0                                                   | <error: Passed value 0 is invalid>                                     |
             | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
             | INF                                                   | <error: Passed value INF is invalid>                                   |
+            | -INF                                                  | <error: Passed value -INF is invalid>                                  |
             | NAN                                                   | <error: Passed value NAN is invalid>                                   |
             | "1"                                                   | <error: Passed value "1" is invalid>                                   |
             | "0"                                                   | <error: Passed value "0" is invalid>                                   |

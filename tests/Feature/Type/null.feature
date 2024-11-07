@@ -1,7 +1,7 @@
-Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
+Feature: Checking the "null" (TypeLang\Mapper\Type\NullType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\BoolType"
+        Given type "TypeLang\Mapper\Type\NullType"
 
     Scenario Outline: Matching "<value>"
         When normalize
@@ -11,8 +11,8 @@ Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
         Examples:
             | value                                                 | is_matched |
             | 1                                                     | false      |
-            | -1                                                    | false      |
             | 0                                                     | false      |
+            | -1                                                    | false      |
             | 42                                                    | false      |
             | 42.1                                                  | false      |
             | 1.0                                                   | false      |
@@ -27,9 +27,9 @@ Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
             | "true"                                                | false      |
             | "false"                                               | false      |
             | ""                                                    | false      |
-            | null                                                  | false      |
-            | true                                                  | true       |
-            | false                                                 | true       |
+            | null                                                  | true       |
+            | true                                                  | false      |
+            | false                                                 | false      |
             | []                                                    | false      |
             | [1]                                                   | false      |
             | (object)[]                                            | false      |
@@ -37,39 +37,9 @@ Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
 
-    Scenario Outline: Normalize "<value>"
+    Scenario Outline: Casting "<value>"
         When normalize
         Then cast of "<value>" must return <result>
-        Examples:
-            | value                                                 | result |
-            | 1                                                     | true   |
-            | -1                                                    | true   |
-            | 0                                                     | false  |
-            | 42                                                    | true   |
-            | 42.1                                                  | true   |
-            | 1.0                                                   | true   |
-            | 0.0                                                   | false  |
-            | -1.0                                                  | true   |
-            | INF                                                   | true   |
-            | -INF                                                  | true   |
-            | NAN                                                   | true   |
-            | "1"                                                   | true   |
-            | "0"                                                   | false  |
-            | "string"                                              | true   |
-            | "true"                                                | true   |
-            | "false"                                               | true   |
-            | ""                                                    | false  |
-            | null                                                  | false  |
-            | true                                                  | true   |
-            | false                                                 | false  |
-            | []                                                    | false  |
-            | [1]                                                   | true   |
-            | (object)[]                                            | true   |
-            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | true   |
-            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | true   |
-            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | true   |
-
-    Scenario Outline: Denormalize "<value>"
         When denormalize
         Then cast of "<value>" must return <result>
         Examples:
@@ -83,7 +53,7 @@ Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
             | 0.0                                                   | <error: Passed value 0 is invalid>                                     |
             | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
             | INF                                                   | <error: Passed value INF is invalid>                                   |
-            | -INF                                                  | <error: Passed value -INF is invalid>                                   |
+            | -INF                                                  | <error: Passed value -INF is invalid>                                  |
             | NAN                                                   | <error: Passed value NAN is invalid>                                   |
             | "1"                                                   | <error: Passed value "1" is invalid>                                   |
             | "0"                                                   | <error: Passed value "0" is invalid>                                   |
@@ -91,9 +61,9 @@ Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
             | "true"                                                | <error: Passed value "true" is invalid>                                |
             | "false"                                               | <error: Passed value "false" is invalid>                               |
             | ""                                                    | <error: Passed value "" is invalid>                                    |
-            | null                                                  | <error: Passed value null is invalid>                                  |
-            | true                                                  | true                                                                   |
-            | false                                                 | false                                                                  |
+            | null                                                  | null                                                                   |
+            | true                                                  | <error: Passed value true is invalid>                                  |
+            | false                                                 | <error: Passed value false is invalid>                                 |
             | []                                                    | <error: Passed value [] is invalid>                                    |
             | [1]                                                   | <error: Passed value [1] is invalid>                                   |
             | (object)[]                                            | <error: Passed value {} is invalid>                                    |

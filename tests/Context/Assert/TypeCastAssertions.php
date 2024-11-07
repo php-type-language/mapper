@@ -34,10 +34,11 @@ final class TypeCastAssertions extends Context
             $values->assertCompareWithCode(
                 expected: $expectedCode,
                 actual: $actualValue,
-                message: \vsprintf('Type %s expects "%s" to be "%s" after casting:', [
+                message: \vsprintf('Type %s expects %s to be %s after casting, but %s given:', [
                     $type::class,
                     $inputCode,
                     $expectedCode,
+                    \var_export($actualValue, true),
                 ]),
             );
         } catch (\Throwable $e) {

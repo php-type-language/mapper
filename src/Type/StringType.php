@@ -42,16 +42,29 @@ class StringType implements TypeInterface
     protected function convertToString(mixed $value, Context $context): string
     {
         return match (true) {
+            // Null
             $value === null => static::NULL_TO_STRING,
+            // True
             $value === true => static::TRUE_TO_STRING,
+            // False
             $value === false => static::FALSE_TO_STRING,
+            // Float
             \is_float($value) => match (true) {
+                // NaN
                 \is_nan($value) => static::NAN_TO_STRING,
-                \is_infinite($value) => ($value >= 0 ? '' : '-') . static::INF_TO_STRING,
-                default => (string) $value,
+                // Infinity
+                $value === \INF => static::INF_TO_STRING,
+                $value === -\INF => '-' . static::INF_TO_STRING,
+                // Non-zero float number
+                \str_contains($result = (string) $value, '.') => $result,
+                // Integer-like float number
+                default => \number_format($value, 1, '.', ''),
             },
+            // Int
             \is_int($value),
+            // Stringable
             $value instanceof \Stringable => (string) $value,
+            // Enum
             $value instanceof \BackedEnum => (string) $value->value,
             default => throw InvalidValueException::createFromContext(
                 value: $value,
