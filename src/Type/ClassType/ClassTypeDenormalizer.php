@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type\ClassType;
 
 use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
 use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
@@ -39,8 +38,6 @@ class ClassTypeDenormalizer implements TypeInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @return T
      */
     public function cast(mixed $value, Context $context): object

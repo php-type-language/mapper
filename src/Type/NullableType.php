@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context;
 
 class NullableType implements TypeInterface

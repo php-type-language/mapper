@@ -16,8 +16,6 @@ final class ObjectTypeNormalizer implements TypeInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @return array<array-key, mixed>|object
      */
     public function cast(mixed $value, Context $context): array|object

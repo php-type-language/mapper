@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ArrayType;
 
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\ArrayKeyType;
@@ -26,8 +24,6 @@ class ArrayTypeNormalizer implements TypeInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @return array<array-key, mixed>
      */
     public function cast(mixed $value, Context $context): array

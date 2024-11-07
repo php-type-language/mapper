@@ -50,13 +50,16 @@ class IntType implements TypeInterface
      */
     protected function convertToInt(mixed $value, Context $context): int
     {
+        if ($value instanceof \BackedEnum && \is_int($value->value)) {
+            $value = $value->value;
+        }
+
         return match (true) {
             \is_int($value) => $value,
             $value === false,
             $value === null => 0,
             $value === true => 1,
             // Check that the conversion to int does not lose precision.
-            // 1)
             \is_numeric($value) && (float) (int) $value === (float) $value => (int) $value,
             default => throw InvalidValueException::createFromContext(
                 value: $value,

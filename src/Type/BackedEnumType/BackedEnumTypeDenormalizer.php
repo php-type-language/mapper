@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\BackedEnumType;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 

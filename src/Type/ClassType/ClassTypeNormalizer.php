@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type\ClassType;
 
 use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
 use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
@@ -38,8 +37,6 @@ class ClassTypeNormalizer implements TypeInterface
     }
 
     /**
-     * {@inheritDoc}
-     *
      * @return object|array<non-empty-string, mixed>
      */
     public function cast(mixed $value, Context $context): object|array

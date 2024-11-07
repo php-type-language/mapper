@@ -48,43 +48,43 @@ Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
         When normalize
         Then cast of "<value>" must return <result>
         Examples:
-            | value                                                 | result                                                                 |
-            | 9223372036854775807                                   | 9223372036854775807                                                    |
-            | -9223372036854775807-1                                | -9223372036854775807-1                                                 |
-            | -9223372036854775808                                  | -9223372036854775807-1                                                 |
-            | 1                                                     | 1                                                                      |
-            | 0                                                     | 0                                                                      |
-            | -1                                                    | -1                                                                     |
-            | 42                                                    | 42                                                                     |
-            | 42.1                                                  | <error: Passed value 42.1 is invalid>                                  |
+            | value                                                 | result                                                             |
+            | 9223372036854775807                                   | 9223372036854775807                                                |
+            | -9223372036854775807-1                                | -9223372036854775807-1                                             |
+            | -9223372036854775808                                  | -9223372036854775807-1                                             |
+            | 1                                                     | 1                                                                  |
+            | 0                                                     | 0                                                                  |
+            | -1                                                    | -1                                                                 |
+            | 42                                                    | 42                                                                 |
+            | 42.1                                                  | <error: Passed value 42.1 is invalid>                              |
             # Conversion from float without loss of precision
-            | 1.0                                                   | 1                                                                      |
-            | 0.0                                                   | 0                                                                      |
-            | -1.0                                                  | -1                                                                     |
-            | INF                                                   | <error: Passed value INF is invalid>                                   |
-            | -INF                                                  | <error: Passed value -INF is invalid>                                  |
-            | NAN                                                   | <error: Passed value NAN is invalid>                                   |
+            | 1.0                                                   | 1                                                                  |
+            | 0.0                                                   | 0                                                                  |
+            | -1.0                                                  | -1                                                                 |
+            | INF                                                   | <error: Passed value INF is invalid>                               |
+            | -INF                                                  | <error: Passed value -INF is invalid>                              |
+            | NAN                                                   | <error: Passed value NAN is invalid>                               |
             # Conversion from stringable int without loss of precision
-            | "1"                                                   | 1                                                                      |
-            | "0"                                                   | 0                                                                      |
-            | "-1"                                                  | -1                                                                     |
+            | "1"                                                   | 1                                                                  |
+            | "0"                                                   | 0                                                                  |
+            | "-1"                                                  | -1                                                                 |
             # Conversion from stringable float without loss of precision
-            | "1.0"                                                 | 1                                                                      |
-            | "0.0"                                                 | 0                                                                      |
-            | "-1.0"                                                | -1                                                                     |
-            | "string"                                              | <error: Passed value "string" is invalid>                              |
-            | "true"                                                | <error: Passed value "true" is invalid>                                |
-            | "false"                                               | <error: Passed value "false" is invalid>                               |
-            | ""                                                    | <error: Passed value "" is invalid>                                    |
-            | null                                                  | 0                                                                      |
-            | true                                                  | 1                                                                      |
-            | false                                                 | 0                                                                      |
-            | []                                                    | <error: Passed value [] is invalid>                                    |
-            | [1]                                                   | <error: Passed value [1] is invalid>                                   |
-            | (object)[]                                            | <error: Passed value {} is invalid>                                    |
-            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
-            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
-            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |
+            | "1.0"                                                 | 1                                                                  |
+            | "0.0"                                                 | 0                                                                  |
+            | "-1.0"                                                | -1                                                                 |
+            | "string"                                              | <error: Passed value "string" is invalid>                          |
+            | "true"                                                | <error: Passed value "true" is invalid>                            |
+            | "false"                                               | <error: Passed value "false" is invalid>                           |
+            | ""                                                    | <error: Passed value "" is invalid>                                |
+            | null                                                  | 0                                                                  |
+            | true                                                  | 1                                                                  |
+            | false                                                 | 0                                                                  |
+            | []                                                    | <error: Passed value [] is invalid>                                |
+            | [1]                                                   | <error: Passed value [1] is invalid>                               |
+            | (object)[]                                            | <error: Passed value {} is invalid>                                |
+            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | 3735928559                                                         |
+            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid> |
+            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                  |
 
 
     Scenario Outline: Denormalization "<value>"
