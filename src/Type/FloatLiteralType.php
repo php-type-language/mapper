@@ -25,9 +25,6 @@ class FloatLiteralType implements TypeInterface
         return $value === $this->expected;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): float
     {
         if ($this->match($value, $context)) {

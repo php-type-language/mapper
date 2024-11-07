@@ -31,9 +31,6 @@ class DateTimeTypeDenormalizer implements TypeInterface
         }
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): \DateTimeInterface
     {
         if (!\is_string($value)) {

@@ -24,9 +24,6 @@ class DateTimeTypeNormalizer implements TypeInterface
         return $value instanceof \DateTimeInterface;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): string
     {
         if ($value instanceof \DateTimeInterface) {

@@ -14,9 +14,6 @@ class IntType implements TypeInterface
         return \is_int($value);
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): int
     {
         if (\is_int($value)) {

@@ -14,12 +14,9 @@ class NullType implements TypeInterface
         return $value === null;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): mixed
     {
-        if ($this->match($value, $context)) {
+        if ($value === null) {
             return null;
         }
 

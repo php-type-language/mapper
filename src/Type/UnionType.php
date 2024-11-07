@@ -39,11 +39,6 @@ class UnionType implements TypeInterface
         return $this->findType($value, $context) !== null;
     }
 
-    /**
-     * @throws InvalidValueException
-     * @throws RuntimeExceptionInterface
-     * @throws \Throwable
-     */
     public function cast(mixed $value, Context $context): mixed
     {
         $type = $this->findType($value, $context);

@@ -39,10 +39,9 @@ class ClassTypeDenormalizer implements TypeInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return T
-     * @throws InvalidValueException
-     * @throws MissingFieldValueException
-     * @throws \Throwable in case of object's property is not accessible
      */
     public function cast(mixed $value, Context $context): object
     {

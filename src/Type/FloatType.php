@@ -14,9 +14,6 @@ class FloatType implements TypeInterface
         return \is_float($value) || \is_int($value);
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): float
     {
         if (\is_float($value) || \is_int($value)) {

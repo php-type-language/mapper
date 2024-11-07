@@ -24,9 +24,6 @@ class IntRangeType implements TypeInterface
             && $value <= $this->max;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): int
     {
         if ($this->match($value, $context)) {

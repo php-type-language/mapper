@@ -19,10 +19,6 @@ class BackedEnumTypeDenormalizer implements TypeInterface
         protected readonly TypeInterface $type,
     ) {}
 
-    /**
-     * @throws \Throwable
-     * @throws RuntimeExceptionInterface
-     */
     public function match(mixed $value, Context $context): bool
     {
         $isSupportsType = $this->type->match($value, $context);
@@ -41,13 +37,6 @@ class BackedEnumTypeDenormalizer implements TypeInterface
         }
     }
 
-    /**
-     * Converts a scalar representation of an enum to an enum case object.
-     *
-     * @throws InvalidValueException
-     * @throws RuntimeExceptionInterface
-     * @throws \Throwable
-     */
     public function cast(mixed $value, Context $context): \BackedEnum
     {
         $denormalized = $this->type->cast($value, $context);

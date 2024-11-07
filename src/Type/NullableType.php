@@ -19,10 +19,6 @@ class NullableType implements TypeInterface
             || $this->parent->match($value, $context);
     }
 
-    /**
-     * @throws RuntimeExceptionInterface
-     * @throws \Throwable
-     */
     public function cast(mixed $value, Context $context): mixed
     {
         if ($value === null) {

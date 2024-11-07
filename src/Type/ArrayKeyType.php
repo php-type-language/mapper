@@ -14,9 +14,6 @@ class ArrayKeyType implements TypeInterface
         return \is_string($value) || \is_int($value);
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): string|int
     {
         if (\is_string($value) || \is_int($value)) {

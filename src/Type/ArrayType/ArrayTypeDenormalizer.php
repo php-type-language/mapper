@@ -26,11 +26,9 @@ class ArrayTypeDenormalizer implements TypeInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return array<array-key, mixed>
-     * @throws InvalidValueException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     * @throws RuntimeExceptionInterface
      */
     public function cast(mixed $value, Context $context): array
     {

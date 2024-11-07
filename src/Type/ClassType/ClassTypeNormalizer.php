@@ -38,9 +38,9 @@ class ClassTypeNormalizer implements TypeInterface
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return object|array<non-empty-string, mixed>
-     * @throws InvalidValueException
-     * @throws \Throwable
      */
     public function cast(mixed $value, Context $context): object|array
     {

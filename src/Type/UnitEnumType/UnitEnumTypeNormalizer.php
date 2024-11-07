@@ -22,12 +22,6 @@ class UnitEnumTypeNormalizer implements TypeInterface
         return $value instanceof $this->class;
     }
 
-    /**
-     * Converts enum case (of {@see \UnitEnum}) objects to their
-     * scalar representation.
-     *
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): string
     {
         if ($value instanceof $this->class) {

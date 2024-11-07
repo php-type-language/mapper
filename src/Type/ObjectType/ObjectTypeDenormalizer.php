@@ -15,9 +15,6 @@ final class ObjectTypeDenormalizer implements TypeInterface
         return \is_object($value) || \is_array($value);
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): object
     {
         if (\is_array($value)) {

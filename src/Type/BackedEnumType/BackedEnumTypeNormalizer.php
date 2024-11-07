@@ -22,12 +22,6 @@ class BackedEnumTypeNormalizer implements TypeInterface
         return $value instanceof $this->class;
     }
 
-    /**
-     * Converts enum case (of {@see \BackedEnum}) objects to their
-     * scalar representation.
-     *
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): int|string
     {
         if (!$value instanceof $this->class) {

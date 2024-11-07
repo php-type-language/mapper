@@ -18,9 +18,6 @@ class IntLiteralType implements TypeInterface
         return $value === $this->value;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): int
     {
         if ($value === $this->value) {

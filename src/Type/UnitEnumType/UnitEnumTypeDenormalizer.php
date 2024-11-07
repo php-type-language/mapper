@@ -29,13 +29,6 @@ class UnitEnumTypeDenormalizer implements TypeInterface
         return \in_array($value, $this->cases, true);
     }
 
-    /**
-     * Converts a scalar representation of an enum to an enum case object.
-     *
-     * @throws InvalidValueException
-     * @throws RuntimeExceptionInterface
-     * @throws \Throwable
-     */
     public function cast(mixed $value, Context $context): \UnitEnum
     {
         if (!$this->match($value, $context)) {

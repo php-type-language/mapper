@@ -20,11 +20,6 @@ class StringType implements TypeInterface
         return \is_string($value);
     }
 
-    /**
-     * Converts incoming value to the string (in case of strict types is disabled).
-     *
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): string
     {
         if (\is_string($value)) {
