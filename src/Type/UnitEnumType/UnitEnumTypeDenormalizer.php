@@ -17,20 +17,19 @@ class UnitEnumTypeDenormalizer implements TypeInterface
     public function __construct(
         protected readonly string $class,
         protected readonly array $cases,
+        protected readonly TypeInterface $string,
     ) {}
 
     public function match(mixed $value, Context $context): bool
     {
-        if (!\is_string($value) || $value === '') {
-            return false;
-        }
-
         return \in_array($value, $this->cases, true);
     }
 
     public function cast(mixed $value, Context $context): \UnitEnum
     {
-        if (!$this->match($value, $context)) {
+        $string = $this->string->cast($value, $context);
+
+        if (!$this->match($string, $context)) {
             throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
@@ -38,8 +37,8 @@ class UnitEnumTypeDenormalizer implements TypeInterface
         }
 
         try {
-            // @phpstan-ignore-next-line
-            return \constant($this->class . '::' . $value);
+            // @phpstan-ignore-next-line : Handle Error manually
+            return \constant($this->class . '::' . $string);
         } catch (\Error $e) {
             throw InvalidValueException::createFromContext(
                 value: $value,

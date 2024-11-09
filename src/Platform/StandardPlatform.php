@@ -55,7 +55,7 @@ class StandardPlatform extends Platform
             \Generator::class,
             \Traversable::class,
             \IteratorAggregate::class,
-        ]);
+        ], 'array-key', 'mixed');
 
         // Adds support for the "object" type
         yield new Builder\ObjectTypeBuilder([

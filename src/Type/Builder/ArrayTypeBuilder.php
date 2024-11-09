@@ -21,10 +21,34 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class ArrayTypeBuilder extends NamedTypeBuilder
 {
     /**
+     * @var non-empty-lowercase-string
+     */
+    public const DEFAULT_INNER_KEY_TYPE = 'array-key';
+
+    /**
+     * @var non-empty-lowercase-string
+     */
+    public const DEFAULT_INNER_VALUE_TYPE = 'mixed';
+
+    /**
+     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-string $keyType
+     * @param non-empty-string $valueType
+     */
+    public function __construct(
+        array|string $names,
+        protected readonly string $keyType = self::DEFAULT_INNER_KEY_TYPE,
+        protected readonly string $valueType = self::DEFAULT_INNER_VALUE_TYPE,
+    ) {
+        parent::__construct($names);
+    }
+
+    /**
+     * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws TypeNotFoundException
-     * @throws ShapeFieldsNotSupportedException
+     * @throws \Throwable
      */
     public function build(
         TypeStatement $statement,
@@ -36,9 +60,9 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $arguments = $statement->arguments->items ?? [];
 
         return match (\count($arguments)) {
-            0 => new ArrayType(),
-            1 => $this->buildByValue($statement, $types),
-            2 => $this->buildByKeyValue($statement, $types),
+            0 => $this->buildWithNoKeyValue($types, $parser),
+            1 => $this->buildWithValue($statement, $types, $parser),
+            2 => $this->buildWithKeyValue($statement, $types),
             default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
                 passedArgumentsCount: \count($arguments),
                 minSupportedArgumentsCount: 0,
@@ -49,11 +73,31 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     }
 
     /**
+     * @throws TypeNotFoundException
+     * @throws \Throwable
+     */
+    private function buildWithNoKeyValue(TypeRepositoryInterface $types, TypeParserInterface $parser): ArrayType
+    {
+        return new ArrayType(
+            key: $types->getTypeByStatement(
+                statement: $parser->getStatementByDefinition(
+                    definition: $this->keyType,
+                ),
+            ),
+            value: $types->getTypeByStatement(
+                statement: $parser->getStatementByDefinition(
+                    definition: $this->valueType,
+                ),
+            ),
+        );
+    }
+
+    /**
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByKeyValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
+    private function buildWithKeyValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
     {
         $arguments = $statement->arguments->items ?? [];
 
@@ -79,8 +123,11 @@ class ArrayTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildByValue(NamedTypeNode $statement, TypeRepositoryInterface $types): ArrayType
-    {
+    private function buildWithValue(
+        NamedTypeNode $statement,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ArrayType {
         $arguments = $statement->arguments->items ?? [];
 
         assert(\array_key_exists(0, $arguments));
@@ -91,6 +138,11 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $this->expectNoTemplateArgumentHint($statement, $value);
 
         return new ArrayType(
+            key: $types->getTypeByStatement(
+                statement: $parser->getStatementByDefinition(
+                    definition: $this->keyType,
+                ),
+            ),
             value: $types->getTypeByStatement($value->value),
         );
     }

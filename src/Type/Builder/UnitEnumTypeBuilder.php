@@ -16,6 +16,18 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class UnitEnumTypeBuilder extends Builder
 {
+    /**
+     * @var non-empty-lowercase-string
+     */
+    public const DEFAULT_INNER_SCALAR_TYPE = 'string';
+
+    /**
+     * @param non-empty-string $type
+     */
+    public function __construct(
+        protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
+    ) {}
+
     public function isSupported(TypeStatement $statement): bool
     {
         if (!$statement instanceof NamedTypeNode) {
@@ -50,6 +62,11 @@ class UnitEnumTypeBuilder extends Builder
             // @phpstan-ignore-next-line
             class: $statement->name->toString(),
             cases: $names,
+            type: $types->getTypeByStatement(
+                statement: $parser->getStatementByDefinition(
+                    definition: $this->type,
+                ),
+            ),
         );
     }
 
