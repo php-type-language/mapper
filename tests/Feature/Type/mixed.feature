@@ -10,29 +10,57 @@ Feature: Checking the "mixed" (TypeLang\Mapper\Type\MixedType) type behavior
         Then match of "<value>" must return <is_matched>
         Examples:
             | value                                                 | is_matched |
+            # default checks
+            ## int
+            | 42                                                    | true       |
             | 1                                                     | true       |
             | 0                                                     | true       |
             | -1                                                    | true       |
-            | 42                                                    | true       |
-            | 42.1                                                  | true       |
+            | -42                                                   | true       |
+            ## numeric int string
+            | "42"                                                  | true       |
+            | "1"                                                   | true       |
+            | "0"                                                   | true       |
+            | "-1"                                                  | true       |
+            | "-42"                                                 | true       |
+            ## float
+            | 42.5                                                  | true       |
+            | 42.0                                                  | true       |
             | 1.0                                                   | true       |
             | 0.0                                                   | true       |
             | -1.0                                                  | true       |
+            | -42.0                                                 | true       |
+            | -42.5                                                 | true       |
+            ## numeric float string
+            | "42.5"                                                | true       |
+            | "42.0"                                                | true       |
+            | "1.0"                                                 | true       |
+            | "0.0"                                                 | true       |
+            | "-1.0"                                                | true       |
+            | "-42.0"                                               | true       |
+            | "-42.5"                                               | true       |
+            ## extra float
             | INF                                                   | true       |
             | -INF                                                  | true       |
             | NAN                                                   | true       |
-            | "1"                                                   | true       |
-            | "0"                                                   | true       |
-            | "string"                                              | true       |
-            | "true"                                                | true       |
-            | "false"                                               | true       |
-            | ""                                                    | true       |
+            ## null
             | null                                                  | true       |
+            ## bool
             | true                                                  | true       |
             | false                                                 | true       |
+            ## bool string
+            | "true"                                                | true       |
+            | "false"                                               | true       |
+            ## string
+            | "non empty"                                           | true       |
+            | ""                                                    | true       |
+            ## array
             | []                                                    | true       |
-            | [1]                                                   | true       |
+            | [0 => 23]                                             | true       |
+            | ['key' => 42]                                         | true       |
+            ## object
             | (object)[]                                            | true       |
+            ## enum
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | true       |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | true       |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | true       |
@@ -41,33 +69,61 @@ Feature: Checking the "mixed" (TypeLang\Mapper\Type\MixedType) type behavior
         When normalize
         Then cast of "<value>" must return <result>
         Examples:
-            | value                                                 | result     |
-            | 1                                                     | 1          |
-            | 0                                                     | 0          |
-            | -1                                                    | -1         |
-            | 42                                                    | 42         |
-            | 42.1                                                  | 42.1       |
-            | 1.0                                                   | 1.0        |
-            | 0.0                                                   | 0.0        |
-            | -1.0                                                  | -1.0       |
-            | INF                                                   | INF        |
-            | -INF                                                  | -INF       |
-            | NAN                                                   | NAN        |
-            | "1"                                                   | "1"        |
-            | "0"                                                   | "0"        |
-            | "string"                                              | "string"   |
-            | "true"                                                | "true"     |
-            | "false"                                               | "false"    |
-            | ""                                                    | ""         |
-            | null                                                  | null       |
-            | true                                                  | true       |
-            | false                                                 | false      |
-            | []                                                    | []         |
-            | [1]                                                   | [1]        |
-            | (object)[]                                            | []         |
-            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | 3735928559 |
-            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | "case"     |
-            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | "CASE"     |
+            | value                                                 | result        |
+            # default checks
+            ## int
+            | 42                                                    | 42            |
+            | 1                                                     | 1             |
+            | 0                                                     | 0             |
+            | -1                                                    | -1            |
+            | -42                                                   | -42           |
+            ## numeric int string
+            | "42"                                                  | "42"          |
+            | "1"                                                   | "1"           |
+            | "0"                                                   | "0"           |
+            | "-1"                                                  | "-1"          |
+            | "-42"                                                 | "-42"         |
+            ## float
+            | 42.5                                                  | 42.5          |
+            | 42.0                                                  | 42.0          |
+            | 1.0                                                   | 1.0           |
+            | 0.0                                                   | 0.0           |
+            | -1.0                                                  | -1.0          |
+            | -42.0                                                 | -42.0         |
+            | -42.5                                                 | -42.5         |
+            ## numeric float string
+            | "42.5"                                                | "42.5"        |
+            | "42.0"                                                | "42.0"        |
+            | "1.0"                                                 | "1.0"         |
+            | "0.0"                                                 | "0.0"         |
+            | "-1.0"                                                | "-1.0"        |
+            | "-42.0"                                               | "-42.0"       |
+            | "-42.5"                                               | "-42.5"       |
+            ## extra float
+            | INF                                                   | INF           |
+            | -INF                                                  | -INF          |
+            | NAN                                                   | NAN           |
+            ## null
+            | null                                                  | null          |
+            ## bool
+            | true                                                  | true          |
+            | false                                                 | false         |
+            ## bool string
+            | "true"                                                | "true"        |
+            | "false"                                               | "false"       |
+            ## string
+            | "non empty"                                           | "non empty"   |
+            | ""                                                    | ""            |
+            ## array
+            | []                                                    | []            |
+            | [0 => 23]                                             | [0 => 23]     |
+            | ['key' => 42]                                         | ['key' => 42] |
+            ## object
+            | (object)[]                                            | []            |
+            ## enum
+            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | 3735928559    |
+            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | "case"        |
+            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | "CASE"        |
 
 
     Scenario Outline: Denormalize "<value>"
@@ -75,29 +131,57 @@ Feature: Checking the "mixed" (TypeLang\Mapper\Type\MixedType) type behavior
         Then cast of "<value>" must return <result>
         Examples:
             | value                                                 | result                                                                 |
+            # default checks
+            ## int
+            | 42                                                    | 42                                                                     |
             | 1                                                     | 1                                                                      |
             | 0                                                     | 0                                                                      |
             | -1                                                    | -1                                                                     |
-            | 42                                                    | 42                                                                     |
-            | 42.1                                                  | 42.1                                                                   |
+            | -42                                                   | -42                                                                    |
+            ## numeric int string
+            | "42"                                                  | "42"                                                                   |
+            | "1"                                                   | "1"                                                                    |
+            | "0"                                                   | "0"                                                                    |
+            | "-1"                                                  | "-1"                                                                   |
+            | "-42"                                                 | "-42"                                                                  |
+            ## float
+            | 42.5                                                  | 42.5                                                                   |
+            | 42.0                                                  | 42.0                                                                   |
             | 1.0                                                   | 1.0                                                                    |
             | 0.0                                                   | 0.0                                                                    |
             | -1.0                                                  | -1.0                                                                   |
+            | -42.0                                                 | -42.0                                                                  |
+            | -42.5                                                 | -42.5                                                                  |
+            ## numeric float string
+            | "42.5"                                                | "42.5"                                                                 |
+            | "42.0"                                                | "42.0"                                                                 |
+            | "1.0"                                                 | "1.0"                                                                  |
+            | "0.0"                                                 | "0.0"                                                                  |
+            | "-1.0"                                                | "-1.0"                                                                 |
+            | "-42.0"                                               | "-42.0"                                                                |
+            | "-42.5"                                               | "-42.5"                                                                |
+            ## extra float
             | INF                                                   | INF                                                                    |
             | -INF                                                  | -INF                                                                   |
             | NAN                                                   | NAN                                                                    |
-            | "1"                                                   | "1"                                                                    |
-            | "0"                                                   | "0"                                                                    |
-            | "string"                                              | "string"                                                               |
-            | "true"                                                | "true"                                                                 |
-            | "false"                                               | "false"                                                                |
-            | ""                                                    | ""                                                                     |
+            ## null
             | null                                                  | null                                                                   |
+            ## bool
             | true                                                  | true                                                                   |
             | false                                                 | false                                                                  |
+            ## bool string
+            | "true"                                                | "true"                                                                 |
+            | "false"                                               | "false"                                                                |
+            ## string
+            | "non empty"                                           | "non empty"                                                            |
+            | ""                                                    | ""                                                                     |
+            ## array
             | []                                                    | []                                                                     |
-            | [1]                                                   | [1]                                                                    |
+            | [0 => 23]                                             | [0 => 23]                                                              |
+            | ['key' => 42]                                         | ['key' => 42]                                                          |
+            ## object
             | (object)[]                                            | (object)[]                                                             |
+            ## enum
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |

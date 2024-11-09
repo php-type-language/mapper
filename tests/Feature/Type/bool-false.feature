@@ -10,29 +10,57 @@ Feature: Checking the "false" (TypeLang\Mapper\Type\BoolLiteralType) type behavi
         Then match of "<value>" must return <is_matched>
         Examples:
             | value                                                 | is_matched |
-            | 1                                                     | false      |
-            | -1                                                    | false      |
-            | 0                                                     | false      |
+            # default checks
+            ## int
             | 42                                                    | false      |
-            | 42.1                                                  | false      |
+            | 1                                                     | false      |
+            | 0                                                     | false      |
+            | -1                                                    | false      |
+            | -42                                                   | false      |
+            ## numeric int string
+            | "42"                                                  | false      |
+            | "1"                                                   | false      |
+            | "0"                                                   | false      |
+            | "-1"                                                  | false      |
+            | "-42"                                                 | false      |
+            ## float
+            | 42.5                                                  | false      |
+            | 42.0                                                  | false      |
             | 1.0                                                   | false      |
             | 0.0                                                   | false      |
             | -1.0                                                  | false      |
+            | -42.0                                                 | false      |
+            | -42.5                                                 | false      |
+            ## numeric float string
+            | "42.5"                                                | false      |
+            | "42.0"                                                | false      |
+            | "1.0"                                                 | false      |
+            | "0.0"                                                 | false      |
+            | "-1.0"                                                | false      |
+            | "-42.0"                                               | false      |
+            | "-42.5"                                               | false      |
+            ## extra float
             | INF                                                   | false      |
             | -INF                                                  | false      |
             | NAN                                                   | false      |
-            | "1"                                                   | false      |
-            | "0"                                                   | false      |
-            | "string"                                              | false      |
-            | "true"                                                | false      |
-            | "false"                                               | false      |
-            | ""                                                    | false      |
+            ## null
             | null                                                  | false      |
+            ## bool
             | true                                                  | false      |
             | false                                                 | true       |
+            ## bool string
+            | "true"                                                | false      |
+            | "false"                                               | false      |
+            ## string
+            | "non empty"                                           | false      |
+            | ""                                                    | false      |
+            ## array
             | []                                                    | false      |
-            | [1]                                                   | false      |
+            | [0 => 23]                                             | false      |
+            | ['key' => 42]                                         | false      |
+            ## object
             | (object)[]                                            | false      |
+            ## enum
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | false      |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
@@ -42,29 +70,57 @@ Feature: Checking the "false" (TypeLang\Mapper\Type\BoolLiteralType) type behavi
         Then cast of "<value>" must return <result>
         Examples:
             | value                                                 | result                                                                 |
-            | 1                                                     | <error: Passed value 1 is invalid>                                     |
-            | -1                                                    | <error: Passed value -1 is invalid>                                    |
-            | 0                                                     | false                                                                  |
+           # default checks
+            ## int
             | 42                                                    | <error: Passed value 42 is invalid>                                    |
-            | 42.1                                                  | <error: Passed value 42.1 is invalid>                                  |
+            | 1                                                     | <error: Passed value 1 is invalid>                                     |
+            | 0                                                     | false                                                                  |
+            | -1                                                    | <error: Passed value -1 is invalid>                                    |
+            | -42                                                   | <error: Passed value -42 is invalid>                                   |
+            ## numeric int string
+            | "42"                                                  | <error: Passed value "42" is invalid>                                  |
+            | "1"                                                   | <error: Passed value "1" is invalid>                                   |
+            | "0"                                                   | false                                                                  |
+            | "-1"                                                  | <error: Passed value "-1" is invalid>                                  |
+            | "-42"                                                 | <error: Passed value "-42" is invalid>                                 |
+            ## float
+            | 42.5                                                  | <error: Passed value 42.5 is invalid>                                  |
+            | 42.0                                                  | <error: Passed value 42 is invalid>                                    |
             | 1.0                                                   | <error: Passed value 1 is invalid>                                     |
             | 0.0                                                   | false                                                                  |
             | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
+            | -42.0                                                 | <error: Passed value -42 is invalid>                                   |
+            | -42.5                                                 | <error: Passed value -42.5 is invalid>                                 |
+            ## numeric float string
+            | "42.5"                                                | <error: Passed value "42.5" is invalid>                                |
+            | "42.0"                                                | <error: Passed value "42.0" is invalid>                                |
+            | "1.0"                                                 | <error: Passed value "1.0" is invalid>                                 |
+            | "0.0"                                                 | <error: Passed value "0.0" is invalid>                                 |
+            | "-1.0"                                                | <error: Passed value "-1.0" is invalid>                                |
+            | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                               |
+            | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                               |
+            ## extra float
             | INF                                                   | <error: Passed value INF is invalid>                                   |
             | -INF                                                  | <error: Passed value -INF is invalid>                                  |
             | NAN                                                   | <error: Passed value NAN is invalid>                                   |
-            | "1"                                                   | <error: Passed value "1" is invalid>                                   |
-            | "0"                                                   | false                                                                  |
-            | "string"                                              | <error: Passed value "string" is invalid>                              |
-            | "true"                                                | <error: Passed value "true" is invalid>                                |
-            | "false"                                               | <error: Passed value "false" is invalid>                               |
-            | ""                                                    | false                                                                  |
+            ## null
             | null                                                  | false                                                                  |
+            ## bool
             | true                                                  | <error: Passed value true is invalid>                                  |
             | false                                                 | false                                                                  |
+            ## bool string
+            | "true"                                                | <error: Passed value "true" is invalid>                                |
+            | "false"                                               | <error: Passed value "false" is invalid>                               |
+            ## string
+            | "non empty"                                           | <error: Passed value "non empty" is invalid>                           |
+            | ""                                                    | false                                                                  |
+            ## array
             | []                                                    | false                                                                  |
-            | [1]                                                   | <error: Passed value [1] is invalid>                                   |
+            | [0 => 23]                                             | <error: Passed value [23] is invalid>                                  |
+            | ['key' => 42]                                         | <error: Passed value {"key": 42} is invalid>                           |
+            ## object
             | (object)[]                                            | <error: Passed value {} is invalid>                                    |
+            ## enum
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |
@@ -74,29 +130,57 @@ Feature: Checking the "false" (TypeLang\Mapper\Type\BoolLiteralType) type behavi
         Then cast of "<value>" must return <result>
         Examples:
             | value                                                 | result                                                                 |
+            # default checks
+            ## int
+            | 42                                                    | <error: Passed value 42 is invalid>                                    |
             | 1                                                     | <error: Passed value 1 is invalid>                                     |
             | 0                                                     | <error: Passed value 0 is invalid>                                     |
             | -1                                                    | <error: Passed value -1 is invalid>                                    |
-            | 42                                                    | <error: Passed value 42 is invalid>                                    |
-            | 42.1                                                  | <error: Passed value 42.1 is invalid>                                  |
+            | -42                                                   | <error: Passed value -42 is invalid>                                   |
+            ## numeric int string
+            | "42"                                                  | <error: Passed value "42" is invalid>                                  |
+            | "1"                                                   | <error: Passed value "1" is invalid>                                   |
+            | "0"                                                   | <error: Passed value "0" is invalid>                                   |
+            | "-1"                                                  | <error: Passed value "-1" is invalid>                                  |
+            | "-42"                                                 | <error: Passed value "-42" is invalid>                                 |
+            ## float
+            | 42.5                                                  | <error: Passed value 42.5 is invalid>                                  |
+            | 42.0                                                  | <error: Passed value 42 is invalid>                                    |
             | 1.0                                                   | <error: Passed value 1 is invalid>                                     |
             | 0.0                                                   | <error: Passed value 0 is invalid>                                     |
             | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
+            | -42.0                                                 | <error: Passed value -42 is invalid>                                   |
+            | -42.5                                                 | <error: Passed value -42.5 is invalid>                                 |
+            ## numeric float string
+            | "42.5"                                                | <error: Passed value "42.5" is invalid>                                |
+            | "42.0"                                                | <error: Passed value "42.0" is invalid>                                |
+            | "1.0"                                                 | <error: Passed value "1.0" is invalid>                                 |
+            | "0.0"                                                 | <error: Passed value "0.0" is invalid>                                 |
+            | "-1.0"                                                | <error: Passed value "-1.0" is invalid>                                |
+            | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                               |
+            | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                               |
+            ## extra float
             | INF                                                   | <error: Passed value INF is invalid>                                   |
             | -INF                                                  | <error: Passed value -INF is invalid>                                  |
             | NAN                                                   | <error: Passed value NAN is invalid>                                   |
-            | "1"                                                   | <error: Passed value "1" is invalid>                                   |
-            | "0"                                                   | <error: Passed value "0" is invalid>                                   |
-            | "string"                                              | <error: Passed value "string" is invalid>                              |
-            | "true"                                                | <error: Passed value "true" is invalid>                                |
-            | "false"                                               | <error: Passed value "false" is invalid>                               |
-            | ""                                                    | <error: Passed value "" is invalid>                                    |
+            ## null
             | null                                                  | <error: Passed value null is invalid>                                  |
+            ## bool
             | true                                                  | <error: Passed value true is invalid>                                  |
             | false                                                 | false                                                                  |
+            ## bool string
+            | "true"                                                | <error: Passed value "true" is invalid>                                |
+            | "false"                                               | <error: Passed value "false" is invalid>                               |
+            ## string
+            | "non empty"                                           | <error: Passed value "non empty" is invalid>                           |
+            | ""                                                    | <error: Passed value "" is invalid>                                    |
+            ## array
             | []                                                    | <error: Passed value [] is invalid>                                    |
-            | [1]                                                   | <error: Passed value [1] is invalid>                                   |
+            | [0 => 23]                                             | <error: Passed value [23] is invalid>                                  |
+            | ['key' => 42]                                         | <error: Passed value {"key": 42} is invalid>                           |
+            ## object
             | (object)[]                                            | <error: Passed value {} is invalid>                                    |
+            ## enum
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |
