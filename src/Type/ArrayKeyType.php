@@ -43,19 +43,23 @@ class ArrayKeyType implements TypeInterface
             return $value;
         }
 
-        if (\is_float($value)) {
+        if (!$context->isStrictTypesEnabled()) {
             try {
                 /** @var int */
                 return $this->int->cast($value, $context);
             } catch (ValueExceptionInterface) {
+                // NaN, -INF and INF cannot be converted to
+                // array-key implicitly without losses.
+                if (\is_float($value) && !\is_finite($value)) {
+                    throw InvalidValueException::createFromContext(
+                        value: $value,
+                        context: $context,
+                    );
+                }
+
                 /** @var string */
                 return $this->string->cast($value, $context);
             }
-        }
-
-        if (!$context->isStrictTypesEnabled()) {
-            /** @var string */
-            return $this->string->cast($value, $context);
         }
 
         throw InvalidValueException::createFromContext(
