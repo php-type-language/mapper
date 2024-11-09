@@ -11,8 +11,10 @@ Feature: Checking the "array-key" (TypeLang\Mapper\Type\ArrayKeyType) type behav
         Examples:
             | value                                                 | is_matched |
             | 9223372036854775807                                   | true       |
+            | -9223372036854775807                                  | true       |
             | -9223372036854775807-1                                | true       |
-            | -9223372036854775808                                  | true       |
+            | -9223372036854775808                                  | false      |
+            | -9223372036854775809                                  | false      |
             | 1                                                     | true       |
             | 0                                                     | true       |
             | -1                                                    | true       |
@@ -83,8 +85,10 @@ Feature: Checking the "array-key" (TypeLang\Mapper\Type\ArrayKeyType) type behav
         Examples:
             | value                                                 | result                                                                 |
             | 9223372036854775807                                   | 9223372036854775807                                                    |
+            | -9223372036854775807                                  | -9223372036854775807                                                   |
             | -9223372036854775807-1                                | -9223372036854775807-1                                                 |
-            | -9223372036854775808                                  | -9223372036854775807-1                                                 |
+            | -9223372036854775808                                  | <error: Passed value -9.2233720368548E+18 is invalid>                  |
+            | -9223372036854775809                                  | <error: Passed value -9.2233720368548E+18 is invalid>                  |
             | 1                                                     | 1                                                                      |
             | 0                                                     | 0                                                                      |
             | -1                                                    | -1                                                                     |
@@ -96,9 +100,9 @@ Feature: Checking the "array-key" (TypeLang\Mapper\Type\ArrayKeyType) type behav
             | INF                                                   | <error: Passed value INF is invalid>                                   |
             | -INF                                                  | <error: Passed value -INF is invalid>                                  |
             | NAN                                                   | <error: Passed value NAN is invalid>                                   |
-            | "1"                                                   | "1"                                                                      |
+            | "1"                                                   | "1"                                                                    |
             | "0"                                                   | 0                                                                      |
-            | "-1"                                                  | "-1"                                                                     |
+            | "-1"                                                  | "-1"                                                                   |
             | "string"                                              | "string"                                                               |
             | "true"                                                | "true"                                                                 |
             | "false"                                               | "false"                                                                |
