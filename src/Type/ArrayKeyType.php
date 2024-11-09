@@ -45,13 +45,16 @@ class ArrayKeyType implements TypeInterface
 
         if (\is_float($value)) {
             try {
+                /** @var int */
                 return $this->int->cast($value, $context);
             } catch (ValueExceptionInterface) {
+                /** @var string */
                 return $this->string->cast($value, $context);
             }
         }
 
         if (!$context->isStrictTypesEnabled()) {
+            /** @var string */
             return $this->string->cast($value, $context);
         }
 
