@@ -44,6 +44,9 @@ class StandardPlatform extends Platform
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
 
+        // Adds support for the "array-key" type
+        yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
+
         // Adds support for the "array" type
         yield new Builder\ArrayTypeBuilder([
             'array',
