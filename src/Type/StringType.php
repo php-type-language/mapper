@@ -9,10 +9,15 @@ use TypeLang\Mapper\Runtime\Context;
 
 class StringType implements TypeInterface
 {
+    /** @var string */
     protected const NULL_TO_STRING = '';
+    /** @var string */
     protected const TRUE_TO_STRING = 'true';
+    /** @var string */
     protected const FALSE_TO_STRING = 'false';
+    /** @var string */
     protected const NAN_TO_STRING = 'nan';
+    /** @var string */
     protected const INF_TO_STRING = 'inf';
 
     public function match(mixed $value, Context $context): bool
@@ -56,16 +61,16 @@ class StringType implements TypeInterface
                 $value === \INF => static::INF_TO_STRING,
                 $value === -\INF => '-' . static::INF_TO_STRING,
                 // Non-zero float number
-                \str_contains($result = (string) $value, '.') => $result,
+                \str_contains($result = (string)$value, '.') => $result,
                 // Integer-like float number
                 default => \number_format($value, 1, '.', ''),
             },
             // Int
             \is_int($value),
             // Stringable
-            $value instanceof \Stringable => (string) $value,
+            $value instanceof \Stringable => (string)$value,
             // Enum
-            $value instanceof \BackedEnum => (string) $value->value,
+            $value instanceof \BackedEnum => (string)$value->value,
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
