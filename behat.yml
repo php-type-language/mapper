@@ -15,6 +15,7 @@ default:
         - TypeLang\Mapper\Tests\Context\Provider\MetadataContext
         - TypeLang\Mapper\Tests\Context\Provider\PlatformContext
         - TypeLang\Mapper\Tests\Context\Provider\TypeContext
+        - TypeLang\Mapper\Tests\Context\Provider\TypeContext\EnumTypeContext
         - TypeLang\Mapper\Tests\Context\Provider\TypeParserContext
         - TypeLang\Mapper\Tests\Context\Provider\TypeRepositoryContext
         # Utils

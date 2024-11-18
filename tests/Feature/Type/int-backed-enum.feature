@@ -1,22 +1,84 @@
-Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
+Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\IntType"
+        Given type "int-backed-enum"
 
-    Scenario Outline: Matching "<value>"
+    Scenario Outline: Normalize matching "<value>"
         When normalize
         Then match of "<value>" must return <is_matched>
+        Examples:
+            | value                                                 | is_matched |
+            # default checks
+            ## int
+            | 42                                                    | false      |
+            | 1                                                     | false      |
+            | 0                                                     | false      |
+            | -1                                                    | false      |
+            | -42                                                   | false      |
+            ## numeric int string
+            | "42"                                                  | false      |
+            | "1"                                                   | false      |
+            | "0"                                                   | false      |
+            | "-1"                                                  | false      |
+            | "-42"                                                 | false      |
+            ## float
+            | 42.5                                                  | false      |
+            | 42.0                                                  | false      |
+            | 1.0                                                   | false      |
+            | 0.0                                                   | false      |
+            | -1.0                                                  | false      |
+            | -42.0                                                 | false      |
+            | -42.5                                                 | false      |
+            ## numeric float string
+            | "42.5"                                                | false      |
+            | "42.0"                                                | false      |
+            | "1.0"                                                 | false      |
+            | "0.0"                                                 | false      |
+            | "-1.0"                                                | false      |
+            | "-42.0"                                               | false      |
+            | "-42.5"                                               | false      |
+            ## extra float
+            | INF                                                   | false      |
+            | -INF                                                  | false      |
+            | NAN                                                   | false      |
+            ## null
+            | null                                                  | false      |
+            ## bool
+            | true                                                  | false      |
+            | false                                                 | false      |
+            ## bool string
+            | "true"                                                | false      |
+            | "false"                                               | false      |
+            ## string
+            | "non empty"                                           | false      |
+            | ""                                                    | false      |
+            ## array
+            | []                                                    | false      |
+            | [0 => 23]                                             | false      |
+            | ['key' => 42]                                         | false      |
+            ## object
+            | (object)[]                                            | false      |
+            ## enum
+            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | true       |
+            | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
+            | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
+            ### ADDITIONAL SPECIAL CASES ###
+            | "case"                                                | false      |
+            | 3735928559                                            | false      |
+            | -3735928559                                           | false      |
+
+    Scenario Outline: Denormalize matching "<value>"
         When denormalize
         Then match of "<value>" must return <is_matched>
         Examples:
             | value                                                 | is_matched |
             # default checks
             ## int
-            | 42                                                    | true       |
-            | 1                                                     | true       |
-            | 0                                                     | true       |
-            | -1                                                    | true       |
-            | -42                                                   | true       |
+            | 42                                                    | false      |
+            | 1                                                     | false      |
+            | 0                                                     | false      |
+            | -1                                                    | false      |
+            | -42                                                   | false      |
             ## numeric int string
             | "42"                                                  | false      |
             | "1"                                                   | false      |
@@ -64,56 +126,54 @@ Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | false      |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | false      |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | false      |
-            ### OVERFLOW EXTRAS ###
-            | 9223372036854775807                                   | true       |
-            | -9223372036854775807                                  | true       |
-            | -9223372036854775807-1                                | true       |
-            | -9223372036854775808                                  | false      |
-            | -9223372036854775809                                  | false      |
+            ### ADDITIONAL SPECIAL CASES ###
+            | "case"                                                | false      |
+            | 3735928559                                            | true       |
+            | -3735928559                                           | false      |
 
-    Scenario Outline: Normalization "<value>"
+    Scenario Outline: Normalize "<value>"
         When normalize
         Then cast of "<value>" must return <result>
         Examples:
             | value                                                 | result                                                             |
             # default checks
             ## int
-            | 42                                                    | 42                                                                 |
-            | 1                                                     | 1                                                                  |
-            | 0                                                     | 0                                                                  |
-            | -1                                                    | -1                                                                 |
-            | -42                                                   | -42                                                                |
+            | 42                                                    | <error: Passed value 42 is invalid>                                |
+            | 1                                                     | <error: Passed value 1 is invalid>                                 |
+            | 0                                                     | <error: Passed value 0 is invalid>                                 |
+            | -1                                                    | <error: Passed value -1 is invalid>                                |
+            | -42                                                   | <error: Passed value -42 is invalid>                               |
             ## numeric int string
-            | "42"                                                  | 42                                                                 |
-            | "1"                                                   | 1                                                                  |
-            | "0"                                                   | 0                                                                  |
-            | "-1"                                                  | -1                                                                 |
-            | "-42"                                                 | -42                                                                |
+            | "42"                                                  | <error: Passed value "42" is invalid>                              |
+            | "1"                                                   | <error: Passed value "1" is invalid>                               |
+            | "0"                                                   | <error: Passed value "0" is invalid>                               |
+            | "-1"                                                  | <error: Passed value "-1" is invalid>                              |
+            | "-42"                                                 | <error: Passed value "-42" is invalid>                             |
             ## float
             | 42.5                                                  | <error: Passed value 42.5 is invalid>                              |
-            | 42.0                                                  | 42                                                                 |
-            | 1.0                                                   | 1                                                                  |
-            | 0.0                                                   | 0                                                                  |
-            | -1.0                                                  | -1                                                                 |
-            | -42.0                                                 | -42                                                                |
+            | 42.0                                                  | <error: Passed value 42 is invalid>                                |
+            | 1.0                                                   | <error: Passed value 1 is invalid>                                 |
+            | 0.0                                                   | <error: Passed value 0 is invalid>                                 |
+            | -1.0                                                  | <error: Passed value -1 is invalid>                                |
+            | -42.0                                                 | <error: Passed value -42 is invalid>                               |
             | -42.5                                                 | <error: Passed value -42.5 is invalid>                             |
             ## numeric float string
             | "42.5"                                                | <error: Passed value "42.5" is invalid>                            |
-            | "42.0"                                                | 42                                                                 |
-            | "1.0"                                                 | 1                                                                  |
-            | "0.0"                                                 | 0                                                                  |
-            | "-1.0"                                                | -1                                                                 |
-            | "-42.0"                                               | -42                                                                |
+            | "42.0"                                                | <error: Passed value "42.0" is invalid>                            |
+            | "1.0"                                                 | <error: Passed value "1.0" is invalid>                             |
+            | "0.0"                                                 | <error: Passed value "0.0" is invalid>                             |
+            | "-1.0"                                                | <error: Passed value "-1.0" is invalid>                            |
+            | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                           |
             | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                           |
             ## extra float
             | INF                                                   | <error: Passed value INF is invalid>                               |
             | -INF                                                  | <error: Passed value -INF is invalid>                              |
             | NAN                                                   | <error: Passed value NAN is invalid>                               |
             ## null
-            | null                                                  | 0                                                                  |
+            | null                                                  | <error: Passed value null is invalid>                              |
             ## bool
-            | true                                                  | 1                                                                  |
-            | false                                                 | 0                                                                  |
+            | true                                                  | <error: Passed value true is invalid>                              |
+            | false                                                 | <error: Passed value false is invalid>                             |
             ## bool string
             | "true"                                                | <error: Passed value "true" is invalid>                            |
             | "false"                                               | <error: Passed value "false" is invalid>                           |
@@ -130,12 +190,10 @@ Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | 3735928559                                                         |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid> |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                  |
-            ### OVERFLOW EXTRAS ###
-            | 9223372036854775807                                   | 9223372036854775807                                                |
-            | -9223372036854775807                                  | -9223372036854775807                                               |
-            | -9223372036854775807-1                                | -9223372036854775807-1                                             |
-            | -9223372036854775808                                  | -9223372036854775807-1                                             |
-            | -9223372036854775809                                  | -9223372036854775807-1                                             |
+            ### ADDITIONAL SPECIAL CASES ###
+            | "case"                                                | <error: Passed value "case" is invalid>                            |
+            | 3735928559                                            | <error: Passed value 3735928559 is invalid>                        |
+            | -3735928559                                           | <error: Passed value -3735928559 is invalid>                       |
 
     Scenario Outline: Denormalize "<value>"
         When denormalize
@@ -144,11 +202,11 @@ Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
             | value                                                 | result                                                                 |
             # default checks
             ## int
-            | 42                                                    | 42                                                                     |
-            | 1                                                     | 1                                                                      |
-            | 0                                                     | 0                                                                      |
-            | -1                                                    | -1                                                                     |
-            | -42                                                   | -42                                                                    |
+            | 42                                                    | <error: Passed value 42 is invalid>                                    |
+            | 1                                                     | <error: Passed value 1 is invalid>                                     |
+            | 0                                                     | <error: Passed value 0 is invalid>                                     |
+            | -1                                                    | <error: Passed value -1 is invalid>                                    |
+            | -42                                                   | <error: Passed value -42 is invalid>                                   |
             ## numeric int string
             | "42"                                                  | <error: Passed value "42" is invalid>                                  |
             | "1"                                                   | <error: Passed value "1" is invalid>                                   |
@@ -196,9 +254,7 @@ Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
             | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE    | <error: Passed value {"name": "CASE", "value": 3735928559} is invalid> |
             | TypeLang\Mapper\Tests\Stub\StringBackedEnumStub::CASE | <error: Passed value {"name": "CASE", "value": "case"} is invalid>     |
             | TypeLang\Mapper\Tests\Stub\UnitEnumStub::CASE         | <error: Passed value {"name": "CASE"} is invalid>                      |
-            ### OVERFLOW EXTRAS ###
-            | 9223372036854775807                                   | 9223372036854775807                                                    |
-            | -9223372036854775807                                  | -9223372036854775807                                                   |
-            | -9223372036854775807-1                                | -9223372036854775807-1                                                 |
-            | -9223372036854775808                                  | <error: Passed value -9.2233720368548E+18 is invalid>                  |
-            | -9223372036854775809                                  | <error: Passed value -9.2233720368548E+18 is invalid>                  |
+            ### ADDITIONAL SPECIAL CASES ###
+            | "case"                                                | <error: Passed value "case" is invalid>                                |
+            | 3735928559                                            | TypeLang\Mapper\Tests\Stub\IntBackedEnumStub::CASE                     |
+            | -3735928559                                           | <error: Passed value -3735928559 is invalid>                           |

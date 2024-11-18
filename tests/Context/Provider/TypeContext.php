@@ -70,11 +70,11 @@ final class TypeContext extends Context
     #[Given('/^type "(?P<class>[a-zA-Z0-9_\x80-\xff\\\\]+?)"$/')]
     public function givenType(string $class): void
     {
-        $this->givenTypeWith($class);
+        $this->givenTypeWithJsonArguments($class);
     }
 
     #[Given('/^type "(?P<class>[a-zA-Z0-9_\x80-\xff\\\\]+?)" with (?P<args>.+?)$/')]
-    public function givenTypeWith(string $class, string $args = '{}'): void
+    public function givenTypeWithJsonArguments(string $class, string $args = '{}'): void
     {
         try {
             $arguments = \json_decode($args, true, flags: \JSON_THROW_ON_ERROR);
