@@ -61,16 +61,16 @@ class StringType implements TypeInterface
                 $value === \INF => static::INF_TO_STRING,
                 $value === -\INF => '-' . static::INF_TO_STRING,
                 // Non-zero float number
-                \str_contains($result = (string)$value, '.') => $result,
+                \str_contains($result = (string) $value, '.') => $result,
                 // Integer-like float number
                 default => \number_format($value, 1, '.', ''),
             },
             // Int
             \is_int($value),
             // Stringable
-            $value instanceof \Stringable => (string)$value,
+            $value instanceof \Stringable => (string) $value,
             // Enum
-            $value instanceof \BackedEnum => (string)$value->value,
+            $value instanceof \BackedEnum => (string) $value->value,
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
