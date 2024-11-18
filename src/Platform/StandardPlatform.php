@@ -57,11 +57,11 @@ class StandardPlatform extends Platform
             \IteratorAggregate::class,
         ], 'array-key', 'mixed');
 
+        // Adds support for the "list" type
+        yield new Builder\ListTypeBuilder(['list'], 'mixed');
+
         // Adds support for the "object" type
-        yield new Builder\ObjectTypeBuilder([
-            'object',
-            \stdClass::class,
-        ]);
+        yield new Builder\ObjectTypeBuilder(['object', \stdClass::class]);
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
