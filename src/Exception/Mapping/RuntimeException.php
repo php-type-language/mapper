@@ -46,7 +46,9 @@ abstract class RuntimeException extends \RuntimeException
 
     /**
      * @template T of \Throwable
+     *
      * @param T $e
+     *
      * @return T
      */
     public static function tryAdopt(\Throwable $e, Context $context): \Throwable
@@ -59,7 +61,7 @@ abstract class RuntimeException extends \RuntimeException
                 return $e;
             }
 
-            $property->setValue($e, (string)self::createTemplate(
+            $property->setValue($e, (string) self::createTemplate(
                 template: $message,
                 context: $e,
                 path: clone $context->getPath(),
