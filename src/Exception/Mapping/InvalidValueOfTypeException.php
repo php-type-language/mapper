@@ -8,7 +8,8 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-class InvalidValueOfTypeException extends ValueOfTypeException
+class InvalidValueOfTypeException extends ValueOfTypeException implements
+    FinalExceptionInterface
 {
     public static function createFromPath(
         TypeStatement $expected,
