@@ -8,7 +8,7 @@ final class JsonValuePrinter implements ValuePrinterInterface
 {
     public const DEFAULT_MAX_ITEMS_COUNT = 3;
 
-    public const DEFAULT_MAX_DEPTH = 2;
+    public const DEFAULT_MAX_DEPTH = 1;
 
     public function __construct(
         private readonly int $maxItemsCount = self::DEFAULT_MAX_ITEMS_COUNT,

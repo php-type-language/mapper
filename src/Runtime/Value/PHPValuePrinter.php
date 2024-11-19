@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Value;
 
-final class SimpleValuePrinter implements ValuePrinterInterface
+final class PHPValuePrinter implements ValuePrinterInterface
 {
     public function print(mixed $value, int $depth = 0): string
     {

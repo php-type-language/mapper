@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Runtime\Value;
 
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
+use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
@@ -30,7 +31,21 @@ final class SymfonyValuePrinter implements ValuePrinterInterface
 
     private function createDefaultDataDumper(): CliDumper
     {
-        return new CliDumper();
+        $dumper = new class extends CliDumper {
+            public function dump(Data $data, $output = null): ?string
+            {
+                $result = parent::dump($data, $output);
+
+                if ($result !== null) {
+                    return \rtrim($result, "\n");
+                }
+
+                return null;
+            }
+        };
+        $dumper->setColors(false);
+
+        return $dumper;
     }
 
     private function createDefaultVarCloner(): VarCloner
