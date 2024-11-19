@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class MissingRequiredObjectFieldException extends ObjectFieldException
@@ -15,7 +16,7 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
      */
     public static function createFromPath(
         mixed $field,
-        TypeStatement $expected,
+        ?TypeStatement $expected,
         array|object $value,
         PathInterface $path,
         ?\Throwable $previous = null,
@@ -24,7 +25,7 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
 
         return new self(
             field: $field,
-            expected: $expected,
+            expected: $expected ?? self::mixedTypeStatement(),
             value: $value,
             path: $path,
             template: $template,
@@ -37,7 +38,7 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
      */
     public static function createFromContext(
         mixed $field,
-        TypeStatement $expected,
+        ?TypeStatement $expected,
         array|object $value,
         Context $context,
         ?\Throwable $previous = null,

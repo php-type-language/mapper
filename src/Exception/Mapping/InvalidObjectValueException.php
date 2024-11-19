@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class InvalidObjectValueException extends ObjectValueException
@@ -16,7 +17,7 @@ class InvalidObjectValueException extends ObjectValueException
     public static function createFromPath(
         mixed $element,
         mixed $field,
-        TypeStatement $expected,
+        ?TypeStatement $expected,
         array|object $value,
         PathInterface $path,
         ?\Throwable $previous = null,
@@ -26,7 +27,7 @@ class InvalidObjectValueException extends ObjectValueException
         return new self(
             element: $element,
             field: $field,
-            expected: $expected,
+            expected: $expected ?? self::mixedTypeStatement(),
             value: $value,
             path: $path,
             template: $template,
@@ -40,7 +41,7 @@ class InvalidObjectValueException extends ObjectValueException
     public static function createFromContext(
         mixed $element,
         mixed $field,
-        TypeStatement $expected,
+        ?TypeStatement $expected,
         array|object $value,
         Context $context,
         ?\Throwable $previous = null,
