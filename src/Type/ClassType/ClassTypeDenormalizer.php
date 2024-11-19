@@ -79,6 +79,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
     /**
      * @param array<array-key, mixed> $value
+     *
      * @throws MissingFieldValueException
      * @throws \Throwable
      * @throws TypeNotFoundException
