@@ -12,7 +12,7 @@ class TypeNotFoundException extends DefinitionException
     {
         return new self(
             type: $type,
-            template: 'Type "{{type}}" is not registered',
+            template: 'Type "{{type}}" is not defined',
             previous: $previous,
         );
     }

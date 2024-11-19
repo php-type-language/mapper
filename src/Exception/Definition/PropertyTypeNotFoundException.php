@@ -37,7 +37,7 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
             class: $class,
             property: $property,
             type: $type,
-            template: \vsprintf('Type "{{type}}" for property %s::$%s is not registered', [
+            template: \vsprintf('Type "{{type}}" for property %s::$%s is not defined', [
                 $class,
                 $property,
             ]),
