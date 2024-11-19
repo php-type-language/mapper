@@ -48,7 +48,7 @@ $mapper = new Mapper(new SimplePlatform());
 var_dump($mapper->normalize(new ExampleDTO()));
 //
 // TypeRequiredException: Type "int" for property ExampleDTO::$value
-//                        is not registered.
+//                        is not defined
 //
 
 var_dump($mapper->normalize([new ExampleDTO()], 'array<ExampleDTO>'));

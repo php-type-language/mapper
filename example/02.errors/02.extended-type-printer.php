@@ -28,10 +28,11 @@ try {
         ],
     ], ExampleDTO::class);
 } catch (RuntimeException $e) {
-    // Before: "list<ExampleDTO>"
+    // Before
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type list<ExampleDTO>,
-    // but 42 given at $.values[1].values
+    // - Type: "list<ExampleDTO>"
+    // - Message: Passed value in "values" of {"values": 42} must be of type
+    //   list<ExampleDTO>, but 42 given at $.values[1].values
 
     // Print all NamedTypeNode AST statements as "!!!MODIFIED!!!" string
     $e->template->types = new class extends PrettyPrinter {
@@ -41,8 +42,9 @@ try {
         }
     };
 
-    // After: "!!!MODIFIED!!!"
+    // After
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type !!!MODIFIED!!!,
-    // but 42 given at $.values[1].values
+    // - Type: "!!!MODIFIED!!!"
+    // - Message: Passed value in "values" of {"values": 42} must be of type
+    //   !!!MODIFIED!!!, but 42 given at $.values[1].values
 }

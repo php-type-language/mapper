@@ -41,5 +41,5 @@ var_dump($result);
 
 //
 // InvalidValueException: Passed value must be of type ChildDTO{name: string},
-//                        but int (42) given at $.children[2]
+//                        but 42 given at $.children[2]
 //

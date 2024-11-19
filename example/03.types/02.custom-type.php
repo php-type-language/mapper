@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -26,9 +26,10 @@ class MyNonEmptyStringType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::createFromContext(
+        throw new InvalidValueException(
             value: $value,
-            context: $context,
+            path: $context->getPath(),
+            template: 'Passed value cannot be empty, but {{value}} given',
         );
     }
 }
@@ -46,5 +47,11 @@ $result = $mapper->normalize(['example', ''], 'list<custom-string>');
 
 var_dump($result);
 //
-// InvalidValueException: Passed value "" is invalid at $[1]
+// expected exception:
+//   TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException:
+//     Passed value "" on index 1 in ["example", ""] is invalid at $[1]
+//
+// previous exception:
+//   TypeLang\Mapper\Exception\Mapping\InvalidValueException:
+//     Passed value cannot be empty, but "" given at $[1]
 //

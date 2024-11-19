@@ -26,17 +26,19 @@ try {
         ]
     ], ExampleDTO::class);
 } catch (RuntimeException $e) {
-    // Before: "list<ExampleDTO>"
+    // Before
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type list<ExampleDTO>,
-    // but 42 given at $.values[1].values
+    // - Type: "list<ExampleDTO>"
+    // - Message: Passed value in "values" of {"values": 42} must be of type
+    //   list<ExampleDTO>, but 42 given at $.values[1].values
 
     // Replace all "expected type" definition to PHP-supported printer
     // instead of PrettyPrinter
     $e->template->types = new \TypeLang\Printer\NativeTypePrinter();
 
-    // After: "array"
+    // After
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type array,
-    // but 42 given at $.values[1].values
+    // - Type: "array"
+    // - Message: Passed value in "values" of {"values": 42} must be of type
+    //   array, but 42 given at $.values[1].values
 }

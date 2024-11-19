@@ -18,5 +18,5 @@ $result = $mapper->normalize('example');
 
 var_dump($result);
 //
-// TypeNotFoundException: Type "string" is not registered
+// TypeNotFoundException: Type "string" is not defined
 //

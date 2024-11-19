@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -89,19 +89,17 @@ var_dump($mapper->normalize([1, 2, 3], 'non-empty<array>'));
 
 var_dump($mapper->normalize([], 'non-empty<string>'));
 //
-// InvalidValueException: Passed value must be of type non-empty, but
-//                        array given at root.
+// InvalidValueException: Passed value [] is invalid
 //
 
 
 var_dump($mapper->normalize('example', 'non-empty'));
 //
-// MissingTemplateArgumentsException: Type "non-empty" expects 1 template
-//                                    argument, but only 0 were passed
+// MissingTemplateArgumentsException: Type "non-empty" expects at least 1
+//                                    template argument(s), but 0 were passed
 //
 
 var_dump($mapper->normalize('', 'non-empty<string>'));
 //
-// InvalidValueException: Passed value must be of type non-empty, but
-//                        null given at root.
+// InvalidValueException: Passed value "" is invalid
 //
