@@ -111,7 +111,7 @@ abstract class Context implements
 
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        return $this->parser->getStatementByValue($definition);
+        return $this->parser->getStatementByDefinition($definition);
     }
 
     public function getStatementByValue(mixed $value): TypeStatement
