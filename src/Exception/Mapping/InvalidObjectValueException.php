@@ -11,11 +11,12 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class InvalidObjectValueException extends ObjectValueException
 {
     /**
+     * @param non-empty-string $field
      * @param array<array-key, mixed>|object $value
      */
     public static function createFromPath(
         mixed $element,
-        mixed $field,
+        string $field,
         ?TypeStatement $expected,
         array|object $value,
         PathInterface $path,
@@ -35,11 +36,12 @@ class InvalidObjectValueException extends ObjectValueException
     }
 
     /**
-     * @param iterable<mixed, mixed> $value
+     * @param non-empty-string $field
+     * @param array<array-key, mixed>|object $value
      */
     public static function createFromContext(
         mixed $element,
-        mixed $field,
+        string $field,
         ?TypeStatement $expected,
         array|object $value,
         Context $context,

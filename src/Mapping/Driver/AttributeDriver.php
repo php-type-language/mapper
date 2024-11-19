@@ -194,6 +194,7 @@ final class AttributeDriver extends LoadableDriver
 
     /**
      * @param non-empty-string $type
+     * @param \ReflectionClass<object> $class
      *
      * @throws PropertyTypeNotFoundException
      * @throws \Throwable

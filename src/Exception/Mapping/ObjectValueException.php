@@ -42,6 +42,7 @@ abstract class ObjectValueException extends ObjectFieldException
      */
     public function getField(): string
     {
+        /** @var non-empty-string */
         return $this->field;
     }
 

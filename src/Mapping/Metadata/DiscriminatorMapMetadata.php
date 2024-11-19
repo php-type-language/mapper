@@ -21,7 +21,7 @@ final class DiscriminatorMapMetadata extends Metadata
         /**
          * @var non-empty-array<non-empty-string, TypeMetadata>
          */
-        private readonly array $map = [],
+        private readonly array $map,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -31,8 +31,6 @@ final class DiscriminatorMapMetadata extends Metadata
      * Returns class for the passed value of the defined {@see $field}.
      *
      * @api
-     *
-     * @return non-empty-string|null
      */
     public function findType(string $fieldValue): ?TypeMetadata
     {

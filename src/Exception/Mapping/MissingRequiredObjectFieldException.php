@@ -11,10 +11,11 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class MissingRequiredObjectFieldException extends ObjectFieldException
 {
     /**
+     * @param non-empty-string $field
      * @param array<array-key, mixed>|object $value
      */
     public static function createFromPath(
-        mixed $field,
+        string $field,
         ?TypeStatement $expected,
         array|object $value,
         PathInterface $path,
@@ -33,10 +34,11 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
     }
 
     /**
+     * @param non-empty-string $field
      * @param iterable<mixed, mixed> $value
      */
     public static function createFromContext(
-        mixed $field,
+        string $field,
         ?TypeStatement $expected,
         array|object $value,
         Context $context,

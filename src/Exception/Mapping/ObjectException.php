@@ -45,6 +45,7 @@ abstract class ObjectException extends ValueOfTypeException implements
      */
     public function getValue(): array|object
     {
+        /** @var array<array-key, mixed>|object */
         return $this->value;
     }
 }

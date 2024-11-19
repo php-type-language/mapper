@@ -17,6 +17,9 @@ class ArrayType implements TypeInterface
         protected readonly TypeInterface $value = new MixedType(),
     ) {}
 
+    /**
+     * @return ($value is iterable ? bool : false)
+     */
     public function match(mixed $value, Context $context): bool
     {
         if ($context->isDenormalization()) {
@@ -45,6 +48,7 @@ class ArrayType implements TypeInterface
         $result = [];
         $index = 0;
 
+        /** @var iterable<mixed, mixed> $value */
         foreach ($value as $key => $item) {
             try {
                 $key = $this->key->cast($key, $context);

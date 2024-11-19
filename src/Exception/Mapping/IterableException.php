@@ -36,6 +36,7 @@ abstract class IterableException extends ValueException implements
      */
     public function getValue(): iterable
     {
+        /** @var iterable<mixed, mixed> */
         return $this->value;
     }
 }

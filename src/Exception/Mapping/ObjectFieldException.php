@@ -10,7 +10,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 abstract class ObjectFieldException extends ObjectException
 {
     /**
-     * @param iterable<mixed, mixed> $value
+     * @param array<array-key, mixed>|object $value
      */
     public function __construct(
         protected readonly mixed $field,

@@ -45,6 +45,7 @@ class ListType implements TypeInterface
         $result = [];
         $index = 0;
 
+        /** @var iterable<mixed, mixed> $value */
         foreach ($value as $key => $item) {
             $entrance = $context->enter($item, new ArrayIndexEntry($index));
 
