@@ -6,7 +6,7 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
+use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
@@ -110,7 +110,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @throws RuntimeExceptionInterface
+     * @throws RuntimeException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
@@ -143,7 +143,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @throws RuntimeExceptionInterface
+     * @throws RuntimeException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
