@@ -14,10 +14,14 @@ use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ExpressionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\EmptyConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ExpressionConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\NullConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\SkipWhen;
+use TypeLang\Mapper\Mapping\SkipWhenEmpty;
+use TypeLang\Mapper\Mapping\SkipWhenNull;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
@@ -91,9 +95,8 @@ final class AttributeDriver extends LoadableDriver
             // -----------------------------------------------------------------
 
             $attribute = $this->findPropertyAttribute($property, MapType::class);
-
             if ($attribute !== null) {
-                $metadata->setTypeInfo($this->createType(
+                $metadata->setTypeInfo($this->createPropertyType(
                     type: $attribute->type,
                     property: $property,
                     types: $types,
@@ -106,37 +109,55 @@ final class AttributeDriver extends LoadableDriver
             // -----------------------------------------------------------------
 
             $attribute = $this->findPropertyAttribute($property, MapName::class);
-
             if ($attribute !== null) {
                 $metadata->setExportName($attribute->name);
             }
 
             // -----------------------------------------------------------------
-            //  Apply skip condition
+            //  Apply skip conditions
             // -----------------------------------------------------------------
 
-            $attribute = $this->findPropertyAttribute($property, SkipWhen::class);
-
-            if ($attribute !== null) {
-                $metadata->setSkipCondition(new ExpressionMetadata(
-                    expression: $this->createExpression($attribute->expr, [
-                        $attribute->context,
+            $conditions = $this->getAllPropertyAttributes($property, SkipWhen::class);
+            foreach ($conditions as $condition) {
+                $metadata->addSkipCondition(new ExpressionConditionMetadata(
+                    expression: $this->createExpression($condition->expr, [
+                        $condition->context,
                     ]),
-                    context: $attribute->context,
+                    context: $condition->context,
                 ));
+            }
+
+            $condition = $this->findPropertyAttribute($property, SkipWhenEmpty::class);
+            if ($condition !== null) {
+                $metadata->addSkipCondition(new EmptyConditionMetadata());
+            }
+
+            $condition = $this->findPropertyAttribute($property, SkipWhenNull::class);
+            if ($condition !== null) {
+                $metadata->addSkipCondition(new NullConditionMetadata());
             }
         }
 
         // -----------------------------------------------------------------
-        //  Apply discriminator logic
+        //  Apply discriminator map
         // -----------------------------------------------------------------
 
         $attribute = $this->findClassAttribute($reflection, DiscriminatorMap::class);
-
         if ($attribute !== null) {
+            $mapping = [];
+
+            foreach ($attribute->map as $mappedValue => $mappedType) {
+                $mapping[$mappedValue] = $this->createDiscriminatorType(
+                    type: $mappedType,
+                    class: $reflection,
+                    types: $types,
+                    parser: $parser,
+                );
+            }
+
             $class->setDiscriminator(new DiscriminatorMapMetadata(
                 field: $attribute->field,
-                map: $attribute->map,
+                map: $mapping,
             ));
         }
     }
@@ -147,7 +168,7 @@ final class AttributeDriver extends LoadableDriver
      * @throws PropertyTypeNotFoundException
      * @throws \Throwable
      */
-    private function createType(
+    private function createPropertyType(
         string $type,
         \ReflectionProperty $property,
         TypeRepositoryInterface $types,
@@ -172,6 +193,26 @@ final class AttributeDriver extends LoadableDriver
     }
 
     /**
+     * @param non-empty-string $type
+     *
+     * @throws PropertyTypeNotFoundException
+     * @throws \Throwable
+     */
+    private function createDiscriminatorType(
+        string $type,
+        \ReflectionClass $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): TypeMetadata {
+        $statement = $parser->getStatementByDefinition($type);
+
+        // TODO Add custom "discriminator type exception"
+        $instance = $types->getTypeByStatement($statement, $class);
+
+        return new TypeMetadata($instance, $statement);
+    }
+
+    /**
      * @template TAttribute of object
      *
      * @param class-string<TAttribute> $attr
@@ -188,6 +229,22 @@ final class AttributeDriver extends LoadableDriver
         }
 
         return null;
+    }
+
+    /**
+     * @template TAttribute of object
+     *
+     * @param class-string<TAttribute> $attr
+     *
+     * @return iterable<array-key, TAttribute>
+     */
+    private function getAllPropertyAttributes(\ReflectionProperty $property, string $attr): iterable
+    {
+        $attributes = $property->getAttributes($attr, \ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($attributes as $attribute) {
+            yield $attribute->newInstance();
+        }
     }
 
     /**

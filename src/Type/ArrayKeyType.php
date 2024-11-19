@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Exception\Mapping\ValueExceptionInterface;
 use TypeLang\Mapper\Runtime\Context;
 
 class ArrayKeyType implements TypeInterface
@@ -47,7 +46,7 @@ class ArrayKeyType implements TypeInterface
             try {
                 /** @var int */
                 return $this->int->cast($value, $context);
-            } catch (ValueExceptionInterface) {
+            } catch (InvalidValueException) {
                 // NaN, -INF and INF cannot be converted to
                 // array-key implicitly without losses.
                 if (\is_float($value) && !\is_finite($value)) {

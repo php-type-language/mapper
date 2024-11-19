@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Mapping\Metadata;
 
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 
-final class ExpressionMetadata extends Metadata
+final class ExpressionConditionMetadata extends MatchConditionMetadata
 {
     /**
      * @var non-empty-string
@@ -22,6 +22,15 @@ final class ExpressionMetadata extends Metadata
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
+    }
+
+    public function match(object $object, mixed $value): bool
+    {
+        $nodes = $this->expression->getNodes();
+
+        return (bool) $nodes->evaluate([], [
+            $this->getContextVariableName() => $object,
+        ]);
     }
 
     /**

@@ -87,7 +87,7 @@ Feature: Checking the "true" (TypeLang\Mapper\Type\BoolLiteralType) type behavio
             | 42.5                                                  | true                                   |
             | 42.0                                                  | true                                   |
             | 1.0                                                   | true                                   |
-            | 0.0                                                   | <error: Passed value 0 is invalid>     |
+            | 0.0                                                   | <error: Passed value 0.0 is invalid>   |
             | -1.0                                                  | true                                   |
             | -42.0                                                 | true                                   |
             | -42.5                                                 | true                                   |
@@ -145,11 +145,11 @@ Feature: Checking the "true" (TypeLang\Mapper\Type\BoolLiteralType) type behavio
             | "-42"                                                 | <error: Passed value "-42" is invalid>                                 |
             ## float
             | 42.5                                                  | <error: Passed value 42.5 is invalid>                                  |
-            | 42.0                                                  | <error: Passed value 42 is invalid>                                    |
-            | 1.0                                                   | <error: Passed value 1 is invalid>                                     |
-            | 0.0                                                   | <error: Passed value 0 is invalid>                                     |
-            | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
-            | -42.0                                                 | <error: Passed value -42 is invalid>                                   |
+            | 42.0                                                  | <error: Passed value 42.0 is invalid>                                  |
+            | 1.0                                                   | <error: Passed value 1.0 is invalid>                                   |
+            | 0.0                                                   | <error: Passed value 0.0 is invalid>                                   |
+            | -1.0                                                  | <error: Passed value -1.0 is invalid>                                  |
+            | -42.0                                                 | <error: Passed value -42.0 is invalid>                                 |
             | -42.5                                                 | <error: Passed value -42.5 is invalid>                                 |
             ## numeric float string
             | "42.5"                                                | <error: Passed value "42.5" is invalid>                                |
@@ -160,9 +160,9 @@ Feature: Checking the "true" (TypeLang\Mapper\Type\BoolLiteralType) type behavio
             | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                               |
             | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                               |
             ## extra float
-            | INF                                                   | <error: Passed value INF is invalid>                                   |
-            | -INF                                                  | <error: Passed value -INF is invalid>                                  |
-            | NAN                                                   | <error: Passed value NAN is invalid>                                   |
+            | INF                                                   | <error: Passed value Infinity is invalid>                              |
+            | -INF                                                  | <error: Passed value -Infinity is invalid>                             |
+            | NAN                                                   | <error: Passed value NaN is invalid>                                   |
             ## null
             | null                                                  | <error: Passed value null is invalid>                                  |
             ## bool

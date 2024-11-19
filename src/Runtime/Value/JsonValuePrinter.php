@@ -22,11 +22,26 @@ final class JsonValuePrinter implements ValuePrinterInterface
             $value === false => 'false',
             $value === null => 'null',
             \is_string($value) => \sprintf('"%s"', \addcslashes($value, '"')),
+            \is_float($value) => $this->printFloat($value),
             \is_scalar($value),
             $value instanceof \Stringable => (string) $value,
             \is_array($value) => $this->printArray($value, $depth),
             \is_object($value) => $this->printObject($value, $depth),
             default => \get_debug_type($value),
+        };
+    }
+
+    private function printFloat(float $value): string
+    {
+        return match (true) {
+            \is_nan($value) => 'NaN',
+            \is_infinite($value) => $value > 0 ? 'Infinity' : '-Infinity',
+            // In the case of float to an int cast without loss of precision
+            // PHP converts such values to an int when converting to a string.
+            //
+            // Such cases should be handled separately.
+            $value === (float) (int) $value => \number_format($value, 1, '.', ''),
+            default => \sprintf('%g', $value),
         };
     }
 

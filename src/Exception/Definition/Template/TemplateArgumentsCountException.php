@@ -12,11 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 abstract class TemplateArgumentsCountException extends TemplateArgumentsException
 {
     /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = parent::CODE_ERROR_LAST;
-
-    /**
      * @param int<0, max> $passedArgumentsCount
      * @param int<0, max> $minSupportedArgumentsCount
      * @param int<0, max> $maxSupportedArgumentsCount

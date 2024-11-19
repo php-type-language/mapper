@@ -12,16 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
 {
     /**
-     * @var int
-     */
-    public const CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS;
-
-    /**
      * @param int<0, max> $passedArgumentsCount
      * @param int<0, max> $minSupportedArgumentsCount
      * @param int<0, max> $maxSupportedArgumentsCount
@@ -46,7 +36,6 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
             maxSupportedArgumentsCount: $maxSupportedArgumentsCount,
             type: $type,
             template: $template,
-            code: self::CODE_ERROR_TOO_MANY_TEMPLATE_ARGUMENTS,
             previous: $previous,
         );
     }

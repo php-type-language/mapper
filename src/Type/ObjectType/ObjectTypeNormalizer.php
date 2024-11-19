@@ -17,6 +17,7 @@ final class ObjectTypeNormalizer implements TypeInterface
 
     /**
      * @return array<array-key, mixed>|object
+     * @throws InvalidValueException in case the value is incorrect
      */
     public function cast(mixed $value, Context $context): array|object
     {

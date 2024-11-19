@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\MapType;
-use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Printer\PrettyPrinter;
 

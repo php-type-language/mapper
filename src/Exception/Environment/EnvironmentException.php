@@ -12,11 +12,6 @@ use TypeLang\Mapper\Exception\Template;
  */
 abstract class EnvironmentException extends \LogicException implements MapperExceptionInterface
 {
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = 0x00;
-
     public readonly Template $template;
 
     public function __construct(string $template, int $code = 0, ?\Throwable $previous = null)

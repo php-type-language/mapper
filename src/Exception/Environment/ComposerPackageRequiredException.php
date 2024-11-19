@@ -10,16 +10,6 @@ namespace TypeLang\Mapper\Exception\Environment;
 class ComposerPackageRequiredException extends EnvironmentException
 {
     /**
-     * @var int
-     */
-    public const CODE_ERROR_PACKAGE_NOT_INSTALLED = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_PACKAGE_NOT_INSTALLED;
-
-    /**
      * @param non-empty-string $package
      */
     public function __construct(
@@ -56,7 +46,6 @@ class ComposerPackageRequiredException extends EnvironmentException
         return new self(
             package: $package,
             template: \sprintf($template, $purpose, $package),
-            code: self::CODE_ERROR_PACKAGE_NOT_INSTALLED,
             previous: $previous,
         );
     }

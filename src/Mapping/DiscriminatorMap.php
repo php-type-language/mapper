@@ -28,7 +28,7 @@ class DiscriminatorMap
          */
         public readonly string $field,
         /**
-         * @var array<non-empty-string, non-empty-string>
+         * @var non-empty-array<non-empty-string, non-empty-string>
          */
         public readonly array $map,
     ) {}

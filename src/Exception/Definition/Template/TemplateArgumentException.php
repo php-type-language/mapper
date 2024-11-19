@@ -14,11 +14,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 abstract class TemplateArgumentException extends TemplateArgumentsException
 {
     /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = parent::CODE_ERROR_LAST;
-
-    /**
      * @var int<0, max>
      */
     protected readonly int $index;

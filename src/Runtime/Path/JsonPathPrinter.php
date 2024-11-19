@@ -15,7 +15,7 @@ final class JsonPathPrinter implements PathPrinterInterface
 
         foreach ($path as $entry) {
             $result .= match (true) {
-                $entry instanceof ArrayIndexEntry => "[$entry]",
+                $entry instanceof ArrayIndexEntry => \is_numeric($entry->value) ? "[$entry]" : ".$entry",
                 $entry instanceof ObjectPropertyEntry => ".$entry",
                 default => '',
             };

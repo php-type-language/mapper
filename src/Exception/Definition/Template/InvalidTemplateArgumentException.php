@@ -12,16 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class InvalidTemplateArgumentException extends TemplateArgumentException
 {
-    /**
-     * @var int
-     */
-    public const CODE_ERROR_INVALID_TEMPLATE_ARGUMENT = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_INVALID_TEMPLATE_ARGUMENT;
-
     public function __construct(
         private readonly TypeStatement $expected,
         TemplateArgumentNode $argument,
@@ -73,7 +63,6 @@ class InvalidTemplateArgumentException extends TemplateArgumentException
             argument: $argument,
             type: $type,
             template: $template,
-            code: self::CODE_ERROR_INVALID_TEMPLATE_ARGUMENT,
             previous: $previous,
         );
     }

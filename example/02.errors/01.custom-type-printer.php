@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\MapType;
-use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

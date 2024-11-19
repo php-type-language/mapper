@@ -7,35 +7,8 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
-class InvalidValueException extends RuntimeException implements ValueExceptionInterface
+class InvalidValueException extends ValueException
 {
-    use ValueProvider;
-
-    /**
-     * @var int
-     */
-    public const CODE_ERROR_INVALID_VALUE = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_INVALID_VALUE;
-
-    public function __construct(
-        protected readonly mixed $value,
-        PathInterface $path,
-        string $template,
-        int $code = 0,
-        ?\Throwable $previous = null,
-    ) {
-        parent::__construct(
-            path: $path,
-            template: $template,
-            code: $code,
-            previous: $previous,
-        );
-    }
-
     public static function createFromPath(
         mixed $value,
         PathInterface $path,
@@ -47,7 +20,6 @@ class InvalidValueException extends RuntimeException implements ValueExceptionIn
             value: $value,
             path: $path,
             template: $template,
-            code: self::CODE_ERROR_INVALID_VALUE,
             previous: $previous,
         );
     }
@@ -59,7 +31,7 @@ class InvalidValueException extends RuntimeException implements ValueExceptionIn
     ): self {
         return self::createFromPath(
             value: $value,
-            path: clone $context->getPath(),
+            path: $context->getPath(),
             previous: $previous,
         );
     }

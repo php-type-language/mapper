@@ -7,13 +7,8 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Exception\Template;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
-abstract class RuntimeException extends \RuntimeException implements RuntimeExceptionInterface
+abstract class RuntimeException extends \RuntimeException
 {
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = 0x00;
-
     public readonly Template $template;
 
     protected readonly PathInterface $path;
@@ -39,11 +34,6 @@ abstract class RuntimeException extends \RuntimeException implements RuntimeExce
         );
     }
 
-    /**
-     * Returns the path to the field where the error occurred.
-     *
-     * @api
-     */
     public function getPath(): PathInterface
     {
         return $this->path;

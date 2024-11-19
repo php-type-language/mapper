@@ -12,16 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintException
 {
-    /**
-     * @var int
-     */
-    public const CODE_ERROR_TEMPLATE_ARGUMENT_HINTS_NOT_SUPPORTED = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_TEMPLATE_ARGUMENT_HINTS_NOT_SUPPORTED;
-
     public static function becauseTemplateArgumentHintsNotSupported(
         TemplateArgumentNode $argument,
         TypeStatement $type,
@@ -34,7 +24,6 @@ class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintExc
             argument: $argument,
             type: $type,
             template: $template,
-            code: self::CODE_ERROR_TEMPLATE_ARGUMENT_HINTS_NOT_SUPPORTED,
             previous: $previous,
         );
     }

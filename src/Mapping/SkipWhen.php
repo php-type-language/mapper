@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping;
 
 use JetBrains\PhpStorm\Language;
-use TypeLang\Mapper\Mapping\Metadata\ExpressionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ExpressionConditionMetadata;
 
-#[\Attribute(\Attribute::TARGET_PROPERTY)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class SkipWhen
 {
     public function __construct(
@@ -29,6 +29,6 @@ class SkipWhen
          *
          * @var non-empty-string
          */
-        public readonly string $context = ExpressionMetadata::DEFAULT_CONTEXT_VARIABLE_NAME,
+        public readonly string $context = ExpressionConditionMetadata::DEFAULT_CONTEXT_VARIABLE_NAME,
     ) {}
 }

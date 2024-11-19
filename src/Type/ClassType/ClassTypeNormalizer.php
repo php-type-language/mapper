@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
-use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
-use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
-use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
-use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
+use TypeLang\Mapper\Exception\Mapping\FinalExceptionInterface;
+use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
@@ -38,15 +36,17 @@ class ClassTypeNormalizer implements TypeInterface
 
     /**
      * @return object|array<non-empty-string, mixed>
+     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
+     * @throws \Throwable in case of internal error occurs
      */
     public function cast(mixed $value, Context $context): object|array
     {
         $className = $this->metadata->getName();
 
         if (!$value instanceof $className) {
-            throw InvalidValueMappingException::createFromContext(
-                value: $value,
+            throw InvalidValueOfTypeException::createFromContext(
                 expected: $this->metadata->getTypeStatement($context),
+                value: $value,
                 context: $context,
             );
         }
@@ -66,7 +66,8 @@ class ClassTypeNormalizer implements TypeInterface
      * @param T $object
      *
      * @return array<non-empty-string, mixed>
-     * @throws \Throwable in case of object's property is not accessible
+     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
+     * @throws \Throwable in case of internal error occurs
      */
     protected function normalizeObject(object $object, Context $context): array
     {
@@ -80,42 +81,30 @@ class ClassTypeNormalizer implements TypeInterface
                 continue;
             }
 
-            // Assert that type is present
-            $info = $meta->findTypeInfo();
-            if ($info === null) {
-                throw MissingFieldTypeException::createFromContext(
-                    field: $meta->getName(),
-                    context: $entrance,
-                );
-            }
-
-            $fieldValue = $this->accessor->getValue($object, $meta);
+            $element = $this->accessor->getValue($object, $meta);
 
             // Skip the property when condition is matched
-            $skip = $meta->findSkipCondition();
-
-            if ($skip !== null) {
-                $expression = $skip->getExpression();
-                $variable = $skip->getContextVariableName();
-
-                $nodes = $expression->getNodes();
-
-                if ((bool) $nodes->evaluate([], [$variable => $object])) {
-                    continue;
+            foreach ($meta->getSkipConditions() as $condition) {
+                if ($condition->match($object, $element)) {
+                    continue 2;
                 }
             }
 
-            $type = $info->getType();
+            // Fetch field type
+            $info = $meta->findTypeInfo();
+            $type = $info !== null ? $info->getType() : $context->getTypeByDefinition('mixed');
+
             try {
-                $result[$meta->getExportName()] = $type->cast($fieldValue, $entrance);
-            } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
+                // Insert field value into result
+                $result[$meta->getExportName()] = $type->cast($element, $entrance);
+            } catch (FinalExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
-                throw InvalidFieldTypeValueException::createFromContext(
+                throw InvalidObjectValueException::createFromContext(
+                    element: $element,
                     field: $meta->getExportName(),
-                    value: $fieldValue,
-                    expected: $info->getTypeStatement(),
-                    object: $this->metadata->getTypeStatement($entrance),
+                    expected: $meta->getTypeStatement($entrance),
+                    value: $object,
                     context: $entrance,
                     previous: $e,
                 );

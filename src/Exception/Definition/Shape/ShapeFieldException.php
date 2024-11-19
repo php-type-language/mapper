@@ -12,11 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class ShapeFieldException extends ShapeFieldsException
 {
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = parent::CODE_ERROR_LAST;
-
     public function __construct(
         protected readonly FieldNode $field,
         TypeStatement $type,

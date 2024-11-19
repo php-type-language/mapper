@@ -151,11 +151,11 @@ Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type beh
             | "-42"                                                 | <error: Passed value "-42" is invalid>                             |
             ## float
             | 42.5                                                  | <error: Passed value 42.5 is invalid>                              |
-            | 42.0                                                  | <error: Passed value 42 is invalid>                                |
-            | 1.0                                                   | <error: Passed value 1 is invalid>                                 |
-            | 0.0                                                   | <error: Passed value 0 is invalid>                                 |
-            | -1.0                                                  | <error: Passed value -1 is invalid>                                |
-            | -42.0                                                 | <error: Passed value -42 is invalid>                               |
+            | 42.0                                                  | <error: Passed value 42.0 is invalid>                              |
+            | 1.0                                                   | <error: Passed value 1.0 is invalid>                               |
+            | 0.0                                                   | <error: Passed value 0.0 is invalid>                               |
+            | -1.0                                                  | <error: Passed value -1.0 is invalid>                              |
+            | -42.0                                                 | <error: Passed value -42.0 is invalid>                             |
             | -42.5                                                 | <error: Passed value -42.5 is invalid>                             |
             ## numeric float string
             | "42.5"                                                | <error: Passed value "42.5" is invalid>                            |
@@ -166,9 +166,9 @@ Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type beh
             | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                           |
             | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                           |
             ## extra float
-            | INF                                                   | <error: Passed value INF is invalid>                               |
-            | -INF                                                  | <error: Passed value -INF is invalid>                              |
-            | NAN                                                   | <error: Passed value NAN is invalid>                               |
+            | INF                                                   | <error: Passed value Infinity is invalid>                          |
+            | -INF                                                  | <error: Passed value -Infinity is invalid>                         |
+            | NAN                                                   | <error: Passed value NaN is invalid>                               |
             ## null
             | null                                                  | <error: Passed value null is invalid>                              |
             ## bool
@@ -215,11 +215,11 @@ Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type beh
             | "-42"                                                 | <error: Passed value "-42" is invalid>                                 |
             ## float
             | 42.5                                                  | <error: Passed value 42.5 is invalid>                                  |
-            | 42.0                                                  | <error: Passed value 42 is invalid>                                    |
-            | 1.0                                                   | <error: Passed value 1 is invalid>                                     |
-            | 0.0                                                   | <error: Passed value 0 is invalid>                                     |
-            | -1.0                                                  | <error: Passed value -1 is invalid>                                    |
-            | -42.0                                                 | <error: Passed value -42 is invalid>                                   |
+            | 42.0                                                  | <error: Passed value 42.0 is invalid>                                  |
+            | 1.0                                                   | <error: Passed value 1.0 is invalid>                                   |
+            | 0.0                                                   | <error: Passed value 0.0 is invalid>                                   |
+            | -1.0                                                  | <error: Passed value -1.0 is invalid>                                  |
+            | -42.0                                                 | <error: Passed value -42.0 is invalid>                                 |
             | -42.5                                                 | <error: Passed value -42.5 is invalid>                                 |
             ## numeric float string
             | "42.5"                                                | <error: Passed value "42.5" is invalid>                                |
@@ -230,9 +230,9 @@ Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type beh
             | "-42.0"                                               | <error: Passed value "-42.0" is invalid>                               |
             | "-42.5"                                               | <error: Passed value "-42.5" is invalid>                               |
             ## extra float
-            | INF                                                   | <error: Passed value INF is invalid>                                   |
-            | -INF                                                  | <error: Passed value -INF is invalid>                                  |
-            | NAN                                                   | <error: Passed value NAN is invalid>                                   |
+            | INF                                                   | <error: Passed value Infinity is invalid>                              |
+            | -INF                                                  | <error: Passed value -Infinity is invalid>                             |
+            | NAN                                                   | <error: Passed value NaN is invalid>                                   |
             ## null
             | null                                                  | <error: Passed value null is invalid>                                  |
             ## bool

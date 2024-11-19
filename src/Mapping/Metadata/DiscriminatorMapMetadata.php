@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Parser\Node\Literal\StringLiteralNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Node\Stmt\UnionTypeNode;
+
 /**
  * Represents an abstraction over general information about a class.
  */
@@ -15,9 +20,9 @@ final class DiscriminatorMapMetadata extends Metadata
          */
         private readonly string $field,
         /**
-         * @var array<non-empty-string, non-empty-string>
+         * @var non-empty-array<non-empty-string, TypeMetadata>
          */
-        private array $map = [],
+        private readonly array $map = [],
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -26,9 +31,11 @@ final class DiscriminatorMapMetadata extends Metadata
     /**
      * Returns class for the passed value of the defined {@see $field}.
      *
+     * @api
+     *
      * @return non-empty-string|null
      */
-    public function findType(string $fieldValue): ?string
+    public function findType(string $fieldValue): ?TypeMetadata
     {
         return $this->map[$fieldValue] ?? null;
     }
@@ -36,6 +43,8 @@ final class DiscriminatorMapMetadata extends Metadata
     /**
      * Returns {@see true} in case of the passed value of the
      * defined {@see $field} is mapped on class.
+     *
+     * @api
      */
     public function hasType(string $fieldValue): bool
     {
@@ -45,7 +54,9 @@ final class DiscriminatorMapMetadata extends Metadata
     /**
      * Returns class mapping.
      *
-     * @return array<non-empty-string, non-empty-string>
+     * @api
+     *
+     * @return array<non-empty-string, TypeMetadata>
      */
     public function getMapping(): array
     {
@@ -62,5 +73,29 @@ final class DiscriminatorMapMetadata extends Metadata
     public function getField(): string
     {
         return $this->field;
+    }
+
+    /**
+     * Dynamically creates AST discriminator representation.
+     *
+     * Required to print type information in exceptions.
+     *
+     * @api
+     *
+     * @codeCoverageIgnore
+     */
+    public function getTypeStatement(): TypeStatement
+    {
+        $participants = [];
+
+        foreach ($this->getMapping() as $field => $_) {
+            $participants[] = StringLiteralNode::createFromValue($field);
+        }
+
+        if (\count($participants) === 1) {
+            return \reset($participants);
+        }
+
+        return new UnionTypeNode(...$participants);
     }
 }

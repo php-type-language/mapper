@@ -9,16 +9,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class PropertyTypeNotFoundException extends TypeNotFoundException
 {
     /**
-     * @var int
-     */
-    public const CODE_ERROR_PROPERTY_TYPE_NOT_DEFINED = 0x01 + parent::CODE_ERROR_LAST;
-
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = self::CODE_ERROR_PROPERTY_TYPE_NOT_DEFINED;
-
-    /**
      * @param class-string $class
      * @param non-empty-string $property
      */
@@ -31,6 +21,28 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
         ?\Throwable $previous = null,
     ) {
         parent::__construct($type, $template, $code, $previous);
+    }
+
+    /**
+     * @param class-string $class
+     * @param non-empty-string $property
+     */
+    public static function becauseTypeOfPropertyNotDefined(
+        string $class,
+        string $property,
+        TypeStatement $type,
+        ?\Throwable $previous = null,
+    ): self {
+        return new self(
+            class: $class,
+            property: $property,
+            type: $type,
+            template: \vsprintf('Type "{{type}}" for property %s::$%s is not registered', [
+                $class,
+                $property,
+            ]),
+            previous: $previous,
+        );
     }
 
     /**
@@ -51,29 +63,5 @@ class PropertyTypeNotFoundException extends TypeNotFoundException
     public function getProperty(): string
     {
         return $this->property;
-    }
-
-    /**
-     * @param class-string $class
-     * @param non-empty-string $property
-     */
-    public static function becauseTypeOfPropertyNotDefined(
-        string $class,
-        string $property,
-        TypeStatement $type,
-        ?\Throwable $previous = null,
-    ): self {
-        return new self(
-            class: $class,
-            property: $property,
-            type: $type,
-            template: \sprintf(
-                'Type "{{type}}" for property %s::$%s is not registered',
-                $class,
-                $property,
-            ),
-            code: self::CODE_ERROR_PROPERTY_TYPE_NOT_DEFINED,
-            previous: $previous,
-        );
     }
 }

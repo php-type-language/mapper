@@ -13,11 +13,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class DefinitionException extends \InvalidArgumentException implements MapperExceptionInterface
 {
-    /**
-     * @var int
-     */
-    protected const CODE_ERROR_LAST = 0x00;
-
     public readonly Template $template;
 
     public function __construct(

@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
-use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
-use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
-use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
-use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
+use TypeLang\Mapper\Exception\Mapping\FinalExceptionInterface;
+use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
+use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Runtime\Context;
@@ -20,6 +17,8 @@ use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
  * @template T of object
@@ -42,11 +41,9 @@ class ClassTypeDenormalizer implements TypeInterface
 
     /**
      * @return T|mixed
-     * @throws InvalidValueMappingException
-     * @throws MissingFieldValueException
-     * @throws RuntimeExceptionInterface
-     * @throws TypeNotFoundException
-     * @throws \Throwable
+     * @throws MissingRequiredObjectFieldException in case the required field is missing
+     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
+     * @throws \Throwable in case of object's property is not accessible
      */
     public function cast(mixed $value, Context $context): mixed
     {
@@ -55,9 +52,9 @@ class ClassTypeDenormalizer implements TypeInterface
         }
 
         if (!\is_array($value)) {
-            throw InvalidValueMappingException::createFromContext(
-                value: $value,
+            throw InvalidValueOfTypeException::createFromContext(
                 expected: $this->metadata->getTypeStatement($context),
+                value: $value,
                 context: $context,
             );
         }
@@ -79,45 +76,61 @@ class ClassTypeDenormalizer implements TypeInterface
 
     /**
      * @param array<array-key, mixed> $value
-     *
-     * @throws MissingFieldValueException
-     * @throws \Throwable
-     * @throws TypeNotFoundException
-     * @throws RuntimeExceptionInterface
+     * @throws MissingRequiredObjectFieldException in case the required discriminator field is missing
+     * @throws InvalidObjectValueException in case the discriminator field contains invalid value
+     * @throws RuntimeException in case of mapped type casting error occurs
+     * @throws \Throwable in case of internal error occurs
      */
     private function castOverDiscriminator(DiscriminatorMapMetadata $map, array $value, Context $context): mixed
     {
-        $discriminatorValue = $value[$map->getField()] ?? null;
+        $field = $map->getField();
 
-        // Invalid discriminator field type
-        if (!\is_string($discriminatorValue)) {
-            throw MissingFieldValueException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context),
-                field: $map->getField(),
+        // In case of discriminator field is missing
+        if (!\array_key_exists($field, $value)) {
+            throw MissingRequiredObjectFieldException::createFromContext(
+                field: $field,
+                expected: $map->getTypeStatement(),
+                value: $value,
                 context: $context,
             );
         }
 
-        $discriminatorDefinition = $map->findType($discriminatorValue);
+        $element = $value[$field];
 
-        // Invalid discriminator type
-        if ($discriminatorDefinition === null) {
-            throw MissingFieldValueException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context),
-                field: $map->getField(),
+        // In case of discriminator field is not a string
+        if (!\is_string($element)) {
+            throw InvalidObjectValueException::createFromContext(
+                element: $element,
+                field: $field,
+                expected: $map->getTypeStatement(),
+                value: $value,
                 context: $context,
             );
         }
 
-        $discriminatorType = $context->getTypeByDefinition($discriminatorDefinition);
+        $mapping = $map->findType($element);
 
-        return $discriminatorType->cast($value, $context);
+        // In case of discriminator value is not found
+        if ($mapping === null) {
+            throw InvalidObjectValueException::createFromContext(
+                element: $element,
+                field: $field,
+                expected: $map->getTypeStatement(),
+                value: $value,
+                context: $context,
+            );
+        }
+
+        $mappingType = $mapping->getType();
+
+        return $mappingType->cast($value, $context);
     }
 
     /**
      * @param array<array-key, mixed> $value
      *
-     * @throws MissingFieldValueException
+     * @throws MissingRequiredObjectFieldException in case the required field is missing
+     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
      * @throws \Throwable in case of object's property is not accessible
      */
     private function denormalizeObject(array $value, object $object, Context $context): void
@@ -133,29 +146,22 @@ class ClassTypeDenormalizer implements TypeInterface
             switch (true) {
                 // In case of value has been passed
                 case \array_key_exists($meta->getExportName(), $value):
-                    // Assert that type is present
+                    $element = $value[$meta->getExportName()];
+
+                    // Fetch field type
                     $info = $meta->findTypeInfo();
-
-                    if ($info === null) {
-                        throw MissingFieldTypeException::createFromContext(
-                            field: $meta->getExportName(),
-                            context: $entrance,
-                        );
-                    }
-
-                    $fieldValue = $value[$meta->getExportName()];
-                    $type = $info->getType();
+                    $type = $info !== null ? $info->getType() : $context->getTypeByDefinition('mixed');
 
                     try {
-                        $propertyValue = $type->cast($fieldValue, $entrance);
-                    } catch (FieldExceptionInterface|MappingExceptionInterface $e) {
+                        $element = $type->cast($element, $entrance);
+                    } catch (FinalExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {
-                        throw InvalidFieldTypeValueException::createFromContext(
+                        throw InvalidObjectValueException::createFromContext(
+                            element: $element,
                             field: $meta->getExportName(),
-                            value: $fieldValue,
-                            expected: $info->getTypeStatement(),
-                            object: $this->metadata->getTypeStatement($entrance),
+                            expected: $meta->getTypeStatement($entrance),
+                            value: $value,
                             context: $entrance,
                             previous: $e,
                         );
@@ -164,18 +170,19 @@ class ClassTypeDenormalizer implements TypeInterface
 
                     // In case of property has default argument
                 case $meta->hasDefaultValue():
-                    $propertyValue = $meta->findDefaultValue();
+                    $element = $meta->findDefaultValue();
                     break;
 
                 default:
-                    throw MissingFieldValueException::createFromContext(
-                        expected: $this->metadata->getTypeStatement($entrance),
+                    throw MissingRequiredObjectFieldException::createFromContext(
                         field: $meta->getExportName(),
+                        expected: $meta->getTypeStatement($entrance),
+                        value: $value,
                         context: $entrance,
                     );
             }
 
-            $this->accessor->setValue($object, $meta, $propertyValue);
+            $this->accessor->setValue($object, $meta, $element);
         }
     }
 }

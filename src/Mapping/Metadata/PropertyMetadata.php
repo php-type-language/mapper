@@ -20,7 +20,10 @@ final class PropertyMetadata extends Metadata
 
     private bool $hasDefaultValue = false;
 
-    private ?ExpressionMetadata $skipWhen = null;
+    /**
+     * @var list<MatchConditionMetadata>
+     */
+    private array $skipWhen = [];
 
     /**
      * @param non-empty-string $export
@@ -155,39 +158,22 @@ final class PropertyMetadata extends Metadata
     }
 
     /**
-     * @api
-     */
-    public function setSkipCondition(ExpressionMetadata $expression): void
-    {
-        $this->skipWhen = $expression;
-    }
-
-    /**
-     * @api
-     */
-    public function removeSkipCondition(): void
-    {
-        $this->skipWhen = null;
-    }
-
-    /**
-     * @api
-     */
-    public function hasSkipCondition(): bool
-    {
-        return $this->skipWhen !== null;
-    }
-
-    /**
-     * Note: The prefix "find" is used to indicate that the
-     *       {@see ExpressionMetadata} definition may be optional and method
-     *       may return {@see null}. The prefix "get" is used when the value
-     *       is forced to be obtained and should throw an exception if the type
-     *       definition is missing.
+     * Adds new skip condition.
      *
      * @api
      */
-    public function findSkipCondition(): ?ExpressionMetadata
+    public function addSkipCondition(MatchConditionMetadata $expression): void
+    {
+        $this->skipWhen[] = $expression;
+    }
+
+    /**
+     * Returns list of skip conditions.
+     *
+     * @api
+     * @return list<MatchConditionMetadata>
+     */
+    public function getSkipConditions(): array
     {
         return $this->skipWhen;
     }
