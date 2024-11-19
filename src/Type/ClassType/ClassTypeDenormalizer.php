@@ -17,8 +17,6 @@ use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
  * @template T of object
@@ -76,6 +74,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
     /**
      * @param array<array-key, mixed> $value
+     *
      * @throws MissingRequiredObjectFieldException in case the required discriminator field is missing
      * @throws InvalidObjectValueException in case the discriminator field contains invalid value
      * @throws RuntimeException in case of mapped type casting error occurs

@@ -171,6 +171,7 @@ final class PropertyMetadata extends Metadata
      * Returns list of skip conditions.
      *
      * @api
+     *
      * @return list<MatchConditionMetadata>
      */
     public function getSkipConditions(): array
