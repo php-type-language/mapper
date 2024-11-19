@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\InternalTypeException;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -49,7 +50,11 @@ class ClassTypeBuilder extends Builder
 
         $reflection = new \ReflectionClass($name);
 
-        return $reflection->isInstantiable();
+        return $reflection->isInstantiable()
+            // Allow abstract classes for discriminators
+            || $reflection->isAbstract()
+            // Allow interfaces for discriminators
+            || $reflection->isInterface();
     }
 
     public function build(
@@ -63,11 +68,29 @@ class ClassTypeBuilder extends Builder
         /** @var class-string<T> $class */
         $class = $statement->name->toString();
 
+        $reflection = new \ReflectionClass($class);
+
         $metadata = $this->driver->getClassMetadata(
-            class: new \ReflectionClass($class),
+            class: $reflection,
             types: $types,
             parser: $parser,
         );
+
+        $discriminator = $metadata->findDiscriminator();
+
+        if ($discriminator === null && !$reflection->isInstantiable()) {
+            throw InternalTypeException::becauseInternalTypeErrorOccurs(
+                type: $statement,
+                message: \vsprintf('%s "%s" expects a discriminator map to be able to be created', [
+                    match (true) {
+                        $reflection->isAbstract() => 'Non-creatable abstract class',
+                        $reflection->isInterface() => 'Non-creatable interface',
+                        default => 'Unknown non-instantiable type',
+                    },
+                    $reflection->getName(),
+                ]),
+            );
+        }
 
         return new ClassType(
             metadata: $metadata,

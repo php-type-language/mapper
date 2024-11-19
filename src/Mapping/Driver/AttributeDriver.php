@@ -9,9 +9,11 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
+use TypeLang\Mapper\Mapping\DiscriminatorMap;
 use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ExpressionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\NormalizeAsArray;
@@ -123,6 +125,19 @@ final class AttributeDriver extends LoadableDriver
                     context: $attribute->context,
                 ));
             }
+        }
+
+        // -----------------------------------------------------------------
+        //  Apply discriminator logic
+        // -----------------------------------------------------------------
+
+        $attribute = $this->findClassAttribute($reflection, DiscriminatorMap::class);
+
+        if ($attribute !== null) {
+            $class->setDiscriminator(new DiscriminatorMapMetadata(
+                field: $attribute->field,
+                map: $attribute->map,
+            ));
         }
     }
 

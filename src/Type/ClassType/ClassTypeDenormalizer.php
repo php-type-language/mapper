@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\FieldExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidFieldTypeValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueMappingException;
 use TypeLang\Mapper\Exception\Mapping\MappingExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingFieldValueException;
+use TypeLang\Mapper\Exception\Mapping\RuntimeExceptionInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
@@ -38,9 +41,14 @@ class ClassTypeDenormalizer implements TypeInterface
     }
 
     /**
-     * @return T
+     * @return T|mixed
+     * @throws InvalidValueMappingException
+     * @throws MissingFieldValueException
+     * @throws RuntimeExceptionInterface
+     * @throws TypeNotFoundException
+     * @throws \Throwable
      */
-    public function cast(mixed $value, Context $context): object
+    public function cast(mixed $value, Context $context): mixed
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -54,6 +62,12 @@ class ClassTypeDenormalizer implements TypeInterface
             );
         }
 
+        $discriminator = $this->metadata->findDiscriminator();
+
+        if ($discriminator !== null) {
+            return $this->castOverDiscriminator($discriminator, $value, $context);
+        }
+
         $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
 
         $instance = $this->instantiator->instantiate($this->metadata);
@@ -61,6 +75,42 @@ class ClassTypeDenormalizer implements TypeInterface
         $this->denormalizeObject($value, $instance, $entrance);
 
         return $instance;
+    }
+
+    /**
+     * @param array<array-key, mixed> $value
+     * @throws MissingFieldValueException
+     * @throws \Throwable
+     * @throws TypeNotFoundException
+     * @throws RuntimeExceptionInterface
+     */
+    private function castOverDiscriminator(DiscriminatorMapMetadata $map, array $value, Context $context): mixed
+    {
+        $discriminatorValue = $value[$map->getField()] ?? null;
+
+        // Invalid discriminator field type
+        if (!\is_string($discriminatorValue)) {
+            throw MissingFieldValueException::createFromContext(
+                expected: $this->metadata->getTypeStatement($context),
+                field: $map->getField(),
+                context: $context,
+            );
+        }
+
+        $discriminatorDefinition = $map->findType($discriminatorValue);
+
+        // Invalid discriminator type
+        if ($discriminatorDefinition === null) {
+            throw MissingFieldValueException::createFromContext(
+                expected: $this->metadata->getTypeStatement($context),
+                field: $map->getField(),
+                context: $context,
+            );
+        }
+
+        $discriminatorType = $context->getTypeByDefinition($discriminatorDefinition);
+
+        return $discriminatorType->cast($value, $context);
     }
 
     /**

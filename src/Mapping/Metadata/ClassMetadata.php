@@ -33,12 +33,19 @@ final class ClassMetadata extends Metadata
     private ?bool $normalizeAsArray = null;
 
     /**
+     * Contains a {@see DiscriminatorMapMetadata} instance in case of class-like
+     * contains a discriminator map.
+     */
+    private ?DiscriminatorMapMetadata $discriminator;
+
+    /**
      * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
      */
     public function __construct(
         private readonly string $name,
         iterable $properties = [],
+        ?DiscriminatorMapMetadata $discriminator = null,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -46,6 +53,7 @@ final class ClassMetadata extends Metadata
         foreach ($properties as $property) {
             $this->addProperty($property);
         }
+        $this->discriminator = $discriminator;
     }
 
     /**
@@ -182,5 +190,39 @@ final class ClassMetadata extends Metadata
     public function getProperties(): array
     {
         return \array_values($this->properties);
+    }
+
+    /**
+     * Returns {@see DiscriminatorMapMetadata} information about a class
+     * discriminator map, or returns {@see null} if no such metadata has been
+     * registered in the {@see ClassMetadata} instance.
+     *
+     * @api
+     */
+    public function findDiscriminator(): ?DiscriminatorMapMetadata
+    {
+        return $this->discriminator;
+    }
+
+    /**
+     * Returns {@see true} if the {@see DiscriminatorMapMetadata} information
+     * was registered in the {@see ClassMetadata}  and {@see false} otherwise.
+     *
+     * @api
+     */
+    public function hasDiscriminator(): bool
+    {
+        return $this->discriminator !== null;
+    }
+
+    /**
+     * Updates {@see DiscriminatorMapMetadata} information about a class
+     * discriminator map.
+     *
+     * @api
+     */
+    public function setDiscriminator(?DiscriminatorMapMetadata $discriminator): void
+    {
+        $this->discriminator = $discriminator;
     }
 }
