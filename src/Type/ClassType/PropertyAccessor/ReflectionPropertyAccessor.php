@@ -11,15 +11,27 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
     /**
      * @throws \ReflectionException
      */
-    private function getProperty(object $object, PropertyMetadata $meta): \ReflectionProperty
+    private function getPropertyForGet(object $object, PropertyMetadata $meta): \ReflectionProperty
     {
         return new \ReflectionProperty($object, $meta->getName());
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    private function getPropertyForSet(object $object, PropertyMetadata $meta): \ReflectionProperty
+    {
+        $property = new \ReflectionProperty($object, $meta->getName());
+
+        $context = $property->getDeclaringClass();
+
+        return $context->getProperty($meta->getName());
     }
 
     public function getValue(object $object, PropertyMetadata $meta): mixed
     {
         try {
-            $property = $this->getProperty($object, $meta);
+            $property = $this->getPropertyForGet($object, $meta);
 
             return $property->getValue($object);
         } catch (\ReflectionException) {
@@ -34,15 +46,22 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
         }
 
         if (\PHP_VERSION_ID >= 80400) {
-            return $this->isReadableUsingHooks($object, $meta);
+            try {
+                return $this->isReadableUsingHooks($object, $meta);
+            } catch (\ReflectionException) {
+                return false;
+            }
         }
 
         return true;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     private function isReadableUsingHooks(object $object, PropertyMetadata $meta): bool
     {
-        $property = $this->getProperty($object, $meta);
+        $property = $this->getPropertyForSet($object, $meta);
 
         // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
         return $property->getHook(\PropertyHookType::Get) !== null
@@ -53,7 +72,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
     public function setValue(object $object, PropertyMetadata $meta, mixed $value): void
     {
         try {
-            $property = $this->getProperty($object, $meta);
+            $property = $this->getPropertyForSet($object, $meta);
 
             $property->setValue($object, $value);
         } catch (\ReflectionException) {
@@ -64,7 +83,11 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
     public function isWritable(object $object, PropertyMetadata $meta): bool
     {
         if (\PHP_VERSION_ID >= 80400) {
-            return $this->isWritableUsingHooks($object, $meta);
+            try {
+                return $this->isWritableUsingHooks($object, $meta);
+            } catch (\ReflectionException) {
+                return false;
+            }
         }
 
         return true;
@@ -75,7 +98,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
      */
     private function isWritableUsingHooks(object $object, PropertyMetadata $meta): bool
     {
-        $property = $this->getProperty($object, $meta);
+        $property = $this->getPropertyForSet($object, $meta);
 
         // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
         return $property->getHook(\PropertyHookType::Get) === null
