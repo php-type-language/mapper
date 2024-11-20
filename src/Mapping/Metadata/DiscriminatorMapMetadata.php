@@ -22,6 +22,7 @@ final class DiscriminatorMapMetadata extends Metadata
          * @var non-empty-array<non-empty-string, TypeMetadata>
          */
         private readonly array $map,
+        private ?TypeMetadata $default = null,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -73,11 +74,30 @@ final class DiscriminatorMapMetadata extends Metadata
     }
 
     /**
+     * Returns default mapping type for transformations that do not comply
+     * with the specified mapping rules defined in {@see getMapping()}.
+     *
+     * @api
+     */
+    public function getDefaultType(): ?TypeMetadata
+    {
+        return $this->default;
+    }
+
+    /**
+     * Updates default mapping type.
+     *
+     * @api
+     */
+    public function setDefaultType(?TypeMetadata $type): void
+    {
+        $this->default = $type;
+    }
+
+    /**
      * Dynamically creates AST discriminator representation.
      *
      * Required to print type information in exceptions.
-     *
-     * @api
      *
      * @codeCoverageIgnore
      */

@@ -145,6 +145,7 @@ final class AttributeDriver extends LoadableDriver
         $attribute = $this->findClassAttribute($reflection, DiscriminatorMap::class);
         if ($attribute !== null) {
             $mapping = [];
+            $default = null;
 
             foreach ($attribute->map as $mappedValue => $mappedType) {
                 $mapping[$mappedValue] = $this->createDiscriminatorType(
@@ -155,9 +156,19 @@ final class AttributeDriver extends LoadableDriver
                 );
             }
 
+            if ($attribute->otherwise !== null) {
+                $default = $this->createDiscriminatorType(
+                    type: $attribute->otherwise,
+                    class: $reflection,
+                    types: $types,
+                    parser: $parser,
+                );
+            }
+
             $class->setDiscriminator(new DiscriminatorMapMetadata(
                 field: $attribute->field,
                 map: $mapping,
+                default: $default,
             ));
         }
     }

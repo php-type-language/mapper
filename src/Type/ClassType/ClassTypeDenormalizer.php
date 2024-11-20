@@ -82,10 +82,19 @@ class ClassTypeDenormalizer implements TypeInterface
      */
     private function castOverDiscriminator(DiscriminatorMapMetadata $map, array $value, Context $context): mixed
     {
+        // Default mapping type
+        $default = $map->getDefaultType()
+            ?->getType();
+
         $field = $map->getField();
 
         // In case of discriminator field is missing
         if (!\array_key_exists($field, $value)) {
+            // In case of default type is present
+            if ($default !== null) {
+                return $default->cast($value, $context);
+            }
+
             throw MissingRequiredObjectFieldException::createFromContext(
                 field: $field,
                 expected: $map->getTypeStatement(),
@@ -98,6 +107,11 @@ class ClassTypeDenormalizer implements TypeInterface
 
         // In case of discriminator field is not a string
         if (!\is_string($element)) {
+            // In case of default type is present
+            if ($default !== null) {
+                return $default->cast($value, $context);
+            }
+
             throw InvalidObjectValueException::createFromContext(
                 element: $element,
                 field: $field,
@@ -111,6 +125,11 @@ class ClassTypeDenormalizer implements TypeInterface
 
         // In case of discriminator value is not found
         if ($mapping === null) {
+            // In case of default type is present
+            if ($default !== null) {
+                return $default->cast($value, $context);
+            }
+
             throw InvalidObjectValueException::createFromContext(
                 element: $element,
                 field: $field,

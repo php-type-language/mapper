@@ -61,8 +61,6 @@ final class ClassMetadata extends Metadata
      *
      * Required to print type information in exceptions.
      *
-     * @api
-     *
      * @codeCoverageIgnore
      */
     public function getTypeStatement(Context $context): TypeStatement
