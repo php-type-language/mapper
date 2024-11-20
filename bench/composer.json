@@ -26,10 +26,10 @@
     },
     "scripts": {
         "bench": [
-            "phpbench run --report=grouped --tag=current --filter=benchNormalization",
-            "phpbench run --report=grouped --tag=current --filter=benchCachedNormalization",
-            "phpbench run --report=grouped --tag=current --filter=benchDenormalization",
-            "phpbench run --report=grouped --tag=current --filter=benchCachedDenormalization"
+            "phpbench run --report=default --tag=current --progress=none --filter=benchNormalization",
+            "phpbench run --report=default --tag=current --progress=none --filter=benchCachedNormalization",
+            "phpbench run --report=default --tag=current --progress=none --filter=benchDenormalization",
+            "phpbench run --report=default --tag=current --progress=none --filter=benchCachedDenormalization"
         ]
     },
     "minimum-stability": "dev",

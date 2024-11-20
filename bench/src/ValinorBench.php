@@ -10,13 +10,12 @@ use CuyZ\Valinor\MapperBuilder;
 use CuyZ\Valinor\Normalizer\Format;
 use CuyZ\Valinor\Normalizer\Normalizer;
 use PhpBench\Attributes\BeforeMethods;
-use PhpBench\Attributes\Groups;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(10), Warmup(5), Iterations(10), BeforeMethods('prepare')]
+#[Revs(20), Warmup(5), Iterations(20), BeforeMethods('prepare')]
 final class ValinorBench extends MapperBenchmark
 {
     private readonly TreeMapper $rawMapper;

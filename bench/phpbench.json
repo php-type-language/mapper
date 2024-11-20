@@ -1,5 +1,5 @@
 {
-    "$schema":"./vendor/phpbench/phpbench/phpbench.schema.json",
+    "$schema": "./vendor/phpbench/phpbench/phpbench.schema.json",
     "runner.bootstrap": "vendor/autoload.php",
     "runner.path": "src",
     "runner.progress": "plain",
@@ -15,9 +15,68 @@
     "storage.store_binary": true,
     "storage.driver": "xml",
     "report.generators": {
-        "grouped": {
+        "default": {
             "extends": "overview",
-            "tabbed": false
+            "tabbed": false,
+            "components": [
+                {
+                    "component": "section",
+                    "tabbed": true,
+                    "tab_labels": [
+                        "Time",
+                        "Memory"
+                    ],
+                    "components": [
+                        {
+                            "title": "Average iteration times aggregated by benchmark",
+                            "component": "bar_chart_aggregate",
+                            "x_partition": [
+                                "benchmark_name"
+                            ],
+                            "bar_partition": [
+                                "suite_tag"
+                            ],
+                            "y_expr": "mode(partition['result_time_avg'])",
+                            "y_axes_label": "yValue as time precision 1"
+                        },
+                        {
+                            "title": "Average peak memory aggregated by benchmark",
+                            "component": "bar_chart_aggregate",
+                            "x_partition": [
+                                "benchmark_name"
+                            ],
+                            "bar_partition": [
+                                "suite_tag"
+                            ],
+                            "y_expr": "mode(partition['result_mem_peak'])",
+                            "y_axes_label": "yValue as memory precision 1"
+                        },
+                        {
+                            "component": "section",
+                            "title": "Results",
+                            "components": [
+                                {
+                                    "component": "table_aggregate",
+                                    "title": "{{ first(frame.suite_tag) }}",
+                                    "partition": [
+                                        "benchmark_name",
+                                        "subject_name",
+                                        "variant_name"
+                                    ],
+                                    "row": {
+                                        "benchmark": "first(partition['benchmark_name'])",
+                                        "memory": "first(partition['result_mem_peak']) as memory",
+                                        "min": "min(partition['result_time_avg']) as time",
+                                        "max": "max(partition['result_time_avg']) as time",
+                                        "mode": "mode(partition['result_time_avg']) as time",
+                                        "rstdev": "rstdev(partition['result_time_avg'])"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     }
 }

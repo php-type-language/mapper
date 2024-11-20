@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Bench;
 
 use PhpBench\Attributes\BeforeMethods;
-use PhpBench\Attributes\Groups;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
@@ -16,7 +15,7 @@ use TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
-#[Revs(10), Warmup(5), Iterations(10), BeforeMethods('prepare')]
+#[Revs(20), Warmup(5), Iterations(20), BeforeMethods('prepare')]
 final class TypeLangAttributesBench extends MapperBenchmark
 {
     private readonly Mapper $raw;
