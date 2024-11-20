@@ -25,7 +25,12 @@
         "symfony/var-dumper": "^7.1"
     },
     "scripts": {
-        "bench": "phpbench run --report=grouped"
+        "bench": [
+            "phpbench run --report=grouped --tag=current --filter=benchNormalization",
+            "phpbench run --report=grouped --tag=current --filter=benchCachedNormalization",
+            "phpbench run --report=grouped --tag=current --filter=benchDenormalization",
+            "phpbench run --report=grouped --tag=current --filter=benchCachedDenormalization"
+        ]
     },
     "minimum-stability": "dev",
     "prefer-stable": true
