@@ -6,7 +6,6 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
@@ -109,14 +108,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $this->parser;
     }
 
-    /**
-     * @throws RuntimeException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
-        $instance = $this->getType($value, $type);
+        $instance = $type === null
+            ? $this->types->getTypeByValue($value)
+            : $this->types->getTypeByDefinition($type);
 
         return $instance->cast($value, RootContext::forNormalization(
             value: $value,
@@ -126,13 +122,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    /**
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
     public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
     {
-        $instance = $this->getType($value, $type);
+        $instance = $type === null
+            ? $this->types->getTypeByValue($value)
+            : $this->types->getTypeByDefinition($type);
 
         return $instance->match($value, RootContext::forNormalization(
             value: $value,
@@ -142,14 +136,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    /**
-     * @throws RuntimeException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
     {
-        $instance = $this->getType($value, $type);
+        $instance = $this->types->getTypeByDefinition($type);
 
         return $instance->cast($value, RootContext::forDenormalization(
             value: $value,
@@ -159,13 +148,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    /**
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
     {
-        $instance = $this->getType($value, $type);
+        $instance = $this->types->getTypeByDefinition($type);
 
         return $instance->match($value, RootContext::forDenormalization(
             value: $value,
@@ -176,21 +161,38 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * @param non-empty-string|null $type
+     * Returns type for mapping by signature.
      *
-     * @throws TypeNotFoundException
-     * @throws \Throwable
+     * @api
+     * @param non-empty-string $type
+     * @throws TypeNotFoundException in case of type not found
+     * @throws \Throwable in case of internal error occurs
      */
-    private function getType(mixed $value, ?string $type): TypeInterface
+    public function getType(#[Language('PHP')] string $type): TypeInterface
     {
-        if ($type === null) {
-            return $this->types->getTypeByValue($value);
-        }
-
         return $this->types->getTypeByDefinition($type);
     }
 
     /**
+     * Returns type for mapping by value.
+     *
+     * @api
+     * @throws TypeNotFoundException in case of type not found
+     * @throws \Throwable in case of internal error occurs
+     */
+    public function getTypeByValue(mixed $value): TypeInterface
+    {
+        return $this->types->getTypeByValue($value);
+    }
+
+    /**
+     * Warms up the cache for the selected class or object.
+     *
+     * Please note that the cache can only be warmed up if the
+     * appropriate driver is used otherwise it doesn't give any effect.
+     *
+     * @api
+     *
      * @param class-string|object $class
      *
      * @throws TypeNotFoundException
