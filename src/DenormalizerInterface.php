@@ -6,7 +6,6 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 
 interface DenormalizerInterface
@@ -25,6 +24,7 @@ interface DenormalizerInterface
      * ```
      *
      * @param non-empty-string $type
+     *
      * @throws RuntimeException in case of runtime mapping exception occurs
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
@@ -35,6 +35,7 @@ interface DenormalizerInterface
      * Returns {@see true} if the value can be denormalized for the given type.
      *
      * @param non-empty-string $type
+     *
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */

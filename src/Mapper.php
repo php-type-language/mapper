@@ -164,7 +164,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * Returns type for mapping by signature.
      *
      * @api
+     *
      * @param non-empty-string $type
+     *
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
@@ -177,6 +179,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * Returns type for mapping by value.
      *
      * @api
+     *
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */

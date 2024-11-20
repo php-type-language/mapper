@@ -6,7 +6,6 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 
 interface NormalizerInterface
@@ -28,6 +27,7 @@ interface NormalizerInterface
      * ```
      *
      * @param non-empty-string|null $type
+     *
      * @throws RuntimeException in case of runtime mapping exception occurs
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
@@ -41,6 +41,7 @@ interface NormalizerInterface
      * inferred from the passed value.
      *
      * @param non-empty-string|null $type
+     *
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */
