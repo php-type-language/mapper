@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition\Template;
 
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * Group of errors related to incorrect number of template arguments
@@ -20,12 +20,17 @@ abstract class TemplateArgumentsCountException extends TemplateArgumentsExceptio
         protected readonly int $passedArgumentsCount,
         protected readonly int $minSupportedArgumentsCount,
         protected readonly int $maxSupportedArgumentsCount,
-        TypeStatement $type,
+        NamedTypeNode $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null
     ) {
-        parent::__construct($type, $template, $code, $previous);
+        parent::__construct(
+            type: $type,
+            template: $template,
+            code: $code,
+            previous: $previous,
+        );
     }
 
     /**

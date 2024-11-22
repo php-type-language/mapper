@@ -33,7 +33,6 @@ abstract class Builder implements TypeBuilderInterface
         }
 
         throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
-            passedArgumentsCount: $stmt->arguments->count(),
             type: $stmt,
         );
     }
@@ -94,7 +93,6 @@ abstract class Builder implements TypeBuilderInterface
         }
 
         throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
-            passedArgumentsCount: $stmt->arguments->count(),
             minSupportedArgumentsCount: $min,
             maxSupportedArgumentsCount: $max,
             type: $stmt,
@@ -131,7 +129,6 @@ abstract class Builder implements TypeBuilderInterface
         }
 
         throw MissingTemplateArgumentsException::becauseTemplateArgumentsRangeRequired(
-            passedArgumentsCount: $actualArgumentsCount,
             minSupportedArgumentsCount: $min,
             maxSupportedArgumentsCount: $max ?? $min,
             type: $stmt,

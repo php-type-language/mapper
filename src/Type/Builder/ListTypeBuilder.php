@@ -56,7 +56,6 @@ class ListTypeBuilder extends NamedTypeBuilder
             0 => $this->buildWithNoValue($types, $parser),
             1 => $this->buildWithValue($statement, $types),
             default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
-                passedArgumentsCount: \count($arguments),
                 minSupportedArgumentsCount: 0,
                 maxSupportedArgumentsCount: 1,
                 type: $statement,

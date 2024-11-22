@@ -64,7 +64,6 @@ class ArrayTypeBuilder extends NamedTypeBuilder
             1 => $this->buildWithValue($statement, $types, $parser),
             2 => $this->buildWithKeyValue($statement, $types),
             default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
-                passedArgumentsCount: \count($arguments),
                 minSupportedArgumentsCount: 0,
                 maxSupportedArgumentsCount: 2,
                 type: $statement,

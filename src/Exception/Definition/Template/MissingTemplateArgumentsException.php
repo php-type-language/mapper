@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition\Template;
 
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * Occurs when a type requires more template arguments to be specified than required
@@ -12,15 +12,13 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class MissingTemplateArgumentsException extends TemplateArgumentsCountException
 {
     /**
-     * @param int<0, max> $passedArgumentsCount
      * @param int<0, max> $minSupportedArgumentsCount
      * @param int<0, max> $maxSupportedArgumentsCount
      */
     public static function becauseTemplateArgumentsRangeRequired(
-        int $passedArgumentsCount,
         int $minSupportedArgumentsCount,
         int $maxSupportedArgumentsCount,
-        TypeStatement $type,
+        NamedTypeNode $type,
         ?\Throwable $previous = null
     ): self {
         $template = 'Type "{{type}}" expects at least %s template argument(s), '
@@ -31,7 +29,7 @@ class MissingTemplateArgumentsException extends TemplateArgumentsCountException
             : \sprintf($template, 'from {{minSupportedArgumentsCount}} to {{maxSupportedArgumentsCount}}');
 
         return new self(
-            passedArgumentsCount: $passedArgumentsCount,
+            passedArgumentsCount: $type->arguments?->count() ?? 0,
             minSupportedArgumentsCount: $minSupportedArgumentsCount,
             maxSupportedArgumentsCount: $maxSupportedArgumentsCount,
             type: $type,
