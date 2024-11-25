@@ -19,9 +19,9 @@ final class DiscriminatorMapMetadata extends Metadata
          */
         private readonly string $field,
         /**
-         * @var non-empty-array<non-empty-string, TypeMetadata>
+         * @var array<non-empty-string, TypeMetadata>
          */
-        private readonly array $map,
+        private array $map = [],
         private ?TypeMetadata $default = null,
         ?int $createdAt = null,
     ) {
@@ -47,6 +47,18 @@ final class DiscriminatorMapMetadata extends Metadata
     public function hasType(string $fieldValue): bool
     {
         return $this->findType($fieldValue) !== null;
+    }
+
+    /**
+     * Adds type metadata for the given mapping field value.
+     *
+     * @api
+     *
+     * @param non-empty-string $fieldValue
+     */
+    public function addType(string $fieldValue, TypeMetadata $type): void
+    {
+        $this->map[$fieldValue] = $type;
     }
 
     /**

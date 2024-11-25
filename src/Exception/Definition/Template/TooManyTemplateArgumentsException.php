@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception\Definition\Template;
 
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * Occurs when a type supports fewer arguments than were passed

@@ -1,0 +1,97 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/php-type-language/mapper/refs/heads/master/resources/config.schema.json",
+    "title": "Config",
+    "type": "object",
+    "description": "A mapper configuration schema",
+    "additionalProperties": false,
+    "properties": {
+        "normalize_as_array": {
+            "type": "boolean",
+            "description": "Responsible for enabling or disabling the conversion to an associative array"
+        },
+        "discriminator": {
+            "type": "object",
+            "description": "Configuration of discriminator map",
+            "additionalProperties": false,
+            "required": ["field", "map"],
+            "properties": {
+                "field": {
+                    "type": "string",
+                    "description": "The name of the field with which the discriminator map values should be compared",
+                    "minLength": 1
+                },
+                "map": {
+                    "type": "object",
+                    "description": "List of values for discriminator map. Each key must contain a value for the configured field",
+                    "patternProperties": {
+                        "^.+?$": {
+                            "type": "string",
+                            "description": "Concrete type for discriminator map in case of key matches discriminator field",
+                            "minLength": 1
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "otherwise": {
+                    "type": "string",
+                    "description": "An optional type in case the field's value is not found in the discriminator map",
+                    "minLength": 1
+                }
+            }
+        },
+        "properties": {
+            "type": "object",
+            "description": "List of properties for the specified class. Each key must contain the actual name of the class property",
+            "patternProperties": {
+                "^[a-zA-Z_\\x80-\\xff][a-zA-Z0-9_\\x80-\\xff]*$": {
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "description": "Configuration of a specific class property",
+                            "additionalProperties": false,
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "Public name of the property",
+                                    "minLength": 1
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "description": "Specific property type",
+                                    "minLength": 1
+                                },
+                                "skip": {
+                                    "description": "Rules according to which a property should be excluded during normalization",
+                                    "anyOf": [
+                                        {
+                                            "type": "string",
+                                            "description": "A specific rule to exclude: Can contain 'null' (if a field should be excluded when it contains null), 'empty' (if a field should be excluded when it empty), or an expression (if a complex expression is required for exclusion)",
+                                            "minLength": 1
+                                        },
+                                        {
+                                            "type": "array",
+                                            "description": "List of multiple rules to exclude. Only one of the rules is taken into account (logical disjunction)",
+                                            "minItems": 1,
+                                            "items": {
+                                                "type": "string",
+                                                "description": "A specific rule to exclude: Can contain 'null' (if a field should be excluded when it contains null), 'empty' (if a field should be excluded when it empty), or an expression (if a complex expression is required for exclusion)",
+                                                "minLength": 1
+                                            }
+                                        }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "type": "string",
+                            "description": "Specific property type",
+                            "minLength": 1
+                        }
+                    ]
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
