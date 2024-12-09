@@ -65,7 +65,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
         $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
 
-        $instance = $this->instantiator->instantiate($this->metadata);
+        $instance = $this->instantiator->instantiate($this->metadata, $context);
 
         $this->denormalizeObject($value, $instance, $entrance);
 

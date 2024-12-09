@@ -68,32 +68,12 @@ class ClassTypeBuilder extends Builder
         /** @var class-string<T> $class */
         $class = $statement->name->toString();
 
-        $reflection = new \ReflectionClass($class);
-
-        $metadata = $this->driver->getClassMetadata(
-            class: $reflection,
-            types: $types,
-            parser: $parser,
-        );
-
-        $discriminator = $metadata->findDiscriminator();
-
-        if ($discriminator === null && !$reflection->isInstantiable()) {
-            throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
-                message: \vsprintf('%s "%s" expects a discriminator map to be able to be created', [
-                    match (true) {
-                        $reflection->isAbstract() => 'Non-creatable abstract class',
-                        $reflection->isInterface() => 'Non-creatable interface',
-                        default => 'Unknown non-instantiable type',
-                    },
-                    $reflection->getName(),
-                ]),
-            );
-        }
-
         return new ClassType(
-            metadata: $metadata,
+            metadata: $this->driver->getClassMetadata(
+                class: new \ReflectionClass($class),
+                types: $types,
+                parser: $parser,
+            ),
             accessor: $this->accessor,
             instantiator: $this->instantiator,
         );

@@ -51,6 +51,13 @@ class ClassTypeNormalizer implements TypeInterface
             );
         }
 
+        // Subtype normalization
+        if ($value::class !== $className) {
+            /** @var object|array<non-empty-string, mixed> */
+            return $context->getTypeByValue($value)
+                ->cast($value, $context);
+        }
+
         $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
 
         $result = $this->normalizeObject($value, $entrance);
