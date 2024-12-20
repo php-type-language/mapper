@@ -70,7 +70,7 @@ $mapper = new Mapper(new DelegatePlatform(
     delegate: new StandardPlatform(),
     types: [
         // Additional type
-        new PsrContainerTypeBuilder('custom-string', $container, MyNonEmptyStringType::class),
+        new PsrContainerTypeBuilder('custom-string', MyNonEmptyStringType::class, $container),
     ],
 ));
 

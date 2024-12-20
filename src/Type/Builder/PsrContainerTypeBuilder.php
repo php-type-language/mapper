@@ -21,8 +21,8 @@ class PsrContainerTypeBuilder extends NamedTypeBuilder
      */
     public function __construct(
         array|string $names,
-        protected readonly ContainerInterface $container,
         protected readonly string $serviceId,
+        protected readonly ContainerInterface $container,
     ) {
         parent::__construct($names);
     }
