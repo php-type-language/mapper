@@ -38,6 +38,7 @@ You can see some [examples here](/example):
     - [03.custom-type-template-arguments](/example/03.types/03.custom-type-template-arguments.php)
     - [04.custom-platform](/example/03.types/04.custom-platform.php)
     - [05.custom-type-callable](/example/03.types/05.custom-type-callable.php)
+    - [06.custom-type-psr-container](/example/03.types/06.custom-type-psr-container.php)
 - [04.mapping](/example/04.mapping)
     - [01.reflection-mapping](/example/04.mapping/01.reflection-mapping.php)
     - [02.attribute-mapping](/example/04.mapping/02.attribute-mapping.php)

@@ -9,6 +9,7 @@ use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Builder\CallableTypeBuilder;
+use TypeLang\Mapper\Type\Builder\PsrContainerTypeBuilder;
 use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -24,7 +25,7 @@ class Container implements ContainerInterface
     public function __construct()
     {
         $this->services = [
-            'my-non-empty-type' => new MyNonEmptyStringType()
+            MyNonEmptyStringType::class => new MyNonEmptyStringType()
         ];
     }
 
@@ -38,8 +39,6 @@ class Container implements ContainerInterface
         return array_key_exists($id, $this->services);
     }
 }
-
-
 
 
 // Add new type (must implement TypeInterface)
@@ -56,7 +55,6 @@ class MyNonEmptyStringType implements TypeInterface
             return $value;
         }
 
-
         throw new InvalidValueException(
             value: $value,
             path: $context->getPath(),
@@ -72,7 +70,7 @@ $mapper = new Mapper(new DelegatePlatform(
     delegate: new StandardPlatform(),
     types: [
         // Additional type
-        new CallableTypeBuilder('custom-string', static fn (): TypeInterface => $container->get('my-non-empty-type')),
+        new PsrContainerTypeBuilder('custom-string', $container, MyNonEmptyStringType::class),
     ],
 ));
 
