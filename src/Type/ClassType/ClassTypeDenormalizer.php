@@ -11,6 +11,7 @@ use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
@@ -34,7 +35,56 @@ class ClassTypeDenormalizer implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        return \is_object($value) || \is_array($value);
+        return (\is_array($value) || \is_object($value))
+            && $this->matchRequiredProperties((array) $value, $context);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function getPropertyType(PropertyMetadata $meta, Context $context): TypeInterface
+    {
+        // Fetch field type
+        $info = $meta->findTypeInfo();
+
+        if ($info === null) {
+            return $context->getTypeByDefinition('mixed');
+        }
+
+        return $info->getType();
+    }
+
+    /**
+     * @param array<array-key, mixed> $payload
+     */
+    private function matchRequiredProperties(array $payload, Context $context): bool
+    {
+        foreach ($this->metadata->getProperties() as $meta) {
+            // Match property for existence
+            if (!\array_key_exists($meta->getExportName(), $payload)) {
+                // Skip all properties with defaults
+                if ($meta->hasDefaultValue()) {
+                    continue;
+                }
+
+                return false;
+            }
+
+            // Fetch field value and type
+            try {
+                $value = $payload[$meta->getExportName()];
+                $type = $this->getPropertyType($meta, $context);
+            } catch (\Throwable) {
+                return false;
+            }
+
+            // Assert valid type
+            if (!$type->match($value, $context)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -165,10 +215,7 @@ class ClassTypeDenormalizer implements TypeInterface
                 // In case of value has been passed
                 case \array_key_exists($meta->getExportName(), $value):
                     $element = $value[$meta->getExportName()];
-
-                    // Fetch field type
-                    $info = $meta->findTypeInfo();
-                    $type = $info !== null ? $info->getType() : $context->getTypeByDefinition('mixed');
+                    $type = $this->getPropertyType($meta, $context);
 
                     try {
                         $element = $type->cast($element, $entrance);
