@@ -33,6 +33,7 @@ final class TypeParser implements TypeParserInterface
             union: $platform->isFeatureSupported(GrammarFeature::Union),
             intersection: $platform->isFeatureSupported(GrammarFeature::Intersection),
             list: $platform->isFeatureSupported(GrammarFeature::List),
+            offsets: $platform->isFeatureSupported(GrammarFeature::Offsets),
             hints: $platform->isFeatureSupported(GrammarFeature::Hints),
             attributes: $platform->isFeatureSupported(GrammarFeature::Attributes),
         ));

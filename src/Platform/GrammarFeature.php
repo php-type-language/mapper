@@ -7,17 +7,17 @@ namespace TypeLang\Mapper\Platform;
 enum GrammarFeature
 {
     /**
-     * Enables conditional types such as `T ? X : Y`.
+     * Enables conditional types such as `T ? U : V`.
      */
     case Conditional;
 
     /**
-     * Enables type shapes such as `T{key: X}`.
+     * Enables type shapes such as `T{key: U}`.
      */
     case Shapes;
 
     /**
-     * Enables callable types such as `name(X, Y): T`.
+     * Enables callable types such as `name(U, V): T`.
      */
     case Callables;
 
@@ -27,17 +27,17 @@ enum GrammarFeature
     case Literals;
 
     /**
-     * Enables template arguments such as `T<X, Y>`.
+     * Enables template arguments such as `T<U, V>`.
      */
     case Generics;
 
     /**
-     * Enables logical union types such as `T | X`.
+     * Enables logical union types such as `T | U`.
      */
     case Union;
 
     /**
-     * Enables logical intersection types such as `T & X`.
+     * Enables logical intersection types such as `T & U`.
      */
     case Intersection;
 
@@ -45,6 +45,11 @@ enum GrammarFeature
      * Enables list types such as `T[]`.
      */
     case List;
+
+    /**
+     * Enables offset types such as `T[U]`.
+     */
+    case Offsets;
 
     /**
      * Enables or disables support for template argument
