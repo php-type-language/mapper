@@ -116,12 +116,9 @@ Sample: An object that contains a collection of objects, which contains
 another collection of objects.
 
 ```typescript
-ExampleObject
-{
+ExampleObject {
     name: string,
-        items
-:
-    list<ExampleObject>
+    items: list<ExampleObject>
 }
 ```
 
