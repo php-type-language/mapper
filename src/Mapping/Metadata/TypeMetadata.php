@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class TypeMetadata extends Metadata

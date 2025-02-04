@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class InMemoryTypeRepository extends TypeRepositoryDecorator

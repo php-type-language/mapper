@@ -7,6 +7,7 @@ namespace TypeLang\Mapper;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
@@ -21,7 +22,6 @@ use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
-use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {

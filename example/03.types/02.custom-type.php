@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\Builder\SimpleTypeBuilder;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
-use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

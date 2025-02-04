@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Platform\Builder\ClassTypeBuilder;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Builder\ClassTypeBuilder;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

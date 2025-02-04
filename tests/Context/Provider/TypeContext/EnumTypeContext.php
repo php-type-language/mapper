@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Context\Provider\TypeContext;
 
 use Behat\Step\Given;
+use TypeLang\Mapper\Platform\Type\BackedEnumType;
+use TypeLang\Mapper\Platform\Type\IntType;
+use TypeLang\Mapper\Platform\Type\StringType;
+use TypeLang\Mapper\Platform\Type\UnitEnumType;
 use TypeLang\Mapper\Tests\Stub\IntBackedEnumStub;
 use TypeLang\Mapper\Tests\Stub\StringBackedEnumStub;
 use TypeLang\Mapper\Tests\Stub\UnitEnumStub;
-use TypeLang\Mapper\Type\BackedEnumType;
-use TypeLang\Mapper\Type\IntType;
-use TypeLang\Mapper\Type\StringType;
-use TypeLang\Mapper\Type\UnitEnumType;
 
 /**
  * @api

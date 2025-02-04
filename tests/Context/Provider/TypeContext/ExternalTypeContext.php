@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Context\Provider\TypeContext;
 
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Tests\Context\Context;
 use TypeLang\Mapper\Tests\Context\Provider\TypeContext;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**

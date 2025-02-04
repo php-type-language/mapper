@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeDecorator\LoggableType;
 use TypeLang\Mapper\Runtime\Repository\TypeDecorator\TypeDecoratorInterface;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class LoggableTypeRepository extends TypeRepositoryDecorator

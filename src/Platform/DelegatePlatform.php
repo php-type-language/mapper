@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class DelegatePlatform implements PlatformInterface

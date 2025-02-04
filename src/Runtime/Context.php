@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
@@ -14,7 +15,6 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
