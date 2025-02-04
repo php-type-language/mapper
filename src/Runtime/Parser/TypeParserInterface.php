@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Parser;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 interface TypeParserInterface
@@ -17,5 +16,5 @@ interface TypeParserInterface
      *
      * @throws \Throwable in case of any internal error occurs
      */
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement;
+    public function getStatementByDefinition(string $definition): TypeStatement;
 }

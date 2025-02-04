@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime;
 
-use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
@@ -94,7 +93,7 @@ abstract class Context implements
         return new Path();
     }
 
-    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
         return $this->types->getTypeByDefinition($definition, $context);
     }
@@ -109,7 +108,7 @@ abstract class Context implements
         return $this->types->getTypeByStatement($statement, $context);
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    public function getStatementByDefinition(string $definition): TypeStatement
     {
         return $this->parser->getStatementByDefinition($definition);
     }

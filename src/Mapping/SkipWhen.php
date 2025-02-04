@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Mapping\Metadata\ExpressionConditionMetadata;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
@@ -21,7 +20,6 @@ class SkipWhen
          *
          * @var non-empty-string
          */
-        #[Language('JavaScript')]
         public readonly string $expr,
         /**
          * Contains the name of the variable that will hold the reference

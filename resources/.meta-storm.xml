@@ -21,7 +21,7 @@
 
         <classConstructor class="\TypeLang\Mapper\Mapping\DiscriminatorMap"
                           argument="2">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classConstructor>
 
         <!-- ===================================================================
@@ -30,7 +30,7 @@
 
         <classConstructor class="\TypeLang\Mapper\Mapping\MapType"
                           argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classConstructor>
 
         <!-- ===================================================================
@@ -49,25 +49,25 @@
         <classMethod class="\TypeLang\Mapper\DenormalizerInterface"
                      method="denormalize"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Mapper"
                      method="denormalize"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\DenormalizerInterface"
                      method="isDenormalizable"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Mapper"
                      method="isDenormalizable"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <!-- ===================================================================
@@ -77,25 +77,25 @@
         <classMethod class="\TypeLang\Mapper\NormalizerInterface"
                      method="normalize"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Mapper"
                      method="normalize"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\NormalizerInterface"
                      method="isNormalizable"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Mapper"
                      method="isNormalizable"
                      argument="1">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <!-- ===================================================================
@@ -105,7 +105,7 @@
         <classMethod class="\TypeLang\Mapper\Mapper"
                      method="getType"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <!-- ===================================================================
@@ -115,19 +115,19 @@
         <classMethod class="\TypeLang\Mapper\Runtime\Context"
                      method="getTypeByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface"
                      method="getTypeByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade"
                      method="getTypeByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <!-- ===================================================================
@@ -137,43 +137,43 @@
         <classMethod class="\TypeLang\Mapper\Runtime\Context"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\TypeParserInterface"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\LoggableTypeParser"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\TraceableTypeParser"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\TypeParser"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
 
         <classMethod class="\TypeLang\Mapper\Runtime\Parser\TypeParserFacade"
                      method="getStatementByDefinition"
                      argument="0">
-            <languageInjection language="PHP" />
+            <languageInjection language="InjectablePHP" />
         </classMethod>
     </definitions>
 </meta-storm>

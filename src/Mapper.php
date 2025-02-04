@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -108,7 +107,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $this->parser;
     }
 
-    public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
+    public function normalize(mixed $value, ?string $type = null): mixed
     {
         $instance = $type === null
             ? $this->types->getTypeByValue($value)
@@ -122,7 +121,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
+    public function isNormalizable(mixed $value, ?string $type = null): bool
     {
         $instance = $type === null
             ? $this->types->getTypeByValue($value)
@@ -136,7 +135,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
+    public function denormalize(mixed $value, string $type): mixed
     {
         $instance = $this->types->getTypeByDefinition($type);
 
@@ -148,7 +147,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         ));
     }
 
-    public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
+    public function isDenormalizable(mixed $value, string $type): bool
     {
         $instance = $this->types->getTypeByDefinition($type);
 
@@ -170,7 +169,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getType(#[Language('PHP')] string $type): TypeInterface
+    public function getType(string $type): TypeInterface
     {
         return $this->types->getTypeByDefinition($type);
     }

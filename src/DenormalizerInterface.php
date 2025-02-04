@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 
@@ -29,7 +28,7 @@ interface DenormalizerInterface
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */
-    public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed;
+    public function denormalize(mixed $value, string $type): mixed;
 
     /**
      * Returns {@see true} if the value can be denormalized for the given type.
@@ -39,5 +38,5 @@ interface DenormalizerInterface
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */
-    public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool;
+    public function isDenormalizable(mixed $value, string $type): bool;
 }

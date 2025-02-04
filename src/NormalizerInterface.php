@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 
@@ -32,7 +31,7 @@ interface NormalizerInterface
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */
-    public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed;
+    public function normalize(mixed $value, ?string $type = null): mixed;
 
     /**
      * Returns {@see true} if the value can be normalized for the given type.
@@ -45,5 +44,5 @@ interface NormalizerInterface
      * @throws DefinitionException in case of type building exception occurs
      * @throws \Throwable in case of any internal error occurs
      */
-    public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool;
+    public function isNormalizable(mixed $value, ?string $type = null): bool;
 }

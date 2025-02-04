@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -18,7 +17,6 @@ interface TypeRepositoryFacadeInterface extends TypeRepositoryInterface
      * @throws \Throwable in case of any internal error occurs
      */
     public function getTypeByDefinition(
-        #[Language('PHP')]
         string $definition,
         ?\ReflectionClass $context = null,
     ): TypeInterface;

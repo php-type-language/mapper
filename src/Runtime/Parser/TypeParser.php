@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Parser;
 
-use JetBrains\PhpStorm\Language;
 use Phplrt\Source\Source;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
@@ -39,7 +38,7 @@ final class TypeParser implements TypeParserInterface
         ));
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    public function getStatementByDefinition(string $definition): TypeStatement
     {
         // Fast-built optimization: if the definition is "null", return a null literal.
         if ($definition === 'null') {

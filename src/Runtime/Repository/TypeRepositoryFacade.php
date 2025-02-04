@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -16,7 +15,7 @@ final class TypeRepositoryFacade implements TypeRepositoryFacadeInterface
         private readonly TypeRepositoryInterface $runtime,
     ) {}
 
-    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(string $definition, ?\ReflectionClass $context = null): TypeInterface
     {
         $statement = $this->parser->getStatementByDefinition($definition);
 

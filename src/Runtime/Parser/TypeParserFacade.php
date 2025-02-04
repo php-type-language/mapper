@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Parser;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Parser\Node\Literal\BoolLiteralNode;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -15,7 +14,7 @@ final class TypeParserFacade implements TypeParserFacadeInterface
         private readonly TypeParserInterface $runtime,
     ) {}
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    public function getStatementByDefinition(string $definition): TypeStatement
     {
         return $this->runtime->getStatementByDefinition($definition);
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Parser;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class InMemoryTypeParser implements TypeParserInterface
@@ -31,7 +30,7 @@ final class InMemoryTypeParser implements TypeParserInterface
         private readonly int $typesCleanupCount = 30,
     ) {}
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    public function getStatementByDefinition(string $definition): TypeStatement
     {
         $this->cleanup();
 

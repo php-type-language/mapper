@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Parser;
 
-use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -15,7 +14,7 @@ final class LoggableTypeParser implements TypeParserInterface
         private readonly TypeParserInterface $delegate,
     ) {}
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    public function getStatementByDefinition(string $definition): TypeStatement
     {
         $this->logger->debug('Fetching an AST by "{definition}"', [
             'definition' => $definition,

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping;
 
-use JetBrains\PhpStorm\Language;
-
 /**
  * ```
  * #[DiscriminatorMap(field: 'type', map: [
@@ -49,7 +47,6 @@ class DiscriminatorMap
          *
          * @var non-empty-string|null
          */
-        #[Language('PHP')]
         public readonly ?string $otherwise = null,
     ) {}
 }
