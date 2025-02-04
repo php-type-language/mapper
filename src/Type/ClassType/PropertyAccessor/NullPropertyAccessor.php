@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType\PropertyAccessor;
 
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-
 class NullPropertyAccessor implements PropertyAccessorInterface
 {
     public function getValue(object $object, string $property): mixed
