@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\ClassType\ClassTypeDenormalizer;
 use TypeLang\Mapper\Type\ClassType\ClassTypeNormalizer;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
 
 /**
  * @template T of object

@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**

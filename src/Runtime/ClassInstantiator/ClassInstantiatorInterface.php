@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ClassType\ClassInstantiator;
+namespace TypeLang\Mapper\Runtime\ClassInstantiator;
 
 use TypeLang\Mapper\Exception\Mapping\NonInstantiatableObjectException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;

@@ -6,13 +6,13 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
+use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\ReflectionPropertyAccessor;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\ClassType;
-use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ReflectionClassInstantiator;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\ReflectionPropertyAccessor;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

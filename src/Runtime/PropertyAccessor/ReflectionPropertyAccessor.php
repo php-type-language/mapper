@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ClassType\PropertyAccessor;
+namespace TypeLang\Mapper\Runtime\PropertyAccessor;
 
 final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 {
