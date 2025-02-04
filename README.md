@@ -9,6 +9,7 @@
     <a href="https://packagist.org/packages/type-lang/mapper"><img src="https://poser.pugx.org/type-lang/mapper/version?style=for-the-badge" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/type-lang/mapper"><img src="https://poser.pugx.org/type-lang/mapper/v/unstable?style=for-the-badge" alt="Latest Unstable Version"></a>
     <a href="https://raw.githubusercontent.com/php-type-language/mapper/blob/master/LICENSE"><img src="https://poser.pugx.org/type-lang/mapper/license?style=for-the-badge" alt="License MIT"></a>
+    <a href="https://github.com/xepozz/meta-storm-idea-plugin"><img src="https://img.shields.io/static/v1?&label=Powered+by&message=Meta+Storm+Plugin&logo=phpstorm&color=db5860&style=for-the-badge" alt="MetaStorm"></a>
 </p>
 <p align="center">
     <a href="https://github.com/php-type-language/mapper/actions"><img src="https://github.com/php-type-language/mapper/workflows/tests/badge.svg"></a>
