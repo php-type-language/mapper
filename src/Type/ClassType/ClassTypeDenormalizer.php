@@ -207,7 +207,7 @@ class ClassTypeDenormalizer implements TypeInterface
             $entrance = $context->enter($value, new ObjectPropertyEntry($meta->getExportName()));
 
             // Skip the property when not writable
-            if (!$this->accessor->isWritable($object, $meta)) {
+            if (!$this->accessor->isWritable($object, $meta->getName())) {
                 continue;
             }
 
@@ -247,7 +247,7 @@ class ClassTypeDenormalizer implements TypeInterface
                     );
             }
 
-            $this->accessor->setValue($object, $meta, $element);
+            $this->accessor->setValue($object, $meta->getName(), $element);
         }
     }
 }

@@ -8,30 +8,30 @@ use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 
 class NullPropertyAccessor implements PropertyAccessorInterface
 {
-    public function getValue(object $object, PropertyMetadata $meta): mixed
+    public function getValue(object $object, string $property): mixed
     {
         throw new \LogicException(\sprintf(
             'The %s::$%s property is not readable',
             $object::class,
-            $meta->getName(),
+            $property,
         ));
     }
 
-    public function isReadable(object $object, PropertyMetadata $meta): bool
+    public function isReadable(object $object, string $property): bool
     {
         return false;
     }
 
-    public function setValue(object $object, PropertyMetadata $meta, mixed $value): void
+    public function setValue(object $object, string $property, mixed $value): void
     {
         throw new \LogicException(\sprintf(
             'The %s::$%s property is not writable',
             $object::class,
-            $meta->getName(),
+            $property,
         ));
     }
 
-    public function isWritable(object $object, PropertyMetadata $meta): bool
+    public function isWritable(object $object, string $property): bool
     {
         return false;
     }

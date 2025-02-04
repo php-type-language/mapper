@@ -84,11 +84,11 @@ class ClassTypeNormalizer implements TypeInterface
             $entrance = $context->enter($object, new ObjectPropertyEntry($meta->getName()));
 
             // Skip the property when not readable
-            if (!$this->accessor->isReadable($object, $meta)) {
+            if (!$this->accessor->isReadable($object, $meta->getName())) {
                 continue;
             }
 
-            $element = $this->accessor->getValue($object, $meta);
+            $element = $this->accessor->getValue($object, $meta->getName());
 
             // Skip the property when condition is matched
             foreach ($meta->getSkipConditions() as $condition) {

@@ -9,45 +9,47 @@ use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 {
     /**
+     * @param non-empty-string $property
      * @throws \ReflectionException
      */
-    private function getPropertyForGet(object $object, PropertyMetadata $meta): \ReflectionProperty
+    private function getPropertyForGet(object $object, string $property): \ReflectionProperty
     {
-        return new \ReflectionProperty($object, $meta->getName());
+        return new \ReflectionProperty($object, $property);
     }
 
     /**
+     * @param non-empty-string $property
      * @throws \ReflectionException
      */
-    private function getPropertyForSet(object $object, PropertyMetadata $meta): \ReflectionProperty
+    private function getPropertyForSet(object $object, string $property): \ReflectionProperty
     {
-        $property = new \ReflectionProperty($object, $meta->getName());
+        $reflection = new \ReflectionProperty($object, $property);
 
-        $context = $property->getDeclaringClass();
+        $context = $reflection->getDeclaringClass();
 
-        return $context->getProperty($meta->getName());
+        return $context->getProperty($property);
     }
 
-    public function getValue(object $object, PropertyMetadata $meta): mixed
+    public function getValue(object $object, string $property): mixed
     {
         try {
-            $property = $this->getPropertyForGet($object, $meta);
+            $reflection = $this->getPropertyForGet($object, $property);
 
-            return $property->getValue($object);
+            return $reflection->getValue($object);
         } catch (\ReflectionException) {
             return null;
         }
     }
 
-    public function isReadable(object $object, PropertyMetadata $meta): bool
+    public function isReadable(object $object, string $property): bool
     {
-        if (!\property_exists($object, $meta->getName())) {
+        if (!\property_exists($object, $property)) {
             return false;
         }
 
         if (\PHP_VERSION_ID >= 80400) {
             try {
-                return $this->isReadableUsingHooks($object, $meta);
+                return $this->isReadableUsingHooks($object, $property);
             } catch (\ReflectionException) {
                 return false;
             }
@@ -57,34 +59,35 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
+     * @param non-empty-string $property
      * @throws \ReflectionException
      */
-    private function isReadableUsingHooks(object $object, PropertyMetadata $meta): bool
+    private function isReadableUsingHooks(object $object, string $property): bool
     {
-        $property = $this->getPropertyForSet($object, $meta);
+        $reflection = $this->getPropertyForSet($object, $property);
 
         // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
-        return $property->getHook(\PropertyHookType::Get) !== null
+        return $reflection->getHook(\PropertyHookType::Get) !== null
             // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
-            || $property->getHook(\PropertyHookType::Set) === null;
+            || $reflection->getHook(\PropertyHookType::Set) === null;
     }
 
-    public function setValue(object $object, PropertyMetadata $meta, mixed $value): void
+    public function setValue(object $object, string $property, mixed $value): void
     {
         try {
-            $property = $this->getPropertyForSet($object, $meta);
+            $reflection = $this->getPropertyForSet($object, $property);
 
-            $property->setValue($object, $value);
+            $reflection->setValue($object, $value);
         } catch (\ReflectionException) {
             return;
         }
     }
 
-    public function isWritable(object $object, PropertyMetadata $meta): bool
+    public function isWritable(object $object, string $property): bool
     {
         if (\PHP_VERSION_ID >= 80400) {
             try {
-                return $this->isWritableUsingHooks($object, $meta);
+                return $this->isWritableUsingHooks($object, $property);
             } catch (\ReflectionException) {
                 return false;
             }
@@ -94,15 +97,16 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
     }
 
     /**
+     * @param non-empty-string $property
      * @throws \ReflectionException
      */
-    private function isWritableUsingHooks(object $object, PropertyMetadata $meta): bool
+    private function isWritableUsingHooks(object $object, string $property): bool
     {
-        $property = $this->getPropertyForSet($object, $meta);
+        $reflection = $this->getPropertyForSet($object, $property);
 
         // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
-        return $property->getHook(\PropertyHookType::Get) === null
+        return $reflection->getHook(\PropertyHookType::Get) === null
             // @phpstan-ignore-next-line : Requires PHPStan-compatible version for PHP 8.4
-            || $property->getHook(\PropertyHookType::Set) !== null;
+            || $reflection->getHook(\PropertyHookType::Set) !== null;
     }
 }
