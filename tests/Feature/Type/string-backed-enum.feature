@@ -1,4 +1,4 @@
-Feature: Checking the "enum<string>" (TypeLang\Mapper\Type\BackedEnumType) type behavior
+Feature: Checking the "enum<string>" (TypeLang\Mapper\Platform\Type\BackedEnumType) type behavior
 
     Background:
         Given type "string-backed-enum"

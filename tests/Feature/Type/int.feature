@@ -1,7 +1,7 @@
-Feature: Checking the "int" (TypeLang\Mapper\Type\IntType) type behavior
+Feature: Checking the "int" (TypeLang\Mapper\Platform\Type\IntType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\IntType"
+        Given type "TypeLang\Mapper\Platform\Type\IntType"
 
     Scenario Outline: Matching "<value>"
         When normalize

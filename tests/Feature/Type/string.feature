@@ -1,7 +1,7 @@
-Feature: Checking the "string" (TypeLang\Mapper\Type\StringType) type behavior
+Feature: Checking the "string" (TypeLang\Mapper\Platform\Type\StringType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\StringType"
+        Given type "TypeLang\Mapper\Platform\Type\StringType"
 
     Scenario Outline: Matching "<value>"
         When normalize

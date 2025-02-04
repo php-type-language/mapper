@@ -1,7 +1,7 @@
-Feature: Checking the "<type>" (TypeLang\Mapper\Type\<TypeName>) type behavior
+Feature: Checking the "<type>" (TypeLang\Mapper\Platform\Type\<TypeName>) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\<TypeName>"
+        Given type "TypeLang\Mapper\Platform\Type\<TypeName>"
 
     Scenario Outline: Matching "<value>"
         When normalize

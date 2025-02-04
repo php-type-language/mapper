@@ -1,7 +1,7 @@
-Feature: Checking the "bool" (TypeLang\Mapper\Type\BoolType) type behavior
+Feature: Checking the "bool" (TypeLang\Mapper\Platform\Type\BoolType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Type\BoolType"
+        Given type "TypeLang\Mapper\Platform\Type\BoolType"
 
     Scenario Outline: Matching "<value>"
         When normalize

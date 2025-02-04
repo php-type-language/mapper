@@ -1,4 +1,4 @@
-Feature: Checking the "enum<int>" (TypeLang\Mapper\Type\BackedEnumType) type behavior
+Feature: Checking the "enum<int>" (TypeLang\Mapper\Platform\Type\BackedEnumType) type behavior
 
     Background:
         Given type "int-backed-enum"
