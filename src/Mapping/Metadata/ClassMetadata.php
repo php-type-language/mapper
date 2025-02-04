@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Mapping\Introspection\ClassIntrospection;
+use TypeLang\Mapper\Mapping\Introspection\IntrospectionInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  *
  * @template T of object
  */
-final class ClassMetadata extends Metadata
+final class ClassMetadata extends Metadata implements IntrospectionInterface
 {
     /**
      * Contains a list of class fields available for
@@ -66,27 +66,8 @@ final class ClassMetadata extends Metadata
      */
     public function getTypeStatement(Context $context): TypeStatement
     {
-        if (!$context->isDetailedTypes()) {
-            return new NamedTypeNode($this->getName());
-        }
-
-        $fields = [];
-
-        foreach ($this->getProperties() as $property) {
-            $field = $property->getFieldNode($context);
-
-            if ($field === null) {
-                continue;
-            }
-
-            $fields[] = $field;
-        }
-
-        if ($fields === []) {
-            return new NamedTypeNode($this->getName());
-        }
-
-        return new NamedTypeNode($this->getName(), fields: new FieldsListNode($fields));
+        return (new ClassIntrospection($this))
+            ->getTypeStatement($context);
     }
 
     /**

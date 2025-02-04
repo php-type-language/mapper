@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Mapping\Introspection\IntrospectionInterface;
+use TypeLang\Mapper\Mapping\Introspection\PropertyIntrospection;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-final class PropertyMetadata extends Metadata
+final class PropertyMetadata extends Metadata implements IntrospectionInterface
 {
     /**
      * @var non-empty-string
@@ -43,47 +43,10 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(Context $context): ?TypeStatement
+    public function getTypeStatement(Context $context): TypeStatement
     {
-        $info = $this->findTypeInfo();
-
-        if ($info === null) {
-            return null;
-        }
-
-        $statement = clone $info->getTypeStatement();
-
-        if ($context->isDetailedTypes() || !$statement instanceof NamedTypeNode) {
-            return $statement;
-        }
-
-        return new NamedTypeNode($statement->name);
-    }
-
-    /**
-     * Dynamically creates AST field representation.
-     *
-     * @codeCoverageIgnore
-     */
-    public function getFieldNode(Context $context): ?NamedFieldNode
-    {
-        $statement = $this->getTypeStatement($context);
-
-        if ($statement === null) {
-            return null;
-        }
-
-        $name = $this->getName();
-
-        if ($context->isDenormalization()) {
-            $name = $this->getExportName();
-        }
-
-        return new NamedFieldNode(
-            key: $name,
-            of: $statement,
-            optional: $this->hasDefaultValue(),
-        );
+        return (new PropertyIntrospection($this))
+            ->getTypeStatement($context);
     }
 
     /**
