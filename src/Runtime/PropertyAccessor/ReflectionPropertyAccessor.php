@@ -8,6 +8,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 {
     /**
      * @param non-empty-string $property
+     *
      * @throws \ReflectionException
      */
     private function getPropertyForGet(object $object, string $property): \ReflectionProperty
@@ -17,6 +18,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 
     /**
      * @param non-empty-string $property
+     *
      * @throws \ReflectionException
      */
     private function getPropertyForSet(object $object, string $property): \ReflectionProperty
@@ -58,6 +60,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 
     /**
      * @param non-empty-string $property
+     *
      * @throws \ReflectionException
      */
     private function isReadableUsingHooks(object $object, string $property): bool
@@ -96,6 +99,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 
     /**
      * @param non-empty-string $property
+     *
      * @throws \ReflectionException
      */
     private function isWritableUsingHooks(object $object, string $property): bool
