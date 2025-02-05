@@ -1,7 +1,7 @@
-Feature: Checking the "mixed" (TypeLang\Mapper\Platform\Type\MixedType) type behavior
+Feature: Checking the "mixed" (TypeLang\Mapper\Platform\Standard\Type\MixedType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\MixedType"
+        Given type "TypeLang\Mapper\Platform\Standard\Type\MixedType"
 
     Scenario Outline: Matching "<value>"
         When normalize

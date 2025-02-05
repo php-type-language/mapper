@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Platform\Standard\Builder;
+use TypeLang\Mapper\Platform\Standard\Type;
+
 class StandardPlatform extends Platform
 {
     /**

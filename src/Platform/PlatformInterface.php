@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Platform\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Standard\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 interface PlatformInterface

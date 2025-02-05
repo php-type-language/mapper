@@ -1,7 +1,7 @@
-Feature: Checking the "false" (TypeLang\Mapper\Platform\Type\BoolLiteralType) type behavior
+Feature: Checking the "false" (TypeLang\Mapper\Platform\Standard\Type\BoolLiteralType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\BoolLiteralType" with [false]
+        Given type "TypeLang\Mapper\Platform\Standard\Type\BoolLiteralType" with [false]
 
     Scenario Outline: Matching "<value>"
         When normalize

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use TypeLang\Mapper\Platform\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class TypeRepositoryDecorator implements TypeRepositoryDecoratorInterface

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Tests\Context\Provider;
 
 use Behat\Step\Given;
 use PHPUnit\Framework\Assert;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Mapper\Tests\Context\Context;
 use TypeLang\Mapper\Tests\Extension\ContextArgumentTransformerExtension\AsTestingContext;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

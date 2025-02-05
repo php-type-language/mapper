@@ -1,7 +1,7 @@
-Feature: Checking the "list" (TypeLang\Mapper\Platform\Type\ListType) type behavior
+Feature: Checking the "list" (TypeLang\Mapper\Platform\Standard\Type\ListType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\ListType"
+        Given type "TypeLang\Mapper\Platform\Standard\Type\ListType"
 
     Scenario Outline: Normalize matching "<value>"
         When normalize

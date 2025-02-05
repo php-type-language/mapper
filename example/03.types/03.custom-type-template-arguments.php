@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Platform\Builder\Builder;
 use TypeLang\Mapper\Platform\DelegatePlatform;
+use TypeLang\Mapper\Platform\Standard\Builder\Builder;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;

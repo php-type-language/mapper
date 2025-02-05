@@ -1,7 +1,7 @@
-Feature: Checking the "array-key" (TypeLang\Mapper\Platform\Type\ArrayKeyType) type behavior
+Feature: Checking the "array-key" (TypeLang\Mapper\Platform\Standard\Type\ArrayKeyType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\ArrayKeyType"
+        Given type "TypeLang\Mapper\Platform\Standard\Type\ArrayKeyType"
 
     Scenario Outline: Matching "<value>"
         When normalize

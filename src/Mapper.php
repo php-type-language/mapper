@@ -6,8 +6,8 @@ namespace TypeLang\Mapper;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;

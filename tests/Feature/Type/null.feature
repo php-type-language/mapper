@@ -1,7 +1,7 @@
-Feature: Checking the "null" (TypeLang\Mapper\Platform\Type\NullType) type behavior
+Feature: Checking the "null" (TypeLang\Mapper\Platform\Standard\Type\NullType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\NullType"
+        Given type "TypeLang\Mapper\Platform\Standard\Type\NullType"
 
     Scenario Outline: Matching "<value>"
         When normalize

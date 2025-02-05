@@ -5,10 +5,10 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Platform\Builder\CallableTypeBuilder;
 use TypeLang\Mapper\Platform\DelegatePlatform;
+use TypeLang\Mapper\Platform\Standard\Builder\CallableTypeBuilder;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Context;
 
 require __DIR__ . '/../../vendor/autoload.php';

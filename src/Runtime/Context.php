@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime;
 
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;

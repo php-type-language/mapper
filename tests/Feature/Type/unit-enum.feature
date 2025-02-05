@@ -1,4 +1,4 @@
-Feature: Checking the "enum" (TypeLang\Mapper\Platform\Type\UnitEnumType) type behavior
+Feature: Checking the "enum" (TypeLang\Mapper\Platform\Standard\Type\UnitEnumType) type behavior
 
     Background:
         Given type "unit-enum"

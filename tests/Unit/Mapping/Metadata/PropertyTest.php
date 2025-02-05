@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Tests\Unit\Mapping\Metadata;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Platform\Type\NullType;
+use TypeLang\Mapper\Platform\Standard\Type\NullType;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
 
 final class PropertyTest extends MetadataTestCase

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Platform\Type\TypeInterface;
+use TypeLang\Mapper\Platform\Standard\Type\TypeInterface;
 
 interface TypeRepositoryFacadeInterface extends TypeRepositoryInterface
 {

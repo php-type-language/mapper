@@ -1,7 +1,7 @@
-Feature: Checking the "float" (TypeLang\Mapper\Platform\Type\FloatType) type behavior
+Feature: Checking the "float" (TypeLang\Mapper\Platform\Standard\Type\FloatType) type behavior
 
     Background:
-        Given type "TypeLang\Mapper\Platform\Type\FloatType"
+        Given type "TypeLang\Mapper\Platform\Standard\Type\FloatType"
 
     Scenario Outline: Matching "<value>"
         When normalize
