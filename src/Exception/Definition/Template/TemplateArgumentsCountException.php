@@ -23,7 +23,7 @@ abstract class TemplateArgumentsCountException extends TemplateArgumentsExceptio
         NamedTypeNode $type,
         string $template,
         int $code = 0,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ) {
         parent::__construct(
             type: $type,

@@ -13,7 +13,7 @@ class TemplateArgumentsNotSupportedException extends TemplateArgumentsCountExcep
 {
     public static function becauseTemplateArgumentsNotSupported(
         NamedTypeNode $type,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ): self {
         $template = 'Type "{{type}}" does not support template arguments, '
             . 'but {{passedArgumentsCount}} were passed';

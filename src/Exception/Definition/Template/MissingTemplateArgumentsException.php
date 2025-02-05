@@ -19,7 +19,7 @@ class MissingTemplateArgumentsException extends TemplateArgumentsCountException
         int $minSupportedArgumentsCount,
         int $maxSupportedArgumentsCount,
         NamedTypeNode $type,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ): self {
         $template = 'Type "{{type}}" expects at least %s template argument(s), '
             . 'but {{passedArgumentsCount}} were passed';

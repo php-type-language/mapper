@@ -26,7 +26,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TemplateArgumentsNotSupportedException
      */
-    protected function expectNoTemplateArguments(NamedTypeNode $stmt): void
+    protected static function expectNoTemplateArguments(NamedTypeNode $stmt): void
     {
         if ($stmt->arguments === null) {
             return;
@@ -42,7 +42,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws ShapeFieldsNotSupportedException
      */
-    protected function expectNoShapeFields(NamedTypeNode $stmt): void
+    protected static function expectNoShapeFields(NamedTypeNode $stmt): void
     {
         if ($stmt->fields === null) {
             return;
@@ -59,10 +59,10 @@ abstract class Builder implements TypeBuilderInterface
      * @throws MissingTemplateArgumentsException
      * @throws TooManyTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
+    protected static function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
     {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $count, $count);
-        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $count, $count);
+        static::expectTemplateArgumentsLessOrEqualThan($stmt, $count, $count);
+        static::expectTemplateArgumentsGreaterOrEqualThan($stmt, $count, $count);
     }
 
     /**
@@ -73,9 +73,9 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TooManyTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, int $min = 0): void
+    protected static function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $max + 1, $min);
+        static::expectTemplateArgumentsLessOrEqualThan($stmt, $max + 1, $min);
     }
 
     /**
@@ -86,7 +86,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TooManyTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, int $min = 0): void
+    protected static function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
         if ($stmt->arguments === null || $stmt->arguments->count() <= $max) {
             return;
@@ -107,9 +107,9 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws MissingTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
+    protected static function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
     {
-        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $min + 1, $max);
+        static::expectTemplateArgumentsGreaterOrEqualThan($stmt, $min + 1, $max);
     }
 
     /**
@@ -120,7 +120,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws MissingTemplateArgumentsException
      */
-    protected function expectTemplateArgumentsGreaterOrEqualThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
+    protected static function expectTemplateArgumentsGreaterOrEqualThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
     {
         $actualArgumentsCount = $stmt->arguments?->count() ?? 0;
 
@@ -140,7 +140,7 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    protected function expectNoTemplateArgumentHint(TypeStatement $stmt, TemplateArgumentNode $argument): void
+    protected static function expectNoTemplateArgumentHint(TypeStatement $stmt, TemplateArgumentNode $argument): void
     {
         if ($argument->hint === null) {
             return;

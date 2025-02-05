@@ -10,7 +10,7 @@ class ShapeFieldsNotSupportedException extends ShapeFieldsException
 {
     public static function becauseShapeFieldsNotSupported(
         TypeStatement $type,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ): self {
         $template = 'Type "{{type}}" does not support shape fields';
 

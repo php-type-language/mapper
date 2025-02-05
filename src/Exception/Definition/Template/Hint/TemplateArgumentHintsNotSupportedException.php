@@ -15,7 +15,7 @@ class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintExc
     public static function becauseTemplateArgumentHintsNotSupported(
         TemplateArgumentNode $argument,
         TypeStatement $type,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ): self {
         $template = 'Template argument #{{index}} ({{argument}}) of "{{type}}" does not support any hints, '
             . 'but "{{hint}}" were passed';
