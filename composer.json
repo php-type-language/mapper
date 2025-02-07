@@ -35,7 +35,8 @@
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
         "type-lang/phpdoc": "^1.0",
-        "type-lang/phpdoc-standard-tags": "^1.0"
+        "type-lang/phpdoc-standard-tags": "^1.0",
+        "buggregator/trap": "^1.0"
     },
     "autoload-dev": {
         "psr-4": {
