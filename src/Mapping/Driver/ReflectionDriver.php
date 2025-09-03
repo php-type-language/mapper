@@ -43,6 +43,10 @@ final class ReflectionDriver extends LoadableDriver
         $this->loadParametersFor($class, $reflection);
     }
 
+    /**
+     * @param ClassMetadata<object> $class
+     * @param \ReflectionClass<object> $reflection
+     */
     private function loadParametersFor(ClassMetadata $class, \ReflectionClass $reflection): void
     {
         $constructor = $reflection->getConstructor();

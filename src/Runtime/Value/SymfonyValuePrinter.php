@@ -51,6 +51,7 @@ final class SymfonyValuePrinter implements ValuePrinterInterface
     private function createDefaultVarCloner(): VarCloner
     {
         $cloner = new VarCloner();
+        /** @phpstan-ignore-next-line Allow internal class usage */
         $cloner->addCasters(ReflectionCaster::UNSET_CLOSURE_FILE_INFO);
 
         return $cloner;

@@ -11,3 +11,6 @@ parameters:
     - src
   tmpDir: vendor/.cache.phpstan
   reportUnmatchedIgnoredErrors: false
+  ignoreErrors:
+    # Symfony polyfill bug
+    - '/^Access to property \$\w+ of internal class Symfony\\Polyfill\\Php80\\PhpToken from outside its root namespace Symfony/'
