@@ -40,6 +40,11 @@ final class ReflectionDriver extends LoadableDriver
             $this->fillDefaultValue($property, $metadata);
         }
 
+        $this->loadParametersFor($class, $reflection);
+    }
+
+    private function loadParametersFor(ClassMetadata $class, \ReflectionClass $reflection): void
+    {
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
@@ -56,6 +61,12 @@ final class ReflectionDriver extends LoadableDriver
             if ($parameter->isDefaultValueAvailable()) {
                 $metadata->setDefaultValue($parameter->getDefaultValue());
             }
+        }
+
+        $parent = $reflection->getParentClass();
+
+        if ($parent instanceof \ReflectionClass) {
+            $this->loadParametersFor($class, $parent);
         }
     }
 
