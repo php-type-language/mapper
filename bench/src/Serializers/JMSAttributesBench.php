@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bench;
+namespace TypeLang\Mapper\Bench\Serializers;
 
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
@@ -13,7 +13,7 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(20), Warmup(5), Iterations(20), BeforeMethods('prepare')]
+#[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
 final class JMSAttributesBench extends MapperBenchmark
 {
     private readonly Serializer $raw;
@@ -37,7 +37,7 @@ final class JMSAttributesBench extends MapperBenchmark
             ->addDefaultHandlers()
             ->addDefaultDeserializationVisitors()
             ->addDefaultSerializationVisitors()
-            ->setCacheDir(__DIR__ . '/../var')
+            ->setCacheDir(__DIR__ . '/../../var')
             ->setMetadataCache(new PsrCacheAdapter('jms', $this->psr6))
             ->build();
     }

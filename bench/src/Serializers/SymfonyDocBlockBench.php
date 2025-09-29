@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bench;
+namespace TypeLang\Mapper\Bench\Serializers;
 
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(20), Warmup(5), Iterations(20), BeforeMethods('prepare')]
+#[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
 final class SymfonyDocBlockBench extends MapperBenchmark
 {
     private readonly Serializer $raw;

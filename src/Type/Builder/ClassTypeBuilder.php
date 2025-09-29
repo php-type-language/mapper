@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Mapping\Driver\DriverInterface;
 use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Runtime\ClassInstantiator\CloneClassInstantiator;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
@@ -28,7 +29,9 @@ class ClassTypeBuilder extends Builder
     public function __construct(
         protected readonly DriverInterface $driver = new ReflectionDriver(),
         protected readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
-        protected readonly ClassInstantiatorInterface $instantiator = new ReflectionClassInstantiator(),
+        protected readonly ClassInstantiatorInterface $instantiator = new CloneClassInstantiator(
+            delegate: new ReflectionClassInstantiator(),
+        ),
     ) {}
 
     /**

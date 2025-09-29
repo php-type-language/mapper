@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bench;
+namespace TypeLang\Mapper\Bench\Serializers;
 
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -44,7 +44,7 @@ abstract class MapperBenchmark
     {
         $this->psr6 = new FilesystemAdapter(
             namespace: 'benchmarks',
-            directory: __DIR__ . '/../var',
+            directory: __DIR__ . '/../../var',
         );
 
         $this->psr16 = new Psr16Cache(

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bench;
+namespace TypeLang\Mapper\Bench\Serializers;
 
 use CuyZ\Valinor\Mapper\Source\Source;
 use CuyZ\Valinor\Mapper\TreeMapper;
@@ -15,7 +15,7 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
-#[Revs(20), Warmup(5), Iterations(20), BeforeMethods('prepare')]
+#[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
 final class ValinorBench extends MapperBenchmark
 {
     private readonly TreeMapper $rawMapper;

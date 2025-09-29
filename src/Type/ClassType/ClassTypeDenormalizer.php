@@ -8,9 +8,8 @@ use TypeLang\Mapper\Exception\Mapping\FinalExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeException;
+use TypeLang\Mapper\Exception\Mapping\NonInstantiatableException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Runtime\Context;
@@ -24,6 +23,8 @@ use TypeLang\Mapper\Type\TypeInterface;
  */
 class ClassTypeDenormalizer implements TypeInterface
 {
+    protected readonly DiscriminatorTypeSelector $discriminator;
+
     /**
      * @param ClassMetadata<T> $metadata
      */
@@ -31,7 +32,9 @@ class ClassTypeDenormalizer implements TypeInterface
         protected readonly ClassMetadata $metadata,
         protected readonly PropertyAccessorInterface $accessor,
         protected readonly ClassInstantiatorInterface $instantiator,
-    ) {}
+    ) {
+        $this->discriminator = new DiscriminatorTypeSelector();
+    }
 
     public function match(mixed $value, Context $context): bool
     {
@@ -107,90 +110,28 @@ class ClassTypeDenormalizer implements TypeInterface
             );
         }
 
-        $discriminator = $this->metadata->discriminator;
+        $discriminator = $this->discriminator->select($this->metadata, $value, $context);
 
         if ($discriminator !== null) {
-            return $this->castOverDiscriminator($discriminator, $value, $context);
+            return $discriminator->cast($value, $context);
         }
 
         $entrance = $context->enter($value, new ObjectEntry($this->metadata->name));
 
-        $instance = $this->instantiator->instantiate($this->metadata, $context);
+        try {
+            $instance = $this->instantiator->instantiate($this->metadata->name);
+        } catch (\Throwable $e) {
+            throw NonInstantiatableException::createFromContext(
+                expected: $this->metadata->getTypeStatement($context),
+                class: $this->metadata->name,
+                context: $context,
+                previous: $e,
+            );
+        }
 
         $this->denormalizeObject($value, $instance, $entrance);
 
         return $instance;
-    }
-
-    /**
-     * @param array<array-key, mixed> $value
-     *
-     * @throws MissingRequiredObjectFieldException in case the required discriminator field is missing
-     * @throws InvalidObjectValueException in case the discriminator field contains invalid value
-     * @throws RuntimeException in case of mapped type casting error occurs
-     * @throws \Throwable in case of internal error occurs
-     */
-    private function castOverDiscriminator(DiscriminatorMapMetadata $map, array $value, Context $context): mixed
-    {
-        // Default mapping type
-        $default = $map->default?->type;
-
-        $field = $map->field;
-
-        // In case of discriminator field is missing
-        if (!\array_key_exists($field, $value)) {
-            // In case of default type is present
-            if ($default !== null) {
-                return $default->cast($value, $context);
-            }
-
-            throw MissingRequiredObjectFieldException::createFromContext(
-                field: $field,
-                expected: $map->getTypeStatement(),
-                value: $value,
-                context: $context,
-            );
-        }
-
-        $element = $value[$field];
-
-        // In case of discriminator field is not a string
-        if (!\is_string($element)) {
-            // In case of default type is present
-            if ($default !== null) {
-                return $default->cast($value, $context);
-            }
-
-            throw InvalidObjectValueException::createFromContext(
-                element: $element,
-                field: $field,
-                expected: $map->getTypeStatement(),
-                value: $value,
-                context: $context,
-            );
-        }
-
-        $mapping = $map->findType($element);
-
-        // In case of discriminator value is not found
-        if ($mapping === null) {
-            // In case of default type is present
-            if ($default !== null) {
-                return $default->cast($value, $context);
-            }
-
-            throw InvalidObjectValueException::createFromContext(
-                element: $element,
-                field: $field,
-                expected: $map->getTypeStatement(),
-                value: $value,
-                context: $context,
-            );
-        }
-
-        $mappingType = $mapping->type;
-
-        return $mappingType->cast($value, $context);
     }
 
     /**

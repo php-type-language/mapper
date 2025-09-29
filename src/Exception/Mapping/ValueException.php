@@ -26,7 +26,7 @@ abstract class ValueException extends RuntimeException
     /**
      * Returns the value that causes the error.
      */
-    public function getValue(): mixed
+    public function getClass(): mixed
     {
         return $this->value;
     }

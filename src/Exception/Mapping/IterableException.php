@@ -29,12 +29,12 @@ abstract class IterableException extends ValueException implements
     }
 
     /**
-     * Unlike {@see ValueException::getValue()}, this exception
+     * Unlike {@see ValueException::getClass()}, this exception
      * value can only be {@see iterable}.
      *
      * @return iterable<mixed, mixed>
      */
-    public function getValue(): iterable
+    public function getClass(): iterable
     {
         /** @var iterable<mixed, mixed> */
         return $this->value;

@@ -5,21 +5,25 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-abstract class ValueOfTypeException extends ValueException
+abstract class ClassException extends ValueOfTypeException implements
+    FinalExceptionInterface
 {
+    /**
+     * @param class-string $class
+     */
     public function __construct(
-        protected readonly TypeStatement $expected,
-        mixed $value,
+        TypeStatement $expected,
+        string $class,
         PathInterface $path,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
         parent::__construct(
-            value: $value,
+            expected: $expected,
+            value: $class,
             path: $path,
             template: $template,
             code: $code,
@@ -27,18 +31,15 @@ abstract class ValueOfTypeException extends ValueException
         );
     }
 
-    protected static function mixedTypeStatement(): TypeStatement
-    {
-        return new NamedTypeNode('mixed');
-    }
-
     /**
-     * Returns the type statement in which the error occurred.
+     * Unlike {@see ValueException::getClass()}, this method must return
+     * only {@see class-string}.
      *
-     * @api
+     * @return class-string
      */
-    public function getExpectedType(): TypeStatement
+    public function getClass(): string
     {
-        return $this->expected;
+        /** @var class-string */
+        return $this->value;
     }
 }

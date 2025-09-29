@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class ObjectException extends ValueOfTypeException implements
@@ -32,18 +31,13 @@ abstract class ObjectException extends ValueOfTypeException implements
         );
     }
 
-    protected static function mixedTypeStatement(): TypeStatement
-    {
-        return new NamedTypeNode('mixed');
-    }
-
     /**
-     * Unlike {@see ValueException::getValue()}, this method must return
+     * Unlike {@see ValueException::getClass()}, this method must return
      * only {@see object} or {@see array}.
      *
      * @return array<array-key, mixed>|object
      */
-    public function getValue(): array|object
+    public function getClass(): array|object
     {
         /** @var array<array-key, mixed>|object */
         return $this->value;

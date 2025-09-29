@@ -4,23 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\ClassInstantiator;
 
-use TypeLang\Mapper\Exception\Mapping\NonInstantiatableObjectException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Context;
-
 final class ReflectionClassInstantiator implements ClassInstantiatorInterface
 {
-    public function instantiate(ClassMetadata $class, Context $context): object
+    public function instantiate(string $class): object
     {
-        $reflection = new \ReflectionClass($class->name);
-
-        if (!$reflection->isInstantiable()) {
-            throw NonInstantiatableObjectException::createFromContext(
-                expected: $class->getTypeStatement($context),
-                value: $reflection,
-                context: $context,
-            );
-        }
+        $reflection = new \ReflectionClass($class);
 
         return $reflection->newInstanceWithoutConstructor();
     }
