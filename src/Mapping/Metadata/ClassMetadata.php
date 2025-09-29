@@ -39,10 +39,11 @@ final class ClassMetadata extends Metadata
     public ?bool $isNormalizeAsArray = null;
 
     /**
-     * Contains a {@see DiscriminatorMapMetadata} instance in case of class-like
-     * contains a discriminator map.
+     * Gets {@see DiscriminatorMapMetadata} information about a class
+     * discriminator map, or returns {@see null} if no such metadata has been
+     * registered in the {@see ClassMetadata} instance.
      */
-    private ?DiscriminatorMapMetadata $discriminator;
+    public ?DiscriminatorMapMetadata $discriminator;
 
     /**
      * @param iterable<array-key, PropertyMetadata> $properties
@@ -160,39 +161,5 @@ final class ClassMetadata extends Metadata
     public function getProperties(): array
     {
         return \array_values($this->properties);
-    }
-
-    /**
-     * Returns {@see DiscriminatorMapMetadata} information about a class
-     * discriminator map, or returns {@see null} if no such metadata has been
-     * registered in the {@see ClassMetadata} instance.
-     *
-     * @api
-     */
-    public function findDiscriminator(): ?DiscriminatorMapMetadata
-    {
-        return $this->discriminator;
-    }
-
-    /**
-     * Returns {@see true} if the {@see DiscriminatorMapMetadata} information
-     * was registered in the {@see ClassMetadata}  and {@see false} otherwise.
-     *
-     * @api
-     */
-    public function hasDiscriminator(): bool
-    {
-        return $this->discriminator !== null;
-    }
-
-    /**
-     * Updates {@see DiscriminatorMapMetadata} information about a class
-     * discriminator map.
-     *
-     * @api
-     */
-    public function setDiscriminator(?DiscriminatorMapMetadata $discriminator): void
-    {
-        $this->discriminator = $discriminator;
     }
 }

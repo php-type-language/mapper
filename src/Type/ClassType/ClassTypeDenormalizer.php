@@ -107,7 +107,7 @@ class ClassTypeDenormalizer implements TypeInterface
             );
         }
 
-        $discriminator = $this->metadata->findDiscriminator();
+        $discriminator = $this->metadata->discriminator;
 
         if ($discriminator !== null) {
             return $this->castOverDiscriminator($discriminator, $value, $context);

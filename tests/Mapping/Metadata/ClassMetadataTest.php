@@ -25,8 +25,7 @@ final class ClassMetadataTest extends MetadataTestCase
         self::assertTrue($m->hasProperty('b'));
         self::assertSame($propA, $m->findProperty('a'));
         self::assertSame($propB, $m->findProperty('b'));
-        self::assertTrue($m->hasDiscriminator());
-        self::assertSame($disc, $m->findDiscriminator());
+        self::assertSame($disc, $m->discriminator);
         self::assertSame(777, $m->getTimestamp());
     }
 
@@ -83,17 +82,14 @@ final class ClassMetadataTest extends MetadataTestCase
     public function testDiscriminatorManagement(): void
     {
         $m = new ClassMetadata(\stdClass::class);
-        self::assertFalse($m->hasDiscriminator());
-        self::assertNull($m->findDiscriminator());
+        self::assertNull($m->discriminator);
 
         $disc = new DiscriminatorMapMetadata('kind');
-        $m->setDiscriminator($disc);
+        $m->discriminator = $disc;
 
-        self::assertTrue($m->hasDiscriminator());
-        self::assertSame($disc, $m->findDiscriminator());
+        self::assertSame($disc, $m->discriminator);
 
-        $m->setDiscriminator(null);
-        self::assertFalse($m->hasDiscriminator());
-        self::assertNull($m->findDiscriminator());
+        $m->discriminator = null;
+        self::assertNull($m->discriminator);
     }
 }

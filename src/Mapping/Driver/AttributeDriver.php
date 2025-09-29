@@ -165,11 +165,11 @@ final class AttributeDriver extends LoadableDriver
                 );
             }
 
-            $class->setDiscriminator(new DiscriminatorMapMetadata(
+            $class->discriminator = new DiscriminatorMapMetadata(
                 field: $attribute->field,
                 map: $mapping,
                 default: $default,
-            ));
+            );
         }
     }
 
