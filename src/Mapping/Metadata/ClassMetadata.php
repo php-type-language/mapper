@@ -53,6 +53,7 @@ final class ClassMetadata extends Metadata
         foreach ($properties as $property) {
             $this->addProperty($property);
         }
+
         $this->discriminator = $discriminator;
     }
 

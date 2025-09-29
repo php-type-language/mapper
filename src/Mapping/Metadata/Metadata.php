@@ -13,15 +13,16 @@ abstract class Metadata
         $this->timestamp = $createdAt ?? $this->getCurrentTimestamp();
     }
 
+    private function now(): \DateTimeInterface
+    {
+        return new \DateTimeImmutable();
+    }
+
     private function getCurrentTimestamp(): int
     {
-        try {
-            $date = new \DateTimeImmutable();
+        $date = $this->now();
 
-            return $date->getTimestamp();
-        } catch (\Throwable) {
-            return 0;
-        }
+        return $date->getTimestamp();
     }
 
     /**
