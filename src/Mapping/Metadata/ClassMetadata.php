@@ -25,12 +25,18 @@ final class ClassMetadata extends Metadata
     private array $properties = [];
 
     /**
-     * Contains a {@see bool} flag that is responsible for converting the
-     * object into an associative {@see array} during normalization.
+     * Gets information about the normalization method of an object.
      *
-     * If {@see null}, then the system setting should be used.
+     * - Contains {@see true} if the object should be normalized as
+     *   an associative {@see array}.
+     *
+     * - Contains {@see false} if the object should be normalized as an
+     *   anonymous {@see object}.
+     *
+     * - Contains {@see null} if the system settings for this option
+     *   should be used.
      */
-    private ?bool $isNormalizeAsArray = null;
+    public ?bool $isNormalizeAsArray = null;
 
     /**
      * Contains a {@see DiscriminatorMapMetadata} instance in case of class-like
@@ -91,35 +97,6 @@ final class ClassMetadata extends Metadata
         }
 
         return new NamedTypeNode($this->name, fields: new FieldsListNode($fields));
-    }
-
-    /**
-     * Returns information about the normalization method of an object.
-     *
-     * - Returns {@see true} if the object should be normalized as
-     *   an associative {@see array}.
-     *
-     * - Returns {@see false} if the object should be normalized as an
-     *   anonymous {@see object}.
-     *
-     * - Returns {@see null} if the system settings for this option
-     *   should be used.
-     *
-     * @api
-     */
-    public function isNormalizeAsArray(): ?bool
-    {
-        return $this->isNormalizeAsArray;
-    }
-
-    /**
-     * Forces the object normalization option.
-     *
-     * @api
-     */
-    public function shouldNormalizeAsArray(?bool $enabled = null): void
-    {
-        $this->isNormalizeAsArray = $enabled;
     }
 
     /**

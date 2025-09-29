@@ -108,7 +108,7 @@ abstract class ArrayConfigDriver extends LoadableDriver
             // @phpstan-ignore-next-line : Additional DbC invariant
             assert(\is_bool($classConfig['normalize_as_array']));
 
-            $class->shouldNormalizeAsArray($classConfig['normalize_as_array']);
+            $class->isNormalizeAsArray = $classConfig['normalize_as_array'];
         }
 
         // ---------------------------------------------------------------------

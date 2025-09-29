@@ -62,7 +62,7 @@ class ClassTypeNormalizer implements TypeInterface
 
         $result = $this->normalizeObject($value, $entrance);
 
-        if ($this->metadata->isNormalizeAsArray() ?? $context->isObjectsAsArrays()) {
+        if ($this->metadata->isNormalizeAsArray ?? $context->isObjectsAsArrays()) {
             return $result;
         }
 

@@ -84,7 +84,7 @@ final class AttributeDriver extends LoadableDriver
         $attribute = $this->findClassAttribute($reflection, NormalizeAsArray::class);
 
         if ($attribute !== null) {
-            $class->shouldNormalizeAsArray($attribute->enabled);
+            $class->isNormalizeAsArray = $attribute->enabled;
         }
 
         foreach ($reflection->getProperties() as $property) {

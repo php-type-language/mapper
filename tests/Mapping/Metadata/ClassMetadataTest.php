@@ -39,13 +39,16 @@ final class ClassMetadataTest extends MetadataTestCase
     public function testNormalizeAsArrayFlag(): void
     {
         $m = new ClassMetadata(\stdClass::class);
-        self::assertNull($m->isNormalizeAsArray());
-        $m->shouldNormalizeAsArray(true);
-        self::assertTrue($m->isNormalizeAsArray());
-        $m->shouldNormalizeAsArray(false);
-        self::assertFalse($m->isNormalizeAsArray());
-        $m->shouldNormalizeAsArray(null);
-        self::assertNull($m->isNormalizeAsArray());
+        self::assertNull($m->isNormalizeAsArray);
+
+        $m->isNormalizeAsArray = true;
+        self::assertTrue($m->isNormalizeAsArray);
+
+        $m->isNormalizeAsArray = false;
+        self::assertFalse($m->isNormalizeAsArray);
+
+        $m->isNormalizeAsArray = null;
+        self::assertNull($m->isNormalizeAsArray);
     }
 
     public function testAddAndGetProperties(): void
