@@ -22,6 +22,7 @@ final class JsonValuePrinter implements ValuePrinterInterface
 
     /**
      * @param int<0, max> $depth
+     *
      * @return non-empty-string
      */
     private function printMixed(mixed $value, int $depth): string
@@ -61,6 +62,7 @@ final class JsonValuePrinter implements ValuePrinterInterface
 
     /**
      * @param resource $resource
+     *
      * @return non-empty-string
      */
     private function printResource(mixed $resource): string
@@ -116,6 +118,7 @@ final class JsonValuePrinter implements ValuePrinterInterface
 
     /**
      * @param int<0, max> $depth
+     *
      * @return non-empty-string
      */
     private function printBackedEnum(\BackedEnum $case, int $depth): string
