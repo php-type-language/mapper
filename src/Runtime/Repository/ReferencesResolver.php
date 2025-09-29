@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository;
 
-use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use TypeLang\Mapper\Mapping\Metadata\MatchConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Type\IntType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 #[CoversClass(PropertyMetadata::class)]
@@ -26,7 +26,7 @@ final class PropertyMetadataTest extends MetadataTestCase
 
     public function testTypeInfo(): void
     {
-        $type = new IntType();
+        $type = $this->createMock(TypeInterface::class);
         $stmt = new NamedTypeNode('int');
         $tm = new TypeMetadata($type, $stmt);
 
@@ -46,8 +46,18 @@ final class PropertyMetadataTest extends MetadataTestCase
     public function testSkipConditions(): void
     {
         $m = new PropertyMetadata('x');
-        $condA = new class () extends MatchConditionMetadata { public function match(object $object, mixed $value): bool { return true; } };
-        $condB = new class () extends MatchConditionMetadata { public function match(object $object, mixed $value): bool { return false; } };
+        $condA = new class extends MatchConditionMetadata {
+            public function match(object $object, mixed $value): bool
+            {
+                return true;
+            }
+        };
+        $condB = new class extends MatchConditionMetadata {
+            public function match(object $object, mixed $value): bool
+            {
+                return false;
+            }
+        };
         $m->addSkipCondition($condA);
         $m->addSkipCondition($condB);
 
@@ -71,5 +81,3 @@ final class PropertyMetadataTest extends MetadataTestCase
         self::assertNull($m->findDefaultValue());
     }
 }
-
-

@@ -24,5 +24,3 @@ final class EmptyConditionMetadataTest extends MetadataTestCase
         self::assertFalse($cond->match(new \stdClass(), [1]));
     }
 }
-
-

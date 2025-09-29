@@ -8,7 +8,6 @@ interface TypeExtractorInterface
 {
     /**
      * @return non-empty-string
-     *
      * @throws \Throwable in case of any internal error occurs
      */
     public function getDefinitionByValue(mixed $value): string;

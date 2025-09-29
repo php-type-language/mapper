@@ -33,6 +33,7 @@ final class InMemoryTypeParser implements TypeParserInterface
 
     /**
      * @param non-empty-string $definition
+     *
      * @return non-empty-string
      */
     private function keyOf(string $definition): string

@@ -12,7 +12,13 @@ final class MatchConditionMetadataTest extends MetadataTestCase
 {
     public function testAbstractContract(): void
     {
-        $impl = new class () extends MatchConditionMetadata { public function match(object $object, mixed $value): bool { return $value === 1; } };
+        $impl = new class extends MatchConditionMetadata {
+            public function match(object $object, mixed $value): bool
+            {
+                return $value === 1;
+            }
+        };
+
         self::assertTrue($impl->match(new \stdClass(), 1));
         self::assertFalse($impl->match(new \stdClass(), 2));
     }
@@ -20,15 +26,20 @@ final class MatchConditionMetadataTest extends MetadataTestCase
     public function testTimestampInheritance(): void
     {
         $impl = new class (123) extends MatchConditionMetadata {
-            public function match(object $object, mixed $value): bool { return true; }
+            public function match(object $object, mixed $value): bool
+            {
+                return true;
+            }
         };
+
         self::assertSame(123, $impl->getTimestamp());
     }
 
     public function testMatchWithDifferentObjects(): void
     {
-        $impl = new class () extends MatchConditionMetadata {
-            public function match(object $object, mixed $value): bool {
+        $impl = new class extends MatchConditionMetadata {
+            public function match(object $object, mixed $value): bool
+            {
                 return $object instanceof \stdClass && $value === 'test';
             }
         };
@@ -38,5 +49,3 @@ final class MatchConditionMetadataTest extends MetadataTestCase
         self::assertFalse($impl->match(new \DateTime(), 'test'));
     }
 }
-
-

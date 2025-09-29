@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 use PHPUnit\Framework\Attributes\CoversClass;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Type\IntType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 #[CoversClass(DiscriminatorMapMetadata::class)]
@@ -25,7 +25,7 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
 
     public function testAddAndFindType(): void
     {
-        $type = new IntType();
+        $type = $this->createMock(TypeInterface::class);
         $stmt = new NamedTypeNode('int');
         $tm = new TypeMetadata($type, $stmt);
 
@@ -39,7 +39,7 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
 
     public function testDefaultType(): void
     {
-        $type = new IntType();
+        $type = $this->createMock(TypeInterface::class);
         $stmt = new NamedTypeNode('int');
         $tm = new TypeMetadata($type, $stmt);
 
@@ -51,5 +51,3 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
         self::assertNull($m->getDefaultType());
     }
 }
-
-

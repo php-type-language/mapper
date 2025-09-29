@@ -94,5 +94,3 @@ final class ClassMetadataTest extends MetadataTestCase
         self::assertNull($m->findDiscriminator());
     }
 }
-
-
