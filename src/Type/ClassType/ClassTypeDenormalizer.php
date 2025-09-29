@@ -136,7 +136,7 @@ class ClassTypeDenormalizer implements TypeInterface
         $default = $map->getDefaultType()
             ?->type;
 
-        $field = $map->getField();
+        $field = $map->field;
 
         // In case of discriminator field is missing
         if (!\array_key_exists($field, $value)) {

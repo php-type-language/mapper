@@ -15,9 +15,11 @@ final class DiscriminatorMapMetadata extends Metadata
 {
     public function __construct(
         /**
+         * Gets discriminator field name.
+         *
          * @var non-empty-string
          */
-        private readonly string $field,
+        public readonly string $field,
         /**
          * @var array<non-empty-string, TypeMetadata>
          */
@@ -71,18 +73,6 @@ final class DiscriminatorMapMetadata extends Metadata
     public function getMapping(): array
     {
         return $this->map;
-    }
-
-    /**
-     * Returns discriminator field name.
-     *
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getField(): string
-    {
-        return $this->field;
     }
 
     /**

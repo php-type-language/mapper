@@ -16,7 +16,7 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
     public function testBasics(): void
     {
         $m = new DiscriminatorMapMetadata('kind');
-        self::assertSame('kind', $m->getField());
+        self::assertSame('kind', $m->field);
         self::assertSame([], $m->getMapping());
         self::assertNull($m->getDefaultType());
         self::assertFalse($m->hasType('x'));
