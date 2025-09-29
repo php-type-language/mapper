@@ -113,7 +113,7 @@ class ClassTypeDenormalizer implements TypeInterface
             return $this->castOverDiscriminator($discriminator, $value, $context);
         }
 
-        $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter($value, new ObjectEntry($this->metadata->name));
 
         $instance = $this->instantiator->instantiate($this->metadata, $context);
 

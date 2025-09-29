@@ -132,7 +132,7 @@ final class DocBlockDriver extends LoadableDriver
                     $type = $types->getTypeByStatement($statement, $reflection);
                 } catch (TypeNotFoundException $e) {
                     throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                        class: $class->getName(),
+                        class: $class->name,
                         property: $metadata->getName(),
                         type: $e->getType(),
                         previous: $e,

@@ -30,7 +30,7 @@ final class ClassMetadata extends Metadata
      *
      * If {@see null}, then the system setting should be used.
      */
-    private ?bool $normalizeAsArray = null;
+    private ?bool $isNormalizeAsArray = null;
 
     /**
      * Contains a {@see DiscriminatorMapMetadata} instance in case of class-like
@@ -39,11 +39,15 @@ final class ClassMetadata extends Metadata
     private ?DiscriminatorMapMetadata $discriminator;
 
     /**
-     * @param class-string<T> $name
      * @param iterable<array-key, PropertyMetadata> $properties
      */
     public function __construct(
-        private readonly string $name,
+        /**
+         * Gets full qualified class name.
+         *
+         * @var class-string<T>
+         */
+        public readonly string $name,
         iterable $properties = [],
         ?DiscriminatorMapMetadata $discriminator = null,
         ?int $createdAt = null,
@@ -67,7 +71,7 @@ final class ClassMetadata extends Metadata
     public function getTypeStatement(Context $context): TypeStatement
     {
         if (!$context->isDetailedTypes()) {
-            return new NamedTypeNode($this->getName());
+            return new NamedTypeNode($this->name);
         }
 
         $fields = [];
@@ -83,20 +87,10 @@ final class ClassMetadata extends Metadata
         }
 
         if ($fields === []) {
-            return new NamedTypeNode($this->getName());
+            return new NamedTypeNode($this->name);
         }
 
-        return new NamedTypeNode($this->getName(), fields: new FieldsListNode($fields));
-    }
-
-    /**
-     * Returns full qualified class name.
-     *
-     * @return class-string<T>
-     */
-    public function getName(): string
-    {
-        return $this->name;
+        return new NamedTypeNode($this->name, fields: new FieldsListNode($fields));
     }
 
     /**
@@ -115,7 +109,7 @@ final class ClassMetadata extends Metadata
      */
     public function isNormalizeAsArray(): ?bool
     {
-        return $this->normalizeAsArray;
+        return $this->isNormalizeAsArray;
     }
 
     /**
@@ -125,7 +119,7 @@ final class ClassMetadata extends Metadata
      */
     public function shouldNormalizeAsArray(?bool $enabled = null): void
     {
-        $this->normalizeAsArray = $enabled;
+        $this->isNormalizeAsArray = $enabled;
     }
 
     /**

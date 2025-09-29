@@ -20,7 +20,7 @@ final class ClassMetadataTest extends MetadataTestCase
 
         $m = new ClassMetadata(\stdClass::class, [$propA, $propB], $disc, 777);
 
-        self::assertSame(\stdClass::class, $m->getName());
+        self::assertSame(\stdClass::class, $m->name);
         self::assertTrue($m->hasProperty('a'));
         self::assertTrue($m->hasProperty('b'));
         self::assertSame($propA, $m->findProperty('a'));
@@ -33,7 +33,7 @@ final class ClassMetadataTest extends MetadataTestCase
     public function testNameGetter(): void
     {
         $m = new ClassMetadata(\stdClass::class);
-        self::assertSame(\stdClass::class, $m->getName());
+        self::assertSame(\stdClass::class, $m->name);
     }
 
     public function testNormalizeAsArrayFlag(): void

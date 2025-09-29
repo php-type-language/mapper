@@ -29,7 +29,7 @@ class ClassTypeNormalizer implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        $class = $this->metadata->getName();
+        $class = $this->metadata->name;
 
         return $value instanceof $class;
     }
@@ -41,7 +41,7 @@ class ClassTypeNormalizer implements TypeInterface
      */
     public function cast(mixed $value, Context $context): object|array
     {
-        $className = $this->metadata->getName();
+        $className = $this->metadata->name;
 
         if (!$value instanceof $className) {
             throw InvalidValueOfTypeException::createFromContext(
@@ -58,7 +58,7 @@ class ClassTypeNormalizer implements TypeInterface
                 ->cast($value, $context);
         }
 
-        $entrance = $context->enter($value, new ObjectEntry($this->metadata->getName()));
+        $entrance = $context->enter($value, new ObjectEntry($this->metadata->name));
 
         $result = $this->normalizeObject($value, $entrance);
 

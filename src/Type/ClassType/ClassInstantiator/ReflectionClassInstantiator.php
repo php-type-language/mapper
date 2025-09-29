@@ -12,7 +12,7 @@ final class ReflectionClassInstantiator implements ClassInstantiatorInterface
 {
     public function instantiate(ClassMetadata $class, Context $context): object
     {
-        $reflection = new \ReflectionClass($class->getName());
+        $reflection = new \ReflectionClass($class->name);
 
         if (!$reflection->isInstantiable()) {
             throw NonInstantiatableObjectException::createFromContext(
