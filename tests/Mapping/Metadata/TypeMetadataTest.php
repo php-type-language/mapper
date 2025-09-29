@@ -18,8 +18,8 @@ final class TypeMetadataTest extends MetadataTestCase
         $stmt = new NamedTypeNode('int');
         $m = new TypeMetadata($type, $stmt, 1);
 
-        self::assertSame($type, $m->getType());
-        self::assertSame($stmt, $m->getTypeStatement());
+        self::assertSame($type, $m->type);
+        self::assertSame($stmt, $m->statement);
         self::assertSame(1, $m->getTimestamp());
     }
 }

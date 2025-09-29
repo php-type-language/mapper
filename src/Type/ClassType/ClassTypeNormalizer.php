@@ -99,7 +99,7 @@ class ClassTypeNormalizer implements TypeInterface
 
             // Fetch field type
             $info = $meta->findTypeInfo();
-            $type = $info !== null ? $info->getType() : $context->getTypeByDefinition('mixed');
+            $type = $info !== null ? $info->type : $context->getTypeByDefinition('mixed');
 
             try {
                 // Insert field value into result

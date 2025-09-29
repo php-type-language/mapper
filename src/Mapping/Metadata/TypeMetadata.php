@@ -10,20 +10,16 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 final class TypeMetadata extends Metadata
 {
     public function __construct(
-        private readonly TypeInterface $type,
-        private readonly TypeStatement $statement,
+        /**
+         * Gets type reference.
+         */
+        public readonly TypeInterface $type,
+        /**
+         * Gets declarative type representation.
+         */
+        public readonly TypeStatement $statement,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
-    }
-
-    public function getType(): TypeInterface
-    {
-        return $this->type;
-    }
-
-    public function getTypeStatement(): TypeStatement
-    {
-        return $this->statement;
     }
 }

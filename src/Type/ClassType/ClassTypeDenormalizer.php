@@ -51,7 +51,7 @@ class ClassTypeDenormalizer implements TypeInterface
             return $context->getTypeByDefinition('mixed');
         }
 
-        return $info->getType();
+        return $info->type;
     }
 
     /**
@@ -134,7 +134,7 @@ class ClassTypeDenormalizer implements TypeInterface
     {
         // Default mapping type
         $default = $map->getDefaultType()
-            ?->getType();
+            ?->type;
 
         $field = $map->getField();
 
@@ -189,7 +189,7 @@ class ClassTypeDenormalizer implements TypeInterface
             );
         }
 
-        $mappingType = $mapping->getType();
+        $mappingType = $mapping->type;
 
         return $mappingType->cast($value, $context);
     }
