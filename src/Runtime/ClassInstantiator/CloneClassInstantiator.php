@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\ClassInstantiator;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Context;
-
 final class CloneClassInstantiator implements ClassInstantiatorInterface
 {
     /**
