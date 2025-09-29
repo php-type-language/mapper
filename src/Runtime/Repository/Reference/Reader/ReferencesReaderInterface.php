@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Repository\Reference;
+namespace TypeLang\Mapper\Runtime\Repository\Reference\Reader;
 
 interface ReferencesReaderInterface
 {

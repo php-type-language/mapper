@@ -19,7 +19,7 @@ use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;

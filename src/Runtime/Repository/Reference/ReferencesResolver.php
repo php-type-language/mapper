@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Repository;
+namespace TypeLang\Mapper\Runtime\Repository\Reference;
 
-use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
+use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;
