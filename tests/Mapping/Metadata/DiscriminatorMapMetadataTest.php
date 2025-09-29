@@ -18,7 +18,7 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
         $m = new DiscriminatorMapMetadata('kind');
         self::assertSame('kind', $m->field);
         self::assertSame([], $m->getMapping());
-        self::assertNull($m->getDefaultType());
+        self::assertNull($m->default);
         self::assertFalse($m->hasType('x'));
         self::assertNull($m->findType('x'));
     }
@@ -44,10 +44,10 @@ final class DiscriminatorMapMetadataTest extends MetadataTestCase
         $tm = new TypeMetadata($type, $stmt);
 
         $m = new DiscriminatorMapMetadata('kind');
-        $m->setDefaultType($tm);
-        self::assertSame($tm, $m->getDefaultType());
+        $m->default = $tm;
+        self::assertSame($tm, $m->default);
 
-        $m->setDefaultType(null);
-        self::assertNull($m->getDefaultType());
+        $m->default = null;
+        self::assertNull($m->default);
     }
 }

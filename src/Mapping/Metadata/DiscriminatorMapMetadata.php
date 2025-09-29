@@ -24,7 +24,11 @@ final class DiscriminatorMapMetadata extends Metadata
          * @var array<non-empty-string, TypeMetadata>
          */
         private array $map = [],
-        private ?TypeMetadata $default = null,
+        /**
+         * Gets default mapping type for transformations that do not comply
+         * with the specified mapping rules defined in {@see getMapping()}.
+         */
+        public ?TypeMetadata $default = null,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -73,27 +77,6 @@ final class DiscriminatorMapMetadata extends Metadata
     public function getMapping(): array
     {
         return $this->map;
-    }
-
-    /**
-     * Returns default mapping type for transformations that do not comply
-     * with the specified mapping rules defined in {@see getMapping()}.
-     *
-     * @api
-     */
-    public function getDefaultType(): ?TypeMetadata
-    {
-        return $this->default;
-    }
-
-    /**
-     * Updates default mapping type.
-     *
-     * @api
-     */
-    public function setDefaultType(?TypeMetadata $type): void
-    {
-        $this->default = $type;
     }
 
     /**

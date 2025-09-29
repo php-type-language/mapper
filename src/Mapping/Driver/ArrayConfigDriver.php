@@ -159,12 +159,12 @@ abstract class ArrayConfigDriver extends LoadableDriver
             // @phpstan-ignore-next-line : Additional DbC invariant
             assert(\is_string($discriminatorConfig['otherwise']));
 
-            $discriminator->setDefaultType($this->createDiscriminatorType(
+            $discriminator->default = $this->createDiscriminatorType(
                 type: $discriminatorConfig['otherwise'],
                 class: $reflection,
                 types: $types,
                 parser: $parser,
-            ));
+            );
         }
 
         // ---------------------------------------------------------------------

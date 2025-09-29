@@ -133,8 +133,7 @@ class ClassTypeDenormalizer implements TypeInterface
     private function castOverDiscriminator(DiscriminatorMapMetadata $map, array $value, Context $context): mixed
     {
         // Default mapping type
-        $default = $map->getDefaultType()
-            ?->type;
+        $default = $map->default?->type;
 
         $field = $map->field;
 
