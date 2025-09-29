@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime;
 use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
-use TypeLang\Mapper\Runtime\Context\DirectionInterface;
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
@@ -24,12 +24,11 @@ abstract class Context implements
     PathProviderInterface,
     TypeExtractorInterface,
     TypeParserInterface,
-    TypeRepositoryInterface,
-    DirectionInterface
+    TypeRepositoryInterface
 {
     protected function __construct(
         protected readonly mixed $value,
-        protected readonly DirectionInterface $direction,
+        protected readonly Direction $direction,
         protected readonly TypeExtractorInterface $extractor,
         protected readonly TypeParserInterface $parser,
         protected readonly TypeRepositoryInterface $types,
@@ -83,14 +82,20 @@ abstract class Context implements
         return $this->config->getTracer();
     }
 
+    /**
+     * @api
+     */
     public function isNormalization(): bool
     {
-        return $this->direction->isNormalization();
+        return $this->direction === Direction::Normalize;
     }
 
+    /**
+     * @api
+     */
     public function isDenormalization(): bool
     {
-        return $this->direction->isDenormalization();
+        return $this->direction === Direction::Denormalize;
     }
 
     public function getPath(): PathInterface

@@ -19,7 +19,7 @@ final class ChildContext extends Context
         private readonly Context $parent,
         private readonly EntryInterface $entry,
         mixed $value,
-        DirectionInterface $direction,
+        Direction $direction,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
