@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Parser;
 
 use JetBrains\PhpStorm\Language;
+use TypeLang\Mapper\Runtime\Tracing\SpanInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -15,9 +16,14 @@ final class TraceableTypeParser implements TypeParserInterface
         private readonly TypeParserInterface $delegate,
     ) {}
 
+    private function start(string $definition): SpanInterface
+    {
+        return $this->tracer->start(\sprintf('Parse "%s"', $definition));
+    }
+
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        $span = $this->tracer->start(\sprintf('Parse "%s"', $definition));
+        $span = $this->start($definition);
 
         try {
             return $this->delegate->getStatementByDefinition($definition);

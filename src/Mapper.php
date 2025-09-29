@@ -10,37 +10,46 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
+use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
+use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
 use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
 use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacade;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
+use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
 use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacade;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
-    private readonly TypeRepositoryFacadeInterface $types;
+    private readonly TypeExtractorInterface $extractor;
 
-    private readonly TypeParserFacadeInterface $parser;
+    private readonly TypeParserInterface $parser;
+
+    private readonly TypeRepositoryInterface $types;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
     ) {
+        $this->extractor = $this->createTypeExtractor();
         $this->parser = $this->createTypeParser($platform);
         $this->types = $this->createTypeRepository($platform);
     }
 
-    private function createTypeParser(PlatformInterface $platform): TypeParserFacadeInterface
+    private function createTypeExtractor(): TypeExtractorInterface
     {
-        $runtime = TypeParser::createFromPlatform($platform);
+        return new NativeTypeExtractor();
+    }
+
+    private function createTypeParser(PlatformInterface $platform): TypeParserInterface
+    {
+        $runtime = TypeLangParser::createFromPlatform($platform);
 
         if (($tracer = $this->config->getTracer()) !== null) {
             $runtime = new TraceableTypeParser($tracer, $runtime);
@@ -50,18 +59,15 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             $runtime = new LoggableTypeParser($logger, $runtime);
         }
 
-        return new TypeParserFacade(new InMemoryTypeParser(
-            delegate: $runtime,
-        ));
+        return new InMemoryTypeParser($runtime);
     }
 
-    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryFacadeInterface
+    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
     {
-        $runtime = new InMemoryTypeRepository(
-            delegate: TypeRepository::createFromPlatform(
-                platform: $platform,
-                parser: $this->parser,
-            ),
+        $runtime = new TypeRepository(
+            parser: $this->parser,
+            platform: $platform,
+            references: new NativeReferencesReader(),
         );
 
         if (($tracer = $this->config->getTracer()) !== null) {
@@ -72,10 +78,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             $runtime = new LoggableTypeRepository($logger, $runtime);
         }
 
-        return new TypeRepositoryFacade(
-            parser: $this->parser,
-            runtime: $runtime,
-        );
+        return new InMemoryTypeRepository($runtime);
     }
 
     /**
@@ -89,13 +92,13 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     }
 
     /**
-     * Returns current types registry.
+     * Returns current types extractor.
      *
      * @api
      */
-    public function getTypes(): TypeRepositoryFacadeInterface
+    public function getExtractor(): TypeExtractorInterface
     {
-        return $this->types;
+        return $this->extractor;
     }
 
     /**
@@ -103,20 +106,33 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      *
      * @api
      */
-    public function getParser(): TypeParserFacadeInterface
+    public function getParser(): TypeParserInterface
     {
         return $this->parser;
     }
 
+    /**
+     * Returns current types registry.
+     *
+     * @api
+     */
+    public function getTypes(): TypeRepositoryInterface
+    {
+        return $this->types;
+    }
+
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
-        $instance = $type === null
-            ? $this->types->getTypeByValue($value)
-            : $this->types->getTypeByDefinition($type);
+        $type ??= $this->extractor->getDefinitionByValue($value);
+
+        $instance = $this->types->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
 
         return $instance->cast($value, RootContext::forNormalization(
             value: $value,
             config: $this->config,
+            extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
         ));
@@ -124,13 +140,16 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
     {
-        $instance = $type === null
-            ? $this->types->getTypeByValue($value)
-            : $this->types->getTypeByDefinition($type);
+        $type ??= $this->extractor->getDefinitionByValue($value);
+
+        $instance = $this->types->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
 
         return $instance->match($value, RootContext::forNormalization(
             value: $value,
             config: $this->config,
+            extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
         ));
@@ -138,11 +157,14 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
     {
-        $instance = $this->types->getTypeByDefinition($type);
+        $instance = $this->types->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
 
         return $instance->cast($value, RootContext::forDenormalization(
             value: $value,
             config: $this->config,
+            extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
         ));
@@ -150,11 +172,14 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
     {
-        $instance = $this->types->getTypeByDefinition($type);
+        $instance = $this->types->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
 
         return $instance->match($value, RootContext::forDenormalization(
             value: $value,
             config: $this->config,
+            extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
         ));
@@ -172,7 +197,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function getType(#[Language('PHP')] string $type): TypeInterface
     {
-        return $this->types->getTypeByDefinition($type);
+        return $this->types->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
     }
 
     /**
@@ -185,7 +212,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      */
     public function getTypeByValue(mixed $value): TypeInterface
     {
-        return $this->types->getTypeByValue($value);
+        $definition = $this->extractor->getDefinitionByValue($value);
+
+        return $this->getType($definition);
     }
 
     /**
@@ -207,6 +236,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             $class = $class::class;
         }
 
-        $this->types->getTypeByDefinition($class);
+        $this->getType($class);
     }
 }

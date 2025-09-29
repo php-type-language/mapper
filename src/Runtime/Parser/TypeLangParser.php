@@ -13,15 +13,12 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 use TypeLang\Parser\ParserInterface;
 
-final class TypeParser implements TypeParserInterface
+final class TypeLangParser implements TypeParserInterface
 {
     public function __construct(
         private readonly ParserInterface $parser,
     ) {}
 
-    /**
-     * TODO should me moved to an external factory class
-     */
     public static function createFromPlatform(PlatformInterface $platform): self
     {
         return new self(new Parser(

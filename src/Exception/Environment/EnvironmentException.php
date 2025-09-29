@@ -18,6 +18,7 @@ abstract class EnvironmentException extends \LogicException implements MapperExc
     {
         parent::__construct($template, $code, $previous);
 
+        /** @phpstan-ignore-next-line : Stringable is allowed to set in "message" */
         $this->message = $this->template = new Template($template, $this);
     }
 }

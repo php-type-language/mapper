@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Context\Provider;
 
-use TypeLang\Mapper\Runtime\Parser\TypeParser;
+use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacade;
 use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -46,7 +46,7 @@ final class TypeParserContext extends Context
         $platform = $this->from(PlatformContext::class)
             ->getCurrent();
 
-        return TypeParser::createFromPlatform($platform);
+        return TypeLangParser::createFromPlatform($platform);
     }
 
     /**

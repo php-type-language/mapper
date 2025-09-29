@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Runtime\Repository;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\Reference\NativeReferencesReader;
+use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesReaderInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -22,16 +24,16 @@ final class TypeRepository implements
 
     private TypeRepositoryInterface $context;
 
-    /**
-     * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
-     */
+    private readonly ReferencesResolver $references;
+
     public function __construct(
         private readonly TypeParserInterface $parser,
-        iterable $types = [],
-        private readonly ReferencesResolver $references = new ReferencesResolver(),
+        private readonly PlatformInterface $platform,
+        ReferencesReaderInterface $references = new NativeReferencesReader(),
     ) {
         $this->context = $this;
-        $this->builders = self::toArrayList($types);
+        $this->references = new ReferencesResolver($references);
+        $this->builders = self::toArrayList($this->platform->getTypes());
     }
 
     /**
@@ -54,21 +56,6 @@ final class TypeRepository implements
     public function setTypeRepository(TypeRepositoryInterface $parent): void
     {
         $this->context = $parent;
-    }
-
-    /**
-     * TODO should me moved to an external factory class
-     */
-    public static function createFromPlatform(
-        PlatformInterface $platform,
-        TypeParserInterface $parser,
-        ReferencesResolver $references = new ReferencesResolver(),
-    ): self {
-        return new self(
-            parser: $parser,
-            types: $platform->getTypes(),
-            references: $references,
-        );
     }
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface

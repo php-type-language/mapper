@@ -15,18 +15,34 @@ final class LoggableTypeParser implements TypeParserInterface
         private readonly TypeParserInterface $delegate,
     ) {}
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    /**
+     * @param non-empty-string $definition
+     */
+    private function before(string $definition): void
     {
         $this->logger->debug('Fetching an AST by "{definition}"', [
             'definition' => $definition,
         ]);
+    }
 
-        $statement = $this->delegate->getStatementByDefinition($definition);
-
+    /**
+     * @param non-empty-string $definition
+     */
+    private function after(string $definition, TypeStatement $statement): void
+    {
         $this->logger->info('AST was fetched by "{definition}"', [
             'definition' => $definition,
             'statement' => $statement,
         ]);
+    }
+
+    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
+    {
+        $this->before($definition);
+
+        $statement = $this->delegate->getStatementByDefinition($definition);
+
+        $this->after($definition, $statement);
 
         return $statement;
     }

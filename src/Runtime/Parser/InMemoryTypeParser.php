@@ -31,11 +31,20 @@ final class InMemoryTypeParser implements TypeParserInterface
         private readonly int $typesCleanupCount = 30,
     ) {}
 
+    /**
+     * @param non-empty-string $definition
+     * @return non-empty-string
+     */
+    private function keyOf(string $definition): string
+    {
+        return $definition;
+    }
+
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
         $this->cleanup();
 
-        return $this->types[$definition]
+        return $this->types[$this->keyOf($definition)]
             ??= $this->delegate->getStatementByDefinition($definition);
     }
 

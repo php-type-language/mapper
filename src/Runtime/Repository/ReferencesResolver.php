@@ -22,7 +22,7 @@ final class ReferencesResolver
     private readonly TypeResolver $typeResolver;
 
     public function __construct(
-        private readonly ReferencesReaderInterface $references = new NativeReferencesReader(),
+        private readonly ReferencesReaderInterface $references,
     ) {
         $this->typeResolver = new TypeResolver();
     }

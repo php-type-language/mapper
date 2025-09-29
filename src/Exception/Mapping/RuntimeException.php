@@ -23,6 +23,8 @@ abstract class RuntimeException extends \RuntimeException
         parent::__construct($template, $code, $previous);
 
         $this->path = clone $path;
+
+        /** @phpstan-ignore-next-line : Stringable is allowed to set in "message" */
         $this->message = $this->template = self::createTemplate(
             template: $template,
             context: $this,

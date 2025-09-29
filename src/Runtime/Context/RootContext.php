@@ -7,8 +7,9 @@ namespace TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
+use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 /**
  * @internal this is an internal library class, please do not use it in your code
@@ -19,8 +20,9 @@ final class RootContext extends Context
     public static function forNormalization(
         mixed $value,
         ConfigurationInterface $config,
-        TypeParserFacadeInterface $parser,
-        TypeRepositoryFacadeInterface $types,
+        TypeExtractorInterface $extractor,
+        TypeParserInterface $parser,
+        TypeRepositoryInterface $types,
     ): self {
         if ($config instanceof Configuration) {
             // Disable strict-types for denormalization if option is not set
@@ -34,8 +36,9 @@ final class RootContext extends Context
         return new self(
             value: $value,
             direction: Direction::Normalize,
-            types: $types,
+            extractor: $extractor,
             parser: $parser,
+            types: $types,
             config: $config,
         );
     }
@@ -43,8 +46,9 @@ final class RootContext extends Context
     public static function forDenormalization(
         mixed $value,
         ConfigurationInterface $config,
-        TypeParserFacadeInterface $parser,
-        TypeRepositoryFacadeInterface $types,
+        TypeExtractorInterface $extractor,
+        TypeParserInterface $parser,
+        TypeRepositoryInterface $types,
     ): self {
         if ($config instanceof Configuration) {
             // Enable strict-types for normalization if option is not set
@@ -58,8 +62,9 @@ final class RootContext extends Context
         return new self(
             value: $value,
             direction: Direction::Denormalize,
-            types: $types,
+            extractor: $extractor,
             parser: $parser,
+            types: $types,
             config: $config,
         );
     }

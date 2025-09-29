@@ -8,28 +8,31 @@ use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Context\ChildContext;
 use TypeLang\Mapper\Runtime\Context\DirectionInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserFacadeInterface;
+use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryFacadeInterface;
+use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
-    TypeRepositoryFacadeInterface,
     ConfigurationInterface,
     PathProviderInterface,
-    TypeParserFacadeInterface,
+    TypeExtractorInterface,
+    TypeParserInterface,
+    TypeRepositoryInterface,
     DirectionInterface
 {
     protected function __construct(
         protected readonly mixed $value,
         protected readonly DirectionInterface $direction,
-        protected readonly TypeRepositoryFacadeInterface $types,
-        protected readonly TypeParserFacadeInterface $parser,
+        protected readonly TypeExtractorInterface $extractor,
+        protected readonly TypeParserInterface $parser,
+        protected readonly TypeRepositoryInterface $types,
         protected readonly ConfigurationInterface $config,
     ) {}
 
@@ -43,8 +46,9 @@ abstract class Context implements
             entry: $entry,
             value: $value,
             direction: $this->direction,
-            types: $this->types,
+            extractor: $this->extractor,
             parser: $this->parser,
+            types: $this->types,
             config: $this->config,
         );
     }
@@ -94,16 +98,6 @@ abstract class Context implements
         return new Path();
     }
 
-    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
-    {
-        return $this->types->getTypeByDefinition($definition, $context);
-    }
-
-    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
-    {
-        return $this->types->getTypeByValue($value, $context);
-    }
-
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {
         return $this->types->getTypeByStatement($statement, $context);
@@ -114,8 +108,45 @@ abstract class Context implements
         return $this->parser->getStatementByDefinition($definition);
     }
 
+    /**
+     * @param non-empty-string $definition
+     * @param \ReflectionClass<object>|null $context
+     *
+     * @throws \Throwable
+     */
+    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
+    {
+        return $this->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($definition),
+            context: $context,
+        );
+    }
+
+    public function getDefinitionByValue(mixed $value): string
+    {
+        return $this->extractor->getDefinitionByValue($value);
+    }
+
+    /**
+     * @throws \Throwable
+     */
     public function getStatementByValue(mixed $value): TypeStatement
     {
-        return $this->parser->getStatementByValue($value);
+        return $this->parser->getStatementByDefinition(
+            definition: $this->getDefinitionByValue($value),
+        );
+    }
+
+    /**
+     * @param \ReflectionClass<object>|null $context
+     *
+     * @throws \Throwable
+     */
+    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    {
+        return $this->types->getTypeByStatement(
+            statement: $this->getStatementByValue($value),
+            context: $context,
+        );
     }
 }
