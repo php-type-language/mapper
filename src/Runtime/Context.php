@@ -11,9 +11,7 @@ use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Runtime\Path\Path;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Mapper\Runtime\Path\PathProviderInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -21,7 +19,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
     ConfigurationInterface,
-    PathProviderInterface,
     TypeExtractorInterface,
     TypeParserInterface,
     TypeRepositoryInterface
@@ -98,10 +95,7 @@ abstract class Context implements
         return $this->direction === Direction::Denormalize;
     }
 
-    public function getPath(): PathInterface
-    {
-        return new Path();
-    }
+    abstract public function getPath(): PathInterface;
 
     public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
     {

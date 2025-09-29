@@ -9,6 +9,8 @@ use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
+use TypeLang\Mapper\Runtime\Path\Path;
+use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 /**
@@ -17,6 +19,8 @@ use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
  */
 final class RootContext extends Context
 {
+    private PathInterface $path;
+
     public static function forNormalization(
         mixed $value,
         ConfigurationInterface $config,
@@ -67,5 +71,10 @@ final class RootContext extends Context
             types: $types,
             config: $config,
         );
+    }
+
+    public function getPath(): PathInterface
+    {
+        return $this->path ??= new Path();
     }
 }

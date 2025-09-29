@@ -9,13 +9,13 @@ use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
 /**
  * @template-implements \IteratorAggregate<array-key, EntryInterface>
  */
-class Path implements PathInterface, \IteratorAggregate
+final class Path implements PathInterface, \IteratorAggregate
 {
     public function __construct(
         /**
          * @var list<EntryInterface>
          */
-        protected array $entries = [],
+        protected readonly array $entries = [],
     ) {}
 
     public function getIterator(): \Traversable
