@@ -108,7 +108,7 @@ final class ClassMetadata extends Metadata
      */
     public function addProperty(PropertyMetadata $property): void
     {
-        $this->properties[$property->getName()] = $property;
+        $this->properties[$property->name] = $property;
     }
 
     /**

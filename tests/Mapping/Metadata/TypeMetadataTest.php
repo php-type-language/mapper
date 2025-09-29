@@ -20,6 +20,6 @@ final class TypeMetadataTest extends MetadataTestCase
 
         self::assertSame($type, $m->type);
         self::assertSame($stmt, $m->statement);
-        self::assertSame(1, $m->getTimestamp());
+        self::assertSame(1, $m->timestamp);
     }
 }

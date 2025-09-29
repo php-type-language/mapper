@@ -6,7 +6,10 @@ namespace TypeLang\Mapper\Mapping\Metadata;
 
 abstract class Metadata
 {
-    private readonly int $timestamp;
+    /**
+     * Gets the metadata creation timestamp in seconds.
+     */
+    public readonly int $timestamp;
 
     public function __construct(?int $createdAt = null)
     {
@@ -23,15 +26,5 @@ abstract class Metadata
         $date = $this->now();
 
         return $date->getTimestamp();
-    }
-
-    /**
-     * Returns the metadata creation timestamp in seconds.
-     *
-     * @api
-     */
-    public function getTimestamp(): int
-    {
-        return $this->timestamp;
     }
 }

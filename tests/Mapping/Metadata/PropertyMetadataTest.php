@@ -17,11 +17,11 @@ final class PropertyMetadataTest extends MetadataTestCase
     public function testNames(): void
     {
         $m = new PropertyMetadata('export');
-        self::assertSame('export', $m->getExportName());
-        self::assertSame('export', $m->getName());
-        $m->setExportName('pub');
-        self::assertSame('pub', $m->getExportName());
-        self::assertSame('export', $m->getName());
+        self::assertSame('export', $m->alias);
+        self::assertSame('export', $m->name);
+        $m->alias = 'pub';
+        self::assertSame('pub', $m->alias);
+        self::assertSame('export', $m->name);
     }
 
     public function testTypeInfo(): void
@@ -31,16 +31,13 @@ final class PropertyMetadataTest extends MetadataTestCase
         $tm = new TypeMetadata($type, $stmt);
 
         $m = new PropertyMetadata('a');
-        self::assertFalse($m->hasTypeInfo());
-        self::assertNull($m->findTypeInfo());
+        self::assertNull($m->type);
 
-        $m->setTypeInfo($tm);
-        self::assertTrue($m->hasTypeInfo());
-        self::assertSame($tm, $m->findTypeInfo());
+        $m->type = $tm;
+        self::assertSame($tm, $m->type);
 
-        $m->removeTypeInfo();
-        self::assertFalse($m->hasTypeInfo());
-        self::assertNull($m->findTypeInfo());
+        $m->type = null;
+        self::assertNull($m->type);
     }
 
     public function testSkipConditions(): void

@@ -10,17 +10,17 @@ use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 final class Configuration implements ConfigurationInterface
 {
     /**
-     * Default value for {@see $objectsAsArrays} option.
+     * Default value for {@see $isObjectsAsArrays} option.
      */
     public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
 
     /**
-     * Default value for {@see $detailedTypes} option.
+     * Default value for {@see $isDetailedTypes} option.
      */
     public const DETAILED_TYPES_DEFAULT_VALUE = true;
 
     /**
-     * Default value for {@see $strictTypes} option.
+     * Default value for {@see $isStrictTypes} option.
      */
     public const STRICT_TYPES_DEFAULT_VALUE = true;
 
@@ -30,27 +30,30 @@ final class Configuration implements ConfigurationInterface
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        private ?bool $objectsAsArrays = null,
+        private ?bool $isObjectsAsArrays = null,
         /**
          * If this option contains {@see true}, then all composite types will
          * be displayed along with detailed fields/values.
          */
-        private ?bool $detailedTypes = null,
+        private ?bool $isDetailedTypes = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
          */
-        private ?bool $strictTypes = null,
+        private ?bool $isStrictTypes = null,
         /**
          * If this option contains {@see LoggerInterface}, then logger
-         * will be enabled. Otherwise logger will be disabled in case of
-         * argument contain {@see null}.
+         * will be enabled.
+         *
+         * Logger will be disabled in case of argument contain {@see null}.
          */
         private ?LoggerInterface $logger = null,
         /**
          * If this option contains {@see TracerInterface}, then an application
-         * tracing will be enabled using given tracer. Otherwise an application
-         * tracing will be disabled in case of argument contain {@see null}.
+         * tracing will be enabled using given tracer.
+         *
+         * An application tracing will be disabled in case of argument
+         * contain {@see null}.
          */
         private ?TracerInterface $tracer = null,
     ) {}
@@ -65,14 +68,14 @@ final class Configuration implements ConfigurationInterface
     public function withObjectsAsArrays(?bool $enabled = null): self
     {
         $self = clone $this;
-        $self->objectsAsArrays = $enabled;
+        $self->isObjectsAsArrays = $enabled;
 
         return $self;
     }
 
     public function isObjectsAsArrays(): bool
     {
-        return $this->objectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+        return $this->isObjectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
 
     /**
@@ -82,7 +85,7 @@ final class Configuration implements ConfigurationInterface
      */
     public function isObjectsAsArraysOptionDefined(): bool
     {
-        return $this->objectsAsArrays !== null;
+        return $this->isObjectsAsArrays !== null;
     }
 
     /**
@@ -95,14 +98,14 @@ final class Configuration implements ConfigurationInterface
     public function withDetailedTypes(?bool $enabled = null): self
     {
         $self = clone $this;
-        $self->detailedTypes = $enabled;
+        $self->isDetailedTypes = $enabled;
 
         return $self;
     }
 
     public function isDetailedTypes(): bool
     {
-        return $this->detailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
+        return $this->isDetailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
     }
 
     /**
@@ -112,7 +115,7 @@ final class Configuration implements ConfigurationInterface
      */
     public function isDetailedTypesOptionDefined(): bool
     {
-        return $this->detailedTypes !== null;
+        return $this->isDetailedTypes !== null;
     }
 
     /**
@@ -125,14 +128,14 @@ final class Configuration implements ConfigurationInterface
     public function withStrictTypes(?bool $enabled = null): self
     {
         $self = clone $this;
-        $self->strictTypes = $enabled;
+        $self->isStrictTypes = $enabled;
 
         return $self;
     }
 
     public function isStrictTypesEnabled(): bool
     {
-        return $this->strictTypes ?? self::STRICT_TYPES_DEFAULT_VALUE;
+        return $this->isStrictTypes ?? self::STRICT_TYPES_DEFAULT_VALUE;
     }
 
     /**
@@ -142,7 +145,7 @@ final class Configuration implements ConfigurationInterface
      */
     public function isStrictTypesOptionDefined(): bool
     {
-        return $this->strictTypes !== null;
+        return $this->isStrictTypes !== null;
     }
 
     /**

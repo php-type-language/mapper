@@ -26,7 +26,7 @@ final class ClassMetadataTest extends MetadataTestCase
         self::assertSame($propA, $m->findProperty('a'));
         self::assertSame($propB, $m->findProperty('b'));
         self::assertSame($disc, $m->discriminator);
-        self::assertSame(777, $m->getTimestamp());
+        self::assertSame(777, $m->timestamp);
     }
 
     public function testNameGetter(): void

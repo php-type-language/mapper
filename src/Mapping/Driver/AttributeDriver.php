@@ -95,13 +95,14 @@ final class AttributeDriver extends LoadableDriver
             // -----------------------------------------------------------------
 
             $attribute = $this->findPropertyAttribute($property, MapType::class);
+
             if ($attribute !== null) {
-                $metadata->setTypeInfo($this->createPropertyType(
+                $metadata->type = $this->createPropertyType(
                     type: $attribute->type,
                     property: $property,
                     types: $types,
                     parser: $parser,
-                ));
+                );
             }
 
             // -----------------------------------------------------------------
@@ -109,8 +110,9 @@ final class AttributeDriver extends LoadableDriver
             // -----------------------------------------------------------------
 
             $attribute = $this->findPropertyAttribute($property, MapName::class);
+
             if ($attribute !== null) {
-                $metadata->setExportName($attribute->name);
+                $metadata->alias = $attribute->name;
             }
 
             // -----------------------------------------------------------------
@@ -118,21 +120,24 @@ final class AttributeDriver extends LoadableDriver
             // -----------------------------------------------------------------
 
             $conditions = $this->getAllPropertyAttributes($property, SkipWhen::class);
+
             foreach ($conditions as $condition) {
                 $metadata->addSkipCondition(new ExpressionConditionMetadata(
                     expression: $this->createExpression($condition->expr, [
                         $condition->context,
                     ]),
-                    context: $condition->context,
+                    variable: $condition->context,
                 ));
             }
 
             $condition = $this->findPropertyAttribute($property, SkipWhenEmpty::class);
+
             if ($condition !== null) {
                 $metadata->addSkipCondition(new EmptyConditionMetadata());
             }
 
             $condition = $this->findPropertyAttribute($property, SkipWhenNull::class);
+
             if ($condition !== null) {
                 $metadata->addSkipCondition(new NullConditionMetadata());
             }
@@ -143,6 +148,7 @@ final class AttributeDriver extends LoadableDriver
         // -----------------------------------------------------------------
 
         $attribute = $this->findClassAttribute($reflection, DiscriminatorMap::class);
+
         if ($attribute !== null) {
             $mapping = [];
             $default = null;

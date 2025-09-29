@@ -65,7 +65,7 @@ final class PromotedPropertyTypeDriver
     {
         return $tag instanceof ParamTag
             && $tag->getName() === $this->paramTagName
-            && $tag->getVariableName() === $meta->getName();
+            && $tag->getVariableName() === $meta->name;
     }
 
     /**

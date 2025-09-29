@@ -13,7 +13,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
      */
     private function getPropertyForGet(object $object, PropertyMetadata $meta): \ReflectionProperty
     {
-        return new \ReflectionProperty($object, $meta->getName());
+        return new \ReflectionProperty($object, $meta->name);
     }
 
     /**
@@ -21,11 +21,11 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
      */
     private function getPropertyForSet(object $object, PropertyMetadata $meta): \ReflectionProperty
     {
-        $property = new \ReflectionProperty($object, $meta->getName());
+        $property = new \ReflectionProperty($object, $meta->name);
 
         $context = $property->getDeclaringClass();
 
-        return $context->getProperty($meta->getName());
+        return $context->getProperty($meta->name);
     }
 
     public function getValue(object $object, PropertyMetadata $meta): mixed
@@ -41,7 +41,7 @@ final class ReflectionPropertyAccessor implements PropertyAccessorInterface
 
     public function isReadable(object $object, PropertyMetadata $meta): bool
     {
-        if (!\property_exists($object, $meta->getName())) {
+        if (!\property_exists($object, $meta->name)) {
             return false;
         }
 

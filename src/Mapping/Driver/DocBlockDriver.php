@@ -106,7 +106,7 @@ final class DocBlockDriver extends LoadableDriver
      */
     private function findType(\ReflectionClass $class, PropertyMetadata $meta): ?TypeStatement
     {
-        $property = $class->getProperty($meta->getName());
+        $property = $class->getProperty($meta->name);
 
         if ($property->isPromoted()) {
             return $this->promotedProperties->findType($property, $meta);
@@ -133,16 +133,16 @@ final class DocBlockDriver extends LoadableDriver
                 } catch (TypeNotFoundException $e) {
                     throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
                         class: $class->name,
-                        property: $metadata->getName(),
+                        property: $metadata->name,
                         type: $e->getType(),
                         previous: $e,
                     );
                 }
 
-                $metadata->setTypeInfo(new TypeMetadata(
+                $metadata->type = new TypeMetadata(
                     type: $type,
                     statement: $statement,
-                ));
+                );
             }
 
             $class->addProperty($metadata);

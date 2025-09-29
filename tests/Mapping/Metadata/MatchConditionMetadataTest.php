@@ -32,7 +32,7 @@ final class MatchConditionMetadataTest extends MetadataTestCase
             }
         };
 
-        self::assertSame(123, $impl->getTimestamp());
+        self::assertSame(123, $impl->timestamp);
     }
 
     public function testMatchWithDifferentObjects(): void

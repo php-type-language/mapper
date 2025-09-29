@@ -45,7 +45,7 @@ class ClassTypeDenormalizer implements TypeInterface
     private function getPropertyType(PropertyMetadata $meta, Context $context): TypeInterface
     {
         // Fetch field type
-        $info = $meta->findTypeInfo();
+        $info = $meta->type;
 
         if ($info === null) {
             return $context->getTypeByDefinition('mixed');
@@ -61,7 +61,7 @@ class ClassTypeDenormalizer implements TypeInterface
     {
         foreach ($this->metadata->getProperties() as $meta) {
             // Match property for existence
-            if (!\array_key_exists($meta->getExportName(), $payload)) {
+            if (!\array_key_exists($meta->alias, $payload)) {
                 // Skip all properties with defaults
                 if ($meta->hasDefaultValue()) {
                     continue;
@@ -72,7 +72,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
             // Fetch field value and type
             try {
-                $value = $payload[$meta->getExportName()];
+                $value = $payload[$meta->alias];
                 $type = $this->getPropertyType($meta, $context);
             } catch (\Throwable) {
                 return false;
@@ -203,7 +203,7 @@ class ClassTypeDenormalizer implements TypeInterface
     private function denormalizeObject(array $value, object $object, Context $context): void
     {
         foreach ($this->metadata->getProperties() as $meta) {
-            $entrance = $context->enter($value, new ObjectPropertyEntry($meta->getExportName()));
+            $entrance = $context->enter($value, new ObjectPropertyEntry($meta->alias));
 
             // Skip the property when not writable
             if (!$this->accessor->isWritable($object, $meta)) {
@@ -212,8 +212,8 @@ class ClassTypeDenormalizer implements TypeInterface
 
             switch (true) {
                 // In case of value has been passed
-                case \array_key_exists($meta->getExportName(), $value):
-                    $element = $value[$meta->getExportName()];
+                case \array_key_exists($meta->alias, $value):
+                    $element = $value[$meta->alias];
                     $type = $this->getPropertyType($meta, $context);
 
                     try {
@@ -223,7 +223,7 @@ class ClassTypeDenormalizer implements TypeInterface
                     } catch (\Throwable $e) {
                         throw InvalidObjectValueException::createFromContext(
                             element: $element,
-                            field: $meta->getExportName(),
+                            field: $meta->alias,
                             expected: $meta->getTypeStatement($entrance),
                             value: $value,
                             context: $entrance,
@@ -239,7 +239,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
                 default:
                     throw MissingRequiredObjectFieldException::createFromContext(
-                        field: $meta->getExportName(),
+                        field: $meta->alias,
                         expected: $meta->getTypeStatement($entrance),
                         value: $value,
                         context: $entrance,

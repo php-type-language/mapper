@@ -81,7 +81,7 @@ class ClassTypeNormalizer implements TypeInterface
         $result = [];
 
         foreach ($this->metadata->getProperties() as $meta) {
-            $entrance = $context->enter($object, new ObjectPropertyEntry($meta->getName()));
+            $entrance = $context->enter($object, new ObjectPropertyEntry($meta->name));
 
             // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta)) {
@@ -98,18 +98,18 @@ class ClassTypeNormalizer implements TypeInterface
             }
 
             // Fetch field type
-            $info = $meta->findTypeInfo();
+            $info = $meta->type;
             $type = $info !== null ? $info->type : $context->getTypeByDefinition('mixed');
 
             try {
                 // Insert field value into result
-                $result[$meta->getExportName()] = $type->cast($element, $entrance);
+                $result[$meta->alias] = $type->cast($element, $entrance);
             } catch (FinalExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
                 throw InvalidObjectValueException::createFromContext(
                     element: $element,
-                    field: $meta->getExportName(),
+                    field: $meta->alias,
                     expected: $meta->getTypeStatement($entrance),
                     value: $object,
                     context: $entrance,

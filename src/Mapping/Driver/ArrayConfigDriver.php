@@ -197,13 +197,13 @@ abstract class ArrayConfigDriver extends LoadableDriver
                 // @phpstan-ignore-next-line : Additional DbC invariant
                 assert(\is_string($propertyConfig['type']));
 
-                $metadata->setTypeInfo($this->createPropertyType(
+                $metadata->type = $this->createPropertyType(
                     class: $reflection,
                     propertyName: $propertyName,
                     propertyType: $propertyConfig['type'],
                     types: $types,
                     parser: $parser,
-                ));
+                );
             }
 
             // -----------------------------------------------------------------
@@ -215,7 +215,7 @@ abstract class ArrayConfigDriver extends LoadableDriver
                 // @phpstan-ignore-next-line : Additional DbC invariant
                 assert(\is_string($propertyConfig['name']));
 
-                $metadata->setExportName($propertyConfig['name']);
+                $metadata->alias = $propertyConfig['name'];
             }
 
             // -----------------------------------------------------------------
@@ -242,7 +242,7 @@ abstract class ArrayConfigDriver extends LoadableDriver
                             expression: $this->createExpression($propertyConfigSkip, [
                                 ExpressionConditionMetadata::DEFAULT_CONTEXT_VARIABLE_NAME,
                             ]),
-                            context: ExpressionConditionMetadata::DEFAULT_CONTEXT_VARIABLE_NAME,
+                            variable: ExpressionConditionMetadata::DEFAULT_CONTEXT_VARIABLE_NAME,
                         )
                     });
                 }

@@ -14,11 +14,16 @@ final class ExpressionConditionMetadata extends MatchConditionMetadata
     public const DEFAULT_CONTEXT_VARIABLE_NAME = 'this';
 
     /**
-     * @param non-empty-string $context
+     * @param non-empty-string $variable
      */
     public function __construct(
-        private readonly ParsedExpression $expression,
-        private readonly string $context = self::DEFAULT_CONTEXT_VARIABLE_NAME,
+        public readonly ParsedExpression $expression,
+        /**
+         * Gets expression variable name.
+         *
+         * @var non-empty-string
+         */
+        public readonly string $variable = self::DEFAULT_CONTEXT_VARIABLE_NAME,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
@@ -29,25 +34,7 @@ final class ExpressionConditionMetadata extends MatchConditionMetadata
         $nodes = $this->expression->getNodes();
 
         return (bool) $nodes->evaluate([], [
-            $this->getContextVariableName() => $object,
+            $this->variable => $object,
         ]);
-    }
-
-    /**
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getContextVariableName(): string
-    {
-        return $this->context;
-    }
-
-    /**
-     * @api
-     */
-    public function getExpression(): ParsedExpression
-    {
-        return $this->expression;
     }
 }

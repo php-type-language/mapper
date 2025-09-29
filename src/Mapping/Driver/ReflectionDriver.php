@@ -110,10 +110,10 @@ final class ReflectionDriver extends LoadableDriver
             );
         }
 
-        $meta->setTypeInfo(new TypeMetadata(
+        $meta->type = new TypeMetadata(
             type: $type,
             statement: $statement,
-        ));
+        );
     }
 
     /**

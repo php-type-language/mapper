@@ -24,9 +24,9 @@ final class ExpressionConditionMetadataTest extends MetadataTestCase
         $expr = $this->createParsedExpressionAlwaysTrue();
         $m = new ExpressionConditionMetadata($expr, 'ctx', 5);
 
-        self::assertSame($expr, $m->getExpression());
-        self::assertSame('ctx', $m->getContextVariableName());
-        self::assertSame(5, $m->getTimestamp());
+        self::assertSame($expr, $m->expression);
+        self::assertSame('ctx', $m->variable);
+        self::assertSame(5, $m->timestamp);
     }
 
     public function testMatchUsesExpressionNodesEvaluation(): void

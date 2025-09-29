@@ -13,7 +13,7 @@ class NullPropertyAccessor implements PropertyAccessorInterface
         throw new \LogicException(\sprintf(
             'The %s::$%s property is not readable',
             $object::class,
-            $meta->getName(),
+            $meta->name,
         ));
     }
 
@@ -27,7 +27,7 @@ class NullPropertyAccessor implements PropertyAccessorInterface
         throw new \LogicException(\sprintf(
             'The %s::$%s property is not writable',
             $object::class,
-            $meta->getName(),
+            $meta->name,
         ));
     }
 

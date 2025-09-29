@@ -12,9 +12,11 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 final class PropertyMetadata extends Metadata
 {
     /**
+     * Gets property public name.
+     *
      * @var non-empty-string
      */
-    private readonly string $name;
+    public string $alias;
 
     private mixed $defaultValue = null;
 
@@ -25,15 +27,20 @@ final class PropertyMetadata extends Metadata
      */
     private array $skipWhen = [];
 
-    /**
-     * @param non-empty-string $export
-     */
     public function __construct(
-        private string $export,
-        private ?TypeMetadata $type = null,
+        /**
+         * Gets property real name.
+         *
+         * @var non-empty-string
+         */
+        public readonly string $name,
+        /**
+         * Gets property type info.
+         */
+        public ?TypeMetadata $type = null,
         ?int $createdAt = null,
     ) {
-        $this->name = $this->export;
+        $this->alias = $this->name;
 
         parent::__construct($createdAt);
     }
@@ -45,7 +52,7 @@ final class PropertyMetadata extends Metadata
      */
     public function getTypeStatement(Context $context): ?TypeStatement
     {
-        $info = $this->findTypeInfo();
+        $info = $this->type;
 
         if ($info === null) {
             return null;
@@ -73,10 +80,10 @@ final class PropertyMetadata extends Metadata
             return null;
         }
 
-        $name = $this->getName();
+        $name = $this->name;
 
         if ($context->isDenormalization()) {
-            $name = $this->getExportName();
+            $name = $this->alias;
         }
 
         return new NamedFieldNode(
@@ -84,77 +91,6 @@ final class PropertyMetadata extends Metadata
             of: $statement,
             optional: $this->hasDefaultValue(),
         );
-    }
-
-    /**
-     * Returns property real name.
-     *
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @api
-     *
-     * @param non-empty-string $name
-     */
-    public function setExportName(string $name): void
-    {
-        $this->export = $name;
-    }
-
-    /**
-     * Returns property public name.
-     *
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getExportName(): string
-    {
-        return $this->export;
-    }
-
-    /**
-     * @api
-     */
-    public function setTypeInfo(TypeMetadata $type): void
-    {
-        $this->type = $type;
-    }
-
-    /**
-     * @api
-     */
-    public function removeTypeInfo(): void
-    {
-        $this->type = null;
-    }
-
-    /**
-     * @api
-     */
-    public function hasTypeInfo(): bool
-    {
-        return $this->type !== null;
-    }
-
-    /**
-     * Note: The prefix "find" is used to indicate that the {@see TypeMetadata}
-     *       definition may be optional and method may return {@see null}.
-     *       The prefix "get" is used when the value is forced to be obtained
-     *       and should throw an exception if the type definition is missing.
-     *
-     * @api
-     */
-    public function findTypeInfo(): ?TypeMetadata
-    {
-        return $this->type;
     }
 
     /**
