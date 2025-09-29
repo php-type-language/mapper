@@ -33,7 +33,7 @@ class ClassTypeDenormalizer implements TypeInterface
         protected readonly PropertyAccessorInterface $accessor,
         protected readonly ClassInstantiatorInterface $instantiator,
     ) {
-        $this->discriminator = new DiscriminatorTypeSelector();
+        $this->discriminator = new DiscriminatorTypeSelector($metadata);
     }
 
     public function match(mixed $value, Context $context): bool
@@ -110,7 +110,7 @@ class ClassTypeDenormalizer implements TypeInterface
             );
         }
 
-        $discriminator = $this->discriminator->select($this->metadata, $value, $context);
+        $discriminator = $this->discriminator->select($value, $context);
 
         if ($discriminator !== null) {
             return $discriminator->cast($value, $context);

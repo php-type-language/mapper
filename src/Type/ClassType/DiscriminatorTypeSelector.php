@@ -13,6 +13,10 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 final class DiscriminatorTypeSelector
 {
+    public function __construct(
+        private readonly ClassMetadata $meta,
+    ) {}
+
     /**
      * @param array<array-key, mixed> $value
      *
@@ -21,9 +25,9 @@ final class DiscriminatorTypeSelector
      * @throws RuntimeException in case of mapped type casting error occurs
      * @throws \Throwable in case of internal error occurs
      */
-    public function select(ClassMetadata $meta, mixed $value, Context $context): ?TypeInterface
+    public function select(mixed $value, Context $context): ?TypeInterface
     {
-        $map = $meta->discriminator;
+        $map = $this->meta->discriminator;
 
         if ($map === null) {
             return null;
