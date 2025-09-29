@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -84,11 +84,11 @@ class ClassTypeNormalizer implements TypeInterface
             $entrance = $context->enter($object, new ObjectPropertyEntry($meta->name));
 
             // Skip the property when not readable
-            if (!$this->accessor->isReadable($object, $meta)) {
+            if (!$this->accessor->isReadable($object, $meta->name)) {
                 continue;
             }
 
-            $element = $this->accessor->getValue($object, $meta);
+            $element = $this->accessor->getValue($object, $meta->name);
 
             // Skip the property when condition is matched
             foreach ($meta->getSkipConditions() as $condition) {

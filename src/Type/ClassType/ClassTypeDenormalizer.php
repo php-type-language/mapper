@@ -12,11 +12,11 @@ use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMapMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Type\ClassType\ClassInstantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Type\ClassType\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -206,7 +206,7 @@ class ClassTypeDenormalizer implements TypeInterface
             $entrance = $context->enter($value, new ObjectPropertyEntry($meta->alias));
 
             // Skip the property when not writable
-            if (!$this->accessor->isWritable($object, $meta)) {
+            if (!$this->accessor->isWritable($object, $meta->name)) {
                 continue;
             }
 
@@ -246,7 +246,7 @@ class ClassTypeDenormalizer implements TypeInterface
                     );
             }
 
-            $this->accessor->setValue($object, $meta, $element);
+            $this->accessor->setValue($object, $meta->name, $element);
         }
     }
 }
