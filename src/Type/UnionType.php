@@ -10,7 +10,6 @@ use TypeLang\Mapper\Runtime\Path\Entry\UnionLeafEntry;
 
 /**
  * @template T of mixed = mixed
- *
  * @template-implements TypeInterface<T>
  */
 class UnionType implements TypeInterface

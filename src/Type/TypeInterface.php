@@ -21,7 +21,6 @@ interface TypeInterface
 
     /**
      * @return T
-     *
      * @throws RuntimeException in case of known mapping issue
      * @throws \Throwable in case of internal error occurs
      */

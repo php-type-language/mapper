@@ -11,7 +11,6 @@ use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
 /**
  * @template T of mixed = mixed
- *
  * @template-implements TypeInterface<T>
  */
 class ListType implements TypeInterface
@@ -34,7 +33,6 @@ class ListType implements TypeInterface
 
     /**
      * @return list<T>
-     *
      * @throws InvalidValueException in case the value is incorrect
      * @throws InvalidIterableValueException in case the value of a certain element is incorrect
      * @throws \Throwable in case of internal error occurs
