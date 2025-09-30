@@ -6,9 +6,17 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template T of mixed = mixed
+ *
+ * @template-implements TypeInterface<T|null>
+ */
 class NullableType implements TypeInterface
 {
     public function __construct(
+        /**
+         * @var TypeInterface<T>
+         */
         private readonly TypeInterface $parent,
     ) {}
 

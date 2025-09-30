@@ -55,6 +55,8 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ArrayType {
+        assert($statement instanceof NamedTypeNode);
+
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];

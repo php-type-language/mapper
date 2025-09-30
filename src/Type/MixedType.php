@@ -6,6 +6,9 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template-implements TypeInterface<mixed>
+ */
 class MixedType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool

@@ -41,6 +41,8 @@ class NullTypeBuilder extends Builder
             return new NullType();
         }
 
+        assert($statement instanceof NamedTypeNode);
+
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 

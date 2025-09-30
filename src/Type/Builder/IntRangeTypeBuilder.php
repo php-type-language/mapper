@@ -35,6 +35,8 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): IntRangeType|IntType {
+        assert($statement instanceof NamedTypeNode);
+
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];

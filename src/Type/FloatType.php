@@ -7,11 +7,18 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template-implements TypeInterface<float|int>
+ */
 class FloatType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool
     {
-        return \is_float($value) || \is_int($value);
+        if ($context->isNormalization()) {
+            return \is_float($value) || \is_int($value);
+        }
+
+        return \is_float($value);
     }
 
     public function cast(mixed $value, Context $context): float

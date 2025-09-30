@@ -7,6 +7,9 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template-implements TypeInterface<string>
+ */
 class StringType implements TypeInterface
 {
     /** @var string */

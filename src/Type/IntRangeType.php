@@ -7,6 +7,9 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template-implements TypeInterface<int>
+ */
 class IntRangeType implements TypeInterface
 {
     public const DEFAULT_INT_MIN = \PHP_INT_MIN;

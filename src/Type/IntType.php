@@ -7,6 +7,9 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
+/**
+ * @template-implements TypeInterface<int>
+ */
 class IntType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool

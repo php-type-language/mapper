@@ -8,12 +8,17 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\UnionLeafEntry;
 
+/**
+ * @template T of mixed = mixed
+ *
+ * @template-implements TypeInterface<T>
+ */
 class UnionType implements TypeInterface
 {
-    /**
-     * @param non-empty-list<TypeInterface> $types
-     */
     public function __construct(
+        /**
+         * @var non-empty-list<TypeInterface<T>>
+         */
         private readonly array $types,
     ) {}
 

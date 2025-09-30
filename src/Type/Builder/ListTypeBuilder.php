@@ -48,6 +48,8 @@ class ListTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ListType {
+        assert($statement instanceof NamedTypeNode);
+
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];

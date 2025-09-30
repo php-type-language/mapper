@@ -9,15 +9,20 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
+/**
+ * @template T of mixed = mixed
+ *
+ * @template-implements TypeInterface<T>
+ */
 class ListType implements TypeInterface
 {
     public function __construct(
+        /**
+         * @var TypeInterface<T>
+         */
         protected readonly TypeInterface $value = new MixedType(),
     ) {}
 
-    /**
-     * @return ($value is iterable ? bool : false)
-     */
     public function match(mixed $value, Context $context): bool
     {
         if ($context->isDenormalization()) {
@@ -28,7 +33,8 @@ class ListType implements TypeInterface
     }
 
     /**
-     * @return list<mixed>
+     * @return list<T>
+     *
      * @throws InvalidValueException in case the value is incorrect
      * @throws InvalidIterableValueException in case the value of a certain element is incorrect
      * @throws \Throwable in case of internal error occurs

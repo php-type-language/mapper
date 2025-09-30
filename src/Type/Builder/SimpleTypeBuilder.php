@@ -9,6 +9,7 @@ use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedE
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
@@ -36,6 +37,8 @@ class SimpleTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeInterface {
+        assert($statement instanceof NamedTypeNode);
+
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
