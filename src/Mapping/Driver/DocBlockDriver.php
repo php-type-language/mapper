@@ -15,7 +15,8 @@ use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\TypePropertyDocBlockLoader;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\PHPDoc\Parser;
+use TypeLang\Parser\Parser;
+use TypeLang\PHPDoc\Parser as DocBlockParser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
 use TypeLang\PHPDoc\Tag\Factory\TagFactory;
@@ -61,28 +62,39 @@ final class DocBlockDriver extends LoadableDriver
         string $varTagName = self::DEFAULT_VAR_TAG_NAME,
         DriverInterface $delegate = new NullDriver(),
     ) {
-        self::assertKernelPackageIsInstalled();
-
-        $parser = new Parser(new TagFactory([
-            $paramTagName => new ParamTagFactory(),
-            $varTagName => new VarTagFactory(),
-        ]));
+        $docBlockParser = $this->createDocBlockParser($paramTagName, $varTagName);
 
         $this->varTags = new VarTagReader(
             varTagName: $varTagName,
-            parser: $parser,
+            parser: $docBlockParser,
         );
 
         $this->paramTags = new ParamTagReader(
             paramTagName: $paramTagName,
             varTag: $this->varTags,
-            parser: $parser,
+            parser: $docBlockParser,
         );
 
         $this->classDocBlockLoaders = $this->createClassLoaders();
         $this->propertyDocBlockLoaders = $this->createPropertyLoaders();
 
         parent::__construct($delegate);
+    }
+
+    /**
+     * @param non-empty-string $paramTagName
+     * @param non-empty-string $varTagName
+     */
+    private function createDocBlockParser(string $paramTagName, string $varTagName): DocBlockParser
+    {
+        self::assertKernelPackageIsInstalled();
+
+        $typeParser = new Parser(tolerant: true);
+
+        return new DocBlockParser(new TagFactory([
+            $paramTagName => new ParamTagFactory($typeParser),
+            $varTagName => new VarTagFactory($typeParser),
+        ]));
     }
 
     /**
@@ -112,24 +124,24 @@ final class DocBlockDriver extends LoadableDriver
      */
     private static function assertKernelPackageIsInstalled(): void
     {
-        if (!\class_exists(Parser::class)) {
+        if (!\class_exists(DocBlockParser::class)) {
             throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc',
-                purpose: 'docblock support'
+                purpose: 'docblock support',
             );
         }
 
         if (!\class_exists(ParamTagFactory::class)) {
             throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc-standard-tags',
-                purpose: '"@param" tag support'
+                purpose: '"@param" tag support',
             );
         }
 
         if (!\class_exists(VarTagFactory::class)) {
             throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'type-lang/phpdoc-standard-tags',
-                purpose: '"@var" tag support'
+                purpose: '"@var" tag support',
             );
         }
     }
