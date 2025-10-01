@@ -23,6 +23,25 @@ final class TypePropertyMetadataLoader extends PropertyMetadataLoader
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): void {
+        $this->loadPropertyType($property, $metadata, $types, $parser);
+
+        if (\PHP_VERSION_ID < 80400) {
+            return;
+        }
+
+        $this->loadReadHookType($property, $metadata, $types, $parser);
+        $this->loadWriteHookType($property, $metadata, $types, $parser);
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function loadPropertyType(
+        \ReflectionProperty $property,
+        PropertyMetadata $metadata,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): void {
         $attribute = $this->findPropertyAttribute($property, MapType::class);
 
         if ($attribute === null) {
@@ -30,6 +49,64 @@ final class TypePropertyMetadataLoader extends PropertyMetadataLoader
         }
 
         $metadata->read = $metadata->write = $this->createPropertyType(
+            type: $attribute->type,
+            property: $property,
+            types: $types,
+            parser: $parser,
+        );
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function loadReadHookType(
+        \ReflectionProperty $property,
+        PropertyMetadata $metadata,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): void {
+        $hook = $property->getHook(\PropertyHookType::Get);
+
+        if ($hook === null) {
+            return;
+        }
+
+        $attribute = $this->findHookAttribute($hook, MapType::class);
+
+        if ($attribute === null) {
+            return;
+        }
+
+        $metadata->read = $this->createPropertyType(
+            type: $attribute->type,
+            property: $property,
+            types: $types,
+            parser: $parser,
+        );
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function loadWriteHookType(
+        \ReflectionProperty $property,
+        PropertyMetadata $metadata,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): void {
+        $hook = $property->getHook(\PropertyHookType::Set);
+
+        if ($hook === null) {
+            return;
+        }
+
+        $attribute = $this->findHookAttribute($hook, MapType::class);
+
+        if ($attribute === null) {
+            return;
+        }
+
+        $metadata->write = $this->createPropertyType(
             type: $attribute->type,
             property: $property,
             types: $types,

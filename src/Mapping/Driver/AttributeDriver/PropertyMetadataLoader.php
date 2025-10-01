@@ -30,11 +30,46 @@ abstract class PropertyMetadataLoader implements PropertyMetadataLoaderInterface
      *
      * @param class-string<TAttribute> $name
      *
+     * @return TAttribute|null
+     */
+    protected function findHookAttribute(\ReflectionMethod $hook, string $name): ?object
+    {
+        $attributes = $hook->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($attributes as $attribute) {
+            /** @var TAttribute */
+            return $attribute->newInstance();
+        }
+
+        return null;
+    }
+
+    /**
+     * @template TAttribute of object
+     *
+     * @param class-string<TAttribute> $name
+     *
      * @return iterable<array-key, TAttribute>
      */
     protected function getAllPropertyAttributes(\ReflectionProperty $property, string $name): iterable
     {
         $attributes = $property->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF);
+
+        foreach ($attributes as $attribute) {
+            yield $attribute->newInstance();
+        }
+    }
+
+    /**
+     * @template TAttribute of object
+     *
+     * @param class-string<TAttribute> $name
+     *
+     * @return iterable<array-key, TAttribute>
+     */
+    protected function getAllHookAttributes(\ReflectionMethod $hook, string $name): iterable
+    {
+        $attributes = $hook->getAttributes($name, \ReflectionAttribute::IS_INSTANCEOF);
 
         foreach ($attributes as $attribute) {
             yield $attribute->newInstance();
