@@ -45,7 +45,7 @@ class ClassTypeNormalizer implements TypeInterface
 
         if (!$value instanceof $className) {
             throw InvalidValueOfTypeException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context),
+                expected: $this->metadata->getTypeStatement($context, read: true),
                 value: $value,
                 context: $context,
             );
@@ -98,7 +98,7 @@ class ClassTypeNormalizer implements TypeInterface
             }
 
             // Fetch field type
-            $info = $meta->type;
+            $info = $meta->read;
             $type = $info !== null ? $info->type : $context->getTypeByDefinition('mixed');
 
             try {
@@ -110,7 +110,7 @@ class ClassTypeNormalizer implements TypeInterface
                 $exception = InvalidObjectValueException::createFromContext(
                     element: $element,
                     field: $meta->alias,
-                    expected: $meta->getTypeStatement($entrance),
+                    expected: $meta->getTypeStatement($entrance, read: true),
                     value: $object,
                     context: $entrance,
                     previous: $e,

@@ -24,20 +24,36 @@ final class PropertyMetadataTest extends MetadataTestCase
         self::assertSame('export', $m->name);
     }
 
-    public function testTypeInfo(): void
+    public function testReadTypeInfo(): void
     {
         $type = $this->createMock(TypeInterface::class);
         $stmt = new NamedTypeNode('int');
         $tm = new TypeMetadata($type, $stmt);
 
         $m = new PropertyMetadata('a');
-        self::assertNull($m->type);
+        self::assertNull($m->read);
 
-        $m->type = $tm;
-        self::assertSame($tm, $m->type);
+        $m->read = $tm;
+        self::assertSame($tm, $m->read);
 
-        $m->type = null;
-        self::assertNull($m->type);
+        $m->read = null;
+        self::assertNull($m->read);
+    }
+
+    public function testWriteTypeInfo(): void
+    {
+        $type = $this->createMock(TypeInterface::class);
+        $stmt = new NamedTypeNode('int');
+        $tm = new TypeMetadata($type, $stmt);
+
+        $m = new PropertyMetadata('a');
+        self::assertNull($m->write);
+
+        $m->write = $tm;
+        self::assertSame($tm, $m->write);
+
+        $m->write = null;
+        self::assertNull($m->write);
     }
 
     public function testSkipConditions(): void

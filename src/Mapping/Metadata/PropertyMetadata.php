@@ -43,6 +43,16 @@ final class PropertyMetadata extends Metadata
      */
     private array $skipWhen = [];
 
+    /**
+     * Gets property type information for reading
+     */
+    public ?TypeMetadata $read = null;
+
+    /**
+     * Gets property type information for writing
+     */
+    public ?TypeMetadata $write = null;
+
     public function __construct(
         /**
          * Gets property real name.
@@ -50,13 +60,11 @@ final class PropertyMetadata extends Metadata
          * @var non-empty-string
          */
         public readonly string $name,
-        /**
-         * Gets property type info.
-         */
-        public ?TypeMetadata $type = null,
+        ?TypeMetadata $type = null,
         ?int $createdAt = null,
     ) {
         $this->alias = $this->name;
+        $this->read = $this->write = $type;
 
         parent::__construct($createdAt);
     }
@@ -66,9 +74,9 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(Context $context): ?TypeStatement
+    public function getTypeStatement(Context $context, bool $read): ?TypeStatement
     {
-        $info = $this->type;
+        $info = $read ? $this->read : $this->write;
 
         if ($info === null) {
             return null;
@@ -88,9 +96,9 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getFieldNode(Context $context): ?NamedFieldNode
+    public function getFieldNode(Context $context, bool $read): ?NamedFieldNode
     {
-        $statement = $this->getTypeStatement($context);
+        $statement = $this->getTypeStatement($context, $read);
 
         if ($statement === null) {
             return null;

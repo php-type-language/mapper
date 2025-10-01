@@ -27,7 +27,7 @@ final class TypePropertyConfigLoader extends PropertyConfigLoader
         // @phpstan-ignore-next-line : Additional DbC invariant
         assert(\is_string($config['type']));
 
-        $metadata->type = $this->createPropertyType(
+        $metadata->read = $metadata->write = $this->createPropertyType(
             type: $config['type'],
             property: $property,
             types: $types,

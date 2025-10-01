@@ -29,7 +29,7 @@ final class TypePropertyMetadataLoader extends PropertyMetadataLoader
             return;
         }
 
-        $metadata->type = $this->createPropertyType(
+        $metadata->read = $metadata->write = $this->createPropertyType(
             type: $attribute->type,
             property: $property,
             types: $types,

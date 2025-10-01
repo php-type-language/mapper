@@ -49,7 +49,7 @@ class ClassTypeDenormalizer implements TypeInterface
     private function getPropertyType(PropertyMetadata $meta, Context $context): TypeInterface
     {
         // Fetch field type
-        $info = $meta->type;
+        $info = $meta->write;
 
         if ($info === null) {
             return $context->getTypeByStatement(new NamedTypeNode('mixed'));
@@ -105,7 +105,7 @@ class ClassTypeDenormalizer implements TypeInterface
 
         if (!\is_array($value)) {
             throw InvalidValueOfTypeException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context),
+                expected: $this->metadata->getTypeStatement($context, read: false),
                 value: $value,
                 context: $context,
             );
@@ -123,7 +123,7 @@ class ClassTypeDenormalizer implements TypeInterface
             $instance = $this->instantiator->instantiate($this->metadata->name);
         } catch (\Throwable $e) {
             throw NonInstantiatableException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context),
+                expected: $this->metadata->getTypeStatement($context, read: false),
                 class: $this->metadata->name,
                 context: $context,
                 previous: $e,
@@ -166,7 +166,7 @@ class ClassTypeDenormalizer implements TypeInterface
                         $exception = InvalidObjectValueException::createFromContext(
                             element: $element,
                             field: $meta->alias,
-                            expected: $meta->getTypeStatement($entrance),
+                            expected: $meta->getTypeStatement($entrance, read: false),
                             value: (object) $value,
                             context: $entrance,
                             previous: $e,
@@ -188,7 +188,7 @@ class ClassTypeDenormalizer implements TypeInterface
                 default:
                     $exception = MissingRequiredObjectFieldException::createFromContext(
                         field: $meta->alias,
-                        expected: $meta->getTypeStatement($entrance),
+                        expected: $meta->getTypeStatement($entrance, read: false),
                         value: (object) $value,
                         context: $entrance,
                     );

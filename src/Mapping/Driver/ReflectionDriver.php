@@ -36,7 +36,9 @@ final class ReflectionDriver extends LoadableDriver
 
             $metadata = $class->getPropertyOrCreate($property->getName());
 
-            $this->fillType($property, $metadata, $types);
+            $this->fillReadType($property, $metadata, $types);
+            $this->fillWriteType($property, $metadata, $types);
+
             $this->fillDefaultValue($property, $metadata);
         }
 
@@ -90,27 +92,63 @@ final class ReflectionDriver extends LoadableDriver
      * @throws \InvalidArgumentException
      * @throws \Throwable
      */
-    private function fillType(
+    private function fillReadType(
         \ReflectionProperty $property,
         PropertyMetadata $meta,
         TypeRepositoryInterface $types,
     ): void {
-        $statement = $this->getTypeStatement($property);
+        $statement = $this->getReadTypeStatement($property);
 
+        $meta->read = $meta->write = $this->getTypeMetadataByStatement(
+            statement: $statement,
+            property: $property,
+            types: $types,
+        );
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function fillWriteType(
+        \ReflectionProperty $property,
+        PropertyMetadata $meta,
+        TypeRepositoryInterface $types,
+    ): void {
+        $statement = $this->findWriteTypeStatement($property);
+
+        if ($statement === null) {
+            return;
+        }
+
+        $meta->write = $this->getTypeMetadataByStatement(
+            statement: $statement,
+            property: $property,
+            types: $types,
+        );
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    private function getTypeMetadataByStatement(
+        TypeStatement $statement,
+        \ReflectionProperty $property,
+        TypeRepositoryInterface $types,
+    ): TypeMetadata {
         try {
             $type = $types->getTypeByStatement($statement);
         } catch (TypeNotFoundException $e) {
             $class = $property->getDeclaringClass();
 
             throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                class: $class->getName(),
-                property: $property->getName(),
+                class: $class->name,
+                property: $property->name,
                 type: $e->getType(),
                 previous: $e,
             );
         }
 
-        $meta->type = new TypeMetadata(
+        return new TypeMetadata(
             type: $type,
             statement: $statement,
         );
@@ -119,7 +157,7 @@ final class ReflectionDriver extends LoadableDriver
     /**
      * @throws \InvalidArgumentException
      */
-    private function getTypeStatement(\ReflectionProperty $property): TypeStatement
+    private function getReadTypeStatement(\ReflectionProperty $property): TypeStatement
     {
         $type = $property->getType();
 
@@ -128,6 +166,32 @@ final class ReflectionDriver extends LoadableDriver
         }
 
         return $this->createTypeStatement($type);
+    }
+
+    private function findWriteTypeStatement(\ReflectionProperty $property): ?TypeStatement
+    {
+        // Only PHP 8.4+ supports different get/set
+        if (\PHP_VERSION_ID < 80400) {
+            return null;
+        }
+
+        $hook = $property->getHook(\PropertyHookType::Set);
+
+        if ($hook === null || $hook->getNumberOfParameters() < 1) {
+            return null;
+        }
+
+        foreach ($hook->getParameters() as $parameter) {
+            $type = $parameter->getType();
+
+            if ($type === null) {
+                return null;
+            }
+
+            return $this->createTypeStatement($type);
+        }
+
+        return null;
     }
 
     private static function isValidProperty(\ReflectionProperty $property): bool

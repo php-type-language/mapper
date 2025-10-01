@@ -75,7 +75,7 @@ final class ClassMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(Context $context): TypeStatement
+    public function getTypeStatement(Context $context, bool $read): TypeStatement
     {
         if (!$context->isDetailedTypes()) {
             return new NamedTypeNode($this->name);
@@ -84,7 +84,7 @@ final class ClassMetadata extends Metadata
         $fields = [];
 
         foreach ($this->getProperties() as $property) {
-            $field = $property->getFieldNode($context);
+            $field = $property->getFieldNode($context, $read);
 
             if ($field === null) {
                 continue;

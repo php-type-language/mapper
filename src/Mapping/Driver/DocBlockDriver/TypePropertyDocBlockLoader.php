@@ -46,7 +46,7 @@ final class TypePropertyDocBlockLoader extends PropertyDocBlockLoader
             );
         }
 
-        $metadata->type = new TypeMetadata(
+        $metadata->read = $metadata->write = new TypeMetadata(
             type: $type,
             statement: $statement,
         );
