@@ -19,6 +19,28 @@ use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
+/**
+ * @phpstan-type PropertyConfigType array{
+ *     name?: non-empty-string,
+ *     type?: non-empty-string,
+ *     skip?: 'null'|'empty'|non-empty-string|list<'null'|'empty'|non-empty-string>,
+ *     type_error_message?: non-empty-string,
+ *     undefined_error_message?: non-empty-string,
+ *     ...
+ * }
+ *
+ * @phpstan-type ClassDiscriminatorConfigType array{
+ *     field: non-empty-string,
+ *     map: array<non-empty-string, non-empty-string>,
+ *     otherwise?: non-empty-string,
+ * }
+ *
+ * @phpstan-type ClassConfigType array{
+ *     normalize_as_array?: bool,
+ *     discriminator?: ClassDiscriminatorConfigType,
+ *     properties?: array<non-empty-string, non-empty-string|PropertyConfigType>
+ * }
+ */
 abstract class ArrayConfigDriver extends LoadableDriver
 {
     private static ?bool $supportsSchemaValidation = null;
@@ -42,22 +64,7 @@ abstract class ArrayConfigDriver extends LoadableDriver
     /**
      * @param \ReflectionClass<object> $class
      *
-     * @return array{
-     *     normalize_as_array?: bool,
-     *     type_error_message?: non-empty-string,
-     *     undefined_error_message?: non-empty-string,
-     *     discriminator?: array{
-     *         field: non-empty-string,
-     *         map: array<non-empty-string, non-empty-string>,
-     *         otherwise?: non-empty-string,
-     *     },
-     *     properties?: array<non-empty-string, non-empty-string|array{
-     *         name?: non-empty-string,
-     *         type?: non-empty-string,
-     *         skip?: 'null'|'empty'|non-empty-string|list<'null'|'empty'|non-empty-string>,
-     *         ...
-     *     }>
-     * }|null
+     * @return ClassConfigType|null
      * @throws \InvalidArgumentException
      */
     private function getConfigurationAndValidate(\ReflectionClass $class): ?array

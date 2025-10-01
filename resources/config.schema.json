@@ -6,16 +6,6 @@
     "description": "A mapper configuration schema",
     "additionalProperties": false,
     "properties": {
-        "type_error_message": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Custom error message on property type error"
-        },
-        "undefined_error_message": {
-            "type": "string",
-            "minLength": 1,
-            "description": "Custom error message on property value missing error"
-        },
         "normalize_as_array": {
             "type": "boolean",
             "description": "Responsible for enabling or disabling the conversion to an associative array"
@@ -70,6 +60,16 @@
                                     "type": "string",
                                     "description": "Specific property type",
                                     "minLength": 1
+                                },
+                                "type_error_message": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "Custom error message on property type error"
+                                },
+                                "undefined_error_message": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "description": "Custom error message on property value missing error"
                                 },
                                 "skip": {
                                     "description": "Rules according to which a property should be excluded during normalization",
