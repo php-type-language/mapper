@@ -23,6 +23,22 @@ final class PropertyMetadata extends Metadata
     private bool $hasDefaultValue = false;
 
     /**
+     * An error message that occurs when a property
+     * contains an invalid value.
+     *
+     * @var non-empty-string|null
+     */
+    public ?string $typeErrorMessage = null;
+
+    /**
+     * The error message that occurs when the specified
+     * property does not have a value.
+     *
+     * @var non-empty-string|null
+     */
+    public ?string $undefinedErrorMessage = null;
+
+    /**
      * @var list<MatchConditionMetadata>
      */
     private array $skipWhen = [];

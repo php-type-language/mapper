@@ -28,12 +28,17 @@ final class Template implements \Stringable
     public ValuePrinterInterface $values;
 
     public function __construct(
-        private readonly string $template,
+        private string $template,
         private readonly \Throwable $context,
     ) {
         $this->types = self::createDefaultTypePrinter();
         $this->paths = self::createDefaultPathPrinter();
         $this->values = self::createDefaultValuePrinter();
+    }
+
+    public function updateTemplateMessage(string $message): void
+    {
+        $this->template = $message;
     }
 
     private static function createDefaultTypePrinter(): TypePrinterInterface

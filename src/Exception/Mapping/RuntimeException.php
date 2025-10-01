@@ -32,6 +32,15 @@ abstract class RuntimeException extends \RuntimeException
         );
     }
 
+    public function updateMessage(string $message): void
+    {
+        $this->template->updateTemplateMessage($message);
+
+        if ($this->message instanceof Template) {
+            $this->message->updateTemplateMessage($message);
+        }
+    }
+
     private static function createTemplate(string $template, \Throwable $context, PathInterface $path): Template
     {
         $suffix = '';

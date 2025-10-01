@@ -107,7 +107,7 @@ class ClassTypeNormalizer implements TypeInterface
             } catch (FinalExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
-                throw InvalidObjectValueException::createFromContext(
+                $exception = InvalidObjectValueException::createFromContext(
                     element: $element,
                     field: $meta->alias,
                     expected: $meta->getTypeStatement($entrance),
@@ -115,6 +115,12 @@ class ClassTypeNormalizer implements TypeInterface
                     context: $entrance,
                     previous: $e,
                 );
+
+                if ($meta->typeErrorMessage !== null) {
+                    $exception->updateMessage($meta->typeErrorMessage);
+                }
+
+                throw $exception;
             }
         }
 

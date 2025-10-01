@@ -44,6 +44,8 @@ abstract class ArrayConfigDriver extends LoadableDriver
      *
      * @return array{
      *     normalize_as_array?: bool,
+     *     type_error_message?: non-empty-string,
+     *     undefined_error_message?: non-empty-string,
      *     discriminator?: array{
      *         field: non-empty-string,
      *         map: array<non-empty-string, non-empty-string>,
@@ -188,6 +190,24 @@ abstract class ArrayConfigDriver extends LoadableDriver
             assert(\is_array($propertyConfig));
 
             $metadata = $class->getPropertyOrCreate($propertyName);
+
+            // ---------------------------------------------------------------------
+            //  start: Property Error Message
+            // ---------------------------------------------------------------------
+
+            if (\array_key_exists('type_error_message', $propertyConfig)) {
+                // @phpstan-ignore-next-line : Additional DbC invariant
+                assert(\is_string($propertyConfig['type_error_message']));
+
+                $metadata->typeErrorMessage = $propertyConfig['type_error_message'];
+            }
+
+            if (\array_key_exists('undefined_error_message', $propertyConfig)) {
+                // @phpstan-ignore-next-line : Additional DbC invariant
+                assert(\is_string($propertyConfig['undefined_error_message']));
+
+                $metadata->undefinedErrorMessage = $propertyConfig['undefined_error_message'];
+            }
 
             // -----------------------------------------------------------------
             //  start: Property Type

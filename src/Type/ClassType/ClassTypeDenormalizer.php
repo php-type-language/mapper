@@ -162,7 +162,7 @@ class ClassTypeDenormalizer implements TypeInterface
                     } catch (FinalExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {
-                        throw InvalidObjectValueException::createFromContext(
+                        $exception = InvalidObjectValueException::createFromContext(
                             element: $element,
                             field: $meta->alias,
                             expected: $meta->getTypeStatement($entrance),
@@ -170,6 +170,12 @@ class ClassTypeDenormalizer implements TypeInterface
                             context: $entrance,
                             previous: $e,
                         );
+
+                        if ($meta->typeErrorMessage !== null) {
+                            $exception->updateMessage($meta->typeErrorMessage);
+                        }
+
+                        throw $exception;
                     }
                     break;
 
@@ -179,12 +185,18 @@ class ClassTypeDenormalizer implements TypeInterface
                     break;
 
                 default:
-                    throw MissingRequiredObjectFieldException::createFromContext(
+                    $exception = MissingRequiredObjectFieldException::createFromContext(
                         field: $meta->alias,
                         expected: $meta->getTypeStatement($entrance),
                         value: $value,
                         context: $entrance,
                     );
+
+                    if ($meta->undefinedErrorMessage !== null) {
+                        $exception->updateMessage($meta->undefinedErrorMessage);
+                    }
+
+                    throw $exception;
             }
 
             $this->accessor->setValue($object, $meta->name, $element);
