@@ -36,7 +36,7 @@ class StandardPlatform extends Platform
         yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);
 
         // Adds support for the "string" type
-        yield new Builder\SimpleTypeBuilder('string', Type\StringType::class);
+        yield new Builder\SimpleTypeBuilder(['string', \Stringable::class], Type\StringType::class);
 
         // Adds support for the "int" type
         yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
