@@ -166,7 +166,7 @@ class ClassTypeDenormalizer implements TypeInterface
                             element: $element,
                             field: $meta->alias,
                             expected: $meta->getTypeStatement($entrance),
-                            value: $value,
+                            value: (object) $value,
                             context: $entrance,
                             previous: $e,
                         );
@@ -188,7 +188,7 @@ class ClassTypeDenormalizer implements TypeInterface
                     $exception = MissingRequiredObjectFieldException::createFromContext(
                         field: $meta->alias,
                         expected: $meta->getTypeStatement($entrance),
-                        value: $value,
+                        value: (object) $value,
                         context: $entrance,
                     );
 

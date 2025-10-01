@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Mapping\Driver;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\ClassConfigLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\ErrorMessagePropertyConfigLoader;
-use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\NamePropertyConfigLoader;
+use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\AliasPropertyConfigLoader;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\PropertyConfigLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\SchemaValidator;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\SkipConditionsPropertyConfigLoader;
@@ -82,7 +82,7 @@ abstract class ArrayConfigDriver extends LoadableDriver
     {
         return [
             new TypePropertyConfigLoader(),
-            new NamePropertyConfigLoader(),
+            new AliasPropertyConfigLoader(),
             new ErrorMessagePropertyConfigLoader(),
             new SkipConditionsPropertyConfigLoader($this->expression),
         ];

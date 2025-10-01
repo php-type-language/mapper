@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
-final class NamePropertyConfigLoader extends PropertyConfigLoader
+final class AliasPropertyConfigLoader extends PropertyConfigLoader
 {
     public function load(
         array $config,

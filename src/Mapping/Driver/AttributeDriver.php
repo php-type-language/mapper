@@ -8,7 +8,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\ClassMetadataLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\DiscriminatorMapClassMetadataLoader;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\ErrorMessagePropertyMetadataLoader;
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver\NamePropertyMetadataLoader;
+use TypeLang\Mapper\Mapping\Driver\AttributeDriver\AliasPropertyMetadataLoader;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\NormalizeAsArrayClassMetadataLoader;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\PropertyMetadataLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\AttributeDriver\SkipConditionsPropertyMetadataLoader;
@@ -57,7 +57,7 @@ final class AttributeDriver extends LoadableDriver
     {
         return [
             new TypePropertyMetadataLoader(),
-            new NamePropertyMetadataLoader(),
+            new AliasPropertyMetadataLoader(),
             new ErrorMessagePropertyMetadataLoader(),
             new SkipConditionsPropertyMetadataLoader($this->expression),
         ];

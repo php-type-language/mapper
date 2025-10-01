@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
-final class NamePropertyMetadataLoader extends PropertyMetadataLoader
+final class AliasPropertyMetadataLoader extends PropertyMetadataLoader
 {
     /**
      * @throws \Throwable

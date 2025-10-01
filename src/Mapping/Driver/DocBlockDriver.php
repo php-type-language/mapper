@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Driver;
 
-use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
+use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\ClassConfigLoaderInterface;
+use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\PropertyConfigLoaderInterface;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassDocBlockLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PropertyDocBlockLoaderInterface;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\TypePropertyDocBlockLoader;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
-use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\Parser;
 use TypeLang\PHPDoc\Standard\ParamTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
@@ -39,6 +39,16 @@ final class DocBlockDriver extends LoadableDriver
     private readonly PromotedPropertyTypeDriver $promotedProperties;
 
     private readonly ClassPropertyTypeDriver $classProperties;
+
+    /**
+     * @var list<ClassConfigLoaderInterface>
+     */
+    private readonly array $classDocBlockLoaders;
+
+    /**
+     * @var list<PropertyConfigLoaderInterface>
+     */
+    private readonly array $propertyDocBlockLoaders;
 
     /**
      * @param non-empty-string $paramTagName
@@ -69,7 +79,32 @@ final class DocBlockDriver extends LoadableDriver
             parser: $parser,
         );
 
+        $this->classDocBlockLoaders = $this->createClassLoaders();
+        $this->propertyDocBlockLoaders = $this->createPropertyLoaders();
+
         parent::__construct($delegate);
+    }
+
+    /**
+     * @return list<ClassDocBlockLoaderInterface>
+     */
+    private function createClassLoaders(): array
+    {
+        return [
+        ];
+    }
+
+    /**
+     * @return list<PropertyDocBlockLoaderInterface>
+     */
+    private function createPropertyLoaders(): array
+    {
+        return [
+            new TypePropertyDocBlockLoader(
+                promotedProperties: $this->promotedProperties,
+                classProperties: $this->classProperties,
+            ),
+        ];
     }
 
     /**
@@ -99,22 +134,6 @@ final class DocBlockDriver extends LoadableDriver
         }
     }
 
-    /**
-     * @param \ReflectionClass<object> $class
-     *
-     * @throws \ReflectionException
-     */
-    private function findType(\ReflectionClass $class, PropertyMetadata $meta): ?TypeStatement
-    {
-        $property = $class->getProperty($meta->name);
-
-        if ($property->isPromoted()) {
-            return $this->promotedProperties->findType($property, $meta);
-        }
-
-        return $this->classProperties->findType($property);
-    }
-
     #[\Override]
     protected function load(
         \ReflectionClass $reflection,
@@ -122,30 +141,26 @@ final class DocBlockDriver extends LoadableDriver
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): void {
+        foreach ($this->classDocBlockLoaders as $classDocBlockLoader) {
+            $classDocBlockLoader->load(
+                class: $reflection,
+                metadata: $class,
+                types: $types,
+                parser: $parser,
+            );
+        }
+
         foreach ($reflection->getProperties() as $property) {
             $metadata = $class->getPropertyOrCreate($property->getName());
 
-            $statement = $this->findType($reflection, $metadata);
-
-            if ($statement !== null) {
-                try {
-                    $type = $types->getTypeByStatement($statement, $reflection);
-                } catch (TypeNotFoundException $e) {
-                    throw PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                        class: $class->name,
-                        property: $metadata->name,
-                        type: $e->getType(),
-                        previous: $e,
-                    );
-                }
-
-                $metadata->type = new TypeMetadata(
-                    type: $type,
-                    statement: $statement,
+            foreach ($this->propertyDocBlockLoaders as $propertyDocBlockLoader) {
+                $propertyDocBlockLoader->load(
+                    property: $property,
+                    metadata: $metadata,
+                    types: $types,
+                    parser: $parser,
                 );
             }
-
-            $class->addProperty($metadata);
         }
 
         $this->promotedProperties->cleanup();
