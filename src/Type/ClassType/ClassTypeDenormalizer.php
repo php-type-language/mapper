@@ -17,6 +17,7 @@ use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * @template T of object
@@ -51,7 +52,7 @@ class ClassTypeDenormalizer implements TypeInterface
         $info = $meta->type;
 
         if ($info === null) {
-            return $context->getTypeByDefinition('mixed');
+            return $context->getTypeByStatement(new NamedTypeNode('mixed'));
         }
 
         return $info->type;

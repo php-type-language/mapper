@@ -6,6 +6,8 @@ namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
 
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader\ParamTagReader;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader\VarTagReader;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -15,8 +17,8 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 final class TypePropertyDocBlockLoader extends PropertyDocBlockLoader
 {
     public function __construct(
-        private readonly PromotedPropertyTypeDriver $promotedProperties,
-        private readonly ClassPropertyTypeDriver $classProperties,
+        private readonly ParamTagReader $paramTags,
+        private readonly VarTagReader $varTags,
     ) {}
 
     public function load(
@@ -60,9 +62,9 @@ final class TypePropertyDocBlockLoader extends PropertyDocBlockLoader
         $property = $class->getProperty($meta->name);
 
         if ($property->isPromoted()) {
-            return $this->promotedProperties->findType($property, $meta);
+            return $this->paramTags->findType($property, $meta);
         }
 
-        return $this->classProperties->findType($property);
+        return $this->varTags->findType($property, $meta);
     }
 }

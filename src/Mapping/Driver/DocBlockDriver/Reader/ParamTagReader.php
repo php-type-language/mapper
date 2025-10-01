@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
+namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -11,7 +11,7 @@ use TypeLang\PHPDoc\ParserInterface;
 use TypeLang\PHPDoc\Standard\ParamTag;
 use TypeLang\PHPDoc\Tag\TagInterface;
 
-final class PromotedPropertyTypeDriver
+final class ParamTagReader implements TagReaderInterface
 {
     /**
      * @var array<class-string, DocBlock>
@@ -23,7 +23,7 @@ final class PromotedPropertyTypeDriver
      */
     public function __construct(
         private readonly string $paramTagName,
-        private readonly ClassPropertyTypeDriver $classProperties,
+        private readonly VarTagReader $varTag,
         private readonly ParserInterface $parser,
     ) {}
 
@@ -32,7 +32,7 @@ final class PromotedPropertyTypeDriver
      */
     public function findType(\ReflectionProperty $property, PropertyMetadata $meta): ?TypeStatement
     {
-        $result = $this->classProperties->findType($property);
+        $result = $this->varTag->findType($property, $meta);
 
         if ($result !== null) {
             return $result;

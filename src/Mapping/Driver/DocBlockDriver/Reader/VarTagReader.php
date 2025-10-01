@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver;
+namespace TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader;
 
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\PHPDoc\DocBlock;
 use TypeLang\PHPDoc\ParserInterface;
 use TypeLang\PHPDoc\Standard\VarTag;
 use TypeLang\PHPDoc\Tag\TagInterface;
 
-final class ClassPropertyTypeDriver
+final class VarTagReader implements TagReaderInterface
 {
     /**
      * @param non-empty-string $varTagName
@@ -23,7 +24,7 @@ final class ClassPropertyTypeDriver
     /**
      * Return type for given property from docblock.
      */
-    public function findType(\ReflectionProperty $property): ?TypeStatement
+    public function findType(\ReflectionProperty $property, PropertyMetadata $meta): ?TypeStatement
     {
         $phpdoc = $this->getDocBlockFromProperty($property);
 

@@ -8,9 +8,9 @@ use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\ClassConfigLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver\PropertyConfigLoaderInterface;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassDocBlockLoaderInterface;
-use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\ClassPropertyTypeDriver;
-use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PromotedPropertyTypeDriver;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\PropertyDocBlockLoaderInterface;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader\ParamTagReader;
+use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\Reader\VarTagReader;
 use TypeLang\Mapper\Mapping\Driver\DocBlockDriver\TypePropertyDocBlockLoader;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -36,9 +36,9 @@ final class DocBlockDriver extends LoadableDriver
      */
     private const DEFAULT_VAR_TAG_NAME = 'var';
 
-    private readonly PromotedPropertyTypeDriver $promotedProperties;
+    private readonly ParamTagReader $paramTags;
 
-    private readonly ClassPropertyTypeDriver $classProperties;
+    private readonly VarTagReader $varTags;
 
     /**
      * @var list<ClassConfigLoaderInterface>
@@ -68,14 +68,14 @@ final class DocBlockDriver extends LoadableDriver
             $varTagName => new VarTagFactory(),
         ]));
 
-        $this->classProperties = new ClassPropertyTypeDriver(
+        $this->varTags = new VarTagReader(
             varTagName: $varTagName,
             parser: $parser,
         );
 
-        $this->promotedProperties = new PromotedPropertyTypeDriver(
+        $this->paramTags = new ParamTagReader(
             paramTagName: $paramTagName,
-            classProperties: $this->classProperties,
+            varTag: $this->varTags,
             parser: $parser,
         );
 
@@ -101,8 +101,8 @@ final class DocBlockDriver extends LoadableDriver
     {
         return [
             new TypePropertyDocBlockLoader(
-                promotedProperties: $this->promotedProperties,
-                classProperties: $this->classProperties,
+                paramTags: $this->paramTags,
+                varTags: $this->varTags,
             ),
         ];
     }
@@ -163,6 +163,6 @@ final class DocBlockDriver extends LoadableDriver
             }
         }
 
-        $this->promotedProperties->cleanup();
+        $this->paramTags->cleanup();
     }
 }
