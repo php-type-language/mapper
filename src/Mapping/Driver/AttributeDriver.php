@@ -40,6 +40,17 @@ final class AttributeDriver extends LoadableDriver
     }
 
     /**
+     * @return list<ClassMetadataLoaderInterface>
+     */
+    private function createClassLoaders(): array
+    {
+        return [
+            new NormalizeAsArrayClassMetadataLoader(),
+            new DiscriminatorMapClassMetadataLoader(),
+        ];
+    }
+
+    /**
      * @return list<PropertyMetadataLoaderInterface>
      */
     private function createPropertyLoaders(): array
@@ -49,17 +60,6 @@ final class AttributeDriver extends LoadableDriver
             new NamePropertyMetadataLoader(),
             new ErrorMessagePropertyMetadataLoader(),
             new SkipConditionsPropertyMetadataLoader($this->expression),
-        ];
-    }
-
-    /**
-     * @return list<ClassMetadataLoaderInterface>
-     */
-    private function createClassLoaders(): array
-    {
-        return [
-            new NormalizeAsArrayClassMetadataLoader(),
-            new DiscriminatorMapClassMetadataLoader(),
         ];
     }
 

@@ -2,35 +2,33 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Driver\AttributeDriver;
+namespace TypeLang\Mapper\Mapping\Driver\ArrayConfigDriver;
 
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
-final class TypePropertyMetadataLoader extends PropertyMetadataLoader
+final class TypePropertyConfigLoader extends PropertyConfigLoader
 {
-    /**
-     * @throws \Throwable
-     */
     public function load(
+        array $config,
         \ReflectionProperty $property,
         PropertyMetadata $metadata,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): void {
-        $attribute = $this->findPropertyAttribute($property, MapType::class);
-
-        if ($attribute === null) {
+        if (!\array_key_exists('type', $config)) {
             return;
         }
 
+        // @phpstan-ignore-next-line : Additional DbC invariant
+        assert(\is_string($config['type']));
+
         $metadata->type = $this->createPropertyType(
-            type: $attribute->type,
+            type: $config['type'],
             property: $property,
             types: $types,
             parser: $parser,
@@ -40,8 +38,8 @@ final class TypePropertyMetadataLoader extends PropertyMetadataLoader
     /**
      * @param non-empty-string $type
      *
-     * @throws PropertyTypeNotFoundException
-     * @throws \Throwable
+     * @throws PropertyTypeNotFoundException in case of property type not found
+     * @throws \Throwable in case of internal error occurs
      */
     private function createPropertyType(
         string $type,
