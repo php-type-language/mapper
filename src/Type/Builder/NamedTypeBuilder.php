@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -45,7 +46,16 @@ abstract class NamedTypeBuilder extends Builder
 
     public function isSupported(TypeStatement $statement): bool
     {
-        return $statement instanceof NamedTypeNode
-            && \in_array($statement->name->toLowerString(), $this->lower, true);
+        if (!$statement instanceof NamedTypeNode) {
+            return false;
+        }
+
+        $lower = $statement->name->toLowerString();
+
+        if ($statement->name instanceof FullQualifiedName && $statement->name->isPrefixedByLeadingBackslash()) {
+            $lower = \ltrim($lower, '\\');
+        }
+
+        return \in_array($lower, $this->lower, true);
     }
 }
