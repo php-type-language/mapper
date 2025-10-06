@@ -8,7 +8,7 @@ parameters:
   fileExtensions:
     - php
   paths:
-    - src/Mapping
+    - src
   tmpDir: vendor/.cache.phpstan
   reportUnmatchedIgnoredErrors: false
   ignoreErrors:
