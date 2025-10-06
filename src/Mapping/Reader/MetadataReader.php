@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Reader\MetadataReader\ClassMetadataLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\MetadataReader\PropertyMetadataLoaderInterface;
 
@@ -19,6 +20,15 @@ abstract class MetadataReader extends Reader
     public function read(\ReflectionClass $class): ClassInfo
     {
         $classInfo = parent::read($class);
+
+        if ($classInfo->source === null) {
+            $file = $class->getFileName();
+            $line = $class->getStartLine();
+
+            if (\is_string($file) && $line > 0) {
+                $classInfo->source = new SourceInfo($file, $line);
+            }
+        }
 
         foreach ($this->classLoaders as $classLoader) {
             $classLoader->load($classInfo, $class);

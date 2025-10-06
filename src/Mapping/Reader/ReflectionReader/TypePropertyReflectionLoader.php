@@ -17,74 +17,105 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
         $this->loadWriteType($property, $info);
     }
 
-    private function findSourceMap(\ReflectionProperty $property): ?SourceInfo
-    {
-        $class = $property->getDeclaringClass();
-
-        if ($class->isInternal()) {
-            return null;
-        }
-
-        $file = $class->getFileName();
-        $line = $class->getStartLine();
-
-        if ($file === false || $line < 1) {
-            return null;
-        }
-
-        return new SourceInfo($file, $line);
-    }
-
     private function loadReadType(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $definition = $this->getReadTypeDefinition($property);
+        $definition = $this->getReadTypeInfo($property);
 
-        $info->read = $info->write = new TypeInfo($definition, $this->findSourceMap($property));
+        $info->read = $info->write = $definition;
     }
 
     private function loadWriteType(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $definition = $this->findWriteTypeDefinition($property);
+        $definition = $this->findWriteTypeInfo($property);
 
         if ($definition === null) {
             return;
         }
 
-        $info->write = new TypeInfo($definition, $this->findSourceMap($property));
+        $info->write = $definition;
     }
 
     /**
-     * @return non-empty-string
      * @throws \InvalidArgumentException
      */
-    private function findWriteTypeDefinition(\ReflectionProperty $property): ?string
+    private function findWriteTypeInfo(\ReflectionProperty $property): ?TypeInfo
     {
         if (\PHP_VERSION_ID < 80400) {
             return null;
         }
 
-        $type = $property->getSettableType();
-
-        if ($type === null) {
-            return $this->createMixedTypeDefinition();
+        // Force skip in case of setter is not defined
+        if ($property->getHook(\PropertyHookType::Set) === null) {
+            return null;
         }
 
-        return $this->createTypeDefinition($type);
+        $definition = $this->createMixedTypeDefinition();
+        $type = $property->getSettableType();
+
+        if ($type !== null) {
+            $definition = $this->createTypeDefinition($type);
+        }
+
+        return new TypeInfo(
+            definition: $definition,
+            source: $this->getWriteHookSourceInfo($property),
+        );
+    }
+
+    private function getWriteHookSourceInfo(\ReflectionProperty $property): ?SourceInfo
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            return null;
+        }
+
+        return $this->getHookSourceInfo(
+            hook: $property->getHook(\PropertyHookType::Set),
+        );
     }
 
     /**
-     * @return non-empty-string
      * @throws \InvalidArgumentException
      */
-    private function getReadTypeDefinition(\ReflectionProperty $property): string
+    private function getReadTypeInfo(\ReflectionProperty $property): TypeInfo
     {
+        $definition = $this->createMixedTypeDefinition();
         $type = $property->getType();
 
-        if ($type === null) {
-            return $this->createMixedTypeDefinition();
+        if ($type !== null) {
+            $definition = $this->createTypeDefinition($type);
         }
 
-        return $this->createTypeDefinition($type);
+        return new TypeInfo(
+            definition: $definition,
+            source: $this->getReadHookSourceInfo($property),
+        );
+    }
+
+    private function getReadHookSourceInfo(\ReflectionProperty $property): ?SourceInfo
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            return null;
+        }
+
+        return $this->getHookSourceInfo(
+            hook: $property->getHook(\PropertyHookType::Get),
+        );
+    }
+
+    private function getHookSourceInfo(?\ReflectionMethod $hook): ?SourceInfo
+    {
+        if ($hook === null) {
+            return null;
+        }
+
+        $file = $hook->getFileName();
+        $line = $hook->getStartLine();
+
+        if (\is_string($file) && $file !== '' && $line > 0) {
+            return new SourceInfo($file, $line);
+        }
+
+        return null;
     }
 
     /**
@@ -131,9 +162,15 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
      */
     private function createNonNullNamedTypeDefinition(\ReflectionNamedType $type): string
     {
+        $literal = $type->getName();
+
+        // PHP 8.4 Setter's type bug
+        if (\str_starts_with($literal, '?')) {
+            $literal = \substr($literal, 1);
+        }
+
         /** @phpstan-ignore-next-line : Type's name cannot be empty */
         $name = new Name($type->getName());
-        $literal = $name->toString();
 
         if ($type->isBuiltin() || $name->isSpecial() || $name->isBuiltin()) {
             return $literal;

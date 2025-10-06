@@ -10,7 +10,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 /**
  * @template T of object
  */
-final class ClassInfo
+final class ClassInfo extends MetadataInfo
 {
     /**
      * @var array<non-empty-string, PropertyInfo>
@@ -33,7 +33,10 @@ final class ClassInfo
          * @var class-string<T>
          */
         public readonly string $name,
-    ) {}
+        ?SourceInfo $source = null,
+    ) {
+        parent::__construct($source);
+    }
 
     /**
      * @param non-empty-string $name
