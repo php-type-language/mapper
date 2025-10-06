@@ -11,7 +11,7 @@ use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo\DiscriminatorMapPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata\DiscriminatorMapPrototype;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorPrototype;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;

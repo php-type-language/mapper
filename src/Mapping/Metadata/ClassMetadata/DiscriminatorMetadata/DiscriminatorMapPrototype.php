@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
+namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
 
 use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
 

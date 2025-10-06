@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo\DiscriminatorMapPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata\DiscriminatorMapPrototype;
 use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
 
 final class DiscriminatorPrototype
