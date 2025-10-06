@@ -24,10 +24,16 @@ final class DiscriminatorMapClassConfigLoader extends ClassConfigLoader
             $map[$value] = new TypeInfo($type);
         }
 
+        $default = null;
+
+        if (isset($discriminatorConfig['otherwise'])) {
+            $default = new TypeInfo($discriminatorConfig['otherwise']);
+        }
+
         $info->discriminator = new DiscriminatorInfo(
             field: $discriminatorConfig['field'],
             map: $map,
-            default: $discriminatorConfig['default'] ?? null,
+            default: $default,
         );
     }
 }

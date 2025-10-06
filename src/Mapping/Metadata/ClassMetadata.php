@@ -76,13 +76,7 @@ final class ClassMetadata extends Metadata
         $fields = [];
 
         foreach ($this->properties as $property) {
-            $field = $property->getFieldNode($context, $read);
-
-            if ($field === null) {
-                continue;
-            }
-
-            $fields[] = $field;
+            $fields[] = $property->getFieldNode($context, $read);
         }
 
         if ($fields === []) {

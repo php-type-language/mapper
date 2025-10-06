@@ -10,11 +10,11 @@ use ReflectionProperty as RefProperty;
 abstract class PropertyAttributeLoader implements PropertyAttributeLoaderInterface
 {
     /**
-     * @template TAttribute of object
+     * @template TArgAttribute of object
      *
-     * @param class-string<TAttribute> $name
+     * @param class-string<TArgAttribute> $name
      *
-     * @return TAttribute|null
+     * @return TArgAttribute|null
      */
     protected function findPropertyAttribute(RefProperty|RefHook $property, string $name): ?object
     {
@@ -26,11 +26,11 @@ abstract class PropertyAttributeLoader implements PropertyAttributeLoaderInterfa
     }
 
     /**
-     * @template TAttribute of object
+     * @template TArgAttribute of object
      *
-     * @param class-string<TAttribute> $name
+     * @param class-string<TArgAttribute> $name
      *
-     * @return iterable<array-key, TAttribute>
+     * @return iterable<array-key, TArgAttribute>
      */
     protected function getAllPropertyAttributes(RefProperty|RefHook $property, string $name): iterable
     {

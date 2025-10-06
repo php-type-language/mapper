@@ -54,8 +54,6 @@ final class MetadataReaderProvider implements ProviderInterface
     ): ClassMetadata {
         $info = $this->reader->read($class);
 
-        dd($info);
-
         return $this->toClassMetadata($info, $types, $parser);
     }
 

@@ -9,6 +9,11 @@ use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 
 final class ExpressionConditionMetadata extends ConditionMetadata
 {
+    /**
+     * @var non-empty-string
+     */
+    public const DEFAULT_CONTEXT_VARIABLE_NAME = ExpressionConditionInfo::DEFAULT_CONTEXT_VARIABLE_NAME;
+
     public function __construct(
         public readonly ParsedExpression $expression,
         /**
@@ -16,7 +21,7 @@ final class ExpressionConditionMetadata extends ConditionMetadata
          *
          * @var non-empty-string
          */
-        public readonly string $variable,
+        public readonly string $variable = self::DEFAULT_CONTEXT_VARIABLE_NAME,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);

@@ -7,12 +7,12 @@ namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 abstract class ClassAttributeLoader implements ClassAttributeLoaderInterface
 {
     /**
-     * @template TAttribute of object
+     * @template TArgAttribute of object
      *
      * @param \ReflectionClass<object> $class
-     * @param class-string<TAttribute> $name
+     * @param class-string<TArgAttribute> $name
      *
-     * @return TAttribute|null
+     * @return TArgAttribute|null
      */
     protected function findClassAttribute(\ReflectionClass $class, string $name): ?object
     {
@@ -24,11 +24,12 @@ abstract class ClassAttributeLoader implements ClassAttributeLoaderInterface
     }
 
     /**
-     * @template TAttribute of object
+     * @template TArgAttribute of object
      *
-     * @param class-string<TAttribute> $name
+     * @param \ReflectionClass<object> $class
+     * @param class-string<TArgAttribute> $name
      *
-     * @return iterable<array-key, TAttribute>
+     * @return iterable<array-key, TArgAttribute>
      */
     protected function getAllClassAttributes(\ReflectionClass $class, string $name): iterable
     {

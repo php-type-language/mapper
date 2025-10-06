@@ -20,6 +20,7 @@ use JsonSchema\Validator as JsonSchemaValidator;
  * @phpstan-type PropertyConfigType array{
  *     name?: non-empty-string,
  *     type?: non-empty-string,
+ *     write?: non-empty-string,
  *     skip?: 'null'|'empty'|non-empty-string|list<'null'|'empty'|non-empty-string>,
  *     type_error_message?: non-empty-string,
  *     undefined_error_message?: non-empty-string,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping;
 
 use JetBrains\PhpStorm\Language;
-use TypeLang\Mapper\Mapping\Metadata\ExpressionConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
 
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
 class SkipWhen
