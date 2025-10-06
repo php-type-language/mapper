@@ -331,7 +331,7 @@ final class MetadataReaderProvider implements ProviderInterface
         if (!\class_exists(ExpressionLanguage::class)) {
             throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'symfony/expression-language',
-                purpose: 'expressions support',
+                purpose: 'condition expressions support',
             );
         }
 

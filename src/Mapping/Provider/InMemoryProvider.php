@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
-final class InMemoryProvider extends Provider
+final class InMemoryProvider extends Decorator
 {
     /**
      * @var array<class-string, ClassMetadata<object>>
