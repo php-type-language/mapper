@@ -6,14 +6,19 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of iterable = iterable<mixed, mixed>
+ *
+ * @template-extends IterableKeyException<TValue>
+ */
 abstract class IterableValueException extends IterableKeyException
 {
     /**
      * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TValue $value
      */
     public function __construct(
-        protected readonly mixed $element,
+        public readonly mixed $element,
         int $index,
         mixed $key,
         iterable $value,
@@ -31,10 +36,5 @@ abstract class IterableValueException extends IterableKeyException
             code: $code,
             previous: $previous,
         );
-    }
-
-    public function getElement(): mixed
-    {
-        return $this->element;
     }
 }

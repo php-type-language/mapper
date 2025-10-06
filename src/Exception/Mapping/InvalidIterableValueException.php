@@ -7,11 +7,19 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of iterable = iterable<mixed, mixed>
+ *
+ * @template-extends IterableValueException<TValue>
+ */
 class InvalidIterableValueException extends IterableValueException
 {
     /**
+     * @template TArgValue of iterable
+     *
      * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromPath(
         mixed $element,
@@ -29,6 +37,7 @@ class InvalidIterableValueException extends IterableValueException
             $template = \str_replace('{{key}}', 'index {{index}}', $template);
         }
 
+        /** @var self<TArgValue> */
         return new self(
             element: $element,
             index: $index,
@@ -41,8 +50,11 @@ class InvalidIterableValueException extends IterableValueException
     }
 
     /**
+     * @template TArgValue of iterable
+     *
      * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromContext(
         mixed $element,

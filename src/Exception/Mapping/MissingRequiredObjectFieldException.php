@@ -8,11 +8,19 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
+ * @template-extends ObjectFieldException<non-empty-string, TValue>
+ */
 class MissingRequiredObjectFieldException extends ObjectFieldException
 {
     /**
+     * @template TArgValue of array|object
+     *
      * @param non-empty-string $field
-     * @param array<array-key, mixed>|object $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromPath(
         string $field,
@@ -23,6 +31,7 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
     ): self {
         $template = 'Object {{value}} requires missing field {{field}} of type {{expected}}';
 
+        /** @var self<TArgValue> */
         return new self(
             field: $field,
             expected: $expected ?? self::mixedTypeStatement(),
@@ -34,8 +43,11 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
     }
 
     /**
+     * @template TArgValue of array|object
+     *
      * @param non-empty-string $field
-     * @param iterable<mixed, mixed> $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromContext(
         string $field,

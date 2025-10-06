@@ -6,11 +6,17 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of iterable = iterable<mixed, mixed>
+ *
+ * @template-extends ValueException<TValue>
+ */
 abstract class IterableException extends ValueException implements
     FinalExceptionInterface
 {
     /**
-     * @param iterable<mixed, mixed> $value
+     * @param TValue $value Unlike {@see ValueException::$value}, this exception
+     *        value can only be {@see iterable}.
      */
     public function __construct(
         iterable $value,
@@ -26,17 +32,5 @@ abstract class IterableException extends ValueException implements
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Unlike {@see ValueException::getClass()}, this exception
-     * value can only be {@see iterable}.
-     *
-     * @return iterable<mixed, mixed>
-     */
-    public function getClass(): iterable
-    {
-        /** @var iterable<mixed, mixed> */
-        return $this->value;
     }
 }

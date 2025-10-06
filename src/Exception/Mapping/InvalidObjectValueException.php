@@ -8,11 +8,18 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
+ * @template-extends ObjectValueException<TValue>
+ */
 class InvalidObjectValueException extends ObjectValueException
 {
     /**
+     * @template TArgValue of array|object
      * @param non-empty-string $field
-     * @param array<array-key, mixed>|object $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromPath(
         mixed $element,
@@ -24,6 +31,7 @@ class InvalidObjectValueException extends ObjectValueException
     ): self {
         $template = 'Passed value in {{field}} of {{value}} must be of type {{expected}}, but {{element}} given';
 
+        /** @var self<TArgValue> */
         return new self(
             element: $element,
             field: $field,
@@ -36,8 +44,10 @@ class InvalidObjectValueException extends ObjectValueException
     }
 
     /**
+     * @template TArgValue of array|object
      * @param non-empty-string $field
-     * @param array<array-key, mixed>|object $value
+     * @param TArgValue $value
+     * @return self<TArgValue>
      */
     public static function createFromContext(
         mixed $element,

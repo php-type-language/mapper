@@ -8,10 +8,18 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TObject of object = object
+ *
+ * @template-extends ClassException<TObject>
+ */
 class NonInstantiatableException extends ClassException
 {
     /**
-     * @param class-string $class
+     * @template TArg of object
+     *
+     * @param class-string<TArg> $class
+     * @return self<TArg>
      */
     public static function createFromPath(
         ?TypeStatement $expected,
@@ -21,6 +29,7 @@ class NonInstantiatableException extends ClassException
     ): self {
         $template = 'Unable to instantiate {{value}} of {{expected}}';
 
+        /** @var self<TArg> */
         return new self(
             expected: $expected ?? self::mixedTypeStatement(),
             class: $class,
@@ -31,7 +40,10 @@ class NonInstantiatableException extends ClassException
     }
 
     /**
-     * @param class-string $class
+     * @template TArg of object
+     *
+     * @param class-string<TArg> $class
+     * @return self<TArg>
      */
     public static function createFromContext(
         ?TypeStatement $expected,

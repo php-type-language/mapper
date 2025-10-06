@@ -8,9 +8,19 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of mixed = mixed
+ *
+ * @template-extends ValueOfTypeException<TValue>
+ */
 class InvalidValueOfTypeException extends ValueOfTypeException implements
     FinalExceptionInterface
 {
+    /**
+     * @template TArgValue of mixed
+     * @param TArgValue $value
+     * @return self<TArgValue>
+     */
     public static function createFromPath(
         TypeStatement $expected,
         mixed $value,
@@ -19,6 +29,7 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
     ): self {
         $template = 'Passed value must be of type {{expected}}, but {{value}} given';
 
+        /** @var self<TArgValue> */
         return new self(
             expected: $expected,
             value: $value,
@@ -28,6 +39,11 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
         );
     }
 
+    /**
+     * @template TArgValue of mixed
+     * @param TArgValue $value
+     * @return self<TArgValue>
+     */
     public static function createFromContext(
         TypeStatement $expected,
         mixed $value,

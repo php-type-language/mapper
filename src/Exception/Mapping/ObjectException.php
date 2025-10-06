@@ -7,11 +7,17 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
+ * @template-extends ValueOfTypeException<TValue>
+ */
 abstract class ObjectException extends ValueOfTypeException implements
     FinalExceptionInterface
 {
     /**
-     * @param array<array-key, mixed>|object $value
+     * @param TValue $value Unlike {@see ValueException::$value}, this property
+     *        must contain only {@see object} or {@see array}.
      */
     public function __construct(
         TypeStatement $expected,
@@ -29,17 +35,5 @@ abstract class ObjectException extends ValueOfTypeException implements
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Unlike {@see ValueException::getClass()}, this method must return
-     * only {@see object} or {@see array}.
-     *
-     * @return array<array-key, mixed>|object
-     */
-    public function getClass(): array|object
-    {
-        /** @var array<array-key, mixed>|object */
-        return $this->value;
     }
 }

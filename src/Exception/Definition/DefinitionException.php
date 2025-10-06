@@ -17,7 +17,10 @@ abstract class DefinitionException extends \InvalidArgumentException implements
     public readonly Template $template;
 
     public function __construct(
-        protected readonly TypeStatement $type,
+        /**
+         * Gets the type statement whose definition caused the error.
+         */
+        public readonly TypeStatement $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
@@ -26,16 +29,6 @@ abstract class DefinitionException extends \InvalidArgumentException implements
 
         /** @phpstan-ignore-next-line : Stringable is allowed to set in "message" */
         $this->message = $this->template = new Template($template, $this);
-    }
-
-    /**
-     * Returns the type statement whose definition caused the error.
-     *
-     * @api
-     */
-    public function getType(): TypeStatement
-    {
-        return $this->type;
     }
 
     /**

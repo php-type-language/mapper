@@ -118,35 +118,13 @@ final class MetadataReaderProvider implements ProviderInterface
         try {
             $read = $this->toTypeMetadata($proto->read, $types, $parser);
         } catch (TypeNotFoundException $e) {
-            $error = PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                class: $parent->name,
-                property: $proto->name,
-                type: $e->getType(),
-                previous: $e,
-            );
-
-            if ($proto->read->source !== null) {
-                $error->setSource($proto->read->source->file, $proto->read->source->line);
-            }
-
-            throw $error;
+            throw $this->toPropertyTypeException($e, $parent, $proto, $proto->read);
         }
 
         try {
             $write = $this->toTypeMetadata($proto->write, $types, $parser);
         } catch (TypeNotFoundException $e) {
-            $error = PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
-                class: $parent->name,
-                property: $proto->name,
-                type: $e->getType(),
-                previous: $e,
-            );
-
-            if ($proto->write->source !== null) {
-                $error->setSource($proto->write->source->file, $proto->write->source->line);
-            }
-
-            throw $error;
+            throw $this->toPropertyTypeException($e, $parent, $proto, $proto->write);
         }
 
         return new PropertyMetadata(
@@ -160,6 +138,29 @@ final class MetadataReaderProvider implements ProviderInterface
             undefinedErrorMessage: $proto->undefinedErrorMessage,
             createdAt: $this->now(),
         );
+    }
+
+    /**
+     * @param ClassPrototype<object> $class
+     */
+    private function toPropertyTypeException(
+        TypeNotFoundException $e,
+        ClassPrototype $class,
+        PropertyPrototype $property,
+        TypePrototype $proto,
+    ): PropertyTypeNotFoundException {
+        $error = PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
+            class: $class->name,
+            property: $property->name,
+            type: $e->type,
+            previous: $e,
+        );
+
+        if ($proto->source !== null) {
+            $error->setSource($proto->source->file, $proto->source->line);
+        }
+
+        return $error;
     }
 
     /**

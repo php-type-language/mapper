@@ -7,14 +7,19 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
+ * @template-extends ObjectFieldException<non-empty-string, TValue>
+ */
 abstract class ObjectValueException extends ObjectFieldException
 {
     /**
      * @param non-empty-string $field
-     * @param array<array-key, mixed>|object $value
+     * @param TValue $value
      */
     public function __construct(
-        protected readonly mixed $element,
+        public readonly mixed $element,
         string $field,
         TypeStatement $expected,
         array|object $value,
@@ -32,22 +37,5 @@ abstract class ObjectValueException extends ObjectFieldException
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Unlike {@see ObjectFieldException::getField()}, method
-     * must return only non-empty {@see string}.
-     *
-     * @return non-empty-string
-     */
-    public function getField(): string
-    {
-        /** @var non-empty-string */
-        return $this->field;
-    }
-
-    public function getElement(): mixed
-    {
-        return $this->element;
     }
 }

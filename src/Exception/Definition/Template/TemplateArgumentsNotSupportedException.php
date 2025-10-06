@@ -9,7 +9,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 /**
  * Occurs when a type does not support template arguments
  */
-class TemplateArgumentsNotSupportedException extends TemplateArgumentsCountException
+class TemplateArgumentsNotSupportedException extends TemplateArgumentsRangeException
 {
     public static function becauseTemplateArgumentsNotSupported(
         NamedTypeNode $type,
