@@ -70,6 +70,7 @@ abstract class ConfigReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @return ClassConfigType|null
      */
     private function loadAndValidate(\ReflectionClass $class): ?array

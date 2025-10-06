@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
 use TypeLang\Mapper\Mapping\DiscriminatorMap;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
@@ -36,6 +36,5 @@ final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
             map: $map,
             default: $default,
         );
-
     }
 }

@@ -10,7 +10,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TObject of object = object
- *
  * @template-extends ClassException<TObject>
  */
 class NonInstantiatableException extends ClassException
@@ -19,6 +18,7 @@ class NonInstantiatableException extends ClassException
      * @template TArg of object
      *
      * @param class-string<TArg> $class
+     *
      * @return self<TArg>
      */
     public static function createFromPath(
@@ -43,6 +43,7 @@ class NonInstantiatableException extends ClassException
      * @template TArg of object
      *
      * @param class-string<TArg> $class
+     *
      * @return self<TArg>
      */
     public static function createFromContext(

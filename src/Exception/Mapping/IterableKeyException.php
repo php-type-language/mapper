@@ -8,7 +8,6 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>
- *
  * @template-extends IterableException<TValue>
  */
 abstract class IterableKeyException extends IterableException

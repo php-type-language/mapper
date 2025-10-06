@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Mapping\Reader;
 /**
  * @phpstan-type InExtensionsConfigType iterable<mixed, string>|string
  * @phpstan-type OutExtensionsConfigType list<string>
- *
  * @phpstan-type InDirectoriesConfigType iterable<mixed, non-empty-string>|non-empty-string
  * @phpstan-type OutDirectoriesConfigType list<non-empty-string>
  */
@@ -42,6 +41,7 @@ abstract class ConfigFileReader extends ConfigReader
      * @template TArgValue of mixed
      *
      * @param iterable<mixed, TArgValue>|TArgValue $values
+     *
      * @return list<TArgValue>
      */
     private function iterableOrStringToList(mixed $values): array

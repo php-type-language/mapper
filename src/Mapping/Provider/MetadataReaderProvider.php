@@ -10,24 +10,24 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
-use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionInfo;
-use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionInfo;
-use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionInfo;
-use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
+use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
@@ -165,6 +165,7 @@ final class MetadataReaderProvider implements ProviderInterface
 
     /**
      * @param iterable<mixed, ConditionInfo> $conditions
+     *
      * @return list<ConditionMetadata>
      */
     private function toConditionsMetadata(iterable $conditions): array
@@ -259,6 +260,7 @@ final class MetadataReaderProvider implements ProviderInterface
 
     /**
      * @param non-empty-array<non-empty-string, TypeInfo> $map
+     *
      * @return non-empty-array<non-empty-string, TypeMetadata>
      * @throws \Throwable
      */

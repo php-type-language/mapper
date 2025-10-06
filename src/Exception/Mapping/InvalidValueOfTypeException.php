@@ -10,7 +10,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TValue of mixed = mixed
- *
  * @template-extends ValueOfTypeException<TValue>
  */
 class InvalidValueOfTypeException extends ValueOfTypeException implements
@@ -18,7 +17,9 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
 {
     /**
      * @template TArgValue of mixed
+     *
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromPath(
@@ -41,7 +42,9 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
 
     /**
      * @template TArgValue of mixed
+     *
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromContext(

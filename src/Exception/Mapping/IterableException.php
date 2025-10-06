@@ -8,15 +8,14 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>
- *
  * @template-extends ValueException<TValue>
  */
 abstract class IterableException extends ValueException implements
     FinalExceptionInterface
 {
     /**
-     * @param TValue $value Unlike {@see ValueException::$value}, this exception
-     *        value can only be {@see iterable}.
+     * @param TValue $value unlike {@see ValueException::$value}, this exception
+     *        value can only be {@see iterable}
      */
     public function __construct(
         iterable $value,

@@ -9,7 +9,6 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>
- *
  * @template-extends IterableKeyException<TValue>
  */
 class InvalidIterableKeyException extends IterableKeyException
@@ -19,6 +18,7 @@ class InvalidIterableKeyException extends IterableKeyException
      *
      * @param int<0, max> $index
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromPath(
@@ -46,6 +46,7 @@ class InvalidIterableKeyException extends IterableKeyException
      *
      * @param int<0, max> $index
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromContext(

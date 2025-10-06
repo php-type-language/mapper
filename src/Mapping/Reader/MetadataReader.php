@@ -11,7 +11,6 @@ use TypeLang\Mapper\Mapping\Reader\MetadataReader\PropertyMetadataLoaderInterfac
 /**
  * @template TClassMetadataLoader of ClassMetadataLoaderInterface
  * @template TPropertyMetadataLoader of PropertyMetadataLoaderInterface
- *
  * @template-extends Reader<TClassMetadataLoader, TPropertyMetadataLoader>
  */
 abstract class MetadataReader extends Reader

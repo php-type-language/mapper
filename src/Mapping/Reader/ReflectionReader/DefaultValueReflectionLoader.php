@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
 
 final class DefaultValueReflectionLoader extends PropertyReflectionLoader
 {

@@ -9,7 +9,6 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 
 /**
  * @template TValue of mixed = mixed
- *
  * @template-extends ValueException<TValue>
  */
 class InvalidValueException extends ValueException
@@ -18,6 +17,7 @@ class InvalidValueException extends ValueException
      * @template TArgValue of mixed
      *
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromPath(
@@ -40,6 +40,7 @@ class InvalidValueException extends ValueException
      * @template TArgValue of mixed
      *
      * @param TArgValue $value
+     *
      * @return self<TArgValue>
      */
     public static function createFromContext(

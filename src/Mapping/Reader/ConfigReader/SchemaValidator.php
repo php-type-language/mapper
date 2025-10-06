@@ -17,7 +17,6 @@ use JsonSchema\Validator as JsonSchemaValidator;
  *     },
  *     ...
  * }>
- *
  * @phpstan-type PropertyConfigType array{
  *     name?: non-empty-string,
  *     type?: non-empty-string,
@@ -26,13 +25,11 @@ use JsonSchema\Validator as JsonSchemaValidator;
  *     undefined_error_message?: non-empty-string,
  *     ...
  * }
- *
  * @phpstan-type ClassDiscriminatorConfigType array{
  *     field: non-empty-string,
  *     map: non-empty-array<non-empty-string, non-empty-string>,
  *     otherwise?: non-empty-string,
  * }
- *
  * @phpstan-type ClassConfigType array{
  *     normalize_as_array?: bool,
  *     discriminator?: ClassDiscriminatorConfigType,
