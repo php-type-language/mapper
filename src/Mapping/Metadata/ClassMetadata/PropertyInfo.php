@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValuePrototype;
-use TypeLang\Mapper\Mapping\Metadata\ConditionPrototypeSet;
-use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
+use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
+use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
-final class PropertyPrototype
+final class PropertyInfo
 {
     /**
      * @var non-empty-string
      */
     public string $alias;
 
-    public TypePrototype $read;
+    public TypeInfo $read;
 
-    public TypePrototype $write;
+    public TypeInfo $write;
 
-    public ?DefaultValuePrototype $default = null;
+    public ?DefaultValueInfo $default = null;
 
-    public readonly ConditionPrototypeSet $skip;
+    /**
+     * @var list<ConditionInfo>
+     */
+    public array $skip = [];
 
     /**
      * @var non-empty-string|null
@@ -40,7 +43,6 @@ final class PropertyPrototype
         public readonly string $name,
     ) {
         $this->alias = $name;
-        $this->skip = new ConditionPrototypeSet();
-        $this->read = $this->write = new TypePrototype('mixed');
+        $this->read = $this->write = new TypeInfo('mixed');
     }
 }

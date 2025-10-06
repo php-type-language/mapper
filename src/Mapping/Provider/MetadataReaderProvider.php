@@ -12,25 +12,22 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata\DiscriminatorMapPrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValuePrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototypeSet;
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionMetadata;
-use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionPrototype;
+use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
-use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionPrototype;
+use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
-use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionPrototype;
+use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ConditionPrototype;
-use TypeLang\Mapper\Mapping\Metadata\ConditionPrototypeSet;
+use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
+use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
@@ -63,13 +60,13 @@ final class MetadataReaderProvider implements ProviderInterface
     /**
      * @template T of object
      *
-     * @param ClassPrototype<T> $proto
+     * @param ClassInfo<T> $proto
      *
      * @return ClassMetadata<T>
      * @throws \Throwable
      */
     private function toClassMetadata(
-        ClassPrototype $proto,
+        ClassInfo $proto,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ClassMetadata {
@@ -84,20 +81,21 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
-     * @param ClassPrototype<object> $parent
+     * @param ClassInfo<object> $parent
+     * @param iterable<mixed, PropertyInfo> $properties
      *
      * @return array<non-empty-string, PropertyMetadata>
      * @throws \Throwable
      */
     private function toPropertiesMetadata(
-        ClassPrototype $parent,
-        PropertyPrototypeSet $proto,
+        ClassInfo $parent,
+        iterable $properties,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): array {
         $result = [];
 
-        foreach ($proto as $property) {
+        foreach ($properties as $property) {
             $result[$property->name] = $this->toPropertyMetadata($parent, $property, $types, $parser);
         }
 
@@ -105,13 +103,13 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
-     * @param ClassPrototype<object> $parent
+     * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toPropertyMetadata(
-        ClassPrototype $parent,
-        PropertyPrototype $proto,
+        ClassInfo $parent,
+        PropertyInfo $proto,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): PropertyMetadata {
@@ -141,13 +139,13 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
-     * @param ClassPrototype<object> $class
+     * @param ClassInfo<object> $class
      */
     private function toPropertyTypeException(
         TypeNotFoundException $e,
-        ClassPrototype $class,
-        PropertyPrototype $property,
-        TypePrototype $proto,
+        ClassInfo $class,
+        PropertyInfo $property,
+        TypeInfo $proto,
     ): PropertyTypeNotFoundException {
         $error = PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
             class: $class->name,
@@ -164,29 +162,30 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
+     * @param iterable<mixed, ConditionInfo> $conditions
      * @return list<ConditionMetadata>
      */
-    private function toConditionsMetadata(ConditionPrototypeSet $proto): array
+    private function toConditionsMetadata(iterable $conditions): array
     {
         $result = [];
 
-        foreach ($proto as $condition) {
+        foreach ($conditions as $condition) {
             $result[] = $this->toConditionMetadata($condition);
         }
 
         return $result;
     }
 
-    private function toConditionMetadata(ConditionPrototype $proto): ConditionMetadata
+    private function toConditionMetadata(ConditionInfo $proto): ConditionMetadata
     {
         return match (true) {
-            $proto instanceof NullConditionPrototype => new NullConditionMetadata(
+            $proto instanceof NullConditionInfo => new NullConditionMetadata(
                 createdAt: $this->now(),
             ),
-            $proto instanceof EmptyConditionPrototype => new EmptyConditionMetadata(
+            $proto instanceof EmptyConditionInfo => new EmptyConditionMetadata(
                 createdAt: $this->now(),
             ),
-            $proto instanceof ExpressionConditionPrototype => new ExpressionConditionMetadata(
+            $proto instanceof ExpressionConditionInfo => new ExpressionConditionMetadata(
                 expression: $this->createExpression(
                     expression: $proto->expression,
                     names: [$proto->context],
@@ -200,7 +199,7 @@ final class MetadataReaderProvider implements ProviderInterface
         };
     }
 
-    private function toOptionalDefaultValueMetadata(?DefaultValuePrototype $proto): ?DefaultValueMetadata
+    private function toOptionalDefaultValueMetadata(?DefaultValueInfo $proto): ?DefaultValueMetadata
     {
         if ($proto === null) {
             return null;
@@ -209,7 +208,7 @@ final class MetadataReaderProvider implements ProviderInterface
         return $this->toDefaultValueMetadata($proto);
     }
 
-    private function toDefaultValueMetadata(DefaultValuePrototype $proto): DefaultValueMetadata
+    private function toDefaultValueMetadata(DefaultValueInfo $proto): DefaultValueMetadata
     {
         return new DefaultValueMetadata(
             value: $proto->value,
@@ -218,13 +217,13 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
-     * @param ClassPrototype<object> $parent
+     * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toOptionalDiscriminator(
-        ClassPrototype $parent,
-        ?DiscriminatorPrototype $proto,
+        ClassInfo $parent,
+        ?DiscriminatorInfo $proto,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ?DiscriminatorMetadata {
@@ -236,13 +235,13 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
-     * @param ClassPrototype<object> $parent
+     * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toDiscriminator(
-        ClassPrototype $parent,
-        DiscriminatorPrototype $proto,
+        ClassInfo $parent,
+        DiscriminatorInfo $proto,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): DiscriminatorMetadata {
@@ -257,18 +256,19 @@ final class MetadataReaderProvider implements ProviderInterface
     }
 
     /**
+     * @param non-empty-array<non-empty-string, TypeInfo> $map
      * @return non-empty-array<non-empty-string, TypeMetadata>
      * @throws \Throwable
      */
     private function toDiscriminatorMap(
-        DiscriminatorMapPrototype $proto,
+        array $map,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): array {
         $result = [];
 
-        foreach ($proto as $value => $map) {
-            $result[$value] = $this->toTypeMetadata($map, $types, $parser);
+        foreach ($map as $value => $type) {
+            $result[$value] = $this->toTypeMetadata($type, $types, $parser);
         }
 
         /** @var non-empty-array<non-empty-string, TypeMetadata> $result */
@@ -279,7 +279,7 @@ final class MetadataReaderProvider implements ProviderInterface
      * @throws \Throwable
      */
     private function toOptionalTypeMetadata(
-        ?TypePrototype $proto,
+        ?TypeInfo $proto,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ?TypeMetadata {
@@ -294,7 +294,7 @@ final class MetadataReaderProvider implements ProviderInterface
      * @throws \Throwable
      */
     private function toTypeMetadata(
-        TypePrototype $info,
+        TypeInfo $info,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeMetadata {

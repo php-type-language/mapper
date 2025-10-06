@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
-final class SourceMapPrototype
+final class SourceInfo
 {
     public function __construct(
         /**

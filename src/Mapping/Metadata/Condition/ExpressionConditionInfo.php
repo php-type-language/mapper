@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\Condition;
 
-use TypeLang\Mapper\Mapping\Metadata\ConditionPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
 
-final class ExpressionConditionPrototype extends ConditionPrototype
+final class ExpressionConditionInfo extends ConditionInfo
 {
     /**
      * @var non-empty-string

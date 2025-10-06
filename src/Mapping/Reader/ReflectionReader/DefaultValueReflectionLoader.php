@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValuePrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 
 final class DefaultValueReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         if (!$property->hasDefaultValue()) {
             return;
         }
 
-        $prototype->default = new DefaultValuePrototype(
+        $prototype->default = new DefaultValueInfo(
             value: $property->getDefaultValue(),
         );
     }

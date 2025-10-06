@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
-use TypeLang\Mapper\Mapping\Metadata\SourceMapPrototype;
-use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
+use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 use TypeLang\Parser\Node\Name;
 
 final class TypePropertyReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         $this->loadReadType($property, $prototype);
         $this->loadWriteType($property, $prototype);
     }
 
-    private function findSourceMap(\ReflectionProperty $property): ?SourceMapPrototype
+    private function findSourceMap(\ReflectionProperty $property): ?SourceInfo
     {
         $class = $property->getDeclaringClass();
 
@@ -32,17 +32,17 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
             return null;
         }
 
-        return new SourceMapPrototype($file, $line);
+        return new SourceInfo($file, $line);
     }
 
-    private function loadReadType(\ReflectionProperty $property, PropertyPrototype $info): void
+    private function loadReadType(\ReflectionProperty $property, PropertyInfo $info): void
     {
         $definition = $this->getReadTypeDefinition($property);
 
-        $info->read = $info->write = new TypePrototype($definition, $this->findSourceMap($property));
+        $info->read = $info->write = new TypeInfo($definition, $this->findSourceMap($property));
     }
 
-    private function loadWriteType(\ReflectionProperty $property, PropertyPrototype $info): void
+    private function loadWriteType(\ReflectionProperty $property, PropertyInfo $info): void
     {
         $definition = $this->findWriteTypeDefinition($property);
 
@@ -50,7 +50,7 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
             return;
         }
 
-        $info->write = new TypePrototype($definition, $this->findSourceMap($property));
+        $info->write = new TypeInfo($definition, $this->findSourceMap($property));
     }
 
     /**

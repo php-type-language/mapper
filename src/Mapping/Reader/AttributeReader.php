@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader\AliasPropertyAttributeLoader;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader\ClassAttributeLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader\DiscriminatorMapClassAttributeLoader;
@@ -62,7 +62,7 @@ final class AttributeReader extends Reader
     }
 
     #[\Override]
-    public function read(\ReflectionClass $class): ClassPrototype
+    public function read(\ReflectionClass $class): ClassInfo
     {
         $classInfo = parent::read($class);
 
@@ -76,7 +76,7 @@ final class AttributeReader extends Reader
             }
 
             /** @phpstan-ignore-next-line : Property name cannot be empty */
-            $propertyInfo = $classInfo->properties->getOrCreate($property->name);
+            $propertyInfo = $classInfo->getPropertyOrCreate($property->name);
 
             foreach ($this->propertyLoaders as $propertyLoader) {
                 $propertyLoader->load($property, $propertyInfo);

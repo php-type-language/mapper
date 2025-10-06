@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
 use TypeLang\Mapper\Mapping\MapType;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
-use TypeLang\Mapper\Mapping\Metadata\SourceMapPrototype;
-use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
+use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class TypePropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         $this->loadPropertyType($property, $prototype);
 
@@ -23,7 +23,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
         $this->loadWriteHookType($property, $prototype);
     }
 
-    private function findSourceMap(\ReflectionProperty $property): ?SourceMapPrototype
+    private function findSourceMap(\ReflectionProperty $property): ?SourceInfo
     {
         $class = $property->getDeclaringClass();
 
@@ -38,10 +38,10 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return null;
         }
 
-        return new SourceMapPrototype($file, $line);
+        return new SourceInfo($file, $line);
     }
 
-    private function loadPropertyType(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    private function loadPropertyType(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         $attribute = $this->findPropertyAttribute($property, MapType::class);
 
@@ -49,13 +49,13 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->read = $prototype->write = new TypePrototype(
+        $prototype->read = $prototype->write = new TypeInfo(
             definition: $attribute->type,
             source: $this->findSourceMap($property),
         );
     }
 
-    private function loadReadHookType(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    private function loadReadHookType(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         $hook = $property->getHook(\PropertyHookType::Get);
 
@@ -69,12 +69,12 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->read = new TypePrototype(
+        $prototype->read = new TypeInfo(
             definition: $attribute->type,
         );
     }
 
-    private function loadWriteHookType(\ReflectionProperty $property, PropertyPrototype $prototype): void
+    private function loadWriteHookType(\ReflectionProperty $property, PropertyInfo $prototype): void
     {
         $hook = $property->getHook(\PropertyHookType::Set);
 
@@ -88,7 +88,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->write = new TypePrototype(
+        $prototype->write = new TypeInfo(
             definition: $attribute->type,
         );
     }

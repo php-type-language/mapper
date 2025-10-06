@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 
 interface ClassReflectionLoaderInterface
 {
@@ -12,7 +12,7 @@ interface ClassReflectionLoaderInterface
      * @template T of object
      *
      * @param \ReflectionClass<T> $class
-     * @param ClassPrototype<T> $prototype
+     * @param ClassInfo<T> $prototype
      */
-    public function load(\ReflectionClass $class, ClassPrototype $prototype): void;
+    public function load(\ReflectionClass $class, ClassInfo $prototype): void;
 }

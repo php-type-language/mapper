@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 
 interface ReaderInterface
 {
@@ -13,7 +13,7 @@ interface ReaderInterface
      *
      * @param \ReflectionClass<T> $class
      *
-     * @return ClassPrototype<T>
+     * @return ClassInfo<T>
      */
-    public function read(\ReflectionClass $class): ClassPrototype;
+    public function read(\ReflectionClass $class): ClassInfo;
 }

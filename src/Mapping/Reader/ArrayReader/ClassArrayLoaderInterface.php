@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ArrayReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Reader\ArrayReader;
 
 /**
@@ -16,8 +16,8 @@ interface ClassArrayLoaderInterface
      * @template T of object
      *
      * @param \ReflectionClass<T> $class
-     * @param ClassPrototype<T> $prototype
+     * @param ClassInfo<T> $prototype
      * @param ClassConfigType $config
      */
-    public function load(\ReflectionClass $class, ClassPrototype $prototype, array $config): void;
+    public function load(\ReflectionClass $class, ClassInfo $prototype, array $config): void;
 }

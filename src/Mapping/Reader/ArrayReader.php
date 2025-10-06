@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Reader\ArrayReader\ClassArrayLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ArrayReader\PropertyArrayLoaderInterface;
 
@@ -76,7 +76,7 @@ abstract class ArrayReader extends Reader
      */
     abstract protected function load(\ReflectionClass $class): array;
 
-    public function read(\ReflectionClass $class): ClassPrototype
+    public function read(\ReflectionClass $class): ClassInfo
     {
         $info = parent::read($class);
 

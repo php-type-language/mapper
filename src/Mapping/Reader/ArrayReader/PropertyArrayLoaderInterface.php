@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\ArrayReader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 use TypeLang\Mapper\Mapping\Reader\ArrayReader;
 
 /**
@@ -15,5 +15,5 @@ interface PropertyArrayLoaderInterface
     /**
      * @param PropertyConfigType $config
      */
-    public function load(\ReflectionProperty $property, PropertyPrototype $prototype, array $config): void;
+    public function load(\ReflectionProperty $property, PropertyInfo $prototype, array $config): void;
 }

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
 use TypeLang\Mapper\Mapping\DiscriminatorMap;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorPrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
-use TypeLang\Mapper\Mapping\Metadata\TypePrototype;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
 {
-    public function load(\ReflectionClass $class, ClassPrototype $prototype): void
+    public function load(\ReflectionClass $class, ClassInfo $prototype): void
     {
         $attribute = $this->findClassAttribute($class, DiscriminatorMap::class);
 
@@ -22,16 +22,20 @@ final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
         $default = null;
 
         if ($attribute->otherwise !== null) {
-            $default = new TypePrototype($attribute->otherwise);
+            $default = new TypeInfo($attribute->otherwise);
         }
 
-        $prototype->discriminator = new DiscriminatorPrototype(
+        $map = [];
+
+        foreach ($attribute->map as $value => $type) {
+            $map[$value] = new TypeInfo($type);
+        }
+
+        $prototype->discriminator = new DiscriminatorInfo(
             field: $attribute->field,
+            map: $map,
             default: $default,
         );
 
-        foreach ($attribute->map as $value => $type) {
-            $prototype->discriminator->map->add($value, new TypePrototype($type));
-        }
     }
 }
