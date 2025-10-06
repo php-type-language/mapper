@@ -94,7 +94,7 @@ class StandardPlatform extends Platform
         yield new Builder\UnitEnumTypeBuilder();
 
         // Adds support for the "Path\To\Class" statement
-        yield new Builder\ClassTypeBuilder($this->driver);
+        yield new Builder\ClassTypeBuilder($this->meta);
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

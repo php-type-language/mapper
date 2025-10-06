@@ -4,28 +4,39 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
-use TypeLang\Mapper\Mapping\Driver\DriverInterface;
-use TypeLang\Mapper\Mapping\Driver\InMemoryCachedDriver;
-use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
+use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
+use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
+use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
+use TypeLang\Mapper\Mapping\Reader\AttributeReader;
+use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
 abstract class Platform implements PlatformInterface
 {
-    protected readonly DriverInterface $driver;
+    protected readonly ProviderInterface $meta;
 
-    public function __construct(?DriverInterface $driver = null)
+    public function __construct(ProviderInterface|ReaderInterface|null $meta = null)
     {
-        // We can store all classes in RAM by force, since their
-        // number is limited. This will not lead to memory leaks.
-        $this->driver = new InMemoryCachedDriver(
-            delegate: $driver ?? $this->createDefaultMetadataDriver(),
+        $this->meta = match (true) {
+            $meta instanceof ProviderInterface => $meta,
+            $meta instanceof ReaderInterface => $this->createDefaultMetadataProvider($meta),
+            default => $this->createDefaultMetadataProvider(),
+        };
+    }
+
+    protected function createDefaultMetadataProvider(?ReaderInterface $reader = null): ProviderInterface
+    {
+        return new InMemoryProvider(
+            delegate: new MetadataReaderProvider(
+                reader: $reader ?? $this->createDefaultMetadataReader(),
+            ),
         );
     }
 
-    protected function createDefaultMetadataDriver(): DriverInterface
+    protected function createDefaultMetadataReader(): ReaderInterface
     {
-        return new AttributeDriver(
-            delegate: new ReflectionDriver(),
+        return new AttributeReader(
+            delegate: new ReflectionReader(),
         );
     }
 }

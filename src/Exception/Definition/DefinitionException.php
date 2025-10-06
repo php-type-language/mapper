@@ -11,7 +11,8 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * Occurs when the type was incorrectly defined.
  */
-abstract class DefinitionException extends \InvalidArgumentException implements MapperExceptionInterface
+abstract class DefinitionException extends \InvalidArgumentException implements
+    MapperExceptionInterface
 {
     public readonly Template $template;
 
@@ -35,5 +36,17 @@ abstract class DefinitionException extends \InvalidArgumentException implements 
     public function getType(): TypeStatement
     {
         return $this->type;
+    }
+
+    /**
+     * @api
+     *
+     * @param non-empty-string $file
+     * @param int<1, max> $line
+     */
+    public function setSource(string $file, int $line): void
+    {
+        $this->file = $file;
+        $this->line = $line;
     }
 }

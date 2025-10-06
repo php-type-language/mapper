@@ -21,7 +21,7 @@ class ExampleDTO
 // Which means that we only read those fields that are marked with
 // the "MapProperty" attribute.
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    driver: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),
+    meta: new \TypeLang\Mapper\Mapping\Reader\AttributeReader(),
 );
 
 $mapper = new Mapper($platform);

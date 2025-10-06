@@ -10,9 +10,9 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Driver\AttributeDriver;
-use TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver;
-use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
+use TypeLang\Mapper\Mapping\Provider\AttributeDriver;
+use TypeLang\Mapper\Mapping\Provider\Psr16CachedDriver;
+use TypeLang\Mapper\Mapping\Provider\ReflectionDriver;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
 #[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
@@ -31,7 +31,7 @@ final class TypeLangAttributesBench extends MapperBenchmark
 
         $this->cached = new Mapper(
             platform: new StandardPlatform(
-                driver: new Psr16CachedDriver(
+                meta: new Psr16CachedDriver(
                     cache: $this->psr16,
                     delegate: $driver,
                 ),
@@ -40,7 +40,7 @@ final class TypeLangAttributesBench extends MapperBenchmark
 
         $this->raw = new Mapper(
             platform: new StandardPlatform(
-                driver: $driver,
+                meta: $driver,
             ),
         );
     }

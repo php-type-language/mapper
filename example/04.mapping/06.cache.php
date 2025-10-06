@@ -6,6 +6,8 @@ use TypeLang\Mapper\Mapper;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+die('TODO: Not implemented yet');
+
 class ExampleDTO
 {
     /**
@@ -24,10 +26,10 @@ $cache = new \Symfony\Component\Cache\Psr16Cache(
 );
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    driver: new \TypeLang\Mapper\Mapping\Driver\Psr16CachedDriver(
+    meta: new \TypeLang\Mapper\Mapping\Provider\Psr16CachedDriver(
         cache: $cache,
-        delegate: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
-            delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(),
+        delegate: new \TypeLang\Mapper\Mapping\Provider\DocBlockDriver(
+            delegate: new \TypeLang\Mapper\Mapping\Provider\AttributeDriver(),
         ),
     ),
 );

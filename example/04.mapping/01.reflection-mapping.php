@@ -18,7 +18,7 @@ class ExampleDTO
 
 // Create standard platform with reflection driver
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    driver: new \TypeLang\Mapper\Mapping\Driver\ReflectionDriver(),
+    meta: new \TypeLang\Mapper\Mapping\Reader\ReflectionReader(),
 );
 
 $mapper = new Mapper($platform);

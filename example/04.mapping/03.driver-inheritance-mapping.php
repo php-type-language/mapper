@@ -22,8 +22,8 @@ class ExampleDTO
 // Which means that we read all public fields, as well as those marked
 // with the MapProperty attribute with overwriting.
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    driver: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(
-        delegate: new \TypeLang\Mapper\Mapping\Driver\ReflectionDriver(),
+    meta: new \TypeLang\Mapper\Mapping\Reader\AttributeReader(
+        delegate: new \TypeLang\Mapper\Mapping\Reader\ReflectionReader(),
     ),
 );
 

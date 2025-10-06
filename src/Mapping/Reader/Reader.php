@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Mapping\Info\ClassInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
 
 abstract class Reader implements ReaderInterface
 {
@@ -12,7 +12,7 @@ abstract class Reader implements ReaderInterface
         private readonly ReaderInterface $delegate = new NullReader(),
     ) {}
 
-    public function read(\ReflectionClass $class): ClassInfo
+    public function read(\ReflectionClass $class): ClassPrototype
     {
         return $this->delegate->read($class);
     }

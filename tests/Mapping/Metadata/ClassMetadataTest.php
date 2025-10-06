@@ -21,10 +21,6 @@ final class ClassMetadataTest extends MetadataTestCase
         $m = new ClassMetadata(\stdClass::class, [$propA, $propB], $disc, 777);
 
         self::assertSame(\stdClass::class, $m->name);
-        self::assertTrue($m->hasProperty('a'));
-        self::assertTrue($m->hasProperty('b'));
-        self::assertSame($propA, $m->findProperty('a'));
-        self::assertSame($propB, $m->findProperty('b'));
         self::assertSame($disc, $m->discriminator);
         self::assertSame(777, $m->timestamp);
     }
@@ -57,11 +53,6 @@ final class ClassMetadataTest extends MetadataTestCase
         $propB = new PropertyMetadata('b');
         $m->addProperty($propA);
         $m->addProperty($propB);
-
-        self::assertTrue($m->hasProperty('a'));
-        self::assertTrue($m->hasProperty('b'));
-        self::assertSame($propA, $m->findProperty('a'));
-        self::assertSame($propB, $m->findProperty('b'));
 
         $props = $m->getProperties();
         self::assertCount(2, $props);

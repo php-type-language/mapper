@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
-use TypeLang\Mapper\Mapping\Info\ClassInfo;
+use TypeLang\Mapper\Mapping\Metadata\ClassPrototype;
 
 interface ClassAttributeLoaderInterface
 {
@@ -12,7 +12,7 @@ interface ClassAttributeLoaderInterface
      * @template T of object
      *
      * @param \ReflectionClass<T> $class
-     * @param ClassInfo<T> $info
+     * @param ClassPrototype<T> $prototype
      */
-    public function load(\ReflectionClass $class, ClassInfo $info): void;
+    public function load(\ReflectionClass $class, ClassPrototype $prototype): void;
 }

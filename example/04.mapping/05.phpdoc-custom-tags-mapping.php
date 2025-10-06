@@ -6,6 +6,8 @@ use TypeLang\Mapper\Mapper;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
+die('TODO: Not implemented yet');
+
 class ExampleDTO
 {
     public function __construct(
@@ -18,11 +20,11 @@ class ExampleDTO
 }
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
-    driver: new \TypeLang\Mapper\Mapping\Driver\DocBlockDriver(
+    meta: new \TypeLang\Mapper\Mapping\Provider\DocBlockDriver(
         paramTagName: 'custom-param', // Override "@param" tag by the "@custom-param"
         varTagName: 'custom-var',     // Override "@var" tag by the "@custom-var"
-        delegate: new \TypeLang\Mapper\Mapping\Driver\AttributeDriver(
-            delegate: new \TypeLang\Mapper\Mapping\Driver\ReflectionDriver(),
+        delegate: new \TypeLang\Mapper\Mapping\Provider\AttributeDriver(
+            delegate: new \TypeLang\Mapper\Mapping\Provider\ReflectionDriver(),
         ),
     ),
 );
