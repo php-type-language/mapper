@@ -71,6 +71,7 @@ abstract class ArrayReader extends Reader
 
     /**
      * @param \ReflectionClass<object> $class
+     *
      * @return ClassConfigType
      */
     abstract protected function load(\ReflectionClass $class): array;

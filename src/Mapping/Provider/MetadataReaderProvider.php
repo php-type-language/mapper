@@ -11,8 +11,8 @@ use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata\DiscriminatorMapPrototype;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata\DiscriminatorMapPrototype;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorPrototype;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
@@ -64,8 +64,8 @@ final class MetadataReaderProvider implements ProviderInterface
      * @template T of object
      *
      * @param ClassPrototype<T> $proto
-     * @return ClassMetadata<T>
      *
+     * @return ClassMetadata<T>
      * @throws \Throwable
      */
     private function toClassMetadata(
@@ -85,8 +85,8 @@ final class MetadataReaderProvider implements ProviderInterface
 
     /**
      * @param ClassPrototype<object> $parent
-     * @return array<non-empty-string, PropertyMetadata>
      *
+     * @return array<non-empty-string, PropertyMetadata>
      * @throws \Throwable
      */
     private function toPropertiesMetadata(
@@ -257,7 +257,6 @@ final class MetadataReaderProvider implements ProviderInterface
 
     /**
      * @return non-empty-array<non-empty-string, TypeMetadata>
-     *
      * @throws \Throwable
      */
     private function toDiscriminatorMap(

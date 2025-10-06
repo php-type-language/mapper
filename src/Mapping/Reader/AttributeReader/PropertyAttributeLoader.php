@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
-use ReflectionProperty as RefProperty;
 use ReflectionMethod as RefHook;
+use ReflectionProperty as RefProperty;
 
 abstract class PropertyAttributeLoader implements PropertyAttributeLoaderInterface
 {

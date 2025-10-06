@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
 use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
-use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader;

@@ -12,6 +12,7 @@ interface ReaderInterface
      * @template T of object
      *
      * @param \ReflectionClass<T> $class
+     *
      * @return ClassPrototype<T>
      */
     public function read(\ReflectionClass $class): ClassPrototype;

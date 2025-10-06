@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
-use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 

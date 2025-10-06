@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionPrototype;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionPrototype;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionPrototype;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyPrototype;
 use TypeLang\Mapper\Mapping\SkipWhen;
 use TypeLang\Mapper\Mapping\SkipWhenEmpty;
 use TypeLang\Mapper\Mapping\SkipWhenNull;

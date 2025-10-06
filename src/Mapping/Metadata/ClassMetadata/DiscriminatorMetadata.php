@@ -29,8 +29,8 @@ final class DiscriminatorMetadata extends Metadata
          * Gets default mapping type for transformations that do not comply
          * with the specified mapping rules defined in {@see getMapping()}.
          */
-        public ?TypeMetadata  $default = null,
-        ?int                  $createdAt = null,
+        public ?TypeMetadata $default = null,
+        ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
     }
