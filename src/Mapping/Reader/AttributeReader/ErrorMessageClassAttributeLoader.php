@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\OnTypeError;
 
 final class ErrorMessageClassAttributeLoader extends ClassAttributeLoader
 {
-    public function load(\ReflectionClass $class, ClassInfo $prototype): void
+    public function load(\ReflectionClass $class, ClassInfo $info): void
     {
         $error = $this->findClassAttribute($class, OnTypeError::class);
 
@@ -17,6 +17,6 @@ final class ErrorMessageClassAttributeLoader extends ClassAttributeLoader
             return;
         }
 
-        $prototype->typeErrorMessage = $error->message;
+        $info->typeErrorMessage = $error->message;
     }
 }

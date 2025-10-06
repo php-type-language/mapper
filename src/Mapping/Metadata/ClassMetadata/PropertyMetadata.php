@@ -8,6 +8,10 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValue
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class PropertyMetadata extends Metadata
 {
@@ -60,5 +64,45 @@ final class PropertyMetadata extends Metadata
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
+    }
+
+    /**
+     * Dynamically creates AST type representation.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getTypeStatement(Context $context, bool $read): TypeStatement
+    {
+        $info = $read ? $this->read : $this->write;
+
+        $statement = clone $info->statement;
+
+        if ($context->isDetailedTypes() || !$statement instanceof NamedTypeNode) {
+            return $statement;
+        }
+
+        return new NamedTypeNode($statement->name);
+    }
+
+    /**
+     * Dynamically creates AST field representation.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getFieldNode(Context $context, bool $read): NamedFieldNode
+    {
+        $statement = $this->getTypeStatement($context, $read);
+
+        $name = $this->name;
+
+        if ($context->isDenormalization()) {
+            $name = $this->alias;
+        }
+
+        return new NamedFieldNode(
+            key: $name,
+            of: $statement,
+            optional: $this->default !== null,
+        );
     }
 }

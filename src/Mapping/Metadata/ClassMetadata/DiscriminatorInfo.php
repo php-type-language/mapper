@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
+use TypeLang\Mapper\Mapping\Metadata\MetadataInfo;
+use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
-final class DiscriminatorInfo
+final class DiscriminatorInfo extends MetadataInfo
 {
     public function __construct(
         /**
@@ -18,5 +20,8 @@ final class DiscriminatorInfo
          */
         public array $map,
         public ?TypeInfo $default = null,
-    ) {}
+        ?SourceInfo $source = null,
+    ) {
+        parent::__construct($source);
+    }
 }

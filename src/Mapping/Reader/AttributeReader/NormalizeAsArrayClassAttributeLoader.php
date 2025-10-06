@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\NormalizeAsArray;
 
 final class NormalizeAsArrayClassAttributeLoader extends ClassAttributeLoader
 {
-    public function load(\ReflectionClass $class, ClassInfo $prototype): void
+    public function load(\ReflectionClass $class, ClassInfo $info): void
     {
         $attribute = $this->findClassAttribute($class, NormalizeAsArray::class);
 
@@ -17,6 +17,6 @@ final class NormalizeAsArrayClassAttributeLoader extends ClassAttributeLoader
             return;
         }
 
-        $prototype->isNormalizeAsArray = $attribute->enabled;
+        $info->isNormalizeAsArray = $attribute->enabled;
     }
 }

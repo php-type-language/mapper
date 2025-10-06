@@ -14,11 +14,11 @@ use TypeLang\Mapper\Mapping\SkipWhenNull;
 
 final class SkipConditionsPropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $this->loadUserConditions($property, $prototype);
-        $this->loadNullCondition($property, $prototype);
-        $this->loadEmptyCondition($property, $prototype);
+        $this->loadUserConditions($property, $info);
+        $this->loadNullCondition($property, $info);
+        $this->loadEmptyCondition($property, $info);
     }
 
     private function loadUserConditions(\ReflectionProperty $property, PropertyInfo $prototype): void

@@ -34,6 +34,8 @@
         "symfony/property-access": "^5.4|^6.0|^7.0",
         "symfony/stopwatch": "^5.4|^6.0|^7.0",
         "symfony/var-dumper": "^5.4|^6.0|^7.0",
+        "symfony/yaml": "^5.4|^6.0|^7.0",
+        "nette/neon": "^3.0",
         "type-lang/phpdoc": "^1.0",
         "type-lang/phpdoc-standard-tags": "^1.0"
     },
@@ -43,8 +45,11 @@
         }
     },
     "suggest": {
-        "type-lang/phpdoc-standard-tags": "(^1.0) Required for DocBlockDriver mapping driver support",
-        "justinrainbow/json-schema": "(^5.3|^6.0) Required for configuration drivers validation"
+        "ext-json": "Required for JSON mapping configuration files",
+        "nette/neon": "(^3.0) Required for NEON mapping configuration files",
+        "symfony/yaml": "(^5.4|^6.0|^7.0) Required for YAML mapping configuration files",
+        "type-lang/phpdoc-standard-tags": "(^1.0) Required for PhpDoc mapping configuration",
+        "justinrainbow/json-schema": "(^5.3|^6.0) Required for file-based configuration validation"
     },
     "extra": {
         "branch-alias": {

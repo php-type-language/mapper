@@ -6,9 +6,11 @@ namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueInfo;
 use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
+use TypeLang\Mapper\Mapping\Metadata\MetadataInfo;
+use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
-final class PropertyInfo
+final class PropertyInfo extends MetadataInfo
 {
     /**
      * @var non-empty-string
@@ -41,8 +43,11 @@ final class PropertyInfo
          * @var non-empty-string
          */
         public readonly string $name,
+        ?SourceInfo $source = null,
     ) {
         $this->alias = $name;
         $this->read = $this->write = new TypeInfo('mixed');
+
+        parent::__construct($source);
     }
 }

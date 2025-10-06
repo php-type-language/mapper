@@ -6,6 +6,10 @@ namespace TypeLang\Mapper\Mapping\Metadata;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
+use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * Represents an abstraction over general information about a class.
@@ -54,5 +58,37 @@ final class ClassMetadata extends Metadata
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
+    }
+
+    /**
+     * Dynamically creates AST class representation.
+     *
+     * Required to print type information in exceptions.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getTypeStatement(Context $context, bool $read): TypeStatement
+    {
+        if (!$context->isDetailedTypes()) {
+            return new NamedTypeNode($this->name);
+        }
+
+        $fields = [];
+
+        foreach ($this->properties as $property) {
+            $field = $property->getFieldNode($context, $read);
+
+            if ($field === null) {
+                continue;
+            }
+
+            $fields[] = $field;
+        }
+
+        if ($fields === []) {
+            return new NamedTypeNode($this->name);
+        }
+
+        return new NamedTypeNode($this->name, fields: new FieldsListNode($fields));
     }
 }

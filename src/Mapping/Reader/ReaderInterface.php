@@ -14,6 +14,7 @@ interface ReaderInterface
      * @param \ReflectionClass<T> $class
      *
      * @return ClassInfo<T>
+     * @throws \Throwable
      */
     public function read(\ReflectionClass $class): ClassInfo;
 }

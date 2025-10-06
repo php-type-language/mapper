@@ -54,28 +54,30 @@ final class MetadataReaderProvider implements ProviderInterface
     ): ClassMetadata {
         $info = $this->reader->read($class);
 
+        dd($info);
+
         return $this->toClassMetadata($info, $types, $parser);
     }
 
     /**
      * @template T of object
      *
-     * @param ClassInfo<T> $proto
+     * @param ClassInfo<T> $class
      *
      * @return ClassMetadata<T>
      * @throws \Throwable
      */
     private function toClassMetadata(
-        ClassInfo $proto,
+        ClassInfo $class,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ClassMetadata {
         return new ClassMetadata(
-            name: $proto->name,
-            properties: $this->toPropertiesMetadata($proto, $proto->properties, $types, $parser),
-            discriminator: $this->toOptionalDiscriminator($proto, $proto->discriminator, $types, $parser),
-            isNormalizeAsArray: $proto->isNormalizeAsArray,
-            typeErrorMessage: $proto->typeErrorMessage,
+            name: $class->name,
+            properties: $this->toPropertiesMetadata($class, $class->properties, $types, $parser),
+            discriminator: $this->toOptionalDiscriminator($class, $class->discriminator, $types, $parser),
+            isNormalizeAsArray: $class->isNormalizeAsArray,
+            typeErrorMessage: $class->typeErrorMessage,
             createdAt: $this->now(),
         );
     }
@@ -109,31 +111,31 @@ final class MetadataReaderProvider implements ProviderInterface
      */
     private function toPropertyMetadata(
         ClassInfo $parent,
-        PropertyInfo $proto,
+        PropertyInfo $property,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): PropertyMetadata {
         try {
-            $read = $this->toTypeMetadata($proto->read, $types, $parser);
+            $read = $this->toTypeMetadata($property->read, $types, $parser);
         } catch (TypeNotFoundException $e) {
-            throw $this->toPropertyTypeException($e, $parent, $proto, $proto->read);
+            throw $this->toPropertyTypeException($e, $parent, $property, $property->read);
         }
 
         try {
-            $write = $this->toTypeMetadata($proto->write, $types, $parser);
+            $write = $this->toTypeMetadata($property->write, $types, $parser);
         } catch (TypeNotFoundException $e) {
-            throw $this->toPropertyTypeException($e, $parent, $proto, $proto->write);
+            throw $this->toPropertyTypeException($e, $parent, $property, $property->write);
         }
 
         return new PropertyMetadata(
-            name: $proto->name,
-            alias: $proto->alias,
+            name: $property->name,
+            alias: $property->alias,
             read: $read,
             write: $write,
-            default: $this->toOptionalDefaultValueMetadata($proto->default),
-            skip: $this->toConditionsMetadata($proto->skip),
-            typeErrorMessage: $proto->typeErrorMessage,
-            undefinedErrorMessage: $proto->undefinedErrorMessage,
+            default: $this->toOptionalDefaultValueMetadata($property->default),
+            skip: $this->toConditionsMetadata($property->skip),
+            typeErrorMessage: $property->typeErrorMessage,
+            undefinedErrorMessage: $property->undefinedErrorMessage,
             createdAt: $this->now(),
         );
     }
@@ -145,7 +147,7 @@ final class MetadataReaderProvider implements ProviderInterface
         TypeNotFoundException $e,
         ClassInfo $class,
         PropertyInfo $property,
-        TypeInfo $proto,
+        TypeInfo $type,
     ): PropertyTypeNotFoundException {
         $error = PropertyTypeNotFoundException::becauseTypeOfPropertyNotDefined(
             class: $class->name,
@@ -154,8 +156,8 @@ final class MetadataReaderProvider implements ProviderInterface
             previous: $e,
         );
 
-        if ($proto->source !== null) {
-            $error->setSource($proto->source->file, $proto->source->line);
+        if ($type->source !== null) {
+            $error->setSource($type->source->file, $type->source->line);
         }
 
         return $error;
@@ -176,42 +178,42 @@ final class MetadataReaderProvider implements ProviderInterface
         return $result;
     }
 
-    private function toConditionMetadata(ConditionInfo $proto): ConditionMetadata
+    private function toConditionMetadata(ConditionInfo $info): ConditionMetadata
     {
         return match (true) {
-            $proto instanceof NullConditionInfo => new NullConditionMetadata(
+            $info instanceof NullConditionInfo => new NullConditionMetadata(
                 createdAt: $this->now(),
             ),
-            $proto instanceof EmptyConditionInfo => new EmptyConditionMetadata(
+            $info instanceof EmptyConditionInfo => new EmptyConditionMetadata(
                 createdAt: $this->now(),
             ),
-            $proto instanceof ExpressionConditionInfo => new ExpressionConditionMetadata(
+            $info instanceof ExpressionConditionInfo => new ExpressionConditionMetadata(
                 expression: $this->createExpression(
-                    expression: $proto->expression,
-                    names: [$proto->context],
+                    expression: $info->expression,
+                    names: [$info->context],
                 ),
-                variable: $proto->context,
+                variable: $info->context,
             ),
             default => throw new \InvalidArgumentException(\sprintf(
                 'Unsupported type of condition "%s"',
-                $proto::class,
+                $info::class,
             )),
         };
     }
 
-    private function toOptionalDefaultValueMetadata(?DefaultValueInfo $proto): ?DefaultValueMetadata
+    private function toOptionalDefaultValueMetadata(?DefaultValueInfo $info): ?DefaultValueMetadata
     {
-        if ($proto === null) {
+        if ($info === null) {
             return null;
         }
 
-        return $this->toDefaultValueMetadata($proto);
+        return $this->toDefaultValueMetadata($info);
     }
 
-    private function toDefaultValueMetadata(DefaultValueInfo $proto): DefaultValueMetadata
+    private function toDefaultValueMetadata(DefaultValueInfo $info): DefaultValueMetadata
     {
         return new DefaultValueMetadata(
-            value: $proto->value,
+            value: $info->value,
             createdAt: $this->now(),
         );
     }
@@ -223,15 +225,15 @@ final class MetadataReaderProvider implements ProviderInterface
      */
     private function toOptionalDiscriminator(
         ClassInfo $parent,
-        ?DiscriminatorInfo $proto,
+        ?DiscriminatorInfo $info,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ?DiscriminatorMetadata {
-        if ($proto === null) {
+        if ($info === null) {
             return null;
         }
 
-        return $this->toDiscriminator($parent, $proto, $types, $parser);
+        return $this->toDiscriminator($parent, $info, $types, $parser);
     }
 
     /**
@@ -241,16 +243,16 @@ final class MetadataReaderProvider implements ProviderInterface
      */
     private function toDiscriminator(
         ClassInfo $parent,
-        DiscriminatorInfo $proto,
+        DiscriminatorInfo $info,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): DiscriminatorMetadata {
         // TODO Customize discriminator errors
 
         return new DiscriminatorMetadata(
-            field: $proto->field,
-            map: $this->toDiscriminatorMap($proto->map, $types, $parser),
-            default: $this->toOptionalTypeMetadata($proto->default, $types, $parser),
+            field: $info->field,
+            map: $this->toDiscriminatorMap($info->map, $types, $parser),
+            default: $this->toOptionalTypeMetadata($info->default, $types, $parser),
             createdAt: $this->now(),
         );
     }
@@ -279,15 +281,15 @@ final class MetadataReaderProvider implements ProviderInterface
      * @throws \Throwable
      */
     private function toOptionalTypeMetadata(
-        ?TypeInfo $proto,
+        ?TypeInfo $type,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ?TypeMetadata {
-        if ($proto === null) {
+        if ($type === null) {
             return null;
         }
 
-        return $this->toTypeMetadata($proto, $types, $parser);
+        return $this->toTypeMetadata($type, $types, $parser);
     }
 
     /**

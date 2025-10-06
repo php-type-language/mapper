@@ -11,10 +11,10 @@ use TypeLang\Parser\Node\Name;
 
 final class TypePropertyReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $this->loadReadType($property, $prototype);
-        $this->loadWriteType($property, $prototype);
+        $this->loadReadType($property, $info);
+        $this->loadWriteType($property, $info);
     }
 
     private function findSourceMap(\ReflectionProperty $property): ?SourceInfo

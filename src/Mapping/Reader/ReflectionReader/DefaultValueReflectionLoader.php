@@ -9,13 +9,13 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 
 final class DefaultValueReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $info): void
     {
         if (!$property->hasDefaultValue()) {
             return;
         }
 
-        $prototype->default = new DefaultValueInfo(
+        $info->default = new DefaultValueInfo(
             value: $property->getDefaultValue(),
         );
     }

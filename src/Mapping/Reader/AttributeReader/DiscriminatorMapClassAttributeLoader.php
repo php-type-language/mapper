@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
 {
-    public function load(\ReflectionClass $class, ClassInfo $prototype): void
+    public function load(\ReflectionClass $class, ClassInfo $info): void
     {
         $attribute = $this->findClassAttribute($class, DiscriminatorMap::class);
 
@@ -31,7 +31,7 @@ final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
             $map[$value] = new TypeInfo($type);
         }
 
-        $prototype->discriminator = new DiscriminatorInfo(
+        $info->discriminator = new DiscriminatorInfo(
             field: $attribute->field,
             map: $map,
             default: $default,

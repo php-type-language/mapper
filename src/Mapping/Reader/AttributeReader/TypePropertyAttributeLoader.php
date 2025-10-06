@@ -11,16 +11,16 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class TypePropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $this->loadPropertyType($property, $prototype);
+        $this->loadPropertyType($property, $info);
 
         if (\PHP_VERSION_ID < 80400) {
             return;
         }
 
-        $this->loadReadHookType($property, $prototype);
-        $this->loadWriteHookType($property, $prototype);
+        $this->loadReadHookType($property, $info);
+        $this->loadWriteHookType($property, $info);
     }
 
     private function findSourceMap(\ReflectionProperty $property): ?SourceInfo

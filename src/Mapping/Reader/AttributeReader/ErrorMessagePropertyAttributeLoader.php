@@ -10,10 +10,10 @@ use TypeLang\Mapper\Mapping\OnUndefinedError;
 
 final class ErrorMessagePropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $prototype): void
+    public function load(\ReflectionProperty $property, PropertyInfo $info): void
     {
-        $this->loadTypeErrorMessage($property, $prototype);
-        $this->loadUndefinedErrorMessage($property, $prototype);
+        $this->loadTypeErrorMessage($property, $info);
+        $this->loadUndefinedErrorMessage($property, $info);
     }
 
     private function loadTypeErrorMessage(\ReflectionProperty $property, PropertyInfo $prototype): void
