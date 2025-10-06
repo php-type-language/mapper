@@ -14,7 +14,7 @@ use TypeLang\Mapper\Mapping\SkipWhenNull;
 
 final class SkipConditionsPropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void
     {
         $this->loadUserConditions($property, $info);
         $this->loadNullCondition($property, $info);

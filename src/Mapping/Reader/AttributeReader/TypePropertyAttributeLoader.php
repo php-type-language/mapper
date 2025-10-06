@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class TypePropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void
     {
         $this->loadPropertyType($property, $info);
 

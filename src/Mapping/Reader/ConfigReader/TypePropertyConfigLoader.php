@@ -12,7 +12,7 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
  */
 final class TypePropertyConfigLoader extends PropertyConfigLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info, array $config): void
+    public function load(PropertyInfo $info, array $config): void
     {
         $this->loadPropertyType($info, $config);
         $this->loadWritePropertyType($info, $config);

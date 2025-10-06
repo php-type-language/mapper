@@ -10,7 +10,7 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class DiscriminatorMapClassConfigLoader extends ClassConfigLoader
 {
-    public function load(\ReflectionClass $class, ClassInfo $info, array $config): void
+    public function load(ClassInfo $info, array $config): void
     {
         if (!isset($config['discriminator'])) {
             return;

@@ -14,5 +14,5 @@ interface PropertyConfigLoaderInterface
     /**
      * @param PropertyConfigType $config
      */
-    public function load(\ReflectionProperty $property, PropertyInfo $info, array $config): void;
+    public function load(PropertyInfo $info, array $config): void;
 }

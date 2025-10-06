@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Mapping\Reader;
 use Nette\Neon\Neon as NeonParser;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 
-final class NeonConfigReader extends ConfigFileReader
+class NeonConfigReader extends ConfigFileReader
 {
     /**
      * @var list<non-empty-string>

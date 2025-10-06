@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
 {
-    public function load(\ReflectionClass $class, ClassInfo $info): void
+    public function load(ClassInfo $info, \ReflectionClass $class): void
     {
         $attribute = $this->findClassAttribute($class, DiscriminatorMap::class);
 

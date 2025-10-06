@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\Reader\ConfigReader\SchemaValidator;
 /**
  * @phpstan-import-type ClassConfigType from SchemaValidator
  */
-final class ArrayReader extends ConfigReader
+class ArrayReader extends ConfigReader
 {
     public function __construct(
         /**

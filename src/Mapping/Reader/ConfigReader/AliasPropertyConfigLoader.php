@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 
 final class AliasPropertyConfigLoader extends PropertyConfigLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info, array $config): void
+    public function load(PropertyInfo $info, array $config): void
     {
         if (!isset($config['name'])) {
             return;

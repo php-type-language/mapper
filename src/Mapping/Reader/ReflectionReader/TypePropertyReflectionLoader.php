@@ -11,7 +11,7 @@ use TypeLang\Parser\Node\Name;
 
 final class TypePropertyReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void
     {
         $this->loadReadType($property, $info);
         $this->loadWriteType($property, $info);

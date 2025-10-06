@@ -17,7 +17,7 @@ use TypeLang\Mapper\Mapping\Reader\AttributeReader\TypePropertyAttributeLoader;
 /**
  * @template-extends MetadataReader<ClassAttributeLoaderInterface, PropertyAttributeLoaderInterface>
  */
-final class AttributeReader extends MetadataReader
+class AttributeReader extends MetadataReader
 {
     /**
      * @return list<ClassAttributeLoaderInterface>

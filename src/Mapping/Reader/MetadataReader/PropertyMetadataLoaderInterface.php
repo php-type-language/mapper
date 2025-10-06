@@ -8,5 +8,5 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 
 interface PropertyMetadataLoaderInterface
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void;
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void;
 }

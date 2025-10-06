@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 
-final class NullReader implements ReaderInterface
+class NullReader implements ReaderInterface
 {
     public function read(\ReflectionClass $class): ClassInfo
     {

@@ -14,5 +14,5 @@ interface ClassMetadataLoaderInterface
      * @param \ReflectionClass<T> $class
      * @param ClassInfo<T> $info
      */
-    public function load(\ReflectionClass $class, ClassInfo $info): void;
+    public function load(ClassInfo $info, \ReflectionClass $class): void;
 }

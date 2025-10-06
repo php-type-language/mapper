@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 
 final class AliasPropertyAttributeLoader extends PropertyAttributeLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void
     {
         $attribute = $this->findPropertyAttribute($property, MapName::class);
 

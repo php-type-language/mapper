@@ -9,7 +9,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValue
 
 final class DefaultValueReflectionLoader extends PropertyReflectionLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info): void
+    public function load(PropertyInfo $info, \ReflectionProperty $property): void
     {
         if (!$property->hasDefaultValue()) {
             return;

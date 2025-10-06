@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-final class JsonConfigReader extends ConfigFileReader
+class JsonConfigReader extends ConfigFileReader
 {
     /**
      * @var list<non-empty-string>

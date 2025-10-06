@@ -21,7 +21,7 @@ abstract class MetadataReader extends Reader
         $classInfo = parent::read($class);
 
         foreach ($this->classLoaders as $classLoader) {
-            $classLoader->load($class, $classInfo);
+            $classLoader->load($classInfo, $class);
         }
 
         foreach ($class->getProperties() as $property) {
@@ -33,7 +33,7 @@ abstract class MetadataReader extends Reader
             $propertyInfo = $classInfo->getPropertyOrCreate($property->name);
 
             foreach ($this->propertyLoaders as $propertyLoader) {
-                $propertyLoader->load($property, $propertyInfo);
+                $propertyLoader->load($propertyInfo, $property);
             }
         }
 

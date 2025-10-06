@@ -12,7 +12,7 @@ use TypeLang\Mapper\Mapping\Reader\ReflectionReader\TypePropertyReflectionLoader
 /**
  * @template-extends MetadataReader<ClassReflectionLoaderInterface, PropertyReflectionLoaderInterface>
  */
-final class ReflectionReader extends MetadataReader
+class ReflectionReader extends MetadataReader
 {
     public function __construct(
         ReaderInterface $delegate = new NullReader(),

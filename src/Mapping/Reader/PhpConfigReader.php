@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-final class PhpConfigReader extends ConfigFileReader
+class PhpConfigReader extends ConfigFileReader
 {
     /**
      * @var list<non-empty-string>

@@ -8,7 +8,7 @@ use Symfony\Component\Yaml\Parser as YamlParser;
 use Symfony\Component\Yaml\Yaml;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
 
-final class YamlConfigReader extends ConfigFileReader
+class YamlConfigReader extends ConfigFileReader
 {
     /**
      * @var list<non-empty-string>

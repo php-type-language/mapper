@@ -11,7 +11,7 @@ use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionInfo;
 
 final class SkipConditionsPropertyConfigLoader extends PropertyConfigLoader
 {
-    public function load(\ReflectionProperty $property, PropertyInfo $info, array $config): void
+    public function load(PropertyInfo $info, array $config): void
     {
         if (!isset($config['skip'])) {
             return;

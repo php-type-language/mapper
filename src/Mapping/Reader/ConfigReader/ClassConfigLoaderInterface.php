@@ -12,11 +12,8 @@ use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 interface ClassConfigLoaderInterface
 {
     /**
-     * @template T of object
-     *
-     * @param \ReflectionClass<T> $class
-     * @param ClassInfo<T> $info
+     * @param ClassInfo<object> $info
      * @param ClassConfigType $config
      */
-    public function load(\ReflectionClass $class, ClassInfo $info, array $config): void;
+    public function load(ClassInfo $info, array $config): void;
 }

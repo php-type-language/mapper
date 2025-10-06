@@ -94,25 +94,20 @@ abstract class ConfigReader extends Reader
         $config = $this->loadAndValidate($class);
 
         if ($config !== null) {
-            $this->readFromConfig($class, $info, $config);
+            $this->readFromConfig($info, $config);
         }
 
         return $info;
     }
 
     /**
-     * @template TArg of object
-     *
-     * @param \ReflectionClass<TArg> $class
-     * @param ClassInfo<TArg> $classInfo
+     * @param ClassInfo<object> $classInfo
      * @param ClassConfigType $classConfig
-     *
-     * @throws \ReflectionException
      */
-    private function readFromConfig(\ReflectionClass $class, ClassInfo $classInfo, array $classConfig): void
+    private function readFromConfig(ClassInfo $classInfo, array $classConfig): void
     {
         foreach ($this->classLoaders as $classLoader) {
-            $classLoader->load($class, $classInfo, $classConfig);
+            $classLoader->load($classInfo, $classConfig);
         }
 
         $classConfig['properties'] ??= [];
@@ -129,11 +124,10 @@ abstract class ConfigReader extends Reader
             // @phpstan-ignore-next-line : Additional DbC invariant
             assert(\is_array($propertyConfig));
 
-            $property = $class->getProperty($propertyName);
             $propertyInfo = $classInfo->getPropertyOrCreate($propertyName);
 
             foreach ($this->propertyLoaders as $propertyLoader) {
-                $propertyLoader->load($property, $propertyInfo, $propertyConfig);
+                $propertyLoader->load($propertyInfo, $propertyConfig);
             }
         }
     }
