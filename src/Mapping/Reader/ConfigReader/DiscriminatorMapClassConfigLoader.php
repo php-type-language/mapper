@@ -20,7 +20,7 @@ final class DiscriminatorMapClassConfigLoader extends ClassConfigLoader
 
         $map = [];
 
-        foreach ($discriminatorConfig as $value => $type) {
+        foreach ($discriminatorConfig['map'] as $value => $type) {
             $map[$value] = new TypeInfo($type);
         }
 
