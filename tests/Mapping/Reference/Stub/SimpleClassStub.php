@@ -1,6 +1,6 @@
 <?php
 
-namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub;
+namespace TypeLang\Mapper\Tests\Mapping\Reference\Stub;
 
 use Some\Any;
 use Some\Any\Test as Example;

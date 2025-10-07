@@ -14,18 +14,17 @@ final class InMemoryTypeRepository extends TypeRepositoryDecorator
      */
     private readonly \WeakMap $types;
 
-    public function __construct(
-        TypeRepositoryInterface $delegate,
-    ) {
-        parent::__construct($delegate);
-
+    public function __construct(TypeRepositoryInterface $delegate)
+    {
         $this->types = new \WeakMap();
+
+        parent::__construct($delegate);
     }
 
     #[\Override]
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
         // @phpstan-ignore-next-line : PHPStan bug (array assign over readonly)
-        return $this->types[$statement] ??= parent::getTypeByStatement($statement, $context);
+        return $this->types[$statement] ??= parent::getTypeByStatement($statement);
     }
 }

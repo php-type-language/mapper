@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference\Reader;
+namespace TypeLang\Mapper\Tests\Mapping\Reference\Reader;
 
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NullReferencesReader;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\ReferenceTestCase;
+use TypeLang\Mapper\Mapping\Reference\Reader\NullReferencesReader;
+use TypeLang\Mapper\Tests\Mapping\Reference\ReferenceTestCase;
 
 final class NullReaderTest extends ReferenceTestCase
 {

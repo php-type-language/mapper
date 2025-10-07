@@ -27,14 +27,14 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
         );
     }
 
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
         $span = $this->tracer->start(\vsprintf('Fetch type "%s"', [
             $this->printer->print($statement),
         ]));
 
         try {
-            $result = parent::getTypeByStatement($statement, $context);
+            $result = parent::getTypeByStatement($statement);
         } finally {
             $span->stop();
         }

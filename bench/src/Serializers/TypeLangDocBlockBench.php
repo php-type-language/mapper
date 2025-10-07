@@ -10,9 +10,9 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Provider\DocBlockDriver;
-use TypeLang\Mapper\Mapping\Provider\Psr16CachedDriver;
-use TypeLang\Mapper\Mapping\Provider\ReflectionDriver;
+use TypeLang\Mapper\Mapping\Provider\Psr16CacheProvider;
+use TypeLang\Mapper\Mapping\Reader\PhpDocReader;
+use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
 #[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
@@ -25,14 +25,12 @@ final class TypeLangDocBlockBench extends MapperBenchmark
     {
         parent::prepare();
 
-        $driver = new DocBlockDriver(
-            delegate: new ReflectionDriver(),
-        );
+        $driver = new PhpDocReader();
 
         $this->cached = new Mapper(
             platform: new StandardPlatform(
-                meta: new Psr16CachedDriver(
-                    cache: $this->psr16,
+                meta: new Psr16CacheProvider(
+                    psr16: $this->psr16,
                     delegate: $driver,
                 ),
             ),

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference;
+namespace TypeLang\Mapper\Tests\Mapping\Reference;
 
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
-use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesResolver;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\SimpleClassStub;
+use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
+use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
+use TypeLang\Mapper\Tests\Mapping\Reference\Stub\SimpleClassStub;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
@@ -74,7 +74,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
         $result = $resolver->resolve($statement, $context);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TypeLang\\Mapper\\Tests\\Runtime\\Repository\\Reference\\Stub\\TestClass', $result->name->toString());
+        self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\TestClass', $result->name->toString());
     }
 
     public function testResolveWithNamespaceKeywordInGlobalNamespace(): void
@@ -135,7 +135,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
         $result = $resolver->resolve($statement, $context);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TypeLang\\Mapper\\Tests\\Runtime\\Repository\\Reference\\Stub\\Sub\\Namespace\\TestClass', $result->name->toString());
+        self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\Sub\\Namespace\\TestClass', $result->name->toString());
     }
 
     public function testResolveWithMixedUseStatements(): void

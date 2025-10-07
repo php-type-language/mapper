@@ -25,8 +25,8 @@ abstract class TypeRepositoryDecorator implements TypeRepositoryDecoratorInterfa
         }
     }
 
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        return $this->delegate->getTypeByStatement($statement, $context);
+        return $this->delegate->getTypeByStatement($statement);
     }
 }

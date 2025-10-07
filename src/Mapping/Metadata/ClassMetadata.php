@@ -30,7 +30,9 @@ final class ClassMetadata extends Metadata
          * and denormalization.
          *
          * @readonly
+         *
          * @psalm-readonly-allow-private-mutation
+         *
          * @var array<non-empty-string, PropertyMetadata>
          */
         public array $properties = [],
@@ -40,6 +42,7 @@ final class ClassMetadata extends Metadata
          * has been registered in the {@see ClassMetadata} instance.
          *
          * @readonly
+         *
          * @psalm-readonly-allow-private-mutation
          */
         public ?DiscriminatorMetadata $discriminator = null,

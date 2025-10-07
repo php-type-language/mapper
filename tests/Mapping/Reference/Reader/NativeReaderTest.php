@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference\Reader;
+namespace TypeLang\Mapper\Tests\Mapping\Reference\Reader;
 
 use PHPUnit\Framework\Attributes\Before;
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NativeReferencesReader;
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\ReferenceTestCase;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\ClassWithGroupUsesStub;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\MultipleNamespacesClassStub;
-use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\SimpleClassStub;
+use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
+use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
+use TypeLang\Mapper\Tests\Mapping\Reference\ReferenceTestCase;
+use TypeLang\Mapper\Tests\Mapping\Reference\Stub\ClassWithGroupUsesStub;
+use TypeLang\Mapper\Tests\Mapping\Reference\Stub\MultipleNamespacesClassStub;
+use TypeLang\Mapper\Tests\Mapping\Reference\Stub\SimpleClassStub;
 
 final class NativeReaderTest extends ReferenceTestCase
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Repository\Reference;
+namespace TypeLang\Mapper\Mapping\Reference;
 
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
+use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\TypeResolver;
@@ -14,7 +14,7 @@ use TypeLang\Parser\TypeResolver;
  * in a statement.
  *
  * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Runtime\Repository
+ * @psalm-internal TypeLang\Mapper\Mapping
  */
 final class ReferencesResolver
 {

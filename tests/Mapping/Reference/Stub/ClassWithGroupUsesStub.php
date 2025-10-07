@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub;
+namespace TypeLang\Mapper\Tests\Mapping\Reference\Stub;
 
 use Example\Some\Any\Test1 as Example1;
 use Example\Some\Any1;

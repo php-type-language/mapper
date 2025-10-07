@@ -6,6 +6,7 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
@@ -19,7 +20,6 @@ use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;

@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
+use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
+use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NativeReferencesReader;
-use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
-use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesResolver;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
