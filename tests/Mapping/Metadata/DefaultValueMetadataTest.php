@@ -16,5 +16,3 @@ final class DefaultValueMetadataTest extends MetadataTestCase
         self::assertSame(5, $meta->timestamp);
     }
 }
-
-

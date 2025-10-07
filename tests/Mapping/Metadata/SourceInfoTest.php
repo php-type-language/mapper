@@ -19,5 +19,3 @@ final class SourceInfoTest extends MetadataTestCase
         self::assertSame($line, $info->line);
     }
 }
-
-

@@ -26,5 +26,3 @@ final class DiscriminatorMetadataTest extends MetadataTestCase
         self::assertSame(11, $meta->timestamp);
     }
 }
-
-

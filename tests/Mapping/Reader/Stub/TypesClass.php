@@ -18,7 +18,6 @@ final class TypesClass
 
     public string|int $unionProp;
 
-    /** @var FirstInterface&SecondInterface */
     public FirstInterface&SecondInterface $intersectionProp;
 
     public ImplementsBoth $classProp;
@@ -31,5 +30,3 @@ final class TypesClass
 
     public static string $staticProp;
 }
-
-

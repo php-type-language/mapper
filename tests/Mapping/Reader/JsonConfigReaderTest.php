@@ -38,5 +38,3 @@ final class JsonConfigReaderTest extends ReaderTestCase
         self::assertSame('C', $info->discriminator?->default?->definition ?? null);
     }
 }
-
-

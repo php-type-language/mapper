@@ -10,7 +10,7 @@ final class MetadataTimestampTest extends MetadataTestCase
 {
     public function testTimestampIsSetByDefault(): void
     {
-        $meta = new class() extends Metadata {};
+        $meta = new class extends Metadata {};
 
         self::assertIsInt($meta->timestamp);
         self::assertGreaterThan(0, $meta->timestamp);
@@ -19,10 +19,8 @@ final class MetadataTimestampTest extends MetadataTestCase
     public function testCustomTimestamp(): void
     {
         $ts = 1234567890;
-        $meta = new class($ts) extends Metadata {};
+        $meta = new class ($ts) extends Metadata {};
 
         self::assertSame($ts, $meta->timestamp);
     }
 }
-
-

@@ -23,5 +23,3 @@ final class PropertyInfoTest extends MetadataTestCase
         self::assertNull($info->undefinedErrorMessage);
     }
 }
-
-

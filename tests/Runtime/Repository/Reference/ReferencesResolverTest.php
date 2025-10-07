@@ -32,7 +32,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
         $reader = $this->createMock(ReferencesReaderInterface::class);
         $reader->method('getUseStatements')->willReturn([
             'Any' => 'Some\\Any',
-            'Example' => 'Some\\Any\\Test'
+            'Example' => 'Some\\Any\\Test',
         ]);
 
         $resolver = new ReferencesResolver($reader);
@@ -49,7 +49,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
     {
         $reader = $this->createMock(ReferencesReaderInterface::class);
         $reader->method('getUseStatements')->willReturn([
-            'Example' => 'Some\\Any\\Test'
+            'Example' => 'Some\\Any\\Test',
         ]);
 
         $resolver = new ReferencesResolver($reader);
@@ -144,7 +144,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
         $reader->method('getUseStatements')->willReturn([
             'Any' => 'Some\\Any',
             'Example' => 'Some\\Any\\Test',
-            'GlobalClass' // No alias, just the class name
+            'GlobalClass', // No alias, just the class name
         ]);
 
         $resolver = new ReferencesResolver($reader);

@@ -14,5 +14,3 @@ final class TypesHooksClass
         set(int|null $value) {}
     }
 }
-
-

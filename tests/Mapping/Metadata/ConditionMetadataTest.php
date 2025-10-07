@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
@@ -44,5 +43,3 @@ final class ConditionMetadataTest extends MetadataTestCase
         self::assertFalse($cond->match($obj, 'anything'));
     }
 }
-
-

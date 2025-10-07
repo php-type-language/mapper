@@ -38,5 +38,3 @@ final class YamlConfigReaderTest extends ReaderTestCase
         self::assertSame('C', $info->discriminator?->default?->definition ?? null);
     }
 }
-
-

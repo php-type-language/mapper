@@ -10,5 +10,3 @@ final class SampleClass
 
     public int $age;
 }
-
-

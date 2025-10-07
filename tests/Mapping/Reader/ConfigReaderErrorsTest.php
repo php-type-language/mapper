@@ -18,5 +18,3 @@ final class ConfigReaderErrorsTest extends ReaderTestCase
         $reader->read(new \ReflectionClass(SampleClass::class), new DummyParser());
     }
 }
-
-

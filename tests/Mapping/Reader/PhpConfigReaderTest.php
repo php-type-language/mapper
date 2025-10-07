@@ -40,5 +40,3 @@ final class PhpConfigReaderTest extends ReaderTestCase
         self::assertSame('C', $info->discriminator?->default?->definition ?? null);
     }
 }
-
-

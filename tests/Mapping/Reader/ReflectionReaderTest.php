@@ -88,5 +88,3 @@ final class ReflectionReaderTest extends ReaderTestCase
         self::assertNotNull($info->properties['withSetHook']->write->source);
     }
 }
-
-

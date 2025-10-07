@@ -41,5 +41,3 @@ final class ClassMetadataTest extends MetadataTestCase
         self::assertSame(7, $meta->timestamp);
     }
 }
-
-

@@ -21,5 +21,3 @@ final class ReaderDelegationTest extends ReaderTestCase
         self::assertSame([], $info->properties);
     }
 }
-
-

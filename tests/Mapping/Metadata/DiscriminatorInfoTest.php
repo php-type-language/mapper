@@ -22,5 +22,3 @@ final class DiscriminatorInfoTest extends MetadataTestCase
         self::assertNull($info->default);
     }
 }
-
-

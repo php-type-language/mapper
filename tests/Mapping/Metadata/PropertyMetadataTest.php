@@ -68,5 +68,3 @@ final class PropertyMetadataTest extends MetadataTestCase
         self::assertEquals(new Identifier('alias'), $field->key);
     }
 }
-
-

@@ -20,5 +20,3 @@ final class NullReaderTest extends ReaderTestCase
         self::assertNull($info->discriminator);
     }
 }
-
-

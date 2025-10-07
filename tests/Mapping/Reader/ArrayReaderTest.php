@@ -122,5 +122,3 @@ final class ArrayReaderTest extends ReaderTestCase
         self::assertSame('string', $info->properties['name']->read->definition);
     }
 }
-
-

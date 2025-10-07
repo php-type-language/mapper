@@ -16,5 +16,3 @@ final class ConditionInfoTest extends MetadataTestCase
         self::assertSame('this', $info->context);
     }
 }
-
-

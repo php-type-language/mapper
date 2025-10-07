@@ -23,5 +23,3 @@ final class ClassInfoTest extends MetadataTestCase
         self::assertSame($prop, $info->getPropertyOrCreate('id'));
     }
 }
-
-

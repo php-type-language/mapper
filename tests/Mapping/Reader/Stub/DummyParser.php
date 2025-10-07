@@ -15,5 +15,3 @@ final class DummyParser implements TypeParserInterface
         return new NamedTypeNode($definition);
     }
 }
-
-

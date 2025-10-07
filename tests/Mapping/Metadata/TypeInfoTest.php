@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\ParsedTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 final class TypeInfoTest extends MetadataTestCase
@@ -33,5 +32,3 @@ final class TypeInfoTest extends MetadataTestCase
         self::assertSame(RawTypeInfo::mixed(), RawTypeInfo::mixed());
     }
 }
-
-
