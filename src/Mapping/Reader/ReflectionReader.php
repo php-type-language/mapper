@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader\ClassReflectionLoaderInterface;
-use TypeLang\Mapper\Mapping\Reader\ReflectionReader\DefaultValueReflectionLoader;
+use TypeLang\Mapper\Mapping\Reader\ReflectionReader\DefaultValuePropertyReflectionLoader;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader\PropertyReflectionLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader\TypePropertyReflectionLoader;
 
@@ -28,7 +28,7 @@ class ReflectionReader extends MetadataReader
     {
         return [
             new TypePropertyReflectionLoader(),
-            new DefaultValueReflectionLoader(),
+            new DefaultValuePropertyReflectionLoader(),
         ];
     }
 }
