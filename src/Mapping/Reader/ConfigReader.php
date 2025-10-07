@@ -14,7 +14,6 @@ use TypeLang\Mapper\Mapping\Reader\ConfigReader\PropertyConfigLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ConfigReader\SchemaValidator;
 use TypeLang\Mapper\Mapping\Reader\ConfigReader\SkipConditionsPropertyConfigLoader;
 use TypeLang\Mapper\Mapping\Reader\ConfigReader\TypePropertyConfigLoader;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 
 /**
  * @phpstan-import-type ClassConfigType from SchemaValidator
@@ -88,9 +87,9 @@ abstract class ConfigReader extends Reader
         return $config;
     }
 
-    public function read(\ReflectionClass $class, TypeParserInterface $parser): ClassInfo
+    public function read(\ReflectionClass $class): ClassInfo
     {
-        $info = parent::read($class, $parser);
+        $info = parent::read($class);
 
         $config = $this->loadAndValidate($class);
 

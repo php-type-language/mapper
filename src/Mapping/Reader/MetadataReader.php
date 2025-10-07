@@ -8,7 +8,6 @@ use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Reader\MetadataReader\ClassMetadataLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\MetadataReader\PropertyMetadataLoaderInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 
 /**
  * @template TClassMetadataLoader of ClassMetadataLoaderInterface
@@ -18,9 +17,9 @@ use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 abstract class MetadataReader extends Reader
 {
     #[\Override]
-    public function read(\ReflectionClass $class, TypeParserInterface $parser): ClassInfo
+    public function read(\ReflectionClass $class): ClassInfo
     {
-        $classInfo = parent::read($class, $parser);
+        $classInfo = parent::read($class);
 
         if ($classInfo->source === null) {
             $file = $class->getFileName();
