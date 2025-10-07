@@ -9,26 +9,16 @@ namespace TypeLang\Mapper\Exception\Environment;
  */
 class ComposerPackageRequiredException extends EnvironmentException
 {
-    /**
-     * @param non-empty-string $package
-     */
     public function __construct(
-        private readonly string $package,
+        /**
+         * @var non-empty-string
+         */
+        public readonly string $package,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
         parent::__construct($template, $code, $previous);
-    }
-
-    /**
-     * @api
-     *
-     * @return non-empty-string
-     */
-    public function getPackage(): string
-    {
-        return $this->package;
     }
 
     /**

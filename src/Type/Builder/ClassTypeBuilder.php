@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Mapping\Driver\DriverInterface;
-use TypeLang\Mapper\Mapping\Driver\ReflectionDriver;
+use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
+use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Runtime\ClassInstantiator\CloneClassInstantiator;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
@@ -27,7 +27,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class ClassTypeBuilder extends Builder
 {
     public function __construct(
-        protected readonly DriverInterface $driver = new ReflectionDriver(),
+        protected readonly ProviderInterface $driver = new MetadataReaderProvider(),
         protected readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
         protected readonly ClassInstantiatorInterface $instantiator = new CloneClassInstantiator(
             delegate: new ReflectionClassInstantiator(),

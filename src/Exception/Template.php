@@ -15,10 +15,6 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Printer\PrettyPrinter;
 use TypeLang\Printer\PrinterInterface as TypePrinterInterface;
 
-/**
- * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Exception
- */
 final class Template implements \Stringable
 {
     public TypePrinterInterface $types;

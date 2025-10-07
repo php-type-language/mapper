@@ -6,15 +6,29 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of iterable = iterable<mixed, mixed>
+ * @template-extends IterableException<TValue>
+ */
 abstract class IterableKeyException extends IterableException
 {
     /**
-     * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TValue $value
      */
     public function __construct(
-        protected readonly int $index,
-        protected readonly mixed $key,
+        /**
+         * Gets an ordered index of an element.
+         *
+         * @var int<0, max>
+         */
+        public readonly int $index,
+        /**
+         * Gets the real key of the element.
+         *
+         * Note that the value can be any ({@see mixed}) and may not necessarily
+         * be compatible with PHP array keys ({@see int} or {@see string}).
+         */
+        public readonly mixed $key,
         iterable $value,
         PathInterface $path,
         string $template,
@@ -28,26 +42,5 @@ abstract class IterableKeyException extends IterableException
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Returns ordered index of an element.
-     *
-     * @return int<0, max>
-     */
-    public function getIndex(): int
-    {
-        return $this->index;
-    }
-
-    /**
-     * Returns the real key of the element.
-     *
-     * Note that the value can be any ({@see mixed}) and may not necessarily
-     * be compatible with PHP array keys ({@see int} or {@see string}).
-     */
-    public function getKey(): mixed
-    {
-        return $this->key;
     }
 }

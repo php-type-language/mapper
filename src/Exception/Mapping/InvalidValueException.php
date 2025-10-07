@@ -7,8 +7,19 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of mixed = mixed
+ * @template-extends ValueException<TValue>
+ */
 class InvalidValueException extends ValueException
 {
+    /**
+     * @template TArgValue of mixed
+     *
+     * @param TArgValue $value
+     *
+     * @return self<TArgValue>
+     */
     public static function createFromPath(
         mixed $value,
         PathInterface $path,
@@ -16,6 +27,7 @@ class InvalidValueException extends ValueException
     ): self {
         $template = 'Passed value {{value}} is invalid';
 
+        /** @var self<TArgValue> */
         return new self(
             value: $value,
             path: $path,
@@ -24,6 +36,13 @@ class InvalidValueException extends ValueException
         );
     }
 
+    /**
+     * @template TArgValue of mixed
+     *
+     * @param TArgValue $value
+     *
+     * @return self<TArgValue>
+     */
     public static function createFromContext(
         mixed $value,
         Context $context,

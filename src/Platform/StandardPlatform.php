@@ -29,6 +29,8 @@ class StandardPlatform extends Platform
 
     public function getTypes(): iterable
     {
+        yield from parent::getTypes();
+
         // Adds support for the "mixed" type
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
 
@@ -58,7 +60,7 @@ class StandardPlatform extends Platform
         ], 'array-key', 'mixed');
 
         // Adds support for the "list" type
-        yield new Builder\ListTypeBuilder(['list'], 'mixed');
+        yield new Builder\ListTypeBuilder('list', 'mixed');
 
         // Adds support for the "object" type
         yield new Builder\ObjectTypeBuilder(['object', \stdClass::class]);
@@ -94,7 +96,7 @@ class StandardPlatform extends Platform
         yield new Builder\UnitEnumTypeBuilder();
 
         // Adds support for the "Path\To\Class" statement
-        yield new Builder\ClassTypeBuilder($this->driver);
+        yield new Builder\ClassTypeBuilder($this->meta);
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

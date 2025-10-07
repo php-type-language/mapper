@@ -4,22 +4,20 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\StringType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
-#[CoversClass(TypeMetadata::class)]
 final class TypeMetadataTest extends MetadataTestCase
 {
-    public function testAccessors(): void
+    public function testConstruct(): void
     {
-        $type = $this->createMock(TypeInterface::class);
-        $stmt = new NamedTypeNode('int');
-        $m = new TypeMetadata($type, $stmt, 1);
+        $type = $this->createMock(StringType::class);
+        $node = new NamedTypeNode('string');
+        $meta = new TypeMetadata(type: $type, statement: $node, createdAt: 42);
 
-        self::assertSame($type, $m->type);
-        self::assertSame($stmt, $m->statement);
-        self::assertSame(1, $m->timestamp);
+        self::assertSame($type, $meta->type);
+        self::assertSame($node, $meta->statement);
+        self::assertSame(42, $meta->timestamp);
     }
 }

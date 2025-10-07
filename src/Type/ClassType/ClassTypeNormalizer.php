@@ -80,7 +80,7 @@ class ClassTypeNormalizer implements TypeInterface
     {
         $result = [];
 
-        foreach ($this->metadata->getProperties() as $meta) {
+        foreach ($this->metadata->properties as $meta) {
             $entrance = $context->enter($object, new ObjectPropertyEntry($meta->name));
 
             // Skip the property when not readable
@@ -91,7 +91,7 @@ class ClassTypeNormalizer implements TypeInterface
             $element = $this->accessor->getValue($object, $meta->name);
 
             // Skip the property when condition is matched
-            foreach ($meta->getSkipConditions() as $condition) {
+            foreach ($meta->skip as $condition) {
                 if ($condition->match($object, $element)) {
                     continue 2;
                 }

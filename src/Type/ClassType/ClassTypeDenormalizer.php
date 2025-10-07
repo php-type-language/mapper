@@ -10,14 +10,13 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Mapping\NonInstantiatableException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * @template T of object
@@ -51,10 +50,6 @@ class ClassTypeDenormalizer implements TypeInterface
         // Fetch field type
         $info = $meta->write;
 
-        if ($info === null) {
-            return $context->getTypeByStatement(new NamedTypeNode('mixed'));
-        }
-
         return $info->type;
     }
 
@@ -63,11 +58,11 @@ class ClassTypeDenormalizer implements TypeInterface
      */
     private function matchRequiredProperties(array $payload, Context $context): bool
     {
-        foreach ($this->metadata->getProperties() as $meta) {
+        foreach ($this->metadata->properties as $meta) {
             // Match property for existence
             if (!\array_key_exists($meta->alias, $payload)) {
                 // Skip all properties with defaults
-                if ($meta->hasDefaultValue()) {
+                if ($meta->default !== null) {
                     continue;
                 }
 
@@ -144,7 +139,7 @@ class ClassTypeDenormalizer implements TypeInterface
      */
     private function denormalizeObject(array $value, object $object, Context $context): void
     {
-        foreach ($this->metadata->getProperties() as $meta) {
+        foreach ($this->metadata->properties as $meta) {
             $entrance = $context->enter($value, new ObjectPropertyEntry($meta->alias));
 
             // Skip the property when not writable
@@ -181,8 +176,8 @@ class ClassTypeDenormalizer implements TypeInterface
                     break;
 
                     // In case of property has default argument
-                case $meta->hasDefaultValue():
-                    $element = $meta->findDefaultValue();
+                case $meta->default !== null:
+                    $element = $meta->default->value;
                     break;
 
                 default:

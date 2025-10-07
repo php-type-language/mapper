@@ -97,9 +97,9 @@ abstract class Context implements
 
     abstract public function getPath(): PathInterface;
 
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        return $this->types->getTypeByStatement($statement, $context);
+        return $this->types->getTypeByStatement($statement);
     }
 
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
@@ -109,15 +109,13 @@ abstract class Context implements
 
     /**
      * @param non-empty-string $definition
-     * @param \ReflectionClass<object>|null $context
      *
      * @throws \Throwable
      */
-    public function getTypeByDefinition(#[Language('PHP')] string $definition, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByDefinition(#[Language('PHP')] string $definition): TypeInterface
     {
         return $this->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($definition),
-            context: $context,
         );
     }
 
@@ -137,15 +135,12 @@ abstract class Context implements
     }
 
     /**
-     * @param \ReflectionClass<object>|null $context
-     *
      * @throws \Throwable
      */
-    public function getTypeByValue(mixed $value, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByValue(mixed $value): TypeInterface
     {
         return $this->types->getTypeByStatement(
-            statement: $this->getStatementByValue($value),
-            context: $context,
+            statement: $this->getStatementByValue($value)
         );
     }
 }

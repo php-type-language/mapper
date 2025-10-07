@@ -37,17 +37,17 @@ $result = $mapper->normalize($value);
 
 var_dump($result);
 //
-// object{
-//   items: array:3 [
-//     "key1" => object{
-//       value: "first"
-//     }
-//     "key2" => object{
-//       value: "second"
-//     }
-//     0 => object{
-//       value: "third"
-//     }
+// array:1 [
+//   "items" => array:3 [
+//     "key1" => array:1 [
+//       "value" => "first"
+//     ]
+//     "key2" => array:1 [
+//       "value" => "second"
+//     ]
+//     0 => array:1 [
+//       "value" => "third"
+//     ]
 //   ]
-// }
+// ]
 //

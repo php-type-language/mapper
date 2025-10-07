@@ -13,20 +13,12 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 abstract class ShapeFieldException extends ShapeFieldsException
 {
     public function __construct(
-        protected readonly FieldNode $field,
+        public readonly FieldNode $field,
         TypeStatement $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
         parent::__construct($type, $template, $code, $previous);
-    }
-
-    /**
-     * @api
-     */
-    public function getField(): FieldNode
-    {
-        return $this->field;
     }
 }

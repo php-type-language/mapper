@@ -1,0 +1,22 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
+
+use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Mapping\OnTypeError;
+
+final class ErrorMessageClassAttributeLoader extends ClassAttributeLoader
+{
+    public function load(ClassInfo $info, \ReflectionClass $class): void
+    {
+        $error = $this->findClassAttribute($class, OnTypeError::class);
+
+        if ($error === null) {
+            return;
+        }
+
+        $info->typeErrorMessage = $error->message;
+    }
+}

@@ -12,14 +12,24 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class InvalidTemplateArgumentException extends TemplateArgumentException
 {
+    /**
+     * Gets the type statement that causes the error.
+     */
+    public TypeStatement $actual;
+
     public function __construct(
-        private readonly TypeStatement $expected,
+        /**
+         * Gets the type statement in which the error occurred.
+         */
+        public readonly TypeStatement $expected,
         TemplateArgumentNode $argument,
         TypeStatement $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
+        $this->actual = $argument->value;
+
         parent::__construct(
             argument: $argument,
             type: $type,
@@ -27,26 +37,6 @@ class InvalidTemplateArgumentException extends TemplateArgumentException
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Returns the type statement that causes the error.
-     *
-     * @api
-     */
-    public function getActualType(): TypeStatement
-    {
-        return $this->argument->value;
-    }
-
-    /**
-     * Returns the type statement in which the error occurred.
-     *
-     * @api
-     */
-    public function getExpectedType(): TypeStatement
-    {
-        return $this->expected;
     }
 
     public static function becauseTemplateArgumentIsInvalid(

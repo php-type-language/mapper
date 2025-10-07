@@ -7,11 +7,19 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of iterable = iterable<mixed, mixed>
+ * @template-extends IterableKeyException<TValue>
+ */
 class InvalidIterableKeyException extends IterableKeyException
 {
     /**
+     * @template TArgValue of iterable
+     *
      * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TArgValue $value
+     *
+     * @return self<TArgValue>
      */
     public static function createFromPath(
         int $index,
@@ -22,6 +30,7 @@ class InvalidIterableKeyException extends IterableKeyException
     ): self {
         $template = 'The key {{key}} on index {{index}} in {{value}} is invalid';
 
+        /** @var self<TArgValue> */
         return new self(
             index: $index,
             key: $key,
@@ -33,8 +42,12 @@ class InvalidIterableKeyException extends IterableKeyException
     }
 
     /**
+     * @template TArgValue of iterable
+     *
      * @param int<0, max> $index
-     * @param iterable<mixed, mixed> $value
+     * @param TArgValue $value
+     *
+     * @return self<TArgValue>
      */
     public static function createFromContext(
         int $index,

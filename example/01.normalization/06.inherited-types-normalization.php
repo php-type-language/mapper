@@ -30,7 +30,7 @@ $value = new ItemsResultDTO([
 
 $result = $mapper->normalize($value);
 
-dd($result);
+var_dump($result);
 //
 // array:1 [
 //   "items" => array:3 [

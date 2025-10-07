@@ -9,7 +9,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 /**
  * Occurs when a type supports fewer arguments than were passed
  */
-class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
+class TooManyTemplateArgumentsException extends TemplateArgumentsRangeException
 {
     /**
      * @param int<0, max> $minSupportedArgumentsCount

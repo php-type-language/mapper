@@ -28,10 +28,7 @@ try {
         ],
     ], ExampleDTO::class);
 } catch (RuntimeException $e) {
-    // Before: "at $.values[1].values"
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type list<ExampleDTO>,
-    // but 42 given at $.values[1].values
 
     // Print full path using ">" delimiter
     $e->template->paths = new class implements PathPrinterInterface {
@@ -41,8 +38,10 @@ try {
         }
     };
 
-    // After: "at ExampleDTO > values > 1 > ExampleDTO > values"
+    // Before: Passed value in "values" of {"values": 42} must be of type
+    //         list<ExampleDTO>, but 42 given at $.values[1].values
+    // After:  Passed value in "values" of {"values": 42} must be of type
+    //         list<ExampleDTO>, but 42 given at ExampleDTO > values >
+    //         1 > ExampleDTO > values
     var_dump($e->getMessage());
-    // Passed value of field "values" must be of type list<ExampleDTO>,
-    // but 42 given at ExampleDTO > values > 1 > ExampleDTO > values
 }

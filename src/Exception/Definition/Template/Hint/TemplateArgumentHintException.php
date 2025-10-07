@@ -13,7 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class TemplateArgumentHintException extends TemplateArgumentHintsException
 {
-    protected readonly ?Identifier $hint;
+    public readonly ?Identifier $hint;
 
     public function __construct(
         TemplateArgumentNode $argument,
@@ -31,13 +31,5 @@ abstract class TemplateArgumentHintException extends TemplateArgumentHintsExcept
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * @api
-     */
-    public function findArgumentHint(): ?Identifier
-    {
-        return $this->hint;
     }
 }

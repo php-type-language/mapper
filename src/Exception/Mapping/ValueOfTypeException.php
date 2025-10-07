@@ -8,10 +8,20 @@ use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TValue of mixed = mixed
+ * @template-extends ValueException<TValue>
+ */
 abstract class ValueOfTypeException extends ValueException
 {
+    /**
+     * @param TValue $value
+     */
     public function __construct(
-        protected readonly TypeStatement $expected,
+        /**
+         * Gets the type statement in which the error occurred.
+         */
+        public readonly TypeStatement $expected,
         mixed $value,
         PathInterface $path,
         string $template,
@@ -30,15 +40,5 @@ abstract class ValueOfTypeException extends ValueException
     protected static function mixedTypeStatement(): TypeStatement
     {
         return new NamedTypeNode('mixed');
-    }
-
-    /**
-     * Returns the type statement in which the error occurred.
-     *
-     * @api
-     */
-    public function getExpectedType(): TypeStatement
-    {
-        return $this->expected;
     }
 }

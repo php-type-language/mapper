@@ -11,12 +11,16 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * Occurs when the type was incorrectly defined.
  */
-abstract class DefinitionException extends \InvalidArgumentException implements MapperExceptionInterface
+abstract class DefinitionException extends \InvalidArgumentException implements
+    MapperExceptionInterface
 {
     public readonly Template $template;
 
     public function __construct(
-        protected readonly TypeStatement $type,
+        /**
+         * Gets the type statement whose definition caused the error.
+         */
+        public readonly TypeStatement $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
@@ -28,12 +32,14 @@ abstract class DefinitionException extends \InvalidArgumentException implements 
     }
 
     /**
-     * Returns the type statement whose definition caused the error.
-     *
      * @api
+     *
+     * @param non-empty-string $file
+     * @param int<1, max> $line
      */
-    public function getType(): TypeStatement
+    public function setSource(string $file, int $line): void
     {
-        return $this->type;
+        $this->file = $file;
+        $this->line = $line;
     }
 }

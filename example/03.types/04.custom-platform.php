@@ -45,13 +45,22 @@ class ExampleDTO
 
 $mapper = new Mapper(new SimplePlatform());
 
-var_dump($mapper->normalize(new ExampleDTO()));
+try {
+    var_dump($mapper->normalize(new ExampleDTO()));
+} catch (\Throwable $e) {
+    echo $e->getMessage() . "\n";
+}
 //
 // TypeRequiredException: Type "int" for property ExampleDTO::$value
 //                        is not defined
 //
 
-var_dump($mapper->normalize([new ExampleDTO()], 'array<ExampleDTO>'));
+try {
+    var_dump($mapper->normalize([new ExampleDTO()], 'array<ExampleDTO>'));
+} catch (\Throwable $e) {
+    echo $e->getMessage() . "\n";
+}
 //
-// ParseException: Template arguments not allowed in "array<ExampleDTO>" at column 6
+// ParseException: Template arguments not allowed in "array<ExampleDTO>"
+//                 at column 6
 //

@@ -6,10 +6,18 @@ namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 
+/**
+ * @template TValue of mixed = mixed
+ */
 abstract class ValueException extends RuntimeException
 {
     public function __construct(
-        protected readonly mixed $value,
+        /**
+         * Gets the value that causes the error.
+         *
+         * @var TValue
+         */
+        public readonly mixed $value,
         PathInterface $path,
         string $template,
         int $code = 0,
@@ -21,13 +29,5 @@ abstract class ValueException extends RuntimeException
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Returns the value that causes the error.
-     */
-    public function getClass(): mixed
-    {
-        return $this->value;
     }
 }

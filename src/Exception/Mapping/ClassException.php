@@ -7,11 +7,16 @@ namespace TypeLang\Mapper\Exception\Mapping;
 use TypeLang\Mapper\Runtime\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template TObject of object = object
+ * @template-extends ValueOfTypeException<class-string<TObject>>
+ */
 abstract class ClassException extends ValueOfTypeException implements
     FinalExceptionInterface
 {
     /**
-     * @param class-string $class
+     * @param class-string<TObject> $class unlike {@see ValueException::$value},
+     *        this property must contain only {@see class-string}
      */
     public function __construct(
         TypeStatement $expected,
@@ -29,17 +34,5 @@ abstract class ClassException extends ValueOfTypeException implements
             code: $code,
             previous: $previous,
         );
-    }
-
-    /**
-     * Unlike {@see ValueException::getClass()}, this method must return
-     * only {@see class-string}.
-     *
-     * @return class-string
-     */
-    public function getClass(): string
-    {
-        /** @var class-string */
-        return $this->value;
     }
 }

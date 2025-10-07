@@ -25,7 +25,11 @@ class ListType implements TypeInterface
     public function match(mixed $value, Context $context): bool
     {
         if ($context->isDenormalization()) {
-            return \is_array($value) && \array_is_list($value);
+            if ($context->isStrictTypesEnabled()) {
+                return \is_array($value) && \array_is_list($value);
+            }
+
+            return \is_array($value);
         }
 
         return \is_iterable($value);

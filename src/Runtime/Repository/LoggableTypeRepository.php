@@ -20,15 +20,14 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
     }
 
     #[\Override]
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
         $this->logger->debug('Fetching the type by the AST statement {statement_name}', [
             'statement' => $statement,
             'statement_name' => $statement::class . '#' . \spl_object_id($statement),
-            'context' => $context,
         ]);
 
-        $type = $result = parent::getTypeByStatement($statement, $context);
+        $type = $result = parent::getTypeByStatement($statement);
 
         if ($type instanceof TypeDecoratorInterface) {
             $type = $type->getDecoratedType();
@@ -39,7 +38,6 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
             'statement_name' => $statement::class . '#' . \spl_object_id($statement),
             'type' => $type,
             'type_name' => $type::class . '#' . \spl_object_id($type),
-            'context' => $context,
         ]);
 
         if ($result instanceof LoggableType) {

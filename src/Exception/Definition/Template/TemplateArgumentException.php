@@ -16,10 +16,10 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
     /**
      * @var int<0, max>
      */
-    protected readonly int $index;
+    public readonly int $index;
 
     public function __construct(
-        protected readonly TemplateArgumentNode $argument,
+        public readonly TemplateArgumentNode $argument,
         TypeStatement $type,
         string $template,
         int $code = 0,
@@ -50,13 +50,5 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
         }
 
         return $index;
-    }
-
-    /**
-     * @api
-     */
-    public function getArgument(): TemplateArgumentNode
-    {
-        return $this->argument;
     }
 }
