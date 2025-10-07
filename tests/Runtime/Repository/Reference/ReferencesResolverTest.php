@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference;
 
-use PHPUnit\Framework\Attributes\CoversClass;
 use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Mapper\Runtime\Repository\Reference\ReferencesResolver;
 use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\SimpleClassStub;
 use TypeLang\Parser\Node\FullQualifiedName;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
-#[CoversClass(ReferencesResolver::class)]
 final class ReferencesResolverTest extends ReferenceTestCase
 {
     public function testResolveWithSimpleNameInSameNamespace(): void

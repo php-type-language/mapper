@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Runtime\Repository\Reference\Reader;
 
 use PHPUnit\Framework\Attributes\Before;
-use PHPUnit\Framework\Attributes\CoversClass;
 use TypeLang\Mapper\Runtime\Repository\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Runtime\Repository\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Mapper\Tests\Runtime\Repository\Reference\ReferenceTestCase;
@@ -13,7 +12,6 @@ use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\ClassWithGroupUsesSt
 use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\MultipleNamespacesClassStub;
 use TypeLang\Mapper\Tests\Runtime\Repository\Reference\Stub\SimpleClassStub;
 
-#[CoversClass(NativeReferencesReader::class)]
 final class NativeReaderTest extends ReferenceTestCase
 {
     private readonly ReferencesReaderInterface $reader;

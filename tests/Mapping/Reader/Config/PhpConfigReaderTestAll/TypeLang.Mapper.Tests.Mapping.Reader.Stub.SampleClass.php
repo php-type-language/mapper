@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'normalize_as_array' => true,
+    'discriminator' => [
+        'field' => 'kind',
+        'map' => [
+            'a' => 'A',
+            'b' => 'B',
+        ],
+        'otherwise' => 'C',
+    ],
+    'properties' => [
+        'name' => [
+            'type' => 'string',
+            'name' => 'label',
+            'type_error_message' => 'bad-type',
+            'undefined_error_message' => 'missing',
+            'skip' => ['null', 'empty', 'this.flag == false'],
+        ],
+        'age' => 'int',
+    ],
+];
+
+
