@@ -18,14 +18,6 @@ interface ConfigurationInterface
     public function isObjectsAsArrays(): bool;
 
     /**
-     * In case of returns {@see true}, then all composite types will
-     * be displayed along with detailed fields/values.
-     *
-     * Otherwise, only a short description will be displayed.
-     */
-    public function isDetailedTypes(): bool;
-
-    /**
      * In case of method returns {@see true}, all types will be checked
      * for compliance.
      *

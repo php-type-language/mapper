@@ -77,10 +77,6 @@ final class ClassMetadata extends Metadata
      */
     public function getTypeStatement(Context $context, bool $read): TypeStatement
     {
-        if (!$context->isDetailedTypes()) {
-            return new NamedTypeNode($this->name);
-        }
-
         $fields = [];
 
         foreach ($this->properties as $property) {
@@ -88,7 +84,7 @@ final class ClassMetadata extends Metadata
         }
 
         if ($fields === []) {
-            return new NamedTypeNode($this->name);
+            return new NamedTypeNode($this->name, fields: new FieldsListNode());
         }
 
         return new NamedTypeNode($this->name, fields: new FieldsListNode($fields));

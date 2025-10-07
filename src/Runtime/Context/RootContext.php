@@ -29,7 +29,7 @@ final class RootContext extends Context
         TypeRepositoryInterface $types,
     ): self {
         if ($config instanceof Configuration) {
-            // Disable strict-types for denormalization if option is not set
+            // Disable strict-types for normalization if option is not set
             if (!$config->isStrictTypesOptionDefined()) {
                 $config = $config->withStrictTypes(false);
             }
@@ -55,7 +55,7 @@ final class RootContext extends Context
         TypeRepositoryInterface $types,
     ): self {
         if ($config instanceof Configuration) {
-            // Enable strict-types for normalization if option is not set
+            // Enable strict-types for denormalization if option is not set
             if (!$config->isStrictTypesOptionDefined()) {
                 $config = $config->withStrictTypes(true);
             }

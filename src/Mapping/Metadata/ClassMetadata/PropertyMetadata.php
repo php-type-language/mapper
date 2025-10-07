@@ -77,11 +77,11 @@ final class PropertyMetadata extends Metadata
 
         $statement = clone $info->statement;
 
-        if ($context->isDetailedTypes() || !$statement instanceof NamedTypeNode) {
-            return $statement;
+        if ($statement instanceof NamedTypeNode) {
+            return new NamedTypeNode($statement->name);
         }
 
-        return new NamedTypeNode($statement->name);
+        return $statement;
     }
 
     /**

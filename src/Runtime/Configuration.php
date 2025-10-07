@@ -15,11 +15,6 @@ final class Configuration implements ConfigurationInterface
     public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
 
     /**
-     * Default value for {@see $isDetailedTypes} option.
-     */
-    public const DETAILED_TYPES_DEFAULT_VALUE = true;
-
-    /**
      * Default value for {@see $isStrictTypes} option.
      */
     public const STRICT_TYPES_DEFAULT_VALUE = true;
@@ -30,24 +25,19 @@ final class Configuration implements ConfigurationInterface
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        private ?bool $isObjectsAsArrays = null,
-        /**
-         * If this option contains {@see true}, then all composite types will
-         * be displayed along with detailed fields/values.
-         */
-        private ?bool $isDetailedTypes = null,
+        private readonly ?bool $isObjectsAsArrays = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
          */
-        private ?bool $isStrictTypes = null,
+        private readonly ?bool $isStrictTypes = null,
         /**
          * If this option contains {@see LoggerInterface}, then logger
          * will be enabled.
          *
          * Logger will be disabled in case of argument contain {@see null}.
          */
-        private ?LoggerInterface $logger = null,
+        private readonly ?LoggerInterface $logger = null,
         /**
          * If this option contains {@see TracerInterface}, then an application
          * tracing will be enabled using given tracer.
@@ -55,7 +45,7 @@ final class Configuration implements ConfigurationInterface
          * An application tracing will be disabled in case of argument
          * contain {@see null}.
          */
-        private ?TracerInterface $tracer = null,
+        private readonly ?TracerInterface $tracer = null,
     ) {}
 
     /**
@@ -67,10 +57,12 @@ final class Configuration implements ConfigurationInterface
      */
     public function withObjectsAsArrays(?bool $enabled = null): self
     {
-        $self = clone $this;
-        $self->isObjectsAsArrays = $enabled;
-
-        return $self;
+        return new self(
+            isObjectsAsArrays: $enabled,
+            isStrictTypes: $this->isStrictTypes,
+            logger: $this->logger,
+            tracer: $this->tracer,
+        );
     }
 
     public function isObjectsAsArrays(): bool
@@ -89,36 +81,6 @@ final class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Enables or disables detailed types in exceptions.
-     *
-     * In case of $enabled is {@see null} a default value will be defined.
-     *
-     * @api
-     */
-    public function withDetailedTypes(?bool $enabled = null): self
-    {
-        $self = clone $this;
-        $self->isDetailedTypes = $enabled;
-
-        return $self;
-    }
-
-    public function isDetailedTypes(): bool
-    {
-        return $this->isDetailedTypes ?? self::DETAILED_TYPES_DEFAULT_VALUE;
-    }
-
-    /**
-     * Returns {@see true} in case option is user-defined.
-     *
-     * @api
-     */
-    public function isDetailedTypesOptionDefined(): bool
-    {
-        return $this->isDetailedTypes !== null;
-    }
-
-    /**
      * Enables or disables strict types in casting.
      *
      * In case of $enabled is {@see null} a default value will be defined.
@@ -127,10 +89,12 @@ final class Configuration implements ConfigurationInterface
      */
     public function withStrictTypes(?bool $enabled = null): self
     {
-        $self = clone $this;
-        $self->isStrictTypes = $enabled;
-
-        return $self;
+        return new self(
+            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isStrictTypes: $enabled,
+            logger: $this->logger,
+            tracer: $this->tracer,
+        );
     }
 
     public function isStrictTypesEnabled(): bool
@@ -156,10 +120,12 @@ final class Configuration implements ConfigurationInterface
      */
     public function withLogger(?LoggerInterface $logger = null): self
     {
-        $self = clone $this;
-        $self->logger = $logger;
-
-        return $self;
+        return new self(
+            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isStrictTypes: $this->isStrictTypes,
+            logger: $logger,
+            tracer: $this->tracer,
+        );
     }
 
     public function getLogger(): ?LoggerInterface
@@ -176,10 +142,12 @@ final class Configuration implements ConfigurationInterface
      */
     public function withTracer(?TracerInterface $tracer = null): self
     {
-        $self = clone $this;
-        $self->tracer = $tracer;
-
-        return $self;
+        return new self(
+            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isStrictTypes: $this->isStrictTypes,
+            logger: $this->logger,
+            tracer: $tracer,
+        );
     }
 
     public function getTracer(): ?TracerInterface

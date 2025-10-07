@@ -59,11 +59,6 @@ abstract class Context implements
         return $this->config->isObjectsAsArrays();
     }
 
-    public function isDetailedTypes(): bool
-    {
-        return $this->config->isDetailedTypes();
-    }
-
     public function isStrictTypesEnabled(): bool
     {
         return $this->config->isStrictTypesEnabled();
