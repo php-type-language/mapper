@@ -8,7 +8,6 @@ use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Type\Builder\CallableTypeBuilder;
 use TypeLang\Mapper\Type\Builder\PsrContainerTypeBuilder;
 use TypeLang\Mapper\Type\TypeInterface;
 

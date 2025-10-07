@@ -28,22 +28,16 @@ try {
         ],
     ], ExampleDTO::class);
 } catch (RuntimeException $e) {
-    // Before
     var_dump($e->getMessage());
-    // - Value#1: "of {"values": 42}"
-    // - Value#2: "but 42 given"
-    // - Message: Passed value in "values" of {"values": 42} must be of type
-    //   list<ExampleDTO>, but 42 given at $.values[1].values
 
     // Print all values using PHP-compatible types
     $e->template->values = new PHPValuePrinter();
 
-    // After#1
+    // Before:  Passed value in "values" of {"values": 42} must be of type
+    //          list<ExampleDTO>, but 42 given at $.values[1].values
+    // After#1: Passed value in string of stdClass must be of type
+    //          list<ExampleDTO>, but int given at $.values[1].values
     var_dump($e->getMessage());
-    // - Value#1: "of array"
-    // - Value#2: "but int given"
-    // - Message: Passed value in "values" of array must be of type
-    //   list<ExampleDTO>, but int given at $.values[1].values
 
 
     // In case of symfony/var-dumper is installed, we can use it
@@ -51,14 +45,13 @@ try {
         // Print all values using SymfonyValuePrinter
         $e->template->values = new SymfonyValuePrinter();
 
-        // After#2
+        // Before:  Passed value in "values" of {"values": 42} must be of type
+        //          list<ExampleDTO>, but 42 given at $.values[1].values
+        // After#1: Passed value in string of stdClass must be of type
+        //          list<ExampleDTO>, but int given at $.values[1].values
+        // After#2: Passed value in "values" of {#394
+        //            +"values": 42
+        //          } must be of type list<ExampleDTO>, but 42 given at $.values[1].values
         var_dump($e->getMessage());
-        // - Value#1: "of array:1 [
-        //     "values" => 42
-        //   ]"
-        // - Value#2: "but 42 given"
-        // - Message: Passed value in "values" of array:1 [
-        //     "values" => 42
-        //   ] must be of type list<ExampleDTO>, but 42 given at $.values[1].values
     }
 }

@@ -87,19 +87,30 @@ var_dump($mapper->normalize([1, 2, 3], 'non-empty<array>'));
 // ]
 //
 
-var_dump($mapper->normalize([], 'non-empty<string>'));
+try {
+    var_dump($mapper->normalize([], 'non-empty<string>'));
+} catch (\Throwable $e) {
+    echo $e->getMessage() . "\n";
+}
 //
 // InvalidValueException: Passed value [] is invalid
 //
 
-
-var_dump($mapper->normalize('example', 'non-empty'));
+try {
+    var_dump($mapper->normalize('example', 'non-empty'));
+} catch (\Throwable $e) {
+    echo $e->getMessage() . "\n";
+}
 //
 // MissingTemplateArgumentsException: Type "non-empty" expects at least 1
 //                                    template argument(s), but 0 were passed
 //
 
-var_dump($mapper->normalize('', 'non-empty<string>'));
+try {
+    var_dump($mapper->normalize('', 'non-empty<string>'));
+} catch (\Throwable $e) {
+    echo $e->getMessage() . "\n";
+}
 //
 // InvalidValueException: Passed value "" is invalid
 //
