@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\DiscriminatorMap;
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 
 final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
 {
@@ -22,13 +22,13 @@ final class DiscriminatorMapClassAttributeLoader extends ClassAttributeLoader
         $default = null;
 
         if ($attribute->otherwise !== null) {
-            $default = new TypeInfo($attribute->otherwise);
+            $default = new RawTypeInfo($attribute->otherwise);
         }
 
         $map = [];
 
         foreach ($attribute->map as $value => $type) {
-            $map[$value] = new TypeInfo($type);
+            $map[$value] = new RawTypeInfo($type);
         }
 
         $info->discriminator = new DiscriminatorInfo(

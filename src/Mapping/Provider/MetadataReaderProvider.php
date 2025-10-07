@@ -26,16 +26,19 @@ use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
+use TypeLang\Mapper\Mapping\Metadata\ParsedTypeInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
+use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class MetadataReaderProvider implements ProviderInterface
 {
     public function __construct(
-        private readonly ReaderInterface $reader,
+        private readonly ReaderInterface $reader = new ReflectionReader(),
         private ?ExpressionLanguage $expression = null,
         private readonly ?ClockInterface $clock = null,
     ) {}
@@ -52,9 +55,7 @@ final class MetadataReaderProvider implements ProviderInterface
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ClassMetadata {
-        $info = $this->reader->read($class);
-
-        dd($info);
+        $info = $this->reader->read($class, $parser);
 
         return $this->toClassMetadata($info, $types, $parser);
     }
@@ -302,7 +303,15 @@ final class MetadataReaderProvider implements ProviderInterface
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeMetadata {
-        $statement = $parser->getStatementByDefinition($info->definition);
+        $statement = match (true) {
+            $info instanceof RawTypeInfo => $parser->getStatementByDefinition($info->definition),
+            $info instanceof ParsedTypeInfo => $info->statement,
+            default => throw new \InvalidArgumentException(\sprintf(
+                'Unsupported type info "%s"',
+                $info::class,
+            ))
+        };
+
         $type = $types->getTypeByStatement($statement);
 
         return new TypeMetadata(

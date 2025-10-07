@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 
 /**
  * @template TClassMetadataLoader of object
@@ -45,8 +46,8 @@ abstract class Reader implements ReaderInterface
         return [];
     }
 
-    public function read(\ReflectionClass $class): ClassInfo
+    public function read(\ReflectionClass $class, TypeParserInterface $parser): ClassInfo
     {
-        return $this->delegate->read($class);
+        return $this->delegate->read($class, $parser);
     }
 }

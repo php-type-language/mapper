@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
+use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 
 interface ReaderInterface
 {
@@ -16,5 +17,5 @@ interface ReaderInterface
      * @return ClassInfo<T>
      * @throws \Throwable
      */
-    public function read(\ReflectionClass $class): ClassInfo;
+    public function read(\ReflectionClass $class, TypeParserInterface $parser): ClassInfo;
 }

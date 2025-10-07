@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\ConfigReader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 
 /**
  * @phpstan-import-type PropertyConfigType from SchemaValidator
@@ -27,7 +27,7 @@ final class TypePropertyConfigLoader extends PropertyConfigLoader
             return;
         }
 
-        $info->read = $info->write = new TypeInfo(
+        $info->read = $info->write = new RawTypeInfo(
             definition: $config['type'],
         );
     }
@@ -41,7 +41,7 @@ final class TypePropertyConfigLoader extends PropertyConfigLoader
             return;
         }
 
-        $info->write = new TypeInfo(
+        $info->write = new RawTypeInfo(
             definition: $config['write'],
         );
     }

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Mapping\Reader\ConfigReader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassInfo;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 
 final class DiscriminatorMapClassConfigLoader extends ClassConfigLoader
 {
@@ -21,13 +21,13 @@ final class DiscriminatorMapClassConfigLoader extends ClassConfigLoader
         $map = [];
 
         foreach ($discriminatorConfig['map'] as $value => $type) {
-            $map[$value] = new TypeInfo($type);
+            $map[$value] = new RawTypeInfo($type);
         }
 
         $default = null;
 
         if (isset($discriminatorConfig['otherwise'])) {
-            $default = new TypeInfo($discriminatorConfig['otherwise']);
+            $default = new RawTypeInfo($discriminatorConfig['otherwise']);
         }
 
         $info->discriminator = new DiscriminatorInfo(

@@ -21,14 +21,14 @@ class NeonConfigReader extends ConfigFileReader
         iterable|string $extensions = self::DEFAULT_YAML_FILE_EXTENSIONS,
         ReaderInterface $delegate = new ReflectionReader(),
     ) {
-        parent::__construct($directories, $extensions, $delegate);
-
         if (!\class_exists(NeonParser::class)) {
             throw ComposerPackageRequiredException::becausePackageNotInstalled(
                 package: 'nette/neon',
                 purpose: 'NEON mapping configuration files',
             );
         }
+
+        parent::__construct($directories, $extensions, $delegate);
     }
 
     protected function load(\ReflectionClass $class): ?array

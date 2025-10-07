@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 use TypeLang\Parser\Node\Name;
@@ -56,7 +57,7 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
             $definition = $this->createTypeDefinition($type);
         }
 
-        return new TypeInfo(
+        return new RawTypeInfo(
             definition: $definition,
             source: $this->getWriteHookSourceInfo($property),
         );
@@ -85,7 +86,7 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
             $definition = $this->createTypeDefinition($type);
         }
 
-        return new TypeInfo(
+        return new RawTypeInfo(
             definition: $definition,
             source: $this->getReadHookSourceInfo($property),
         );

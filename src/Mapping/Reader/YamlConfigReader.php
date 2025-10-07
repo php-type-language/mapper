@@ -26,9 +26,9 @@ class YamlConfigReader extends ConfigFileReader
         ?YamlParser $parser = null,
         ReaderInterface $delegate = new ReflectionReader(),
     ) {
-        parent::__construct($directories, $extensions, $delegate);
-
         $this->parser = $parser ?? $this->createDefaultYamlParser();
+
+        parent::__construct($directories, $extensions, $delegate);
     }
 
     private function createDefaultYamlParser(): YamlParser

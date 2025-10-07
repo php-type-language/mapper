@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Mapping\Reader\AttributeReader;
 
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
+use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
-use TypeLang\Mapper\Mapping\Metadata\TypeInfo;
 
 final class TypePropertyAttributeLoader extends PropertyAttributeLoader
 {
@@ -49,7 +49,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->read = $prototype->write = new TypeInfo(
+        $prototype->read = $prototype->write = new RawTypeInfo(
             definition: $attribute->type,
             source: $this->findSourceMap($property),
         );
@@ -69,7 +69,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->read = new TypeInfo(
+        $prototype->read = new RawTypeInfo(
             definition: $attribute->type,
         );
     }
@@ -88,7 +88,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
             return;
         }
 
-        $prototype->write = new TypeInfo(
+        $prototype->write = new RawTypeInfo(
             definition: $attribute->type,
         );
     }
