@@ -29,15 +29,20 @@ final class ClassMetadata extends Metadata
          * Contains a list of class fields available for normalization
          * and denormalization.
          *
+         * @readonly
+         * @psalm-readonly-allow-private-mutation
          * @var array<non-empty-string, PropertyMetadata>
          */
-        public readonly array $properties = [],
+        public array $properties = [],
         /**
          * Gets {@see DiscriminatorMetadata} information about a class
          * discriminator map, or returns {@see null} if no such metadata
          * has been registered in the {@see ClassMetadata} instance.
+         *
+         * @readonly
+         * @psalm-readonly-allow-private-mutation
          */
-        public readonly ?DiscriminatorMetadata $discriminator = null,
+        public ?DiscriminatorMetadata $discriminator = null,
         /**
          * Gets information about the normalization method of an object.
          *

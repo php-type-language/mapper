@@ -37,6 +37,11 @@ use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class MetadataReaderProvider implements ProviderInterface
 {
+    /**
+     * @var array<class-string, ClassMetadata<object>>
+     */
+    private array $references = [];
+
     public function __construct(
         private readonly ReaderInterface $reader = new ReflectionReader(),
         private ?ExpressionLanguage $expression = null,
@@ -50,37 +55,120 @@ final class MetadataReaderProvider implements ProviderInterface
         return $now?->getTimestamp();
     }
 
+    /**
+     * @template TArg of object
+     *
+     * @param \ReflectionClass<TArg> $class
+     *
+     * @return ClassMetadata<TArg>
+     *
+     * @throws \Throwable
+     */
     public function getClassMetadata(
         \ReflectionClass $class,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ClassMetadata {
-        $info = $this->reader->read($class);
+        if (\PHP_VERSION_ID >= 80400) {
+            /** @var ClassMetadata<TArg> */
+            return $this->toProxyClassMetadata($class, $types, $parser);
+        }
 
-        return $this->toClassMetadata($info, $types, $parser);
+        /** @var ClassMetadata<TArg> */
+        return $this->toLazyInitializedClassMetadata($class, $types, $parser);
     }
 
     /**
-     * @template T of object
+     * @template TArg of object
      *
-     * @param ClassInfo<T> $class
+     * @param \ReflectionClass<TArg> $class
      *
-     * @return ClassMetadata<T>
+     * @return ClassMetadata<TArg>
      * @throws \Throwable
      */
-    private function toClassMetadata(
-        ClassInfo $class,
+    private function toProxyClassMetadata(
+        \ReflectionClass $class,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ClassMetadata {
-        return new ClassMetadata(
-            name: $class->name,
-            properties: $this->toPropertiesMetadata($class, $class->properties, $types, $parser),
-            discriminator: $this->toOptionalDiscriminator($class, $class->discriminator, $types, $parser),
-            isNormalizeAsArray: $class->isNormalizeAsArray,
-            typeErrorMessage: $class->typeErrorMessage,
+        /** @var ClassMetadata<TArg> */
+        return $this->references[$class->name] ??=
+            (new \ReflectionClass(ClassMetadata::class))
+                ->newLazyProxy(function () use ($class, $types, $parser): ClassMetadata {
+                    $info = $this->reader->read($class);
+
+                    $metadata = new ClassMetadata(
+                        name: $info->name,
+                        properties: $this->toPropertiesMetadata(
+                            parent: $info,
+                            properties: $info->properties,
+                            types: $types,
+                            parser: $parser,
+                        ),
+                        discriminator: $this->toOptionalDiscriminator(
+                            parent: $info,
+                            info: $info->discriminator,
+                            types: $types,
+                            parser: $parser,
+                        ),
+                        isNormalizeAsArray: $info->isNormalizeAsArray,
+                        typeErrorMessage: $info->typeErrorMessage,
+                        createdAt: $this->now(),
+                    );
+
+                    unset($this->references[$class->name]);
+
+                    return $metadata;
+                });
+    }
+
+    /**
+     * @template TArg of object
+     *
+     * @param \ReflectionClass<TArg> $class
+     *
+     * @return ClassMetadata<TArg>
+     * @throws \Throwable
+     */
+    private function toLazyInitializedClassMetadata(
+        \ReflectionClass $class,
+        TypeRepositoryInterface $types,
+        TypeParserInterface $parser,
+    ): ClassMetadata {
+        if (isset($this->references[$class->name])) {
+            /** @var ClassMetadata<TArg> */
+            return $this->references[$class->name];
+        }
+
+        $info = $this->reader->read($class);
+
+        $this->references[$class->name] = $metadata = new ClassMetadata(
+            name: $info->name,
+            isNormalizeAsArray: $info->isNormalizeAsArray,
+            typeErrorMessage: $info->typeErrorMessage,
             createdAt: $this->now(),
         );
+
+        /** @phpstan-ignore-next-line : Allow readonly writing */
+        $metadata->properties = $this->toPropertiesMetadata(
+            parent: $info,
+            properties: $info->properties,
+            types: $types,
+            parser: $parser,
+        );
+
+        /** @phpstan-ignore-next-line : Allow readonly writing */
+        $metadata->discriminator = $this->toOptionalDiscriminator(
+            parent: $info,
+            info: $info->discriminator,
+            types: $types,
+            parser: $parser,
+        );
+
+        unset($this->references[$class->name]);
+
+        /** @var ClassMetadata<TArg> */
+        return $metadata;
     }
 
     /**
