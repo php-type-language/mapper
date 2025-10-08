@@ -151,7 +151,7 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
     {
         $result = $this->createNonNullNamedTypeDefinition($type);
 
-        if ($type->allowsNull() && $type->getName() !== 'null') {
+        if ($type->allowsNull() && !\in_array($type->getName(), ['null', 'mixed'], true)) {
             return $result . '|null';
         }
 
@@ -174,6 +174,7 @@ final class TypePropertyReflectionLoader extends PropertyReflectionLoader
         $name = new Name($type->getName());
 
         if ($type->isBuiltin() || $name->isSpecial() || $name->isBuiltin()) {
+            /** @var non-empty-string */
             return $literal;
         }
 

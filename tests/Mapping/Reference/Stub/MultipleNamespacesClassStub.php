@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 namespace {
-
     use Some\Any\Test1 as Example1;
     use Some\Any1;
 
@@ -15,7 +14,6 @@ namespace {
 }
 
 namespace TypeLang\Mapper\Tests\Mapping\Reference\Stub {
-
     use Some\Any\Test2 as Example2;
     use Some\Any2;
 
