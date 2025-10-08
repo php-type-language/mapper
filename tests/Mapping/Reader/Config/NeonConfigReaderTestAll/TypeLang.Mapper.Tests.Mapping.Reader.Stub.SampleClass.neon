@@ -16,5 +16,3 @@ properties:
 			- 'empty'
 			- 'this.flag == false'
 	age: int
-
-
