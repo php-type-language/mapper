@@ -34,10 +34,14 @@ class ArrayKeyType implements TypeInterface
 
     public function cast(mixed $value, Context $context): string|int
     {
-        // PHP does not support zero ("0") string array keys,
+        // PHP does not support numeric string array keys,
         // so we need to force-cast it to the integer value.
-        if ($value === '0') {
-            return 0;
+        $isIntNumeric = \is_string($value)
+            && \is_numeric($value)
+            && (float) $value === (float) (int) $value;
+
+        if ($isIntNumeric) {
+            return (int) $value;
         }
 
         if (\is_string($value) || \is_int($value)) {
@@ -46,27 +50,35 @@ class ArrayKeyType implements TypeInterface
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            try {
-                /** @var int */
-                return $this->int->cast($value, $context);
-            } catch (InvalidValueException) {
-                // NaN, -INF and INF cannot be converted to
-                // array-key implicitly without losses.
-                if (\is_float($value) && !\is_finite($value)) {
-                    throw InvalidValueException::createFromContext(
-                        value: $value,
-                        context: $context,
-                    );
-                }
-
-                /** @var string */
-                return $this->string->cast($value, $context);
-            }
+            return $this->coerce($value, $context);
         }
 
         throw InvalidValueException::createFromContext(
             value: $value,
             context: $context,
         );
+    }
+
+    /**
+     * @throws \Throwable
+     */
+    protected function coerce(mixed $value, Context $context): string|int
+    {
+        try {
+            /** @var int */
+            return $this->int->cast($value, $context);
+        } catch (InvalidValueException) {
+            // NaN, -INF and INF cannot be converted to
+            // array-key implicitly without losses.
+            if (\is_float($value) && !\is_finite($value)) {
+                throw InvalidValueException::createFromContext(
+                    value: $value,
+                    context: $context,
+                );
+            }
+
+            /** @var string */
+            return $this->string->cast($value, $context);
+        }
     }
 }
