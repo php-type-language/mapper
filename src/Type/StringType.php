@@ -35,7 +35,7 @@ class StringType implements TypeInterface
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            return $this->convertToString($value, $context);
+            return $this->coerce($value, $context);
         }
 
         throw InvalidValueException::createFromContext(
@@ -47,7 +47,7 @@ class StringType implements TypeInterface
     /**
      * @throws InvalidValueException
      */
-    protected function convertToString(mixed $value, Context $context): string
+    protected function coerce(mixed $value, Context $context): string
     {
         return match (true) {
             // Null
