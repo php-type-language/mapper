@@ -25,25 +25,11 @@
         "symfony/var-dumper": "^5.4|^6.0|^7.1"
     },
     "scripts": {
-        "bench:base": "phpbench run --report=default --tag=current",
-        "bench:instantiate": [
-            "@bench:base --filter=benchInstantiate"
-        ],
-        "bench:extract": [
-            "@bench:base --filter=benchExtract"
-        ],
-        "bench:normalize": [
-            "@bench:base --filter=benchNormalization"
-        ],
-        "bench:denormalize": [
-            "@bench:base --filter=benchDenormalization"
-        ],
-        "bench": [
-            "@bench:instantiate",
-            "@bench:extract",
-            "@bench:normalize",
-            "@bench:denormalize"
-        ]
+        "bench:instantiate": "@bench --filter=benchInstantiate",
+        "bench:extract": "@bench --filter=benchExtract",
+        "bench:normalize": "@bench --filter=benchNormalization",
+        "bench:denormalize": "@bench --filter=benchDenormalization",
+        "bench": "phpbench run --report=default --tag=current"
     },
     "minimum-stability": "dev",
     "prefer-stable": true
