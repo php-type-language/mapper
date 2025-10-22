@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
-use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
-use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
@@ -25,15 +22,11 @@ final class TypeRepository implements
 
     private TypeRepositoryInterface $context;
 
-    private readonly ReferencesResolver $references;
-
     public function __construct(
         private readonly TypeParserInterface $parser,
         private readonly PlatformInterface $platform,
-        ReferencesReaderInterface $references = new NativeReferencesReader(),
     ) {
         $this->context = $this;
-        $this->references = new ReferencesResolver($references);
         $this->builders = self::toArrayList($this->platform->getTypes());
     }
 
@@ -59,12 +52,8 @@ final class TypeRepository implements
         $this->context = $parent;
     }
 
-    public function getTypeByStatement(TypeStatement $statement, ?\ReflectionClass $context = null): TypeInterface
+    public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        if ($context !== null) {
-            $statement = $this->references->resolve($statement, $context);
-        }
-
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
                 // @phpstan-ignore-next-line : Statement expects a bottom type (never), but TypeStatement passed

@@ -67,7 +67,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         $runtime = new TypeRepository(
             parser: $this->parser,
             platform: $platform,
-            references: new NativeReferencesReader(),
         );
 
         if (($tracer = $this->config->getTracer()) !== null) {
