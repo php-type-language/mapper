@@ -39,7 +39,7 @@ final class Psr6CacheProvider extends CacheProvider
         $item->expiresAfter($this->ttl);
         $item->set($result);
 
-        $this->psr6->saveDeferred($item);
+        $this->psr6->save($item);
 
         return $result;
     }
