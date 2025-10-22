@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\DateTimeType\DateTimeTypeDenormalizer;
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\DateTimeType\DateTimeFromStringType;
 
+/**
+ * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ *
+ * @template-extends DateTimeTypeBuilder<TDateTime, TDateTime>
+ */
 class DateTimeFromStringTypeBuilder extends DateTimeTypeBuilder
 {
-    protected function create(string $class, ?string $format = null): TypeInterface
+    protected function create(string $class, ?string $format = null): DateTimeFromStringType
     {
-        return new DateTimeTypeDenormalizer($class, $format);
+        return new DateTimeFromStringType($class, $format);
     }
 }

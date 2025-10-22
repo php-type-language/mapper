@@ -8,12 +8,17 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class UnitEnumTypeNormalizer implements TypeInterface
+/**
+ * @template TEnum of \UnitEnum = \UnitEnum
+ *
+ * @template-implements TypeInterface<non-empty-string>
+ */
+class UnitEnumToStringType implements TypeInterface
 {
-    /**
-     * @param class-string<\UnitEnum> $class
-     */
     public function __construct(
+        /**
+         * @var class-string<TEnum>
+         */
         protected readonly string $class,
     ) {}
 
@@ -25,6 +30,7 @@ class UnitEnumTypeNormalizer implements TypeInterface
     public function cast(mixed $value, Context $context): string
     {
         if ($value instanceof $this->class) {
+            /** @var non-empty-string */
             return $value->name;
         }
 

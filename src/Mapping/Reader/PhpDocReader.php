@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
+use TypeLang\Mapper\Mapping\Reader\PhpDocReader\ClassPhpDocLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader\ParamConstructClassPhpDocLoader;
+use TypeLang\Mapper\Mapping\Reader\PhpDocReader\PropertyPhpDocLoaderInterface;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader\ReadHookTypePropertyPhpDocLoader;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader\TypePropertyPhpDocLoader;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader\WriteHookTypePropertyPhpDocLoader;
@@ -16,6 +18,9 @@ use TypeLang\PHPDoc\Standard\ReturnTagFactory;
 use TypeLang\PHPDoc\Standard\VarTagFactory;
 use TypeLang\PHPDoc\Tag\Factory\TagFactory;
 
+/**
+ * @template-extends MetadataReader<ClassPhpDocLoaderInterface, PropertyPhpDocLoaderInterface>
+ */
 class PhpDocReader extends MetadataReader
 {
     /**

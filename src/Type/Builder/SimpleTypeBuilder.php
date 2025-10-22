@@ -13,13 +13,15 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<TypeInterface>
+ * @template TResult of mixed = mixed
+ *
+ * @template-extends NamedTypeBuilder<TypeInterface<TResult>>
  */
 class SimpleTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @param non-empty-array<non-empty-string>|non-empty-string $names
-     * @param class-string<TypeInterface> $type
+     * @param class-string<TypeInterface<TResult>> $type
      */
     public function __construct(
         array|string $names,
@@ -37,6 +39,7 @@ class SimpleTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeInterface {
+        /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);

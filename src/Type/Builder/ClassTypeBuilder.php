@@ -18,7 +18,9 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, TypeInterface>
+ * @template TObject of object = object
+ * @template TResult of object|array = object|array<array-key, mixed>
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class ClassTypeBuilder extends Builder
 {
@@ -81,7 +83,7 @@ abstract class ClassTypeBuilder extends Builder
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
-        /** @var class-string<T> $class */
+        /** @var class-string<TObject> $class */
         $class = $statement->name->toString();
 
         return $this->create(
@@ -93,5 +95,10 @@ abstract class ClassTypeBuilder extends Builder
         );
     }
 
+    /**
+     * @param ClassMetadata<TObject> $metadata
+     *
+     * @return TypeInterface<TResult>
+     */
     abstract protected function create(ClassMetadata $metadata): TypeInterface;
 }

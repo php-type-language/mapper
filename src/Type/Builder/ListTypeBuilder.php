@@ -10,15 +10,15 @@ use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsExcept
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Type\ListType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<ListType>
+ * @template-extends NamedTypeBuilder<TypeInterface>
  */
-class ListTypeBuilder extends NamedTypeBuilder
+abstract class ListTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @var non-empty-lowercase-string
@@ -47,7 +47,8 @@ class ListTypeBuilder extends NamedTypeBuilder
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): ListType {
+    ): TypeInterface {
+        /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);
@@ -69,10 +70,10 @@ class ListTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildWithNoValue(TypeRepositoryInterface $types, TypeParserInterface $parser): ListType
+    private function buildWithNoValue(TypeRepositoryInterface $types, TypeParserInterface $parser): TypeInterface
     {
-        return new ListType(
-            value: $types->getTypeByStatement(
+        return $this->create(
+            type: $types->getTypeByStatement(
                 statement: $parser->getStatementByDefinition(
                     definition: $this->valueType,
                 ),
@@ -85,10 +86,8 @@ class ListTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildWithValue(
-        NamedTypeNode $statement,
-        TypeRepositoryInterface $types,
-    ): ListType {
+    private function buildWithValue(NamedTypeNode $statement, TypeRepositoryInterface $types): TypeInterface
+    {
         $arguments = $statement->arguments->items ?? [];
 
         assert(\array_key_exists(0, $arguments));
@@ -98,10 +97,12 @@ class ListTypeBuilder extends NamedTypeBuilder
 
         $this->expectNoTemplateArgumentHint($statement, $value);
 
-        return new ListType(
-            value: $types->getTypeByStatement(
+        return $this->create(
+            type: $types->getTypeByStatement(
                 statement: $value->value,
             ),
         );
     }
+
+    abstract protected function create(TypeInterface $type): TypeInterface;
 }

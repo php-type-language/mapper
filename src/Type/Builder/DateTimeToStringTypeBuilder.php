@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\DateTimeType\DateTimeTypeNormalizer;
-use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\DateTimeType\DateTimeToStringType;
 
+/**
+ * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ *
+ * @template-extends DateTimeTypeBuilder<TDateTime, string>
+ */
 class DateTimeToStringTypeBuilder extends DateTimeTypeBuilder
 {
-    protected function create(string $class, ?string $format = null): TypeInterface
+    protected function create(string $class, ?string $format = null): DateTimeToStringType
     {
-        return new DateTimeTypeNormalizer($format);
+        $format ??= DateTimeToStringType::DEFAULT_DATETIME_FORMAT;
+
+        return new DateTimeToStringType($format);
     }
 }

@@ -47,6 +47,7 @@ class PsrContainerTypeBuilder extends NamedTypeBuilder
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): TypeInterface {
+        /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);

@@ -9,14 +9,14 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\UnionLeafEntry;
 
 /**
- * @template T of mixed = mixed
- * @template-implements TypeInterface<T>
+ * @template-covariant TResult of mixed = mixed
+ * @template-implements TypeInterface<TResult>
  */
 class UnionType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var non-empty-list<TypeInterface<T>>
+         * @var non-empty-list<TypeInterface<TResult>>
          */
         private readonly array $types,
     ) {}

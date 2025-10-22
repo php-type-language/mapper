@@ -468,7 +468,7 @@ final class IntTypeTest extends TypeTestCase
     public function testCustomConvertToIntMethod(): void
     {
         $type = new class extends IntType {
-            protected function convertToInt(mixed $value, \TypeLang\Mapper\Runtime\Context $context): int
+            protected function coerce(mixed $value, \TypeLang\Mapper\Runtime\Context $context): int
             {
                 // Custom logic: always return 999
                 return 999;

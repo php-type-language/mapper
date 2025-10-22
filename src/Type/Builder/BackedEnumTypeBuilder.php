@@ -12,7 +12,10 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, TypeInterface>
+ * @template TEnum of \BackedEnum = \BackedEnum
+ * @template TResult of mixed = mixed
+ *
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class BackedEnumTypeBuilder extends Builder
 {
@@ -60,19 +63,22 @@ abstract class BackedEnumTypeBuilder extends Builder
 
         $reflection = $this->createReflectionEnum($statement);
 
-        $type = $this->getBackedEnumType($reflection, $statement);
-
         return $this->create(
-            // @phpstan-ignore-next-line
+            /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
             class: $statement->name->toString(),
+            /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
             type: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition($type),
+                statement: $parser->getStatementByDefinition(
+                    definition: $this->getBackedEnumType($reflection, $statement),
+                ),
             ),
         );
     }
 
     /**
-     * @param class-string<\BackedEnum> $class
+     * @param TypeInterface<value-of<TEnum>> $type
+     * @param class-string<TEnum> $class
+     * @return TypeInterface<TResult>
      */
     abstract protected function create(string $class, TypeInterface $type): TypeInterface;
 

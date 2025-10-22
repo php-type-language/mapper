@@ -14,7 +14,10 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, TypeInterface>
+ * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ * @template TResult of mixed = mixed
+ *
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class DateTimeTypeBuilder extends Builder
 {
@@ -25,15 +28,17 @@ abstract class DateTimeTypeBuilder extends Builder
     }
 
     /**
-     * @return class-string<\DateTime|\DateTimeImmutable>
+     * @return class-string<TDateTime>
+     * @return class-string<TDateTime>
      */
     private function getDateTimeClass(string $name): string
     {
         if ($name === \DateTimeInterface::class || \interface_exists($name)) {
+            /** @phpstan-ignore-next-line : If an interface is passed, then return the base class */
             return \DateTimeImmutable::class;
         }
 
-        /** @var class-string<\DateTime> */
+        /** @var class-string<TDateTime> */
         return $name;
     }
 
@@ -75,8 +80,9 @@ abstract class DateTimeTypeBuilder extends Builder
     }
 
     /**
-     * @param class-string<\DateTime|\DateTimeImmutable> $class
-     * @param non-empty-string|null $format
+     * @param class-string<TDateTime> $class
+     *
+     * @return TypeInterface<TResult>
      */
     abstract protected function create(string $class, ?string $format = null): TypeInterface;
 }

@@ -8,13 +8,20 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class BackedEnumTypeDenormalizer implements TypeInterface
+/**
+ * @template TEnum of \BackedEnum = \BackedEnum
+ * @template-implements TypeInterface<TEnum>
+ */
+class BackedEnumFromScalarType implements TypeInterface
 {
-    /**
-     * @param class-string<\BackedEnum> $class
-     */
     public function __construct(
+        /**
+         * @var class-string<TEnum>
+         */
         protected readonly string $class,
+        /**
+         * @var TypeInterface<string|int>
+         */
         protected readonly TypeInterface $type,
     ) {}
 
@@ -39,13 +46,6 @@ class BackedEnumTypeDenormalizer implements TypeInterface
     public function cast(mixed $value, Context $context): \BackedEnum
     {
         $denormalized = $this->type->cast($value, $context);
-
-        if (!\is_string($denormalized) && !\is_int($denormalized)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
-        }
 
         try {
             $case = $this->class::tryFrom($denormalized);

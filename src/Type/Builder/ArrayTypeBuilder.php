@@ -16,7 +16,10 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<ArrayType>
+ * @template TKey of array-key = array-key
+ * @template TValue of mixed = mixed
+ *
+ * @template-extends NamedTypeBuilder<ArrayType<TKey, TValue>>
  */
 class ArrayTypeBuilder extends NamedTypeBuilder
 {
@@ -43,24 +46,19 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    /**
-     * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentHintsNotSupportedException
-     * @throws TooManyTemplateArgumentsException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
     public function build(
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
     ): ArrayType {
+        /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);
 
         $arguments = $statement->arguments->items ?? [];
 
+        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return match (\count($arguments)) {
             0 => $this->buildWithNoKeyValue($types, $parser),
             1 => $this->buildWithValue($statement, $types, $parser),
@@ -74,11 +72,13 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     }
 
     /**
+     * @return ArrayType<TKey, TValue>
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
     private function buildWithNoKeyValue(TypeRepositoryInterface $types, TypeParserInterface $parser): ArrayType
     {
+        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return new ArrayType(
             key: $types->getTypeByStatement(
                 statement: $parser->getStatementByDefinition(
@@ -94,6 +94,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     }
 
     /**
+     * @return ArrayType<TKey, TValue>
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
@@ -113,6 +114,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
         $value = $arguments[1];
         $this->expectNoTemplateArgumentHint($statement, $value);
 
+        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return new ArrayType(
             key: $types->getTypeByStatement($key->value),
             value: $types->getTypeByStatement($value->value),
@@ -120,6 +122,7 @@ class ArrayTypeBuilder extends NamedTypeBuilder
     }
 
     /**
+     * @return ArrayType<TKey, TValue>
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
@@ -138,11 +141,10 @@ class ArrayTypeBuilder extends NamedTypeBuilder
 
         $this->expectNoTemplateArgumentHint($statement, $value);
 
+        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return new ArrayType(
             key: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition(
-                    definition: $this->keyType,
-                ),
+                statement: $parser->getStatementByDefinition($this->keyType),
             ),
             value: $types->getTypeByStatement($value->value),
         );

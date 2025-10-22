@@ -12,7 +12,10 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, TypeInterface>
+ * @template TEnum of \UnitEnum = \UnitEnum
+ * @template TResult of mixed = mixed
+ *
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class UnitEnumTypeBuilder extends Builder
 {
@@ -21,10 +24,10 @@ abstract class UnitEnumTypeBuilder extends Builder
      */
     public const DEFAULT_INNER_SCALAR_TYPE = 'string';
 
-    /**
-     * @param non-empty-string $type
-     */
     public function __construct(
+        /**
+         * @var non-empty-string
+         */
         protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
     ) {}
 
@@ -70,6 +73,12 @@ abstract class UnitEnumTypeBuilder extends Builder
         );
     }
 
+    /**
+     * @param class-string<TEnum> $class
+     * @param non-empty-list<non-empty-string> $cases
+     * @param TypeInterface<string> $type
+     * @return TypeInterface<TResult>
+     */
     abstract protected function create(string $class, array $cases, TypeInterface $type): TypeInterface;
 
     /**

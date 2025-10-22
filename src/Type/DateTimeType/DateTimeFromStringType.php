@@ -8,16 +8,23 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class DateTimeTypeDenormalizer implements TypeInterface
+/**
+ * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ * @template-implements TypeInterface<TDateTime>
+ */
+class DateTimeFromStringType implements TypeInterface
 {
-    /**
-     * @param class-string<\DateTime|\DateTimeImmutable> $class
-     */
     public function __construct(
+        /**
+         * @var class-string<TDateTime>
+         */
         protected readonly string $class,
         protected readonly ?string $format = null,
     ) {}
 
+    /**
+     * @phpstan-assert-if-true string $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         if (!\is_string($value)) {
@@ -43,6 +50,7 @@ class DateTimeTypeDenormalizer implements TypeInterface
         $result = $this->tryParseDateTime($value);
 
         if ($result instanceof \DateTimeInterface) {
+            /** @var TDateTime */
             return $result;
         }
 
@@ -52,6 +60,9 @@ class DateTimeTypeDenormalizer implements TypeInterface
         );
     }
 
+    /**
+     * @return TDateTime|null
+     */
     private function tryParseDateTime(string $value): ?\DateTimeInterface
     {
         if ($this->format !== null) {

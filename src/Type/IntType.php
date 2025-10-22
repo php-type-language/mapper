@@ -21,7 +21,7 @@ class IntType implements TypeInterface
     {
         return match (true) {
             \is_int($value) => $value,
-            !$context->isStrictTypesEnabled() => $this->convertToInt($value, $context),
+            !$context->isStrictTypesEnabled() => $this->coerce($value, $context),
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
@@ -32,7 +32,7 @@ class IntType implements TypeInterface
     /**
      * @throws InvalidValueException
      */
-    protected function convertToInt(mixed $value, Context $context): int
+    protected function coerce(mixed $value, Context $context): int
     {
         if ($value instanceof \BackedEnum && \is_int($value->value)) {
             $value = $value->value;

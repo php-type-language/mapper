@@ -2,54 +2,56 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\ListType;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Type\MixedType;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template T of mixed = mixed
- * @template-implements TypeInterface<T>
+ * @template-covariant TItem of mixed = mixed
+ *
+ * @template-implements TypeInterface<list<TItem>>
  */
-class ListType implements TypeInterface
+class ListFromIterableType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var TypeInterface<T>
+         * @var TypeInterface<TItem>
          */
         protected readonly TypeInterface $value = new MixedType(),
     ) {}
 
+    /**
+     * @phpstan-assert-if-true iterable<mixed, mixed> $value
+     */
     public function match(mixed $value, Context $context): bool
     {
-        if ($context->isDenormalization()) {
-            if ($context->isStrictTypesEnabled()) {
-                return \is_array($value) && \array_is_list($value);
-            }
-
-            return \is_array($value);
-        }
-
         return \is_iterable($value);
     }
 
-    /**
-     * @return list<T>
-     * @throws InvalidValueException in case the value is incorrect
-     * @throws InvalidIterableValueException in case the value of a certain element is incorrect
-     * @throws \Throwable in case of internal error occurs
-     */
     public function cast(mixed $value, Context $context): array
     {
-        if (!$this->match($value, $context)) {
+        if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
             );
         }
 
+        return $this->process($value, $context);
+    }
+
+    /**
+     * @param iterable<mixed, mixed> $value
+     * @return list<TItem>
+     * @throws \Throwable
+     */
+    protected function process(iterable $value, Context $context): array
+    {
         $result = [];
         $index = 0;
 

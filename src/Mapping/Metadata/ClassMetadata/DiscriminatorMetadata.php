@@ -6,6 +6,9 @@ namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Parser\Node\Literal\StringLiteralNode;
+use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
  * Represents an abstraction over general information about a class.
@@ -33,5 +36,27 @@ final class DiscriminatorMetadata extends Metadata
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);
+    }
+
+    /**
+     * Dynamically creates AST discriminator representation.
+     *
+     * Required to print type information in exceptions.
+     *
+     * @codeCoverageIgnore
+     */
+    public function getTypeStatement(): TypeStatement
+    {
+        $participants = [];
+
+        foreach ($this->map as $field => $_) {
+            $participants[] = StringLiteralNode::createFromValue($field);
+        }
+
+        if (\count($participants) === 1) {
+            return \reset($participants);
+        }
+
+        return new UnionTypeNode(...$participants);
     }
 }

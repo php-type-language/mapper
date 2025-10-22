@@ -11,15 +11,22 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
+/**
+ * @template TObject of object = object
+ */
 final class DiscriminatorTypeSelector
 {
     public function __construct(
+        /**
+         * @var ClassMetadata<TObject>
+         */
         private readonly ClassMetadata $meta,
     ) {}
 
     /**
      * @param array<array-key, mixed> $value
      *
+     * @return TypeInterface<TObject>|null
      * @throws MissingRequiredObjectFieldException in case the required discriminator field is missing
      * @throws InvalidObjectValueException in case the discriminator field contains invalid value
      * @throws RuntimeException in case of mapped type casting error occurs
@@ -27,15 +34,15 @@ final class DiscriminatorTypeSelector
      */
     public function select(mixed $value, Context $context): ?TypeInterface
     {
-        $map = $this->meta->discriminator;
+        $discriminator = $this->meta->discriminator;
 
-        if ($map === null) {
+        if ($discriminator === null) {
             return null;
         }
 
         // Default mapping type
-        $default = $map->default?->type;
-        $field = $map->field;
+        $default = $discriminator->default?->type;
+        $field = $discriminator->field;
 
         // In case of discriminator field is missing
         if (!\array_key_exists($field, $value)) {
@@ -46,7 +53,7 @@ final class DiscriminatorTypeSelector
 
             throw MissingRequiredObjectFieldException::createFromContext(
                 field: $field,
-                expected: $map->getTypeStatement(),
+                expected: $discriminator->getTypeStatement(),
                 value: $value,
                 context: $context,
             );
@@ -64,13 +71,13 @@ final class DiscriminatorTypeSelector
             throw InvalidObjectValueException::createFromContext(
                 element: $element,
                 field: $field,
-                expected: $map->getTypeStatement(),
+                expected: $discriminator->getTypeStatement(),
                 value: $value,
                 context: $context,
             );
         }
 
-        $mapping = $map->findType($element);
+        $mapping = $discriminator->map[$element] ?? null;
 
         // In case of discriminator value is not found
         if ($mapping === null) {
@@ -82,7 +89,7 @@ final class DiscriminatorTypeSelector
             throw InvalidObjectValueException::createFromContext(
                 element: $element,
                 field: $field,
-                expected: $map->getTypeStatement(),
+                expected: $discriminator->getTypeStatement(),
                 value: $value,
                 context: $context,
             );

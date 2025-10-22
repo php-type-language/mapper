@@ -10,7 +10,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-covariant TType of TypeInterface
+ * @template-covariant TType of TypeInterface = TypeInterface<mixed>
  * @template-extends Builder<NamedTypeNode, TType>
  */
 abstract class NamedTypeBuilder extends Builder

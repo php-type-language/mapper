@@ -8,7 +8,10 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class ObjectTypeDenormalizer implements TypeInterface
+/**
+ * @template-implements TypeInterface<object>
+ */
+final class ObjectTypeFromArrayType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool
     {
@@ -16,9 +19,6 @@ final class ObjectTypeDenormalizer implements TypeInterface
             || \is_array($value);
     }
 
-    /**
-     * @throws InvalidValueException in case the value is incorrect
-     */
     public function cast(mixed $value, Context $context): object
     {
         if (\is_array($value)) {

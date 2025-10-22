@@ -61,9 +61,6 @@ class StandardPlatform extends Platform
             \IteratorAggregate::class,
         ], 'array-key', 'mixed');
 
-        // Adds support for the "list" type
-        yield new Builder\ListTypeBuilder('list', 'mixed');
-
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
 
@@ -86,6 +83,8 @@ class StandardPlatform extends Platform
         yield new Builder\UnionTypeBuilder();
 
         if ($direction === Direction::Normalize) {
+            // Adds support for the "iterable<T> -> list<T>" type
+            yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
             yield new Builder\ObjectToArrayTypeBuilder(['object', \stdClass::class]);
             // Adds support for the "BackedEnum -> scalar" type
@@ -97,6 +96,8 @@ class StandardPlatform extends Platform
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder($this->meta);
         } else {
+            // Adds support for the "array<T> -> list<T>" type
+            yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
             yield new Builder\ObjectFromArrayTypeBuilder(['object', \stdClass::class]);
             // Adds support for the "scalar -> BackedEnum" type

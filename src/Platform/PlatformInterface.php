@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 interface PlatformInterface
 {
@@ -39,7 +37,7 @@ interface PlatformInterface
      *    // the mapper will throw an exception.
      *    ```
      *
-     * @return iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
+     * @return iterable<array-key, TypeBuilderInterface>
      */
     public function getTypes(Direction $direction): iterable;
 

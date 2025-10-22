@@ -22,13 +22,17 @@ class BoolLiteralType extends BoolType
     #[\Override]
     public function cast(mixed $value, Context $context): bool
     {
+        // Fast return in case of value if not castable
         if ($value === $this->value) {
             return $value;
         }
 
-        if (!$context->isStrictTypesEnabled()
-            && $this->convertToBool($value) === $this->value) {
-            return $this->value;
+        if (!$context->isStrictTypesEnabled()) {
+            $coerced = $this->coerce($value);
+
+            if ($coerced === $this->value) {
+                return $coerced;
+            }
         }
 
         throw InvalidValueException::createFromContext(

@@ -7,10 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
-/**
- * @template-implements TypeInterface<int>
- */
-class IntLiteralType implements TypeInterface
+
+class IntLiteralType extends IntType
 {
     public function __construct(
         private readonly int $value,
@@ -23,9 +21,17 @@ class IntLiteralType implements TypeInterface
 
     public function cast(mixed $value, Context $context): int
     {
+        // Fast return in case of value if not castable
         if ($value === $this->value) {
-            /** @var int */
             return $value;
+        }
+
+        if (!$context->isStrictTypesEnabled()) {
+            $coerced = $this->coerce($value, $context);
+
+            if ($coerced === $this->value) {
+                return $coerced;
+            }
         }
 
         throw InvalidValueException::createFromContext(

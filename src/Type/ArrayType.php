@@ -10,15 +10,26 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
 
+/**
+ * @template TKey of array-key = array-key
+ * @template TValue of mixed = mixed
+ * @template-implements TypeInterface<array<TKey, TValue>>
+ */
 class ArrayType implements TypeInterface
 {
     public function __construct(
+        /**
+         * @var TypeInterface<TKey>
+         */
         protected readonly TypeInterface $key = new ArrayKeyType(),
+        /**
+         * @var TypeInterface<TValue>
+         */
         protected readonly TypeInterface $value = new MixedType(),
     ) {}
 
     /**
-     * @return ($value is iterable ? bool : false)
+     * @phpstan-assert-if-true iterable<mixed, mixed>|array<array-key, mixed> $value
      */
     public function match(mixed $value, Context $context): bool
     {
@@ -29,13 +40,6 @@ class ArrayType implements TypeInterface
         return \is_iterable($value);
     }
 
-    /**
-     * @return array<array-key, mixed>
-     * @throws InvalidValueException in case the value is incorrect
-     * @throws InvalidIterableKeyException in case the key of a certain element is incorrect
-     * @throws InvalidIterableValueException in case the value of a certain element is incorrect
-     * @throws \Throwable in case of internal error occurs
-     */
     public function cast(mixed $value, Context $context): array
     {
         if (!$this->match($value, $context)) {
@@ -45,10 +49,19 @@ class ArrayType implements TypeInterface
             );
         }
 
+        return $this->process($value, $context);
+    }
+
+    /**
+     * @param iterable<mixed, mixed> $value
+     * @return array<TKey, TValue>
+     * @throws \Throwable
+     */
+    protected function process(iterable $value, Context $context): array
+    {
         $result = [];
         $index = 0;
 
-        /** @var iterable<mixed, mixed> $value */
         foreach ($value as $key => $item) {
             try {
                 $key = $this->key->cast($key, $context);
@@ -59,16 +72,6 @@ class ArrayType implements TypeInterface
                     value: $value,
                     context: $context,
                     previous: $e,
-                );
-            }
-
-            // Not supported by PHP
-            if (!\is_string($key) && !\is_int($key)) {
-                throw InvalidIterableKeyException::createFromContext(
-                    index: $index,
-                    key: $key,
-                    value: $value,
-                    context: $context,
                 );
             }
 

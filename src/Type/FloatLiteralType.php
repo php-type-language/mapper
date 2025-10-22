@@ -7,31 +7,30 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
-/**
- * @template-implements TypeInterface<float>
- */
-class FloatLiteralType implements TypeInterface
+class FloatLiteralType extends FloatType
 {
-    private readonly float $expected;
+    private readonly float $value;
 
-    public function __construct(float|int $value)
+    public function __construct(int|float $value)
     {
-        $this->expected = (float) $value;
+        $this->value = (float) $value;
     }
 
+    /**
+     * @phpstan-assert-if-true int|float $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         if (\is_int($value)) {
-            return (float) $value === $this->expected;
+            return (float) $value === $this->value;
         }
 
-        return $value === $this->expected;
+        return $value === $this->value;
     }
 
     public function cast(mixed $value, Context $context): float
     {
         if ($this->match($value, $context)) {
-            /** @var float|int $value */
             return (float) $value;
         }
 

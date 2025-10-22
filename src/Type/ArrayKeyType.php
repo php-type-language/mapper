@@ -13,10 +13,19 @@ use TypeLang\Mapper\Runtime\Context;
 class ArrayKeyType implements TypeInterface
 {
     public function __construct(
+        /**
+         * @var TypeInterface<string>
+         */
         protected readonly TypeInterface $string = new StringType(),
+        /**
+         * @var TypeInterface<int>
+         */
         protected readonly TypeInterface $int = new IntType(),
     ) {}
 
+    /**
+     * @phpstan-assert-if-true string|int $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         // TBD (?)

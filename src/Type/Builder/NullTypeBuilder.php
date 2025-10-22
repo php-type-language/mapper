@@ -41,6 +41,7 @@ class NullTypeBuilder extends Builder
             return new NullType();
         }
 
+        /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);

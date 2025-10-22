@@ -17,11 +17,6 @@ class BoolType implements TypeInterface
         return \is_bool($value);
     }
 
-    /**
-     * Converts incoming value to the bool (in case of strict types is disabled).
-     *
-     * @throws InvalidValueException
-     */
     public function cast(mixed $value, Context $context): bool
     {
         if (\is_bool($value)) {
@@ -29,7 +24,7 @@ class BoolType implements TypeInterface
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            return $this->convertToBool($value);
+            return $this->coerce($value);
         }
 
         throw InvalidValueException::createFromContext(
@@ -38,7 +33,7 @@ class BoolType implements TypeInterface
         );
     }
 
-    protected function convertToBool(mixed $value): bool
+    protected function coerce(mixed $value): bool
     {
         //
         // Each value should be checked EXPLICITLY, instead

@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\BackedEnumType\BackedEnumTypeDenormalizer;
+use TypeLang\Mapper\Type\BackedEnumType\BackedEnumFromScalarType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
- * @template-extends Builder<NamedTypeNode, BackedEnumTypeDenormalizer>
+ * @template TEnum of \BackedEnum = \BackedEnum
+ * @template-extends BackedEnumTypeBuilder<TEnum, TEnum>
  */
 class BackedEnumFromScalarTypeBuilder extends BackedEnumTypeBuilder
 {
-    protected function create(string $class, TypeInterface $type): BackedEnumTypeDenormalizer
+    protected function create(string $class, TypeInterface $type): BackedEnumFromScalarType
     {
-        return new BackedEnumTypeDenormalizer($class, $type);
+        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
+        return new BackedEnumFromScalarType($class, $type);
     }
 }

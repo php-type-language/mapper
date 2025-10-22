@@ -8,12 +8,16 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class BackedEnumTypeNormalizer implements TypeInterface
+/**
+ * @template TEnum of \BackedEnum = \BackedEnum
+ * @template-implements TypeInterface<value-of<TEnum>>
+ */
+class BackedEnumToScalarType implements TypeInterface
 {
-    /**
-     * @param class-string<\BackedEnum> $class
-     */
     public function __construct(
+        /**
+         * @var class-string<TEnum>
+         */
         protected readonly string $class,
     ) {}
 

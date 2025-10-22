@@ -7,10 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
-/**
- * @template-implements TypeInterface<int>
- */
-class IntRangeType implements TypeInterface
+class IntRangeType extends IntType
 {
     public const DEFAULT_INT_MIN = \PHP_INT_MIN;
     public const DEFAULT_INT_MAX = \PHP_INT_MAX;
@@ -20,6 +17,9 @@ class IntRangeType implements TypeInterface
         protected readonly int $max = self::DEFAULT_INT_MAX,
     ) {}
 
+    /**
+     * @phpstan-assert-if-true int $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return \is_int($value)
@@ -29,9 +29,14 @@ class IntRangeType implements TypeInterface
 
     public function cast(mixed $value, Context $context): int
     {
-        if ($this->match($value, $context)) {
-            /** @var int */
-            return $value;
+        $coerced = $value;
+
+        if (!$context->isStrictTypesEnabled()) {
+            $coerced = $this->coerce($value, $context);
+        }
+
+        if ($this->match($coerced, $context)) {
+            return $coerced;
         }
 
         throw InvalidValueException::createFromContext(

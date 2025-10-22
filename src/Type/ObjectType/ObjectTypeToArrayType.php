@@ -8,17 +8,16 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class ObjectTypeNormalizer implements TypeInterface
+/**
+ * @template-implements TypeInterface<object|array<array-key, mixed>>
+ */
+final class ObjectTypeToArrayType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool
     {
         return \is_object($value);
     }
 
-    /**
-     * @return array<array-key, mixed>|object
-     * @throws InvalidValueException in case the value is incorrect
-     */
     public function cast(mixed $value, Context $context): array|object
     {
         if (!\is_object($value)) {

@@ -10,7 +10,6 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Mapping\NonInstantiatableException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Path\Entry\ObjectEntry;
@@ -19,16 +18,20 @@ use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template T of object
+ * @template TObject of object = object
+ * @template-implements TypeInterface<TObject>
  */
-class ClassTypeDenormalizer implements TypeInterface
+class ClassTypeFromArrayType implements TypeInterface
 {
+    /**
+     * @var DiscriminatorTypeSelector<TObject>
+     */
     protected readonly DiscriminatorTypeSelector $discriminator;
 
-    /**
-     * @param ClassMetadata<T> $metadata
-     */
     public function __construct(
+        /**
+         * @var ClassMetadata<TObject>
+         */
         protected readonly ClassMetadata $metadata,
         protected readonly PropertyAccessorInterface $accessor,
         protected readonly ClassInstantiatorInterface $instantiator,
@@ -40,17 +43,6 @@ class ClassTypeDenormalizer implements TypeInterface
     {
         return (\is_array($value) || \is_object($value))
             && $this->matchRequiredProperties((array) $value, $context);
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    private function getPropertyType(PropertyMetadata $meta, Context $context): TypeInterface
-    {
-        // Fetch field type
-        $info = $meta->write;
-
-        return $info->type;
     }
 
     /**
@@ -69,16 +61,8 @@ class ClassTypeDenormalizer implements TypeInterface
                 return false;
             }
 
-            // Fetch field value and type
-            try {
-                $value = $payload[$meta->alias];
-                $type = $this->getPropertyType($meta, $context);
-            } catch (\Throwable) {
-                return false;
-            }
-
             // Assert valid type
-            if (!$type->match($value, $context)) {
+            if (!$meta->write->type->match($payload[$meta->alias], $context)) {
                 return false;
             }
         }
@@ -86,12 +70,6 @@ class ClassTypeDenormalizer implements TypeInterface
         return true;
     }
 
-    /**
-     * @return T|mixed
-     * @throws MissingRequiredObjectFieldException in case the required field is missing
-     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
-     * @throws \Throwable in case of object's property is not accessible
-     */
     public function cast(mixed $value, Context $context): mixed
     {
         if (\is_object($value)) {
@@ -151,10 +129,9 @@ class ClassTypeDenormalizer implements TypeInterface
                 // In case of value has been passed
                 case \array_key_exists($meta->alias, $value):
                     $element = $value[$meta->alias];
-                    $type = $this->getPropertyType($meta, $context);
 
                     try {
-                        $element = $type->cast($element, $entrance);
+                        $element = $meta->write->type->cast($element, $entrance);
                     } catch (FinalExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {

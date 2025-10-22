@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
+use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Context\Direction;
-use TypeLang\Mapper\Type\Builder\ClassTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ClassToArrayTypeBuilder;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -25,9 +28,15 @@ class SimplePlatform implements PlatformInterface
 
     public function getTypes(Direction $direction): iterable
     {
+        $driver = new MetadataReaderProvider(new AttributeReader());
+
         // The platform will only support objects, that is,
         // references to existing classes.
-        yield new ClassTypeBuilder();
+        if ($direction === Direction::Normalize) {
+            yield new ClassToArrayTypeBuilder($driver);
+        } else {
+            yield new ClassFromArrayTypeBuilder($driver);
+        }
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Mapper\Type\UnitEnumType\UnitEnumTypeDenormalizer;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
+use TypeLang\Mapper\Type\UnitEnumType\UnitEnumFromStringType;
 
 /**
- * @template-extends Builder<NamedTypeNode, TypeInterface>
+ * @template TEnum of \UnitEnum = \UnitEnum
+ *
+ * @template-extends UnitEnumTypeBuilder<TEnum, TEnum>
  */
 class UnitEnumFromScalarTypeBuilder extends UnitEnumTypeBuilder
 {
-    protected function create(string $class, array $cases, TypeInterface $type): TypeInterface
+    protected function create(string $class, array $cases, TypeInterface $type): UnitEnumFromStringType
     {
-        return new UnitEnumTypeDenormalizer($class, $cases, $type);
+        return new UnitEnumFromStringType($class, $cases, $type);
     }
 }

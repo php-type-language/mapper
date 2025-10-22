@@ -15,15 +15,14 @@ final class TypeRepository implements
     TypeRepositoryDecoratorInterface
 {
     /**
-     * @var list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
+     * @var list<TypeBuilderInterface>
      */
     private array $builders = [];
 
     private TypeRepositoryInterface $context;
 
     /**
-     * @param TypeParserInterface $parser
-     * @param iterable<mixed, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $builders
+     * @param iterable<mixed, TypeBuilderInterface> $builders
      */
     public function __construct(
         private readonly TypeParserInterface $parser,
@@ -34,9 +33,9 @@ final class TypeRepository implements
     }
 
     /**
-     * @param iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $types
+     * @param iterable<mixed, TypeBuilderInterface> $types
      *
-     * @return list<TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
+     * @return list<TypeBuilderInterface>
      */
     private static function toArrayList(iterable $types): array
     {

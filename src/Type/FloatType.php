@@ -8,7 +8,7 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
 /**
- * @template-implements TypeInterface<float|int>
+ * @template-implements TypeInterface<float>
  */
 class FloatType implements TypeInterface
 {

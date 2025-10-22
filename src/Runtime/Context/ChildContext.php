@@ -16,7 +16,7 @@ use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 final class ChildContext extends Context
 {
     protected function __construct(
-        private readonly Context $parent,
+        public readonly Context $parent,
         private readonly EntryInterface $entry,
         mixed $value,
         Direction $direction,

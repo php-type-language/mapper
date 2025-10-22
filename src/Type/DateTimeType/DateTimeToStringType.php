@@ -8,7 +8,10 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class DateTimeTypeNormalizer implements TypeInterface
+/**
+ * @template-implements TypeInterface<string>
+ */
+class DateTimeToStringType implements TypeInterface
 {
     /**
      * @var non-empty-string

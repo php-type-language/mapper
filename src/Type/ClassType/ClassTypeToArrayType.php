@@ -15,14 +15,15 @@ use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template T of object
+ * @template TObject of object = object
+ * @template-implements TypeInterface<object|array<array-key, mixed>>
  */
-class ClassTypeNormalizer implements TypeInterface
+class ClassTypeToArrayType implements TypeInterface
 {
-    /**
-     * @param ClassMetadata<T> $metadata
-     */
     public function __construct(
+        /**
+         * @var ClassMetadata<TObject>
+         */
         protected readonly ClassMetadata $metadata,
         protected readonly PropertyAccessorInterface $accessor,
     ) {}
@@ -34,11 +35,6 @@ class ClassTypeNormalizer implements TypeInterface
         return $value instanceof $class;
     }
 
-    /**
-     * @return object|array<non-empty-string, mixed>
-     * @throws InvalidObjectValueException in case the value of a certain field is incorrect
-     * @throws \Throwable in case of internal error occurs
-     */
     public function cast(mixed $value, Context $context): object|array
     {
         $className = $this->metadata->name;
@@ -53,7 +49,7 @@ class ClassTypeNormalizer implements TypeInterface
 
         // Subtype normalization
         if ($value::class !== $className) {
-            /** @var object|array<non-empty-string, mixed> */
+            /** @var object|array<array-key, mixed> */
             return $context->getTypeByValue($value)
                 ->cast($value, $context);
         }
@@ -70,9 +66,7 @@ class ClassTypeNormalizer implements TypeInterface
     }
 
     /**
-     * @param T $object
-     *
-     * @return array<non-empty-string, mixed>
+     * @return array<array-key, mixed>
      * @throws InvalidObjectValueException in case the value of a certain field is incorrect
      * @throws \Throwable in case of internal error occurs
      */
@@ -97,13 +91,9 @@ class ClassTypeNormalizer implements TypeInterface
                 }
             }
 
-            // Fetch field type
-            $info = $meta->read;
-            $type = $info !== null ? $info->type : $context->getTypeByDefinition('mixed');
-
             try {
                 // Insert field value into result
-                $result[$meta->alias] = $type->cast($element, $entrance);
+                $result[$meta->alias] = $meta->read->type->cast($element, $entrance);
             } catch (FinalExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {

@@ -6,18 +6,29 @@ namespace TypeLang\Mapper\Type\UnitEnumType;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
-class UnitEnumTypeDenormalizer implements TypeInterface
+/**
+ * @template TEnum of \UnitEnum = \UnitEnum
+ *
+ * @template-implements TypeInterface<TEnum>
+ */
+class UnitEnumFromStringType implements TypeInterface
 {
-    /**
-     * @param class-string<\UnitEnum> $class
-     * @param non-empty-list<non-empty-string> $cases
-     */
     public function __construct(
+        /**
+         * @var class-string<TEnum>
+         */
         protected readonly string $class,
+        /**
+         * @var non-empty-list<non-empty-string>
+         */
         protected readonly array $cases,
-        protected readonly TypeInterface $string,
+        /**
+         * @var TypeInterface<string>
+         */
+        protected readonly TypeInterface $string = new StringType(),
     ) {}
 
     public function match(mixed $value, Context $context): bool

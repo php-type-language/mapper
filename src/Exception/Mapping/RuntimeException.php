@@ -35,6 +35,7 @@ abstract class RuntimeException extends \RuntimeException
     {
         $this->template->updateTemplateMessage($message);
 
+        /** @phpstan-ignore-next-line : Message can be instance of Template */
         if ($this->message instanceof Template) {
             $this->message->updateTemplateMessage($message);
         }
