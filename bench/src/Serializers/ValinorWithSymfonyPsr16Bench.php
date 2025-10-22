@@ -16,7 +16,7 @@ use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 #[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
-final class ValinorBench extends MapperBenchmark
+final class ValinorWithSymfonyPsr16Bench extends MapperBenchmark
 {
     private readonly TreeMapper $mapper;
     private readonly Normalizer $normalizer;
@@ -25,7 +25,8 @@ final class ValinorBench extends MapperBenchmark
     {
         parent::prepare();
 
-        $builder = new MapperBuilder();
+        $builder = (new MapperBuilder())
+            ->withCache($this->createPsr16Cache('valinor-psr16'));
 
         $this->mapper = $builder->mapper();
         $this->normalizer = $builder->normalizer(Format::array());

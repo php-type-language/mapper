@@ -34,23 +34,12 @@ abstract class MapperBenchmark
         ],
     ];
 
+    protected const CACHE_DIR = __DIR__ . '/../../var';
+
     protected readonly ExampleRequestDTO $denormalized;
-
-    protected readonly CacheItemPoolInterface $psr6;
-
-    protected readonly CacheInterface $psr16;
 
     protected function prepare(): void
     {
-        $this->psr6 = new FilesystemAdapter(
-            namespace: 'benchmarks',
-            directory: __DIR__ . '/../../var',
-        );
-
-        $this->psr16 = new Psr16Cache(
-            pool: $this->psr6,
-        );
-
         $this->denormalized = new ExampleRequestDTO(
             name: 'Example1',
             items: [
@@ -74,8 +63,21 @@ abstract class MapperBenchmark
         );
     }
 
+    protected function createPsr6Cache(string $namespace): CacheItemPoolInterface
+    {
+        return new FilesystemAdapter(
+            namespace: $namespace,
+            directory: self::CACHE_DIR,
+        );
+    }
+
+    protected function createPsr16Cache(string $namespace): CacheInterface
+    {
+        return new Psr16Cache(
+            pool: $this->createPsr6Cache($namespace),
+        );
+    }
+
     abstract public function benchNormalization(): void;
-    abstract public function benchCachedNormalization(): void;
     abstract public function benchDenormalization(): void;
-    abstract public function benchCachedDenormalization(): void;
 }

@@ -15,7 +15,7 @@ use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
 #[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
-final class TypeLangAttributesBench extends MapperBenchmark
+final class TypeLangAttributesWithSymfonyPsr16Bench extends MapperBenchmark
 {
     private readonly Mapper $mapper;
 
@@ -25,7 +25,10 @@ final class TypeLangAttributesBench extends MapperBenchmark
 
         $this->mapper = new Mapper(
             platform: new StandardPlatform(
-                meta: new AttributeReader(),
+                meta: new Psr16CacheProvider(
+                    psr16: $this->createPsr16Cache('tl-attr-psr16'),
+                    delegate: new AttributeReader(),
+                ),
             ),
         );
     }

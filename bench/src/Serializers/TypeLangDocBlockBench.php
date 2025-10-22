@@ -10,56 +10,32 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Provider\Psr16CacheProvider;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader;
-use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
-#[Revs(30), Warmup(3), Iterations(5), BeforeMethods('prepare')]
+#[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
 final class TypeLangDocBlockBench extends MapperBenchmark
 {
-    private readonly Mapper $raw;
-    private readonly Mapper $cached;
+    private readonly Mapper $mapper;
 
     public function prepare(): void
     {
         parent::prepare();
 
-        $driver = new PhpDocReader();
-
-        $this->cached = new Mapper(
+        $this->mapper = new Mapper(
             platform: new StandardPlatform(
-                meta: new Psr16CacheProvider(
-                    psr16: $this->psr16,
-                    delegate: $driver,
-                ),
-            ),
-        );
-
-        $this->raw = new Mapper(
-            platform: new StandardPlatform(
-                meta: $driver,
+                meta: new PhpDocReader(),
             ),
         );
     }
 
     public function benchNormalization(): void
     {
-        $this->raw->normalize($this->denormalized, ExampleRequestDTO::class);
-    }
-
-    public function benchCachedNormalization(): void
-    {
-        $this->cached->normalize($this->denormalized, ExampleRequestDTO::class);
+        $this->mapper->normalize($this->denormalized, ExampleRequestDTO::class);
     }
 
     public function benchDenormalization(): void
     {
-        $this->raw->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
-    }
-
-    public function benchCachedDenormalization(): void
-    {
-        $this->cached->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+        $this->mapper->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
     }
 }

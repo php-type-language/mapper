@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Bench\Serializers;
 
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use Metadata\Cache\PsrCacheAdapter;
 use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
@@ -13,7 +14,7 @@ use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 #[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
-final class JMSAttributesBench extends MapperBenchmark
+final class JMSAttributesWithSymfonyPsr6Bench extends MapperBenchmark
 {
     private readonly Serializer $serializer;
 
@@ -27,6 +28,8 @@ final class JMSAttributesBench extends MapperBenchmark
             ->addDefaultHandlers()
             ->addDefaultDeserializationVisitors()
             ->addDefaultSerializationVisitors()
+            ->setCacheDir(self::CACHE_DIR . '/jms')
+            ->setMetadataCache(new PsrCacheAdapter('jms', $this->createPsr6Cache('jms')))
             ->build();
     }
 
