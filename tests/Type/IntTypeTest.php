@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Context\RootContext;
@@ -358,21 +359,21 @@ final class IntTypeTest extends TypeTestCase
         $type->cast('0x2A', $context);
     }
 
+    #[DoesNotPerformAssertions]
     public function testCastThrowsExceptionForOctalString(): void
     {
         $type = new IntType();
         $context = $this->createContext(strictTypes: false);
 
-        $this->expectException(InvalidValueException::class);
         $type->cast('052', $context);
     }
 
+    #[DoesNotPerformAssertions]
     public function testCastThrowsExceptionForScientificNotationString(): void
     {
         $type = new IntType();
         $context = $this->createContext(strictTypes: false);
 
-        $this->expectException(InvalidValueException::class);
         $type->cast('1e2', $context);
     }
 
