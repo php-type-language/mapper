@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Runtime\ClassInstantiator\CloneClassInstantiator;
+use TypeLang\Mapper\Runtime\ClassInstantiator\DoctrineClassInstantiator;
 use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
@@ -22,13 +22,31 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class ClassTypeBuilder extends Builder
 {
+    protected readonly ClassInstantiatorInterface $instantiator;
+    protected readonly PropertyAccessorInterface $accessor;
+
     public function __construct(
         protected readonly ProviderInterface $driver,
-        protected readonly PropertyAccessorInterface $accessor = new ReflectionPropertyAccessor(),
-        protected readonly ClassInstantiatorInterface $instantiator = new CloneClassInstantiator(
-            delegate: new ReflectionClassInstantiator(),
-        ),
-    ) {}
+        ?PropertyAccessorInterface $accessor = null,
+        ?ClassInstantiatorInterface $instantiator = null,
+    ) {
+        $this->instantiator = $instantiator ?? $this->createDefaultClassInstantiator();
+        $this->accessor = $accessor ?? $this->createDefaultPropertyAccessor();
+    }
+
+    private function createDefaultPropertyAccessor(): PropertyAccessorInterface
+    {
+        return new ReflectionPropertyAccessor();
+    }
+
+    private function createDefaultClassInstantiator(): ClassInstantiatorInterface
+    {
+        if (DoctrineClassInstantiator::isSupported()) {
+            return new DoctrineClassInstantiator();
+        }
+
+        return new ReflectionClassInstantiator();
+    }
 
     /**
      * Returns {@see true} if the type contains a reference to an existing class.
