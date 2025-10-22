@@ -10,7 +10,6 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- *
  * @template-implements TypeInterface<non-empty-string>
  */
 class UnitEnumToStringType implements TypeInterface

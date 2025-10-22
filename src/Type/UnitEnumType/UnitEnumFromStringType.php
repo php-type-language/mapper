@@ -11,7 +11,6 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- *
  * @template-implements TypeInterface<TEnum>
  */
 class UnitEnumFromStringType implements TypeInterface

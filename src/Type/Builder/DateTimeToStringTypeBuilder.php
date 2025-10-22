@@ -8,7 +8,6 @@ use TypeLang\Mapper\Type\DateTimeType\DateTimeToStringType;
 
 /**
  * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
- *
  * @template-extends DateTimeTypeBuilder<TDateTime, string>
  */
 class DateTimeToStringTypeBuilder extends DateTimeTypeBuilder

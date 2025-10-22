@@ -9,7 +9,6 @@ use TypeLang\Mapper\Type\UnitEnumType\UnitEnumFromStringType;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- *
  * @template-extends UnitEnumTypeBuilder<TEnum, TEnum>
  */
 class UnitEnumFromScalarTypeBuilder extends UnitEnumTypeBuilder

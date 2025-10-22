@@ -54,6 +54,7 @@ class ArrayType implements TypeInterface
 
     /**
      * @param iterable<mixed, mixed> $value
+     *
      * @return array<TKey, TValue>
      * @throws \Throwable
      */

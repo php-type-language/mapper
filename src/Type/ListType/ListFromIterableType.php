@@ -13,7 +13,6 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template-covariant TItem of mixed = mixed
- *
  * @template-implements TypeInterface<list<TItem>>
  */
 class ListFromIterableType implements TypeInterface
@@ -47,6 +46,7 @@ class ListFromIterableType implements TypeInterface
 
     /**
      * @param iterable<mixed, mixed> $value
+     *
      * @return list<TItem>
      * @throws \Throwable
      */

@@ -16,7 +16,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
  * @template TResult of mixed = mixed
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class DateTimeTypeBuilder extends Builder

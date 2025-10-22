@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
@@ -18,7 +17,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TKey of array-key = array-key
  * @template TValue of mixed = mixed
- *
  * @template-extends NamedTypeBuilder<ArrayType<TKey, TValue>>
  */
 class ArrayTypeBuilder extends NamedTypeBuilder

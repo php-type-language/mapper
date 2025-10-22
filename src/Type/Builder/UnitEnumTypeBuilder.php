@@ -14,7 +14,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
  * @template TResult of mixed = mixed
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class UnitEnumTypeBuilder extends Builder
@@ -77,6 +76,7 @@ abstract class UnitEnumTypeBuilder extends Builder
      * @param class-string<TEnum> $class
      * @param non-empty-list<non-empty-string> $cases
      * @param TypeInterface<string> $type
+     *
      * @return TypeInterface<TResult>
      */
     abstract protected function create(string $class, array $cases, TypeInterface $type): TypeInterface;

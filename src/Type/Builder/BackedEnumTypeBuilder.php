@@ -14,7 +14,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
  * @template TResult of mixed = mixed
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 abstract class BackedEnumTypeBuilder extends Builder
@@ -78,6 +77,7 @@ abstract class BackedEnumTypeBuilder extends Builder
     /**
      * @param TypeInterface<value-of<TEnum>> $type
      * @param class-string<TEnum> $class
+     *
      * @return TypeInterface<TResult>
      */
     abstract protected function create(string $class, TypeInterface $type): TypeInterface;

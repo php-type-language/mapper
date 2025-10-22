@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
 
-
 class IntLiteralType extends IntType
 {
     public function __construct(

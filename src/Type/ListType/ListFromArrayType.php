@@ -9,7 +9,6 @@ use TypeLang\Mapper\Runtime\Context;
 
 /**
  * @template-covariant TItem of mixed = mixed
- *
  * @template-extends ListFromIterableType<TItem>
  */
 class ListFromArrayType extends ListFromIterableType
