@@ -7,14 +7,14 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\InternalTypeException;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Type\BackedEnumType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, BackedEnumType>
+ * @template-extends Builder<NamedTypeNode, TypeInterface>
  */
-class BackedEnumTypeBuilder extends Builder
+abstract class BackedEnumTypeBuilder extends Builder
 {
     public function isSupported(TypeStatement $statement): bool
     {
@@ -54,7 +54,7 @@ class BackedEnumTypeBuilder extends Builder
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): BackedEnumType {
+    ): TypeInterface {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
@@ -62,7 +62,7 @@ class BackedEnumTypeBuilder extends Builder
 
         $type = $this->getBackedEnumType($reflection, $statement);
 
-        return new BackedEnumType(
+        return $this->create(
             // @phpstan-ignore-next-line
             class: $statement->name->toString(),
             type: $types->getTypeByStatement(
@@ -70,6 +70,11 @@ class BackedEnumTypeBuilder extends Builder
             ),
         );
     }
+
+    /**
+     * @param class-string<\BackedEnum> $class
+     */
+    abstract protected function create(string $class, TypeInterface $type): TypeInterface;
 
     /**
      * @return \ReflectionEnum<\BackedEnum>

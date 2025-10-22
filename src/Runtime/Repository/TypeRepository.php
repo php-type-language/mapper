@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -22,12 +21,16 @@ final class TypeRepository implements
 
     private TypeRepositoryInterface $context;
 
+    /**
+     * @param TypeParserInterface $parser
+     * @param iterable<mixed, TypeBuilderInterface<covariant TypeStatement, TypeInterface>> $builders
+     */
     public function __construct(
         private readonly TypeParserInterface $parser,
-        private readonly PlatformInterface $platform,
+        iterable $builders,
     ) {
         $this->context = $this;
-        $this->builders = self::toArrayList($this->platform->getTypes());
+        $this->builders = self::toArrayList($builders);
     }
 
     /**

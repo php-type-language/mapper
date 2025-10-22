@@ -7,16 +7,16 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Type\DateTimeType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, DateTimeType>
+ * @template-extends Builder<NamedTypeNode, TypeInterface>
  */
-class DateTimeTypeBuilder extends Builder
+abstract class DateTimeTypeBuilder extends Builder
 {
     public function isSupported(TypeStatement $statement): bool
     {
@@ -41,12 +41,12 @@ class DateTimeTypeBuilder extends Builder
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): DateTimeType {
+    ): TypeInterface {
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
 
         if ($statement->arguments === null) {
-            return new DateTimeType(
+            return $this->create(
                 class: $this->getDateTimeClass(
                     name: $statement->name->toString(),
                 ),
@@ -66,11 +66,17 @@ class DateTimeTypeBuilder extends Builder
             );
         }
 
-        return new DateTimeType(
+        return $this->create(
             class: $this->getDateTimeClass(
                 name: $statement->name->toString(),
             ),
             format: $formatArgument->value->value,
         );
     }
+
+    /**
+     * @param class-string<\DateTime|\DateTimeImmutable> $class
+     * @param non-empty-string|null $format
+     */
+    abstract protected function create(string $class, ?string $format = null): TypeInterface;
 }

@@ -7,14 +7,14 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\InternalTypeException;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Type\UnitEnumType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends Builder<NamedTypeNode, UnitEnumType>
+ * @template-extends Builder<NamedTypeNode, TypeInterface>
  */
-class UnitEnumTypeBuilder extends Builder
+abstract class UnitEnumTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string
@@ -45,7 +45,7 @@ class UnitEnumTypeBuilder extends Builder
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): UnitEnumType {
+    ): TypeInterface {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
@@ -58,7 +58,7 @@ class UnitEnumTypeBuilder extends Builder
             );
         }
 
-        return new UnitEnumType(
+        return $this->create(
             // @phpstan-ignore-next-line
             class: $statement->name->toString(),
             cases: $names,
@@ -69,6 +69,8 @@ class UnitEnumTypeBuilder extends Builder
             ),
         );
     }
+
+    abstract protected function create(string $class, array $cases, TypeInterface $type): TypeInterface;
 
     /**
      * @return \Traversable<array-key, non-empty-string>

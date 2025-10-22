@@ -6,22 +6,19 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\RootContext;
-use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
+use TypeLang\Mapper\Runtime\Extractor\Factory\DefaultTypeExtractorFactory;
+use TypeLang\Mapper\Runtime\Extractor\Factory\TypeExtractorFactoryInterface;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Runtime\Parser\InMemoryTypeParser;
-use TypeLang\Mapper\Runtime\Parser\LoggableTypeParser;
-use TypeLang\Mapper\Runtime\Parser\TraceableTypeParser;
-use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
+use TypeLang\Mapper\Runtime\Parser\Factory\DefaultTypeParserFactory;
+use TypeLang\Mapper\Runtime\Parser\Factory\TypeParserFactoryInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TraceableTypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
+use TypeLang\Mapper\Runtime\Repository\Factory\DefaultTypeRepositoryFactory;
+use TypeLang\Mapper\Runtime\Repository\Factory\TypeRepositoryFactoryInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -31,100 +28,40 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private readonly TypeParserInterface $parser;
 
-    private readonly TypeRepositoryInterface $types;
+    private readonly TypeRepositoryInterface $normalize;
+
+    private readonly TypeRepositoryInterface $denormalize;
 
     public function __construct(
-        private readonly PlatformInterface $platform = new StandardPlatform(),
+        PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
+        TypeExtractorFactoryInterface $extractorFactory = new DefaultTypeExtractorFactory(),
+        TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
+        TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
-        $this->extractor = $this->createTypeExtractor();
-        $this->parser = $this->createTypeParser($platform);
-        $this->types = $this->createTypeRepository($platform);
-    }
+        $this->extractor = $extractorFactory->createTypeExtractor($config);
+        $this->parser = $typeParserFactory->createTypeParser($config, $platform);
 
-    private function createTypeExtractor(): TypeExtractorInterface
-    {
-        return new NativeTypeExtractor();
-    }
-
-    private function createTypeParser(PlatformInterface $platform): TypeParserInterface
-    {
-        $runtime = TypeLangParser::createFromPlatform($platform);
-
-        if (($tracer = $this->config->getTracer()) !== null) {
-            $runtime = new TraceableTypeParser($tracer, $runtime);
-        }
-
-        if (($logger = $this->config->getLogger()) !== null) {
-            $runtime = new LoggableTypeParser($logger, $runtime);
-        }
-
-        return new InMemoryTypeParser($runtime);
-    }
-
-    private function createTypeRepository(PlatformInterface $platform): TypeRepositoryInterface
-    {
-        $runtime = new TypeRepository(
-            parser: $this->parser,
+        $this->normalize = $typeRepositoryFactory->createTypeRepository(
+            config: $config,
             platform: $platform,
+            parser: $this->parser,
+            direction: Direction::Normalize,
         );
 
-        if (($tracer = $this->config->getTracer()) !== null) {
-            $runtime = new TraceableTypeRepository($tracer, $runtime);
-        }
-
-        if (($logger = $this->config->getLogger()) !== null) {
-            $runtime = new LoggableTypeRepository($logger, $runtime);
-        }
-
-        return new InMemoryTypeRepository($runtime);
-    }
-
-    /**
-     * Returns current mapper platform.
-     *
-     * @api
-     */
-    public function getPlatform(): PlatformInterface
-    {
-        return $this->platform;
-    }
-
-    /**
-     * Returns current types extractor.
-     *
-     * @api
-     */
-    public function getExtractor(): TypeExtractorInterface
-    {
-        return $this->extractor;
-    }
-
-    /**
-     * Returns current types parser.
-     *
-     * @api
-     */
-    public function getParser(): TypeParserInterface
-    {
-        return $this->parser;
-    }
-
-    /**
-     * Returns current types registry.
-     *
-     * @api
-     */
-    public function getTypes(): TypeRepositoryInterface
-    {
-        return $this->types;
+        $this->denormalize = $typeRepositoryFactory->createTypeRepository(
+            config: $config,
+            platform: $platform,
+            parser: $this->parser,
+            direction: Direction::Denormalize,
+        );
     }
 
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
         $type ??= $this->extractor->getDefinitionByValue($value);
 
-        $instance = $this->types->getTypeByStatement(
+        $instance = $this->normalize->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
 
@@ -133,7 +70,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->types,
+            types: $this->normalize,
         ));
     }
 
@@ -141,7 +78,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     {
         $type ??= $this->extractor->getDefinitionByValue($value);
 
-        $instance = $this->types->getTypeByStatement(
+        $instance = $this->normalize->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
 
@@ -150,13 +87,13 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->types,
+            types: $this->normalize,
         ));
     }
 
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
     {
-        $instance = $this->types->getTypeByStatement(
+        $instance = $this->denormalize->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
 
@@ -165,13 +102,13 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->types,
+            types: $this->denormalize,
         ));
     }
 
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
     {
-        $instance = $this->types->getTypeByStatement(
+        $instance = $this->denormalize->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
 
@@ -180,7 +117,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->types,
+            types: $this->denormalize,
         ));
     }
 
@@ -194,9 +131,15 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getType(#[Language('PHP')] string $type): TypeInterface
+    public function getType(#[Language('PHP')] string $type, Direction $direction): TypeInterface
     {
-        return $this->types->getTypeByStatement(
+        if ($direction === Direction::Normalize) {
+            return $this->normalize->getTypeByStatement(
+                statement: $this->parser->getStatementByDefinition($type),
+            );
+        }
+
+        return $this->denormalize->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
     }
@@ -209,11 +152,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getTypeByValue(mixed $value): TypeInterface
+    public function getTypeByValue(mixed $value, Direction $direction): TypeInterface
     {
-        $definition = $this->extractor->getDefinitionByValue($value);
-
-        return $this->getType($definition);
+        return $this->getType(
+            type: $this->extractor->getDefinitionByValue($value),
+            direction: $direction,
+        );
     }
 
     /**
@@ -235,6 +179,8 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             $class = $class::class;
         }
 
-        $this->getType($class);
+        foreach (Direction::cases() as $direction) {
+            $this->getType($class, $direction);
+        }
     }
 }

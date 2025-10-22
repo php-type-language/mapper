@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
+use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
 
 class StandardPlatform extends Platform
 {
@@ -27,9 +29,9 @@ class StandardPlatform extends Platform
         return 'standard';
     }
 
-    public function getTypes(): iterable
+    public function getTypes(Direction $direction): iterable
     {
-        yield from parent::getTypes();
+        yield from parent::getTypes($direction);
 
         // Adds support for the "mixed" type
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
@@ -62,9 +64,6 @@ class StandardPlatform extends Platform
         // Adds support for the "list" type
         yield new Builder\ListTypeBuilder('list', 'mixed');
 
-        // Adds support for the "object" type
-        yield new Builder\ObjectTypeBuilder(['object', \stdClass::class]);
-
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
 
@@ -86,17 +85,29 @@ class StandardPlatform extends Platform
         // Adds support for the "T|U" union types
         yield new Builder\UnionTypeBuilder();
 
-        // Adds support for the "DateTime" and "DateTimeImmutable" types
-        yield new Builder\DateTimeTypeBuilder();
-
-        // Adds support for the "BackedEnum" type
-        yield new Builder\BackedEnumTypeBuilder();
-
-        // Adds support for the "UnitEnum" type
-        yield new Builder\UnitEnumTypeBuilder();
-
-        // Adds support for the "Path\To\Class" statement
-        yield new Builder\ClassTypeBuilder($this->meta);
+        if ($direction === Direction::Normalize) {
+            // Adds support for the "object -> array{ ... }" type
+            yield new Builder\ObjectToArrayTypeBuilder(['object', \stdClass::class]);
+            // Adds support for the "BackedEnum -> scalar" type
+            yield new Builder\BackedEnumToScalarTypeBuilder();
+            // Adds support for the "UnitEnum -> scalar" type
+            yield new Builder\UnitEnumToScalarTypeBuilder();
+            // Adds support for the "DateTimeInterface -> string" type
+            yield new Builder\DateTimeToStringTypeBuilder();
+            // Adds support for the "object(ClassName) -> array{ ... }" type
+            yield new Builder\ClassToArrayTypeBuilder($this->meta);
+        } else {
+            // Adds support for the "array{ ... } -> object" type
+            yield new Builder\ObjectFromArrayTypeBuilder(['object', \stdClass::class]);
+            // Adds support for the "scalar -> BackedEnum" type
+            yield new Builder\BackedEnumFromScalarTypeBuilder();
+            // Adds support for the "scalar -> UnitEnum" type
+            yield new Builder\UnitEnumFromScalarTypeBuilder();
+            // Adds support for the "string -> DateTime|DateTimeImmutable" type
+            yield new Builder\DateTimeFromStringTypeBuilder();
+            // Adds support for the "array{ ... } -> object(ClassName)" type
+            yield new ClassFromArrayTypeBuilder($this->meta);
+        }
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

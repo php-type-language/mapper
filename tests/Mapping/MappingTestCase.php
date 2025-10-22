@@ -8,6 +8,7 @@ use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Runtime\Context\RootContext;
 use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
@@ -39,11 +40,13 @@ abstract class MappingTestCase extends TestCase
         return TypeLangParser::createFromPlatform($this->createPlatform());
     }
 
-    protected function createTypeRepository(): TypeRepositoryInterface
+    protected function createTypeRepository(Direction $direction): TypeRepositoryInterface
     {
+        $platform = $this->createPlatform();
+
         return new TypeRepository(
             parser: $this->createTypeParser(),
-            platform: $this->createPlatform(),
+            builders: $platform->getTypes($direction),
         );
     }
 
@@ -54,7 +57,7 @@ abstract class MappingTestCase extends TestCase
             config: $this->createConfiguration(),
             extractor: $this->createTypeExtractor(),
             parser: $this->createTypeParser(),
-            types: $this->createTypeRepository(),
+            types: $this->createTypeRepository(Direction::Denormalize),
         );
     }
 
@@ -65,7 +68,7 @@ abstract class MappingTestCase extends TestCase
             config: $this->createConfiguration(),
             extractor: $this->createTypeExtractor(),
             parser: $this->createTypeParser(),
-            types: $this->createTypeRepository(),
+            types: $this->createTypeRepository(Direction::Normalize),
         );
     }
 }

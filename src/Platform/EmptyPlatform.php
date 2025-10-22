@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Runtime\Context\Direction;
+
 final class EmptyPlatform implements PlatformInterface
 {
     public function getName(): string
@@ -11,7 +13,7 @@ final class EmptyPlatform implements PlatformInterface
         return 'empty';
     }
 
-    public function getTypes(): iterable
+    public function getTypes(Direction $direction): iterable
     {
         return [];
     }

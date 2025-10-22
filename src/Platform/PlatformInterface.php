@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Runtime\Context\Direction;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -40,7 +41,7 @@ interface PlatformInterface
      *
      * @return iterable<array-key, TypeBuilderInterface<covariant TypeStatement, TypeInterface>>
      */
-    public function getTypes(): iterable;
+    public function getTypes(Direction $direction): iterable;
 
     /**
      * Returns {@see true} in case of feature is supported.

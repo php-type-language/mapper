@@ -6,25 +6,27 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Type\ObjectType;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<ObjectType>
+ * @template-extends NamedTypeBuilder<TypeInterface>
  */
-class ObjectTypeBuilder extends NamedTypeBuilder
+abstract class ObjectTypeBuilder extends NamedTypeBuilder
 {
     public function build(
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): ObjectType {
+    ): TypeInterface {
         assert($statement instanceof NamedTypeNode);
 
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
-        return new ObjectType();
+        return $this->create();
     }
+
+    abstract protected function create(): TypeInterface;
 }

@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Extractor;
 
+/**
+ * Responsible for obtaining the type declaration from its value.
+ *
+ * For example:
+ * ```
+ * $extractor->getDefinitionByValue(42); // "int"
+ * $extractor->getDefinitionByValue(true); // "bool"
+ * $extractor->getDefinitionByValue(.2); // "float"
+ * ```
+ */
 interface TypeExtractorInterface
 {
     /**
