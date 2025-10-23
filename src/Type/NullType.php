@@ -12,6 +12,9 @@ use TypeLang\Mapper\Runtime\Context;
  */
 class NullType implements TypeInterface
 {
+    /**
+     * @phpstan-assert-if-true null $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return $value === null;

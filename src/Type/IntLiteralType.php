@@ -9,18 +9,22 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
-class IntLiteralType extends IntType
+/**
+ * @template-implements TypeInterface<int>
+ */
+class IntLiteralType implements TypeInterface
 {
-    /**
-     * @param TypeCoercerInterface<int> $coercer
-     */
     public function __construct(
         protected readonly int $value,
-        TypeCoercerInterface $coercer = new IntTypeCoercer(),
-    ) {
-        parent::__construct($coercer);
-    }
+        /**
+         * @var TypeCoercerInterface<int>
+         */
+        protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
+    ) {}
 
+    /**
+     * @phpstan-assert-if-true int $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return $value === $this->value;

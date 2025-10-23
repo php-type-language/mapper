@@ -9,25 +9,27 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Coercer\BoolTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
-class BoolLiteralType extends BoolType
+/**
+ * @template-implements TypeInterface<bool>
+ */
+class BoolLiteralType implements TypeInterface
 {
-    /**
-     * @param TypeCoercerInterface<bool> $coercer
-     */
     public function __construct(
         protected readonly bool $value,
-        TypeCoercerInterface $coercer = new BoolTypeCoercer(),
-    ) {
-        parent::__construct($coercer);
-    }
+        /**
+         * @var TypeCoercerInterface<bool>
+         */
+        protected readonly TypeCoercerInterface $coercer = new BoolTypeCoercer(),
+    ) {}
 
-    #[\Override]
+    /**
+     * @phpstan-assert-if-true bool $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return $value === $this->value;
     }
 
-    #[\Override]
     public function cast(mixed $value, Context $context): bool
     {
         // Fast return in case of value if not castable

@@ -30,7 +30,7 @@ class ArrayKeyType implements TypeInterface
     ) {}
 
     /**
-     * @phpstan-assert-if-true string|int $value
+     * @phpstan-assert-if-true array-key $value
      */
     public function match(mixed $value, Context $context): bool
     {

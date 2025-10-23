@@ -21,8 +21,7 @@ class NullableType implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        return $value === null
-            || $this->parent->match($value, $context);
+        return $value === null || $this->parent->match($value, $context);
     }
 
     public function cast(mixed $value, Context $context): mixed

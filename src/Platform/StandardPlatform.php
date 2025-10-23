@@ -76,6 +76,9 @@ class StandardPlatform extends Platform
         // Adds support for the float literal types
         yield new Builder\FloatLiteralTypeBuilder();
 
+        // Adds support for the string literal types
+        yield new Builder\StringLiteralTypeBuilder();
+
         // Adds support for the "T[]" statement
         yield new Builder\TypesListBuilder();
 
@@ -83,6 +86,12 @@ class StandardPlatform extends Platform
         yield new Builder\UnionTypeBuilder();
 
         if ($direction === Direction::Normalize) {
+            // Adds support for "non-empty-string", "numeric-string" which
+            // are similar to simple string
+            yield new Builder\SimpleTypeBuilder(
+                names: ['non-empty-string', 'numeric-string'],
+                type: Type\StringType::class,
+            );
             // Adds support for the "iterable<T> -> list<T>" type
             yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
@@ -96,6 +105,10 @@ class StandardPlatform extends Platform
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder($this->meta);
         } else {
+            // Adds support for "non-empty-string"
+            yield new Builder\SimpleTypeBuilder('non-empty-string', Type\NonEmptyString::class);
+            // Adds support for "numeric-string"
+            yield new Builder\SimpleTypeBuilder('numeric-string', Type\NumericString::class);
             // Adds support for the "array<T> -> list<T>" type
             yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type

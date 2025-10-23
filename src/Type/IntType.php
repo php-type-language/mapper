@@ -21,6 +21,9 @@ class IntType implements TypeInterface
         protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
     ) {}
 
+    /**
+     * @phpstan-assert-if-true int $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return \is_int($value);

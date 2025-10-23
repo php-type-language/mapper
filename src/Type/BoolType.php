@@ -21,6 +21,9 @@ class BoolType implements TypeInterface
         protected readonly TypeCoercerInterface $coercer = new BoolTypeCoercer(),
     ) {}
 
+    /**
+     * @phpstan-assert-if-true bool $value
+     */
     public function match(mixed $value, Context $context): bool
     {
         return \is_bool($value);

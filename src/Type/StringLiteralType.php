@@ -6,42 +6,35 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Type\Coercer\FloatTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
- * @template-implements TypeInterface<float>
+ * @template-implements TypeInterface<string>
  */
-class FloatLiteralType implements TypeInterface
+class StringLiteralType implements TypeInterface
 {
-    private readonly float $value;
-
     public function __construct(
-        int|float $value,
+        protected readonly string $value,
         /**
-         * @var TypeCoercerInterface<float>
+         * @var TypeCoercerInterface<string>
          */
-        protected readonly TypeCoercerInterface $coercer = new FloatTypeCoercer(),
-    ) {
-        $this->value = (float) $value;
-    }
+        protected readonly TypeCoercerInterface $coercer = new StringTypeCoercer(),
+    ) {}
 
     /**
-     * @phpstan-assert-if-true int|float $value
+     * @phpstan-assert-if-true string $value
      */
     public function match(mixed $value, Context $context): bool
     {
-        if (\is_int($value)) {
-            return (float) $value === $this->value;
-        }
-
         return $value === $this->value;
     }
 
-    public function cast(mixed $value, Context $context): float
+    public function cast(mixed $value, Context $context): string
     {
-        if ($this->match($value, $context)) {
-            return (float) $value;
+        // Fast return in case of value if not castable
+        if ($value === $this->value) {
+            return $value;
         }
 
         if (!$context->isStrictTypesEnabled()) {

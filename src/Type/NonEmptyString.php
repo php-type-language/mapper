@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TypeLang\Mapper\Type;
+
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
+
+/**
+ * @template-implements TypeInterface<non-empty-string>
+ */
+class NonEmptyString implements TypeInterface
+{
+    public function __construct(
+        /**
+         * @var TypeCoercerInterface<string>
+         */
+        protected readonly TypeCoercerInterface $coercer = new StringTypeCoercer(),
+    ) {}
+
+    /**
+     * @phpstan-assert-if-true non-empty-string $value
+     */
+    public function match(mixed $value, Context $context): bool
+    {
+        return \is_string($value) && $value !== '';
+    }
+
+    public function cast(mixed $value, Context $context): string
+    {
+        $coerced = $value;
+
+        if (!\is_string($value) && !$context->isStrictTypesEnabled()) {
+            $coerced = $this->coercer->coerce($value, $context);
+        }
+
+        if ($this->match($coerced, $context)) {
+            return $coerced;
+        }
+
+        throw InvalidValueException::createFromContext(
+            value: $value,
+            context: $context,
+        );
+    }
+}

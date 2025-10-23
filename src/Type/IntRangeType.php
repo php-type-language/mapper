@@ -9,26 +9,26 @@ use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
-class IntRangeType extends IntType
+/**
+ * @template-implements TypeInterface<int>
+ */
+class IntRangeType implements TypeInterface
 {
     public const DEFAULT_INT_MIN = \PHP_INT_MIN;
     public const DEFAULT_INT_MAX = \PHP_INT_MAX;
 
-    /**
-     * @param TypeCoercerInterface<int> $coercer
-     */
     public function __construct(
         protected readonly int $min = self::DEFAULT_INT_MIN,
         protected readonly int $max = self::DEFAULT_INT_MAX,
-        TypeCoercerInterface $coercer = new IntTypeCoercer(),
-    ) {
-        parent::__construct($coercer);
-    }
+        /**
+         * @var TypeCoercerInterface<int>
+         */
+        protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
+    ) {}
 
     /**
      * @phpstan-assert-if-true int $value
      */
-    #[\Override]
     public function match(mixed $value, Context $context): bool
     {
         return \is_int($value)
@@ -36,7 +36,6 @@ class IntRangeType extends IntType
             && $value <= $this->max;
     }
 
-    #[\Override]
     public function cast(mixed $value, Context $context): int
     {
         $coerced = $value;
