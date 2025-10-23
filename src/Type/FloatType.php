@@ -6,30 +6,37 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\FloatTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<float>
  */
 class FloatType implements TypeInterface
 {
+    public function __construct(
+        /**
+         * @var TypeCoercerInterface<float>
+         */
+        protected readonly TypeCoercerInterface $coercer = new FloatTypeCoercer(),
+    ) {}
+
     public function match(mixed $value, Context $context): bool
     {
-        if ($context->isNormalization()) {
-            return \is_float($value) || \is_int($value);
-        }
-
-        return \is_float($value);
+        return \is_float($value)
+            || ($context->isNormalization() && \is_int($value));
     }
 
     public function cast(mixed $value, Context $context): float
     {
-        if (\is_float($value) || \is_int($value)) {
-            return (float) $value;
-        }
-
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        return match (true) {
+            \is_float($value) => $value,
+            \is_int($value) => (float) $value,
+            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
+            default => throw InvalidValueException::createFromContext(
+                value: $value,
+                context: $context,
+            ),
+        };
     }
 }

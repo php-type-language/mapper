@@ -6,6 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\ArrayKeyCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<array-key>
@@ -21,6 +23,10 @@ class ArrayKeyType implements TypeInterface
          * @var TypeInterface<int>
          */
         protected readonly TypeInterface $int = new IntType(),
+        /**
+         * @var TypeCoercerInterface<array-key>
+         */
+        protected readonly TypeCoercerInterface $coercer = new ArrayKeyCoercer(),
     ) {}
 
     /**
@@ -43,51 +49,14 @@ class ArrayKeyType implements TypeInterface
 
     public function cast(mixed $value, Context $context): string|int
     {
-        // PHP does not support numeric string array keys,
-        // so we need to force-cast it to the integer value.
-        $isIntNumeric = \is_string($value)
-            && \is_numeric($value)
-            && (float) $value === (float) (int) $value;
-
-        if ($isIntNumeric) {
-            return (int) $value;
-        }
-
-        if (\is_string($value) || \is_int($value)) {
-            /** @var string|int */
-            return $value;
-        }
-
-        if (!$context->isStrictTypesEnabled()) {
-            return $this->coerce($value, $context);
-        }
-
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    protected function coerce(mixed $value, Context $context): string|int
-    {
-        try {
-            /** @var int */
-            return $this->int->cast($value, $context);
-        } catch (InvalidValueException) {
-            // NaN, -INF and INF cannot be converted to
-            // array-key implicitly without losses.
-            if (\is_float($value) && !\is_finite($value)) {
-                throw InvalidValueException::createFromContext(
-                    value: $value,
-                    context: $context,
-                );
-            }
-
-            /** @var string */
-            return $this->string->cast($value, $context);
-        }
+        return match (true) {
+            \is_string($value),
+            \is_int($value) => $value,
+            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
+            default => throw InvalidValueException::createFromContext(
+                value: $value,
+                context: $context,
+            ),
+        };
     }
 }

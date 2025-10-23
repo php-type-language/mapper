@@ -243,8 +243,8 @@ final class StringTypeTest extends TypeTestCase
         $type = new StringType();
         $context = $this->createContext(strictTypes: false);
 
-        $this->expectException(InvalidValueException::class);
-        $type->cast(UnitEnum::Case1, $context);
+        $result = $type->cast(UnitEnum::Case1, $context);
+        self::assertSame('Case1', $result);
     }
 
     public function testCastThrowsExceptionForResourceInNonStrictMode(): void
@@ -252,14 +252,8 @@ final class StringTypeTest extends TypeTestCase
         $type = new StringType();
         $context = $this->createContext(strictTypes: false);
 
-        $resource = \fopen('php://memory', 'r');
-
-        $this->expectException(InvalidValueException::class);
-        try {
-            $type->cast($resource, $context);
-        } finally {
-            \fclose($resource);
-        }
+        $result = $type->cast(\fopen('php://memory', 'r'), $context);
+        self::assertSame('stream', $result);
     }
 
     public function testCastThrowsExceptionForClosureInNonStrictMode(): void
@@ -280,64 +274,9 @@ final class StringTypeTest extends TypeTestCase
         $result = $type->cast((float)$floatValue, $context);
 
         self::assertIsString($result);
+
         if (!\is_nan((float)$floatValue)) {
             self::assertStringContainsString('.', $result);
         }
-    }
-
-    public function testCustomNullToStringConstant(): void
-    {
-        $type = new class extends StringType {
-            protected const NULL_TO_STRING = 'custom_null';
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        self::assertSame('custom_null', $type->cast(null, $context));
-    }
-
-    public function testCustomTrueToStringConstant(): void
-    {
-        $type = new class extends StringType {
-            protected const TRUE_TO_STRING = '1';
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        self::assertSame('1', $type->cast(true, $context));
-    }
-
-    public function testCustomFalseToStringConstant(): void
-    {
-        $type = new class extends StringType {
-            protected const FALSE_TO_STRING = '0';
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        self::assertSame('0', $type->cast(false, $context));
-    }
-
-    public function testCustomNanToStringConstant(): void
-    {
-        $type = new class extends StringType {
-            protected const NAN_TO_STRING = 'NaN';
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        self::assertSame('NaN', $type->cast(\NAN, $context));
-    }
-
-    public function testCustomInfToStringConstant(): void
-    {
-        $type = new class extends StringType {
-            protected const INF_TO_STRING = 'Infinity';
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        self::assertSame('Infinity', $type->cast(\INF, $context));
-        self::assertSame('-Infinity', $type->cast(-\INF, $context));
     }
 }

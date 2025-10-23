@@ -6,12 +6,20 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 class IntLiteralType extends IntType
 {
+    /**
+     * @param TypeCoercerInterface<int> $coercer
+     */
     public function __construct(
-        private readonly int $value,
-    ) {}
+        protected readonly int $value,
+        TypeCoercerInterface $coercer = new IntTypeCoercer(),
+    ) {
+        parent::__construct($coercer);
+    }
 
     public function match(mixed $value, Context $context): bool
     {
@@ -26,7 +34,7 @@ class IntLiteralType extends IntType
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            $coerced = $this->coerce($value, $context);
+            $coerced = $this->coercer->coerce($value, $context);
 
             if ($coerced === $this->value) {
                 return $coerced;

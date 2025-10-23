@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TypeLang\Mapper\Type\Coercer;
+
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Runtime\Context;
+
+/**
+ * @template-implements TypeCoercerInterface<string>
+ */
+class StringTypeCoercer implements TypeCoercerInterface
+{
+    /** @var string */
+    protected const NULL_TO_STRING = '';
+    /** @var string */
+    protected const TRUE_TO_STRING = 'true';
+    /** @var string */
+    protected const FALSE_TO_STRING = 'false';
+    /** @var string */
+    protected const NAN_TO_STRING = 'nan';
+    /** @var string */
+    protected const INF_TO_STRING = 'inf';
+
+    /**
+     * @throws InvalidValueException
+     */
+    public function coerce(mixed $value, Context $context): string
+    {
+        return match (true) {
+            // string
+            \is_string($value) => $value,
+            // Null
+            $value === null => static::NULL_TO_STRING,
+            // True
+            $value === true => static::TRUE_TO_STRING,
+            // False
+            $value === false => static::FALSE_TO_STRING,
+            // Float
+            \is_float($value) => match (true) {
+                // NaN
+                \is_nan($value) => static::NAN_TO_STRING,
+                // Infinity
+                $value === \INF => static::INF_TO_STRING,
+                $value === -\INF => '-' . static::INF_TO_STRING,
+                // Non-zero float number
+                \str_contains($result = (string) $value, '.') => $result,
+                // Integer-like (0.0, 1.0, etc) float number
+                default => \number_format($value, 1, '.', ''),
+            },
+            // Int
+            \is_int($value),
+            // Stringable
+            $value instanceof \Stringable => (string) $value,
+            \is_resource($value) => \get_resource_type($value),
+            // Enum
+            $value instanceof \BackedEnum => (string) $value->value,
+            $value instanceof \UnitEnum => $value->name,
+            default => throw InvalidValueException::createFromContext(
+                value: $value,
+                context: $context,
+            ),
+        };
+    }
+}

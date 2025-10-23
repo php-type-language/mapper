@@ -6,12 +6,21 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\BoolTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<bool>
  */
 class BoolType implements TypeInterface
 {
+    public function __construct(
+        /**
+         * @var TypeCoercerInterface<bool>
+         */
+        protected readonly TypeCoercerInterface $coercer = new BoolTypeCoercer(),
+    ) {}
+
     public function match(mixed $value, Context $context): bool
     {
         return \is_bool($value);
@@ -19,40 +28,13 @@ class BoolType implements TypeInterface
 
     public function cast(mixed $value, Context $context): bool
     {
-        if (\is_bool($value)) {
-            return $value;
-        }
-
-        if (!$context->isStrictTypesEnabled()) {
-            return $this->coerce($value);
-        }
-
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
-    }
-
-    protected function coerce(mixed $value): bool
-    {
-        //
-        // Each value should be checked EXPLICITLY, instead
-        // of converting to a bool like `(bool) $value`.
-        //
-        // This will avoid implicit behavior, such as when an empty
-        // SimpleXMLElement is cast to false, instead of being
-        // converted to true like any other object:
-        //
-        // ```
-        // (bool) new \SimpleXMLElement('<xml />'); // -> false (WTF?)
-        // ```
-        //
-        return $value !== ''
-            && $value !== '0'
-            && $value !== []
-            && $value !== null
-            && $value !== 0
-            && $value !== 0.0
-            && $value !== false;
+        return match (true) {
+            \is_bool($value) => $value,
+            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
+            default => throw InvalidValueException::createFromContext(
+                value: $value,
+                context: $context,
+            ),
+        };
     }
 }

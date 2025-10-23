@@ -6,12 +6,20 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\BoolTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 class BoolLiteralType extends BoolType
 {
+    /**
+     * @param TypeCoercerInterface<bool> $coercer
+     */
     public function __construct(
-        private readonly bool $value,
-    ) {}
+        protected readonly bool $value,
+        TypeCoercerInterface $coercer = new BoolTypeCoercer(),
+    ) {
+        parent::__construct($coercer);
+    }
 
     #[\Override]
     public function match(mixed $value, Context $context): bool
@@ -28,7 +36,7 @@ class BoolLiteralType extends BoolType
         }
 
         if (!$context->isStrictTypesEnabled()) {
-            $coerced = $this->coerce($value);
+            $coerced = $this->coercer->coerce($value, $context);
 
             if ($coerced === $this->value) {
                 return $coerced;

@@ -388,12 +388,8 @@ final class IntTypeTest extends TypeTestCase
 
         $resource = \fopen('php://memory', 'r');
 
-        $this->expectException(InvalidValueException::class);
-        try {
-            $type->cast($resource, $context);
-        } finally {
-            \fclose($resource);
-        }
+        $result = $type->cast($resource, $context);
+        self::assertSame(\get_resource_id($resource), $result);
     }
 
     public function testCastThrowsExceptionForClosureInNonStrictMode(): void
@@ -459,29 +455,5 @@ final class IntTypeTest extends TypeTestCase
         self::assertSame($largeInt, $type->cast($largeInt, $context));
         self::assertSame($largeInt, $type->cast((string)$largeInt, $context));
         self::assertSame($largeInt, $type->cast((float)$largeInt, $context));
-    }
-
-    // ========================================
-    // Custom Implementation Tests
-    // ========================================
-
-    public function testCustomConvertToIntMethod(): void
-    {
-        $type = new class extends IntType {
-            protected function coerce(mixed $value, \TypeLang\Mapper\Runtime\Context $context): int
-            {
-                // Custom logic: always return 999
-                return 999;
-            }
-        };
-
-        $context = $this->createContext(strictTypes: false);
-
-        // Integer values bypass convertToInt
-        self::assertSame(42, $type->cast(42, $context));
-
-        // Non-integer values use custom convertToInt
-        self::assertSame(999, $type->cast('123', $context));
-        self::assertSame(999, $type->cast(true, $context));
     }
 }

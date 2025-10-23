@@ -6,20 +6,29 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 class IntRangeType extends IntType
 {
     public const DEFAULT_INT_MIN = \PHP_INT_MIN;
     public const DEFAULT_INT_MAX = \PHP_INT_MAX;
 
+    /**
+     * @param TypeCoercerInterface<int> $coercer
+     */
     public function __construct(
         protected readonly int $min = self::DEFAULT_INT_MIN,
         protected readonly int $max = self::DEFAULT_INT_MAX,
-    ) {}
+        TypeCoercerInterface $coercer = new IntTypeCoercer(),
+    ) {
+        parent::__construct($coercer);
+    }
 
     /**
      * @phpstan-assert-if-true int $value
      */
+    #[\Override]
     public function match(mixed $value, Context $context): bool
     {
         return \is_int($value)
@@ -27,12 +36,13 @@ class IntRangeType extends IntType
             && $value <= $this->max;
     }
 
+    #[\Override]
     public function cast(mixed $value, Context $context): int
     {
         $coerced = $value;
 
-        if (!$context->isStrictTypesEnabled()) {
-            $coerced = $this->coerce($value, $context);
+        if (!\is_int($value) && !$context->isStrictTypesEnabled()) {
+            $coerced = $this->coercer->coerce($value, $context);
         }
 
         if ($this->match($coerced, $context)) {

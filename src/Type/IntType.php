@@ -6,12 +6,21 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<int>
  */
 class IntType implements TypeInterface
 {
+    public function __construct(
+        /**
+         * @var TypeCoercerInterface<int>
+         */
+        protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
+    ) {}
+
     public function match(mixed $value, Context $context): bool
     {
         return \is_int($value);
@@ -21,30 +30,7 @@ class IntType implements TypeInterface
     {
         return match (true) {
             \is_int($value) => $value,
-            !$context->isStrictTypesEnabled() => $this->coerce($value, $context),
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
-        };
-    }
-
-    /**
-     * @throws InvalidValueException
-     */
-    protected function coerce(mixed $value, Context $context): int
-    {
-        if ($value instanceof \BackedEnum && \is_int($value->value)) {
-            $value = $value->value;
-        }
-
-        return match (true) {
-            \is_int($value) => $value,
-            $value === false,
-            $value === null => 0,
-            $value === true => 1,
-            // Check that the conversion to int does not lose precision.
-            \is_numeric($value) && (float) (int) $value === (float) $value => (int) $value,
+            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
