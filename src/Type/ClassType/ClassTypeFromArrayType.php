@@ -118,7 +118,11 @@ class ClassTypeFromArrayType implements TypeInterface
     private function denormalizeObject(array $value, object $object, Context $context): void
     {
         foreach ($this->metadata->properties as $meta) {
-            $entrance = $context->enter($value, new ObjectPropertyEntry($meta->alias));
+            $entrance = $context->enter(
+                value: $value,
+                entry: new ObjectPropertyEntry($meta->alias),
+                isStrictTypes: $meta->write->strict,
+            );
 
             // Skip the property when not writable
             if (!$this->accessor->isWritable($object, $meta->name)) {

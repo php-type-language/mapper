@@ -35,7 +35,7 @@ abstract class Context implements
     /**
      * Creates new child context.
      */
-    public function enter(mixed $value, EntryInterface $entry): self
+    public function enter(mixed $value, EntryInterface $entry, ?bool $isStrictTypes = null): self
     {
         return new ChildContext(
             parent: $this,
@@ -46,6 +46,7 @@ abstract class Context implements
             parser: $this->parser,
             types: $this->types,
             config: $this->config,
+            isStrictTypes: $isStrictTypes,
         );
     }
 

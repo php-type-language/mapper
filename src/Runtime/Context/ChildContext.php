@@ -24,6 +24,7 @@ final class ChildContext extends Context
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
         ConfigurationInterface $config,
+        private readonly ?bool $isStrictTypes = null,
     ) {
         parent::__construct(
             value: $value,
@@ -33,6 +34,13 @@ final class ChildContext extends Context
             types: $types,
             config: $config,
         );
+    }
+
+    #[\Override]
+    public function isStrictTypesEnabled(): bool
+    {
+        return $this->isStrictTypes
+            ?? $this->config->isStrictTypesEnabled();
     }
 
     /**

@@ -57,7 +57,11 @@ class ListFromIterableType implements TypeInterface
 
         /** @var iterable<mixed, mixed> $value */
         foreach ($value as $key => $item) {
-            $entrance = $context->enter($item, new ArrayIndexEntry($index));
+            $entrance = $context->enter(
+                value: $item,
+                entry: new ArrayIndexEntry($index),
+                isStrictTypes: $context->isStrictTypesEnabled(),
+            );
 
             try {
                 $result[] = $this->value->cast($item, $entrance);

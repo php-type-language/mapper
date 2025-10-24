@@ -75,7 +75,11 @@ class ClassTypeToArrayType implements TypeInterface
         $result = [];
 
         foreach ($this->metadata->properties as $meta) {
-            $entrance = $context->enter($object, new ObjectPropertyEntry($meta->name));
+            $entrance = $context->enter(
+                value: $object,
+                entry: new ObjectPropertyEntry($meta->name),
+                isStrictTypes: $meta->read->strict,
+            );
 
             // Skip the property when not readable
             if (!$this->accessor->isReadable($object, $meta->name)) {
