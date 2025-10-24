@@ -23,15 +23,13 @@ class FloatType implements TypeInterface
 
     public function match(mixed $value, Context $context): bool
     {
-        return \is_float($value)
-            || ($context->isNormalization() && \is_int($value));
+        return \is_float($value);
     }
 
     public function cast(mixed $value, Context $context): float
     {
         return match (true) {
             \is_float($value) => $value,
-            \is_int($value) => (float) $value,
             !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
             default => throw InvalidValueException::createFromContext(
                 value: $value,
