@@ -69,6 +69,7 @@ final class JsonLikeValuePrinter implements ValuePrinterInterface
      */
     private function printResource(mixed $resource): string
     {
+        /** @var non-empty-string */
         return \get_resource_type($resource);
     }
 
@@ -133,6 +134,7 @@ final class JsonLikeValuePrinter implements ValuePrinterInterface
      */
     private function printFloat(float $value): string
     {
+        /** @var non-empty-string */
         return match (true) {
             // NaN
             \is_nan($value) => StringTypeCoercer::NAN_TO_STRING,
@@ -140,11 +142,23 @@ final class JsonLikeValuePrinter implements ValuePrinterInterface
             $value === \INF => StringTypeCoercer::INF_TO_STRING,
             $value === -\INF => '-' . StringTypeCoercer::INF_TO_STRING,
             // Other floating point values
-            default => \str_ends_with(
-                haystack: $formatted = \rtrim(\sprintf('%f', $value), '0'),
-                needle: '.',
-            ) ? $formatted . '0' : $formatted,
+            default => $this->printWellFormedFloat($value),
         };
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function printWellFormedFloat(float $value): string
+    {
+        /** @var non-empty-string $formatted */
+        $formatted = \rtrim(\sprintf('%f', $value), '0');
+
+        if (\str_ends_with($formatted, '.')) {
+            $formatted .= '0';
+        }
+
+        return $formatted;
     }
 
     /**

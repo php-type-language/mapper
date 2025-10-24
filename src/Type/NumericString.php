@@ -22,7 +22,7 @@ class NumericString implements TypeInterface
     ) {}
 
     /**
-     * @phpstan-assert-if-true non-empty-string $value
+     * @phpstan-assert-if-true numeric-string $value
      */
     public function match(mixed $value, Context $context): bool
     {

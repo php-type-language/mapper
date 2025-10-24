@@ -37,7 +37,7 @@ class FloatLiteralType implements TypeInterface
     public function cast(mixed $value, Context $context): float
     {
         if ($value === $this->value) {
-            return (float) $value;
+            return $value;
         }
 
         if (!$context->isStrictTypesEnabled()) {

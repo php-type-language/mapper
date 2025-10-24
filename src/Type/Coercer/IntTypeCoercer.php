@@ -26,7 +26,7 @@ class IntTypeCoercer implements TypeCoercerInterface
 
         return match (true) {
             \is_int($value) => $value,
-            \is_float($value) && $this->isSafeFloat($value) => (int) $value,
+            \is_float($value) && self::isSafeFloat($value) => (int) $value,
             $value === false,
             $value === null => 0,
             $value === true => 1,
@@ -43,7 +43,7 @@ class IntTypeCoercer implements TypeCoercerInterface
      * Returns {@see true} in case of passed float value can be casting
      * without loss of precision and does not overflows integer min/max bounds.
      */
-    public static function isSafeFloat(float $value): bool
+    final public static function isSafeFloat(float $value): bool
     {
         //
         // PHP int overflow checks.
