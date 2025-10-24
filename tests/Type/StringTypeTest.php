@@ -9,14 +9,13 @@ use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
 use TypeLang\Mapper\Tests\Type\Stub\StringBackedEnumStub;
 use TypeLang\Mapper\Tests\Type\Stub\UnitEnumStub;
-use TypeLang\Mapper\Type\ArrayKeyType;
-use TypeLang\Mapper\Type\Coercer\ArrayKeyTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('types')]
-#[CoversClass(ArrayKeyType::class)]
-#[CoversClass(ArrayKeyTypeCoercer::class)]
+#[CoversClass(StringType::class)]
+#[CoversClass(StringTypeCoercer::class)]
 final class StringTypeTest extends SymmetricTypeTestCase
 {
     protected static function createType(): TypeInterface

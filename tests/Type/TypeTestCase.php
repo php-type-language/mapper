@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Context\RootContext;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
@@ -145,6 +146,33 @@ abstract class TypeTestCase extends TestCase
         yield StringBackedEnumStub::ExampleCase;
     }
 
+    protected static function assertIfNotException(mixed $expected, mixed $actual): void
+    {
+        switch (true) {
+            case $expected instanceof \Throwable:
+                break;
+            case \is_array($expected):
+            case \is_object($expected):
+                self::assertEquals($expected, $actual);
+                break;
+            case \is_float($expected) && \is_nan($expected):
+                self::assertNan($actual);
+                break;
+            default:
+                self::assertSame($expected, $actual);
+        }
+    }
+
+    protected function expectTypeErrorIfException(mixed $expected): void
+    {
+        if (!$expected instanceof \Throwable) {
+            return;
+        }
+
+        $this->expectExceptionMessage($expected->getMessage());
+        $this->expectException(InvalidValueException::class);
+    }
+
     /**
      * @return non-empty-string
      */
@@ -261,9 +289,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('castStrictNormalizationDataProvider')]
     public function testCastStrictNormalization(mixed $value, mixed $expected): void
     {
-        if ($expected instanceof \Throwable) {
-            self::expectExceptionMessage($expected->getMessage());
-        }
+        $this->expectTypeErrorIfException($expected);
 
         $type = static::createType();
 
@@ -272,16 +298,7 @@ abstract class TypeTestCase extends TestCase
             strictTypes: true,
         ));
 
-        switch (true) {
-            case $expected instanceof \Throwable:
-                break;
-            case \is_array($expected):
-            case \is_object($expected):
-                self::assertEquals($expected, $actual);
-                break;
-            default:
-                self::assertSame($expected, $actual);
-        }
+        self::assertIfNotException($expected, $actual);
     }
 
     /**
@@ -295,9 +312,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('castNonStrictNormalizationDataProvider')]
     public function testCastNonStrictNormalization(mixed $value, mixed $expected): void
     {
-        if ($expected instanceof \Throwable) {
-            self::expectExceptionMessage($expected->getMessage());
-        }
+        $this->expectTypeErrorIfException($expected);
 
         $type = static::createType();
 
@@ -306,16 +321,7 @@ abstract class TypeTestCase extends TestCase
             strictTypes: false,
         ));
 
-        switch (true) {
-            case $expected instanceof \Throwable:
-                break;
-            case \is_array($expected):
-            case \is_object($expected):
-                self::assertEquals($expected, $actual);
-                break;
-            default:
-                self::assertSame($expected, $actual);
-        }
+        self::assertIfNotException($expected, $actual);
     }
 
     /**
@@ -329,9 +335,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('castStrictDenormalizationDataProvider')]
     public function testCastStrictDenormalization(mixed $value, mixed $expected): void
     {
-        if ($expected instanceof \Throwable) {
-            self::expectExceptionMessage($expected->getMessage());
-        }
+        $this->expectTypeErrorIfException($expected);
 
         $type = static::createType();
 
@@ -340,16 +344,7 @@ abstract class TypeTestCase extends TestCase
             strictTypes: true,
         ));
 
-        switch (true) {
-            case $expected instanceof \Throwable:
-                break;
-            case \is_array($expected):
-            case \is_object($expected):
-                self::assertEquals($expected, $actual);
-                break;
-            default:
-                self::assertSame($expected, $actual);
-        }
+        self::assertIfNotException($expected, $actual);
     }
 
     /**
@@ -363,9 +358,7 @@ abstract class TypeTestCase extends TestCase
     #[DataProvider('castNonStrictDenormalizationDataProvider')]
     public function testCastNonStrictDenormalization(mixed $value, mixed $expected): void
     {
-        if ($expected instanceof \Throwable) {
-            self::expectExceptionMessage($expected->getMessage());
-        }
+        $this->expectTypeErrorIfException($expected);
 
         $type = static::createType();
 
@@ -374,16 +367,7 @@ abstract class TypeTestCase extends TestCase
             strictTypes: false,
         ));
 
-        switch (true) {
-            case $expected instanceof \Throwable:
-                break;
-            case \is_array($expected):
-            case \is_object($expected):
-                self::assertEquals($expected, $actual);
-                break;
-            default:
-                self::assertSame($expected, $actual);
-        }
+        self::assertIfNotException($expected, $actual);
     }
 
     /**

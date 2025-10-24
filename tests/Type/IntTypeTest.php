@@ -68,7 +68,8 @@ final class IntTypeTest extends SymmetricTypeTestCase
                     $value === null => 0,
                     $value === true => 1,
                     $value === false => 0,
-                    \is_resource($value) => \get_resource_id($value),
+                    // Resource to int type coercion is not obvious:
+                    // \is_resource($value) => \get_resource_id($value),
                     $value === IntBackedEnumStub::ExampleCase => IntBackedEnumStub::ExampleCase->value,
                     default => $default,
                 },
