@@ -31,7 +31,8 @@ final class IntTypeCoercer implements TypeCoercerInterface
             $value === false,
             $value === null => 0,
             $value === true => 1,
-            \is_resource($value) => \get_resource_id($value),
+            // Resource to int type coercion is not obvious:
+            // \is_resource($value) => \get_resource_id($value),
             default => throw InvalidValueException::createFromContext(
                 value: $original,
                 context: $context,

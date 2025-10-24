@@ -15,6 +15,7 @@ final class ArrayKeyTypeCoercer implements TypeCoercerInterface
     public function coerce(mixed $value, Context $context): int|string
     {
         return match (true) {
+            \is_string($value),
             \is_int($value) => $value,
             $value === false,
             $value === null => 0,

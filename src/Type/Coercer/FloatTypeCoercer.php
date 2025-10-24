@@ -19,6 +19,8 @@ final class FloatTypeCoercer implements TypeCoercerInterface
         }
 
         return match (true) {
+            \is_float($value),
+            \is_integer($value),
             \is_numeric($value) => (float) $value,
             $value === false,
             $value === null => 0.0,
