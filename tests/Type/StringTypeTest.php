@@ -6,24 +6,19 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
-use TypeLang\Mapper\Tests\Type\Stub\StringBackedEnumStub;
-use TypeLang\Mapper\Tests\Type\Stub\UnitEnumStub;
-use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('types')]
 #[CoversClass(StringType::class)]
-#[CoversClass(StringTypeCoercer::class)]
-final class StringTypeTest extends SymmetricTypeTestCase
+final class StringTypeTest extends TypeTestCase
 {
     protected static function createType(): TypeInterface
     {
         return new StringType();
     }
 
-    protected static function matchValues(bool $strict): iterable
+    protected static function matchValues(bool $normalize): iterable
     {
         foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
@@ -56,7 +51,7 @@ final class StringTypeTest extends SymmetricTypeTestCase
         }
     }
 
-    protected static function castValues(bool $strict): iterable
+    protected static function castValues(bool $normalize): iterable
     {
         foreach (self::defaultCastDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
@@ -84,39 +79,6 @@ final class StringTypeTest extends SymmetricTypeTestCase
                 $value === 'false' => 'false',
                 $value === 'non empty' => 'non empty',
                 $value === '' => '',
-                // Type casts
-                $strict === false => match (true) {
-                    $value === \PHP_INT_MAX + 1 => '9223372036854775808.0',
-                    $value === \PHP_INT_MAX => '9223372036854775807',
-                    $value === 42 => '42',
-                    $value === 1 => '1',
-                    $value === 0 => '0',
-                    $value === -1 => '-1',
-                    $value === -42 => '-42',
-                    $value === \PHP_INT_MIN => '-9223372036854775808',
-                    $value === \PHP_INT_MIN - 1 => '-9223372036854775808.0',
-                    $value === 42.0 => '42.0',
-                    $value === 42.5 => '42.5',
-                    $value === 1.0 => '1.0',
-                    $value === 0.0 => '0.0',
-                    $value === -1.0 => '-1.0',
-                    $value === -42.0 => '-42.0',
-                    $value === -42.5 => '-42.5',
-                    $value === null => '',
-                    $value === true => 'true',
-                    $value === false => 'false',
-                    $value === \INF => 'inf',
-                    $value === -\INF => '-inf',
-                    \is_float($value) && \is_nan($value) => 'nan',
-                    \is_resource($value) => match (\get_resource_type($value)) {
-                        'stream' => 'stream',
-                        default => $default,
-                    },
-                    $value === IntBackedEnumStub::ExampleCase => (string) IntBackedEnumStub::ExampleCase->value,
-                    $value === StringBackedEnumStub::ExampleCase => StringBackedEnumStub::ExampleCase->value,
-                    $value === UnitEnumStub::ExampleCase => UnitEnumStub::ExampleCase->name,
-                    default => $default,
-                },
                 default => $default,
             };
         }

@@ -27,6 +27,7 @@ final class BoolTypeCoercer implements TypeCoercerInterface
         //
         return $value !== false
             && $value !== '0'
+            && $value !== ''
             && $value !== []
             && $value !== null
             && $value !== 0

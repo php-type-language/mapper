@@ -14,7 +14,6 @@ final class IntTypeCoercer implements TypeCoercerInterface
 {
     public function coerce(mixed $value, Context $context): int
     {
-
         if ($value instanceof \BackedEnum && \is_int($value->value)) {
             return $value->value;
         }

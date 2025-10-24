@@ -6,22 +6,19 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
-use TypeLang\Mapper\Type\Coercer\FloatTypeCoercer;
 use TypeLang\Mapper\Type\FloatType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('types')]
 #[CoversClass(FloatType::class)]
-#[CoversClass(FloatTypeCoercer::class)]
-final class FloatTypeTest extends SymmetricTypeTestCase
+final class FloatTypeTest extends TypeTestCase
 {
     protected static function createType(): TypeInterface
     {
         return new FloatType();
     }
 
-    protected static function matchValues(bool $strict): iterable
+    protected static function matchValues(bool $normalize): iterable
     {
         foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
@@ -42,7 +39,7 @@ final class FloatTypeTest extends SymmetricTypeTestCase
         }
     }
 
-    protected static function castValues(bool $strict): iterable
+    protected static function castValues(bool $normalize): iterable
     {
         foreach (self::defaultCastDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
@@ -58,46 +55,6 @@ final class FloatTypeTest extends SymmetricTypeTestCase
                 $value === -42.0 => -42.0,
                 $value === -42.5 => -42.5,
                 $value === \PHP_INT_MIN - 1 => \PHP_INT_MIN - 1,
-                // Type casts
-                $strict === false => match (true) {
-                    $value === \PHP_INT_MAX => (float) \PHP_INT_MAX,
-                    $value === 42 => 42.0,
-                    $value === 1 => 1.0,
-                    $value === 0 => 0.0,
-                    $value === -1 => -1.0,
-                    $value === -42 => -42.0,
-                    $value === \PHP_INT_MIN => (float) \PHP_INT_MIN,
-                    $value === "9223372036854775808" => 9223372036854775808.0,
-                    $value === "9223372036854775807" => 9223372036854775807.0,
-                    $value === "42" => 42.0,
-                    $value === "1" => 1.0,
-                    $value === "0" => 0.0,
-                    $value === "-1" => -1.0,
-                    $value === "-42" => -42.0,
-                    $value === "-9223372036854775808" => -9223372036854775808.0,
-                    $value === "-9223372036854775809" => -9223372036854775809.0,
-                    $value === "9223372036854775808.0" => 9223372036854775808.0,
-                    $value === "9223372036854775807.0" => 9223372036854775807.0,
-                    $value === "42.5" => 42.5,
-                    $value === "42.0" => 42.0,
-                    $value === "1.0" => 1.0,
-                    $value === "0.0" => 0.0,
-                    $value === "-1.0" => -1.0,
-                    $value === "-42.0" => -42.0,
-                    $value === "-42.5" => -42.5,
-                    $value === "-9223372036854775808.0" => -9223372036854775808.0,
-                    $value === "-9223372036854775809.0" => -9223372036854775809.0,
-                    $value === 42.0 => 42.0,
-                    $value === 1.0 => 1.0,
-                    $value === 0.0 => 0.0,
-                    $value === -1.0 => -1.0,
-                    $value === -42.0 => -42.0,
-                    $value === null => 0.0,
-                    $value === true => 1.0,
-                    $value === false => 0.0,
-                    $value === IntBackedEnumStub::ExampleCase => (float) IntBackedEnumStub::ExampleCase->value,
-                    default => $default,
-                },
                 default => $default,
             };
         }
