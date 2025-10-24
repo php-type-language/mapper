@@ -6,29 +6,29 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\BoolType;
+use TypeLang\Mapper\Type\BoolLiteralType;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
-#[CoversClass(BoolType::class)]
-final class BoolTypeTest extends CoercibleTypeTestCase
+#[CoversClass(BoolLiteralType::class)]
+final class BoolTrueLiteralTypeTest extends CoercibleTypeTestCase
 {
     protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
     {
         if ($coercer !== null) {
-            return new BoolType(coercer: $coercer);
+            return new BoolLiteralType(true, coercer: $coercer);
         }
 
-        return new BoolType();
+        return new BoolLiteralType(true);
     }
 
     protected static function matchValues(bool $normalize): iterable
     {
         foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
-                $value === true,
-                $value === false => true,
+                // Only true is matches
+                $value === true => true,
                 default => $default,
             };
         }
@@ -38,8 +38,8 @@ final class BoolTypeTest extends CoercibleTypeTestCase
     {
         foreach (self::defaultCastDataProviderSamples() as $value => $default) {
             yield $value => match (true) {
+                // Only true may casts
                 $value === true => true,
-                $value === false => false,
                 default => $default,
             };
         }

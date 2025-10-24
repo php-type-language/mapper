@@ -31,16 +31,12 @@ class FloatLiteralType implements TypeInterface
      */
     public function match(mixed $value, Context $context): bool
     {
-        if (\is_int($value)) {
-            return (float) $value === $this->value;
-        }
-
         return $value === $this->value;
     }
 
     public function cast(mixed $value, Context $context): float
     {
-        if ($this->match($value, $context)) {
+        if ($value === $this->value) {
             return (float) $value;
         }
 

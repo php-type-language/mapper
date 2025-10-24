@@ -9,7 +9,7 @@ use TypeLang\Mapper\Context\Context;
 /**
  * @template-implements TypeCoercerInterface<bool>
  */
-final class BoolTypeCoercer implements TypeCoercerInterface
+class BoolTypeCoercer implements TypeCoercerInterface
 {
     public function coerce(mixed $value, Context $context): bool
     {

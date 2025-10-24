@@ -10,7 +10,7 @@ use TypeLang\Mapper\Context\Context;
 /**
  * @template-implements TypeCoercerInterface<int>
  */
-final class IntTypeCoercer implements TypeCoercerInterface
+class IntTypeCoercer implements TypeCoercerInterface
 {
     public function coerce(mixed $value, Context $context): int
     {
