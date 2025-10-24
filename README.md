@@ -124,13 +124,10 @@ like [this](https://github.com/php-type-language/mapper/actions/runs/11924690471
 Sample: An object that contains a collection of objects, which contains
 another collection of objects.
 
-```typescript
-ExampleObject
-{
+```php
+object<ExampleObject>{
     name: string,
-        items
-:
-    list<ExampleObject>
+    items: list<ExampleObject>
 }
 ```
 
@@ -138,48 +135,48 @@ The results are sorted by mode time.
 
 ### Denormalization
 
-Denormalization: Transformation from raw payload (array) to concrete object.
+Denormalization: For example, conversion from JSON to PHP Object.
 
-| benchmark               | memory  | min       | max       | mode      | rstdev |
-|-------------------------|---------|-----------|-----------|-----------|--------|
-| TypeLangAttributesBench | 1.444mb | 141.800μs | 156.050μs | 145.760μs | ±2.13% |
-| JMSAttributesBench      | 1.429mb | 144.400μs | 157.100μs | 146.736μs | ±2.12% |
-| TypeLangDocBlockBench   | 1.642mb | 144.800μs | 153.850μs | 148.059μs | ±1.29% |
-| ValinorBench            | 1.344mb | 217.550μs | 229.150μs | 220.319μs | ±1.41% |
-| SymfonyDocBlockBench    | 2.163mb | 495.350μs | 507.950μs | 499.492μs | ±0.72% |
-| SymfonyPHPStanBench     | 1.426mb | 506.650μs | 544.500μs | 510.798μs | ±1.53% |
-
-### Denormalization + Cache
-
-| benchmark               | memory  | min       | max       | mode      | rstdev |
-|-------------------------|---------|-----------|-----------|-----------|--------|
-| TypeLangDocBlockBench   | 1.544mb | 113.250μs | 125.350μs | 115.831μs | ±2.64% |
-| JMSAttributesBench      | 1.429mb | 125.850μs | 148.750μs | 128.718μs | ±3.68% |
-| TypeLangAttributesBench | 1.436mb | 170.100μs | 182.200μs | 173.155μs | ±1.70% |
-| ValinorBench            | 1.257mb | 341.000μs | 374.450μs | 346.891μs | ±1.94% |
-| SymfonyPHPStanBench     | 1.370mb | 583.600μs | 609.050μs | 590.473μs | ±0.88% |
-| SymfonyDocBlockBench    | 2.163mb | 644.350μs | 686.550μs | 651.617μs | ±1.32% |
+| benchmark                                 | memory      | min       | mode       | rstdev |
+|-------------------------------------------|-------------|-----------|------------|--------|
+| JMSAttributesBench                        | 853.248kb   | 41.890μs  | 42.562μs   | ±6.53% |
+| JMSAttributesWithSymfonyPsr6Bench         | 718.816kb   | 42.500μs  | 42.926μs   | ±0.46% |
+| TypeLangAttributesWithSymfonyPsr16Bench   | 721.720kb   | 52.590μs  | 53.200μs   | ±0.56% |
+| TypeLangDocBlockBench                     | 839.008kb   | 52.490μs  | 53.155μs   | ±6.83% |
+| TypeLangDocBlockWithSymfonyPsr16Bench     | 786.512kb   | 52.500μs  | 52.976μs   | ±2.31% |
+| TypeLangAttributesWithSymfonyPsr6Bench    | 717.960kb   | 52.840μs  | 53.031μs   | ±0.87% |
+| TypeLangDocBlockWithSymfonyPsr6Bench      | 783.312kb   | 52.940μs  | 53.203μs   | ±0.24% |
+| TypeLangAttributesBench                   | 1.209mb     | 53.160μs  | 53.459μs   | ±1.55% |
+| SymfonyPHPStanBench                       | 710.344kb   | 140.460μs | 141.594μs  | ±0.64% |
+| SymfonyDocBlockBench                      | 1.850mb     | 140.910μs | 142.580μs  | ±0.89% |
+| ValinorBench                              | 894.984kb   | 142.120μs | 142.259μs  | ±0.44% |
+| ValinorWithCustomPsr16Bench               | 574.496kb   | 143.380μs | 144.214μs  | ±0.73% |
+| ValinorWithSymfonyPsr16Bench              | 548.008kb   | 145.680μs | 151.617μs  | ±1.83% |
+| SymfonyDocBlockWithSymfonyPsr6Bench       | 644.608kb   | 200.810μs | 203.024μs  | ±1.48% |
+| SymfonyPHPStanWithSymfonyPsr6Bench        | 565.376kb   | 202.000μs | 202.599μs  | ±1.21% |
 
 ### Normalization
 
-Normalization: Transformation from object to raw payload (array).
+Normalization: For example, conversion from PHP Object to JSON.
 
-| benchmark               | memory  | min       | max       | mode      | rstdev |
-|-------------------------|---------|-----------|-----------|-----------|--------|
-| JMSAttributesBench      | 1.476mb | 93.550μs  | 125.100μs | 112.011μs | ±9.21% |
-| TypeLangDocBlockBench   | 1.643mb | 110.650μs | 133.000μs | 112.881μs | ±4.25% |
-| SymfonyPHPStanBench     | 1.370mb | 112.850μs | 121.850μs | 115.140μs | ±1.89% |
-| TypeLangAttributesBench | 1.444mb | 117.300μs | 127.250μs | 120.649μs | ±2.43% |
-| ValinorBench            | 1.251mb | 127.300μs | 135.350μs | 129.379μs | ±1.72% |
-| SymfonyDocBlockBench    | 2.163mb | 153.000μs | 161.800μs | 155.170μs | ±1.39% |
+| benchmark                               | memory      | min      | mode      | rstdev    |
+|-----------------------------------------|-------------|----------|-----------|-----------|
+| ValinorWithCustomPsr16Bench             | 885.496kb   | 10.060μs | 10.107μs  | ±0.79%    |
+| ValinorBench                            | 866.440kb   | 38.250μs | 38.419μs  | ±2.14%    |
+| SymfonyPHPStanBench                     | 647.632kb   | 41.220μs | 43.365μs  | ±2.17%    |
+| SymfonyDocBlockBench                    | 1.850mb     | 43.120μs | 43.370μs  | ±1.11%    |
+| TypeLangAttributesWithSymfonyPsr16Bench | 721.720kb   | 50.520μs | 50.844μs  | ±2.82%    |
+| TypeLangAttributesWithSymfonyPsr6Bench  | 717.960kb   | 50.590μs | 50.952μs  | ±1.46%    |
+| TypeLangAttributesBench                 | 1.200mb     | 50.610μs | 51.502μs  | ±1.25%    |
+| TypeLangDocBlockWithSymfonyPsr6Bench    | 783.256kb   | 50.800μs | 50.859μs  | ±0.37%    |
+| TypeLangDocBlockBench                   | 838.272kb   | 50.810μs | 51.446μs  | ±0.60%    |
+| TypeLangDocBlockWithSymfonyPsr16Bench   | 786.456kb   | 51.960μs | 52.670μs  | ±20.25%   |
+| JMSAttributesBench                      | 927.920kb   | 56.070μs | 56.750μs  | ±2.30%    |
+| JMSAttributesWithSymfonyPsr6Bench       | 793.808kb   | 56.170μs | 57.160μs  | ±2.00%    |
+| SymfonyDocBlockWithSymfonyPsr6Bench     | 603.352kb   | 77.490μs | 78.519μs  | ±1.21%    |
+| SymfonyPHPStanWithSymfonyPsr6Bench      | 448.344kb   | 78.220μs | 79.170μs  | ±1.93%    |
+| ValinorWithSymfonyPsr16Bench*           | 436.760kb   | ERROR    | ERROR     | ±31.62%   |
 
-### Normalization + Cache
-
-| benchmark               | memory  | min       | max       | mode      | rstdev |
-|-------------------------|---------|-----------|-----------|-----------|--------|
-| TypeLangAttributesBench | 1.447mb | 65.850μs  | 94.650μs  | 91.945μs  | ±6.51% |
-| TypeLangDocBlockBench   | 1.544mb | 91.950μs  | 97.250μs  | 93.070μs  | ±1.49% |
-| JMSAttributesBench      | 1.429mb | 88.150μs  | 105.600μs | 100.956μs | ±3.31% |
-| SymfonyPHPStanBench     | 1.370mb | 136.050μs | 147.900μs | 138.879μs | ±1.96% |
-| ValinorBench            | 1.256mb | 114.450μs | 161.600μs | 152.558μs | ±5.88% |
-| SymfonyDocBlockBench    | 2.163mb | 164.300μs | 221.300μs | 212.265μs | ±5.18% |
+- `ValinorWithSymfonyPsr16Bench` - cuyz/valinor does not support PSR-16 cache 
+  (not compatible with other implementations): https://github.com/CuyZ/Valinor/issues/623
+  >  Uncaught Error: Object of type CuyZ\Valinor\Normalizer\Transformer\EvaluatedTransformer is not callable
