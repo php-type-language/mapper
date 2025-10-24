@@ -13,9 +13,10 @@ final class RawTypeInfo extends TypeInfo
          * @var non-empty-string
          */
         public readonly string $definition,
+        ?bool $strict = null,
         ?SourceInfo $source = null,
     ) {
-        parent::__construct($source);
+        parent::__construct($strict, $source);
     }
 
     public static function mixed(): self

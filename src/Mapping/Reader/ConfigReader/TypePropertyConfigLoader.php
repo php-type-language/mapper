@@ -29,6 +29,7 @@ final class TypePropertyConfigLoader extends PropertyConfigLoader
 
         $info->read = $info->write = new RawTypeInfo(
             definition: $config['type'],
+            strict: $config['strict'] ?? null,
         );
     }
 

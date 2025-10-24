@@ -51,6 +51,7 @@ final class TypePropertyAttributeLoader extends PropertyAttributeLoader
 
         $prototype->read = $prototype->write = new RawTypeInfo(
             definition: $attribute->type,
+            strict: $attribute->strict,
             source: $this->findSourceMap($property),
         );
     }

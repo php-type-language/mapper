@@ -18,6 +18,7 @@ final class TypeMetadata extends Metadata
          * Gets declarative type representation.
          */
         public readonly TypeStatement $statement,
+        public readonly ?bool $strict = null,
         ?int $createdAt = null,
     ) {
         parent::__construct($createdAt);

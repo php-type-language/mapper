@@ -13,9 +13,10 @@ final class ParsedTypeInfo extends TypeInfo
 
     public function __construct(
         public readonly TypeStatement $statement,
+        ?bool $strict = null,
         ?SourceInfo $source = null,
     ) {
-        parent::__construct($source);
+        parent::__construct($strict, $source);
     }
 
     public static function mixed(): self

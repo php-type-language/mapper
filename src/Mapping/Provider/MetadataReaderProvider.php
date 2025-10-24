@@ -434,6 +434,7 @@ final class MetadataReaderProvider implements ProviderInterface
         return new TypeMetadata(
             type: $type,
             statement: $statement,
+            strict: $info->strict,
             createdAt: $this->now(),
         );
     }

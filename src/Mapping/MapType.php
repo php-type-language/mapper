@@ -12,5 +12,6 @@ class MapType
          * @var non-empty-string
          */
         public readonly string $type,
+        public readonly ?bool $strict = null,
     ) {}
 }

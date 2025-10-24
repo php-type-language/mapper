@@ -67,6 +67,10 @@
                                     "description": "Specific property write type",
                                     "minLength": 1
                                 },
+                                "strict": {
+                                    "type": "boolean",
+                                    "description": "Determines how strictly the type should be checked"
+                                },
                                 "type_error_message": {
                                     "type": "string",
                                     "minLength": 1,
