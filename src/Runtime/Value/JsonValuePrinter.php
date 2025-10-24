@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Value;
 
+use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
+
 final class JsonValuePrinter implements ValuePrinterInterface
 {
     public const DEFAULT_MAX_ITEMS_COUNT = 3;
@@ -67,7 +69,7 @@ final class JsonValuePrinter implements ValuePrinterInterface
      */
     private function printResource(mixed $resource): string
     {
-        return (string) \get_resource_id($resource);
+        return \get_resource_type($resource);
     }
 
     /**
@@ -132,13 +134,12 @@ final class JsonValuePrinter implements ValuePrinterInterface
     private function printFloat(float $value): string
     {
         return match (true) {
-            \is_nan($value) => 'NaN',
-            \is_infinite($value) => $value > 0 ? 'Infinity' : '-Infinity',
-            // In the case of float to an int cast without loss of precision
-            // PHP converts such values to an int when converting to a string.
-            //
-            // Such cases should be handled separately.
-            $value === (float) (int) $value => \number_format($value, 1, '.', ''),
+            // NaN
+            \is_nan($value) => StringTypeCoercer::NAN_TO_STRING,
+            // Infinity
+            $value === \INF => StringTypeCoercer::INF_TO_STRING,
+            $value === -\INF => '-' . StringTypeCoercer::INF_TO_STRING,
+            // Other floating point values
             default => \str_ends_with(
                 haystack: $formatted = \rtrim(\sprintf('%f', $value), '0'),
                 needle: '.',

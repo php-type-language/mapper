@@ -13,15 +13,15 @@ use TypeLang\Mapper\Context\Context;
 class StringTypeCoercer implements TypeCoercerInterface
 {
     /** @var string */
-    protected const NULL_TO_STRING = '';
+    public const NULL_TO_STRING = '';
     /** @var string */
-    protected const TRUE_TO_STRING = 'true';
+    public const TRUE_TO_STRING = 'true';
     /** @var string */
-    protected const FALSE_TO_STRING = 'false';
+    public const FALSE_TO_STRING = 'false';
     /** @var string */
-    protected const NAN_TO_STRING = 'nan';
+    public const NAN_TO_STRING = 'nan';
     /** @var string */
-    protected const INF_TO_STRING = 'inf';
+    public const INF_TO_STRING = 'inf';
 
     /**
      * @throws InvalidValueException
@@ -44,10 +44,11 @@ class StringTypeCoercer implements TypeCoercerInterface
                 // Infinity
                 $value === \INF => static::INF_TO_STRING,
                 $value === -\INF => '-' . static::INF_TO_STRING,
-                // Non-zero float number
-                \str_contains($result = (string) $value, '.') => $result,
-                // Integer-like (0.0, 1.0, etc) float number
-                default => \number_format($value, 1, '.', ''),
+                // Other floating point values
+                default => \str_ends_with(
+                    haystack: $formatted = \rtrim(\sprintf('%f', $value), '0'),
+                    needle: '.',
+                ) ? $formatted . '0' : $formatted,
             },
             // Int
             \is_int($value),
