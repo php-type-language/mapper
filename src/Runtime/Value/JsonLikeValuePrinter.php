@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Runtime\Value;
 
 use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 
-final class JsonValuePrinter implements ValuePrinterInterface
+final class JsonLikeValuePrinter implements ValuePrinterInterface
 {
     public const DEFAULT_MAX_ITEMS_COUNT = 3;
 

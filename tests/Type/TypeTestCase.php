@@ -10,7 +10,7 @@ use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Runtime\Value\JsonValuePrinter;
+use TypeLang\Mapper\Runtime\Value\JsonLikeValuePrinter;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
 use TypeLang\Mapper\Tests\Type\Stub\StringBackedEnumStub;
@@ -36,7 +36,7 @@ abstract class TypeTestCase extends TestCase
      */
     final protected static function defaultCastDataProviderSamples(): iterable
     {
-        $printer = new JsonValuePrinter();
+        $printer = new JsonLikeValuePrinter();
 
         foreach (self::defaultDataProviderSamples() as $value) {
             yield $value => new \ValueError(\sprintf(
