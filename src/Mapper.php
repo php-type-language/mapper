@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
+use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\RootContext;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Context\RootContext;
 use TypeLang\Mapper\Runtime\Extractor\Factory\DefaultTypeExtractorFactory;
 use TypeLang\Mapper\Runtime\Extractor\Factory\TypeExtractorFactoryInterface;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;

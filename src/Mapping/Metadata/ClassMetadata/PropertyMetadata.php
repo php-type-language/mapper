@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Context\Context;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 
 /**
  * @template-implements TypeInterface<null>

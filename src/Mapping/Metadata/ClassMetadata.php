@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
-use TypeLang\Mapper\Context\Context;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\FieldsListNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

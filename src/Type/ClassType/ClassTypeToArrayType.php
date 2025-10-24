@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
+use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Mapping\FinalExceptionInterface;
 use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Context\Context;
-use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
-use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 

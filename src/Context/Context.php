@@ -6,11 +6,11 @@ namespace TypeLang\Mapper\Context;
 
 use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
+use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**

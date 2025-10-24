@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context\Path;
 
-use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 
 /**
