@@ -11,13 +11,17 @@ final class NativeTypeExtractor implements TypeExtractorInterface
 {
     public function getDefinitionByValue(mixed $value): string
     {
+        if (\is_resource($value)) {
+            return 'resource';
+        }
+
         /** @var non-empty-string $result */
         $result = \get_debug_type($value);
 
-        if ($result === 'class@anonymous') {
-            return 'object';
-        }
-
-        return $result;
+        return match ($result) {
+            'class@anonymous' => 'object',
+            'resource (closed)' => 'resource',
+            default => $result,
+        };
     }
 }

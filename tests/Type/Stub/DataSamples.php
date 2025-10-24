@@ -7,6 +7,9 @@ namespace TypeLang\Mapper\Tests\Type\Stub;
 use TypeLang\Mapper\Runtime\Value\JsonLikeValuePrinter;
 
 /**
+ * @internal this is an internal library class, please do not use it in your code
+ * @psalm-internal TypeLang\Mapper\Tests\Type
+ *
  * @template-implements \IteratorAggregate<array-key, mixed>
  */
 final class DataSamples implements \IteratorAggregate
