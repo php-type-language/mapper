@@ -128,8 +128,13 @@ abstract class TypeTestCase extends TestCase
         yield (object)['key' => 'val'];
         yield (object)['val'];
 
-        // Enum values
+        // Resource
+        yield \fopen('php://memory', 'rb');
+        \fclose($stream = \fopen('php://memory', 'rb'));
+        yield $stream; // closed resource
 
+        // Enum values
+        yield UnitEnumStub::ExampleCase;
         // This behavior can be confusing to the user, since the "public"
         // type (i.e., the one displayed to the user) for an enum is an int,
         // but the actual type is an enum's object.
@@ -138,7 +143,6 @@ abstract class TypeTestCase extends TestCase
         // which is very bad.
         yield IntBackedEnumStub::ExampleCase;
         yield StringBackedEnumStub::ExampleCase;
-        yield UnitEnumStub::ExampleCase;
     }
 
     /**
