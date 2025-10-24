@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Exception\Mapping;
 
 use TypeLang\Mapper\Exception\Template;
-use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\PathInterface;
 
 abstract class RuntimeException extends \RuntimeException
 {

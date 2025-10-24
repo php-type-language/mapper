@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Type\Coercer\ArrayKeyCoercer;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Type\Coercer\ArrayKeyTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
@@ -26,7 +26,7 @@ class ArrayKeyType implements TypeInterface
         /**
          * @var TypeCoercerInterface<array-key>
          */
-        protected readonly TypeCoercerInterface $coercer = new ArrayKeyCoercer(),
+        protected readonly TypeCoercerInterface $coercer = new ArrayKeyTypeCoercer(),
     ) {}
 
     /**

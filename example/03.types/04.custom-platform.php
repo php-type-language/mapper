@@ -7,7 +7,7 @@ use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
 use TypeLang\Mapper\Type\Builder\ClassToArrayTypeBuilder;
 

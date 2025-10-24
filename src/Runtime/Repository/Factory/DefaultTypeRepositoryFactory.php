@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Runtime\Repository\Factory;
 
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Runtime\Repository\LoggableTypeRepository;

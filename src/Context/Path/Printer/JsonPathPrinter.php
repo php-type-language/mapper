@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Path;
+namespace TypeLang\Mapper\Context\Path\Printer;
 
-use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Runtime\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Context\Path\PathInterface;
 
 final class JsonPathPrinter implements PathPrinterInterface
 {

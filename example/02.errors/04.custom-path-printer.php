@@ -5,8 +5,8 @@ declare(strict_types=1);
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\MapType;
-use TypeLang\Mapper\Runtime\Path\PathInterface;
-use TypeLang\Mapper\Runtime\Path\PathPrinterInterface;
+use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\Printer\PathPrinterInterface;
 
 require __DIR__ . '/../../vendor/autoload.php';
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Runtime\Repository\TypeDecorator;
 
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**

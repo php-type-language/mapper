@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValue
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Shape\NamedFieldNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

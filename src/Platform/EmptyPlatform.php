@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Context\Direction;
 
 final class EmptyPlatform implements PlatformInterface
 {

@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Exception\Mapping\InvalidIterableKeyException;
 use TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 
 /**
  * @template TKey of array-key = array-key

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 
 /**
  * @template-implements TypeInterface<mixed>

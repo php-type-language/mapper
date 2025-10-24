@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Context;
+namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Runtime\ConfigurationInterface;
-use TypeLang\Mapper\Runtime\Context;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Runtime\Path\Path;
-use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Context\Path\Path;
+use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 
 final class ChildContext extends Context

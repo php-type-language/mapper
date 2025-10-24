@@ -8,7 +8,7 @@ use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Mapping\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**

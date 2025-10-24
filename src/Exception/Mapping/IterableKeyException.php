@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Mapping;
 
-use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\PathInterface;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>

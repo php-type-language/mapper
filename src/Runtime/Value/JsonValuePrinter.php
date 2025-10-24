@@ -139,7 +139,10 @@ final class JsonValuePrinter implements ValuePrinterInterface
             //
             // Such cases should be handled separately.
             $value === (float) (int) $value => \number_format($value, 1, '.', ''),
-            default => \sprintf('%g', $value),
+            default => \str_ends_with(
+                haystack: $formatted = \rtrim(\sprintf('%f', $value), '0'),
+                needle: '.',
+            ) ? $formatted . '0' : $formatted,
         };
     }
 

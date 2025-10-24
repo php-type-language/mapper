@@ -2,16 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime;
+namespace TypeLang\Mapper\Context;
 
 use JetBrains\PhpStorm\Language;
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Runtime\Context\ChildContext;
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
-use TypeLang\Mapper\Runtime\Path\PathInterface;
+use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;

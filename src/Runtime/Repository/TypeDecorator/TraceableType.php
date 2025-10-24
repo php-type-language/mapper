@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Runtime\Repository\TypeDecorator;
 
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 

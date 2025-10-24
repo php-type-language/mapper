@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Exception\Mapping\RuntimeException;
-use TypeLang\Mapper\Runtime\Context;
+use TypeLang\Mapper\Context\Context;
 
 /**
  * @template-covariant TResult of mixed = mixed

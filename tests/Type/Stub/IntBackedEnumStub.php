@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type\Stub;
 
-enum UnitEnum
+enum IntBackedEnumStub: int
 {
-    case Case1;
-    case Case2;
+    case ExampleCase = 0xDEAD_BEEF;
 }

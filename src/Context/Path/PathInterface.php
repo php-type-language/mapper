@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Runtime\Path;
+namespace TypeLang\Mapper\Context\Path;
 
-use TypeLang\Mapper\Runtime\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 
 /**
  * @template-extends \Traversable<array-key, EntryInterface>

@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type\ListType;
 
 use TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Runtime\Context;
-use TypeLang\Mapper\Runtime\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Type\MixedType;
 use TypeLang\Mapper\Type\TypeInterface;
 

@@ -10,7 +10,7 @@ use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
-use TypeLang\Mapper\Runtime\Context\Direction;
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 
 abstract class Platform implements PlatformInterface
