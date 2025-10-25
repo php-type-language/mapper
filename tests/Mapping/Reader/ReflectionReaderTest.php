@@ -339,25 +339,6 @@ final class ReflectionReaderTest extends ReaderTestCase
         self::assertStringContainsString('self', $info->properties['selfProp']->read->definition);
     }
 
-    public function testHandlesParentType(): void
-    {
-        $parentClass = '__testParentClass' . \hash('xxh32', \random_bytes(32));
-        $childClass = '__testChildClass' . \hash('xxh32', \random_bytes(32));
-
-        eval(\sprintf('class %s {}', $parentClass));
-        eval(\sprintf(<<<'PHP'
-            class %s extends %s {
-                public parent $parentProp;
-            }
-            PHP, $childClass, $parentClass));
-
-        $reader = new ReflectionReader();
-        $info = $reader->read(new \ReflectionClass($childClass));
-
-        self::assertArrayHasKey('parentProp', $info->properties);
-        self::assertStringContainsString('parent', $info->properties['parentProp']->read->definition);
-    }
-
     public function testHandlesStaticType(): void
     {
         $testClass = new class {

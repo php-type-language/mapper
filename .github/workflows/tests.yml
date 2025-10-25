@@ -37,5 +37,8 @@ jobs:
           timeout_minutes: 5
           max_attempts: 5
           command: composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
+      # PHPUnit is not compatible between PHP [ 8.1 ... 8.5 ]
+      - name: Upgrade PHPUnit
+        run: composer require phpunit/phpunit --dev
       - name: Execute Unit Tests
         run: composer test:unit
