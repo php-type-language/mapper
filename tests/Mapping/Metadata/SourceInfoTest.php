@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 
+#[Group('meta')]
 final class SourceInfoTest extends MetadataTestCase
 {
     public function testConstruct(): void

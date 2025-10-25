@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\StringType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
+#[Group('meta')]
 final class TypeMetadataTest extends MetadataTestCase
 {
     public function testConstruct(): void

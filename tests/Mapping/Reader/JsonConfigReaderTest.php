@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Reader;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Reader\JsonConfigReader;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\SampleClass;
 
+#[Group('reader')]
 final class JsonConfigReaderTest extends ReaderTestCase
 {
     public function testJsonConfigReaderLoadsJsonFile(): void
     {
         $reader = new JsonConfigReader($this->getConfigDirectory('JsonConfigReaderTest'));
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertArrayHasKey('name', $info->properties);
     }
@@ -20,7 +22,7 @@ final class JsonConfigReaderTest extends ReaderTestCase
     public function testReadsAllSectionsFromJson(): void
     {
         $reader = new JsonConfigReader($this->getConfigDirectory('JsonConfigReaderTestAll'));
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertTrue($info->isNormalizeAsArray);
 

@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\ParsedTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\RawTypeInfo;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
+#[Group('meta')]
 final class TypeInfoTest extends MetadataTestCase
 {
     public function testParsedTypeInfoConstructAndMixed(): void

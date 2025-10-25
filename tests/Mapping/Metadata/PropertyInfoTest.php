@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyInfo;
 use TypeLang\Mapper\Mapping\Metadata\ParsedTypeInfo;
 
+#[Group('meta')]
 final class PropertyInfoTest extends MetadataTestCase
 {
     public function testDefaults(): void

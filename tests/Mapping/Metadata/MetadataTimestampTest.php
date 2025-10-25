@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
 
+#[Group('meta')]
 final class MetadataTimestampTest extends MetadataTestCase
 {
     public function testTimestampIsSetByDefault(): void

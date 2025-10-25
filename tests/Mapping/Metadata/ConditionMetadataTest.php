@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
 
+#[Group('meta')]
 final class ConditionMetadataTest extends MetadataTestCase
 {
     public function testNullCondition(): void

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Reader;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhp;
-use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\Condition\EmptyConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\ExpressionConditionInfo;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionInfo;
@@ -31,6 +31,7 @@ use TypeLang\Mapper\Tests\Mapping\Reader\Stub\PropertyWithMapType;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\PropertyWithMultipleSkipConditions;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\PropertyWithoutAttributes;
 
+#[Group('reader')]
 final class AttributeReaderTest extends ReaderTestCase
 {
     public function testReadsNormalizeAsArrayAttribute(): void

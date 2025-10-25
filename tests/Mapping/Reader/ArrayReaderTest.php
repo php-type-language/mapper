@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Reader;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Reader\ArrayReader;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\SampleClass;
 
+#[Group('reader')]
 final class ArrayReaderTest extends ReaderTestCase
 {
     public function testLoadsNormalizeAsArrayAndType(): void
@@ -23,7 +25,7 @@ final class ArrayReaderTest extends ReaderTestCase
         ];
 
         $reader = new ArrayReader($config);
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertTrue($info->isNormalizeAsArray);
         self::assertSame('string', $info->properties['name']->read->definition);
@@ -46,7 +48,7 @@ final class ArrayReaderTest extends ReaderTestCase
         ];
 
         $reader = new ArrayReader($config);
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         $prop = $info->properties['name'];
         self::assertSame('label', $prop->alias);
@@ -72,7 +74,7 @@ final class ArrayReaderTest extends ReaderTestCase
         ];
 
         $reader = new ArrayReader($config);
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertCount(1, $info->properties['name']->skip);
         self::assertCount(2, $info->properties['age']->skip);
@@ -94,7 +96,7 @@ final class ArrayReaderTest extends ReaderTestCase
         ];
 
         $reader = new ArrayReader($config);
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertNotNull($info->discriminator);
         self::assertSame('kind', $info->discriminator?->field);
@@ -115,7 +117,7 @@ final class ArrayReaderTest extends ReaderTestCase
         ];
 
         $reader = new ArrayReader($config);
-        $info = $reader->read(new \ReflectionClass(SampleClass::class), $this->createTypeParser());
+        $info = $reader->read(new \ReflectionClass(SampleClass::class));
 
         self::assertNull($info->isNormalizeAsArray);
         self::assertNull($info->discriminator);

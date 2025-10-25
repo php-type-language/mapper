@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Reader;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use TypeLang\Mapper\Mapping\Reader\NullReader;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
@@ -11,6 +12,7 @@ use TypeLang\Mapper\Tests\Mapping\Reader\Stub\SampleClass;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\TypesClass;
 use TypeLang\Mapper\Tests\Mapping\Reader\Stub\TypesHooksClass;
 
+#[Group('reader')]
 final class ReflectionReaderTest extends ReaderTestCase
 {
     public function testReadsPublicPropertiesOnly(): void

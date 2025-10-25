@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Metadata;
 
+use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
@@ -12,6 +13,7 @@ use TypeLang\Mapper\Type\StringType;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
+#[Group('meta')]
 final class PropertyMetadataTest extends MetadataTestCase
 {
     public function testConstructAndFields(): void
