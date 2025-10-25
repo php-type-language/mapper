@@ -32,22 +32,22 @@ jobs:
           command: |
             cd bench
             composer update --prefer-dist --no-interaction --no-progress
-      - name: Normalization Benchmarks
+      - name: '[Bench] Normalization'
         continue-on-error: true
         run: |
           cd bench
           composer bench:normalize
-      - name: Denormalization Benchmarks
+      - name: '[Bench] Denormalization'
         continue-on-error: true
         run: |
           cd bench
-          composer bench:normalize
-      - name: Instantiation Benchmarks
+          composer bench:denormalize
+      - name: '[Bench] Instantiation'
         continue-on-error: true
         run: |
           cd bench
           composer bench:instantiate
-      - name: Type Extraction Benchmarks
+      - name: '[Bench] Type Extraction'
         continue-on-error: true
         run: |
           cd bench
