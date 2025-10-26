@@ -6,12 +6,12 @@ namespace TypeLang\Mapper\Exception\Value;
 
 use Symfony\Component\VarDumper\Caster\ReflectionCaster;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
-use Symfony\Component\VarDumper\Cloner\Data;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 use Symfony\Component\VarDumper\Dumper\AbstractDumper;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
+use TypeLang\Mapper\Exception\Value\SymfonyValuePrinter\SimplifiedCliDumper;
 
 final class SymfonyValuePrinter implements ValuePrinterInterface
 {
@@ -31,21 +31,7 @@ final class SymfonyValuePrinter implements ValuePrinterInterface
 
     private function createDefaultDataDumper(): CliDumper
     {
-        $dumper = new class extends CliDumper {
-            public function dump(Data $data, $output = null): ?string
-            {
-                $result = parent::dump($data, $output);
-
-                if ($result !== null) {
-                    return \rtrim($result, "\n");
-                }
-
-                return null;
-            }
-        };
-        $dumper->setColors(false);
-
-        return $dumper;
+        return new SimplifiedCliDumper();
     }
 
     private function createDefaultVarCloner(): VarCloner
