@@ -77,7 +77,7 @@ class ClassTypeToArrayType implements TypeInterface
             $entrance = $context->enter(
                 value: $object,
                 entry: new ObjectPropertyEntry($meta->name),
-                strictTypes: $meta->read->strict,
+                override: $context->config->withStrictTypes($meta->read->strict),
             );
 
             // Skip the property when not readable

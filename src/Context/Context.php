@@ -14,29 +14,30 @@ use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
+/**
+ * @template-implements \IteratorAggregate<array-key, Context>
+ */
 abstract class Context implements
     TypeExtractorInterface,
     TypeParserInterface,
-    TypeRepositoryInterface
+    TypeRepositoryInterface,
+    \IteratorAggregate,
+    \Countable
 {
     protected function __construct(
-        protected readonly mixed $value,
-        protected readonly Direction $direction,
-        protected readonly Configuration $config,
-        protected readonly TypeExtractorInterface $extractor,
-        protected readonly TypeParserInterface $parser,
-        protected readonly TypeRepositoryInterface $types,
+        public readonly mixed $value,
+        public readonly Direction $direction,
+        public readonly Configuration $config,
+        public readonly TypeExtractorInterface $extractor,
+        public readonly TypeParserInterface $parser,
+        public readonly TypeRepositoryInterface $types,
     ) {}
 
     /**
      * Creates new child context.
      */
-    public function enter(
-        mixed $value,
-        EntryInterface $entry,
-        ?bool $strictTypes = null,
-        ?bool $objectAsArray = null,
-    ): self {
+    public function enter(mixed $value, EntryInterface $entry, ?Configuration $override = null): self
+    {
         return new ChildContext(
             parent: $this,
             entry: $entry,
@@ -46,14 +47,8 @@ abstract class Context implements
             extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
-            overrideStrictTypes: $strictTypes,
-            overrideObjectAsArray: $objectAsArray,
+            override: $override,
         );
-    }
-
-    public function getValue(): mixed
-    {
-        return $this->value;
     }
 
     public function isObjectAsArray(): bool
@@ -127,7 +122,15 @@ abstract class Context implements
     public function getTypeByValue(mixed $value): TypeInterface
     {
         return $this->types->getTypeByStatement(
-            statement: $this->getStatementByValue($value)
+            statement: $this->getStatementByValue($value),
         );
+    }
+
+    /**
+     * @return int<1, max>
+     */
+    public function count(): int
+    {
+        return \iterator_count($this);
     }
 }

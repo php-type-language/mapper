@@ -71,4 +71,9 @@ final class RootContext extends Context
     {
         return $this->path ??= new Path();
     }
+
+    public function getIterator(): \Traversable
+    {
+        yield $this;
+    }
 }

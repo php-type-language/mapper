@@ -16,15 +16,14 @@ final class ChildContext extends Context
 {
     protected function __construct(
         public readonly Context $parent,
-        private readonly EntryInterface $entry,
+        public readonly EntryInterface $entry,
         mixed $value,
         Direction $direction,
         Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
-        private readonly ?bool $overrideStrictTypes = null,
-        private readonly ?bool $overrideObjectAsArray = null,
+        public readonly ?Configuration $override = null,
     ) {
         parent::__construct(
             value: $value,
@@ -39,31 +38,18 @@ final class ChildContext extends Context
     #[\Override]
     public function isStrictTypesEnabled(): bool
     {
-        return $this->overrideStrictTypes
+        return $this->override?->isStrictTypesEnabled()
             ?? parent::isStrictTypesEnabled();
     }
 
     #[\Override]
     public function isObjectAsArray(): bool
     {
-        return $this->overrideObjectAsArray
+        return $this->override?->isObjectAsArray()
             ?? parent::isObjectAsArray();
     }
 
-    /**
-     * Gets parent context
-     *
-     * @api
-     */
-    public function getParent(): Context
-    {
-        return $this->parent;
-    }
-
-    /**
-     * @return iterable<array-key, Context>
-     */
-    private function getStack(): iterable
+    public function getIterator(): \Traversable
     {
         yield $current = $this;
 
@@ -76,7 +62,7 @@ final class ChildContext extends Context
     {
         $entries = [];
 
-        foreach ($this->getStack() as $context) {
+        foreach ($this as $context) {
             if ($context instanceof self) {
                 $entries[] = $context->entry;
             }
