@@ -41,14 +41,29 @@ class StandardPlatform extends Platform
 
         // Adds support for the "string" type
         yield new Builder\SimpleTypeBuilder(['string', \Stringable::class], Type\StringType::class);
+        if ($direction === Direction::Normalize) {
+            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\StringType::class);
+            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\StringType::class);
+        } else {
+            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\LowercaseString::class);
+            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\UppercaseString::class);
+        }
 
         // Adds support for the "int" type
         yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
-        yield new Builder\PositiveIntBuilder('positive-int');
-        yield new Builder\NonPositiveIntBuilder('non-positive-int');
-        yield new Builder\NegativeIntBuilder('negative-int');
-        yield new Builder\NonNegativeIntBuilder('non-negative-int');
-        yield new Builder\NonZeroIntBuilder('non-zero-int');
+        if ($direction === Direction::Normalize) {
+            yield new Builder\SimpleTypeBuilder('positive-int', Type\IntType::class);
+            yield new Builder\SimpleTypeBuilder('non-positive-int', Type\IntType::class);
+            yield new Builder\SimpleTypeBuilder('negative-int', Type\IntType::class);
+            yield new Builder\SimpleTypeBuilder('non-negative-int', Type\IntType::class);
+            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\IntType::class);
+        } else {
+            yield new Builder\PositiveIntBuilder('positive-int');
+            yield new Builder\NonPositiveIntBuilder('non-positive-int');
+            yield new Builder\NegativeIntBuilder('negative-int');
+            yield new Builder\NonNegativeIntBuilder('non-negative-int');
+            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\NonZeroIntType::class);
+        }
 
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);

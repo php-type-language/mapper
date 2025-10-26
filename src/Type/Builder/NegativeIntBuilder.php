@@ -13,7 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-extends NamedTypeBuilder<IntRangeType>
  */
-final class NegativeIntBuilder extends NamedTypeBuilder
+class NegativeIntBuilder extends NamedTypeBuilder
 {
     public function build(
         TypeStatement $statement,

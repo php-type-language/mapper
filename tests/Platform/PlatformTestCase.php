@@ -20,6 +20,7 @@ use TypeLang\Parser\Exception\ParseException;
 
 abstract class PlatformTestCase extends TestCase
 {
+    // v2.1
     protected const TYPES_PHPSTAN = [
         'int',
         'integer',
@@ -30,6 +31,7 @@ abstract class PlatformTestCase extends TestCase
         'non-zero-int',
         'string',
         'lowercase-string',
+        'uppercase-string',
         'literal-string',
         'class-string',
         'interface-string',
@@ -45,6 +47,7 @@ abstract class PlatformTestCase extends TestCase
         'numeric-string',
         'non-empty-string',
         'non-empty-lowercase-string',
+        'non-empty-uppercase-string',
         'truthy-string',
         'non-falsy-string',
         'non-empty-literal-string',
