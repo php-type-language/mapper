@@ -11,7 +11,6 @@ use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
@@ -42,7 +41,7 @@ abstract class TestCase extends BaseTestCase
         ]);
     }
 
-    protected function createConfiguration(bool $strictTypes = true): ConfigurationInterface
+    protected function createConfiguration(bool $strictTypes = true): Configuration
     {
         return new Configuration(
             isStrictTypes: $strictTypes,

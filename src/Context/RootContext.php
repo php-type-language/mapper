@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Context;
 use TypeLang\Mapper\Context\Path\Path;
 use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\ConfigurationInterface;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
@@ -22,19 +21,17 @@ final class RootContext extends Context
 
     public static function forNormalization(
         mixed $value,
-        ConfigurationInterface $config,
+        Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
-        if ($config instanceof Configuration) {
-            // Disable strict-types for normalization if option is not set
-            if (!$config->isStrictTypesOptionDefined()) {
-                $config = $config->withStrictTypes(false);
-            }
-
-            // ...
+        // Disable strict-types for normalization if option is not set
+        if (!$config->isStrictTypesOptionDefined()) {
+            $config = $config->withStrictTypes(false);
         }
+
+        // ...
 
         return new self(
             value: $value,
@@ -48,19 +45,17 @@ final class RootContext extends Context
 
     public static function forDenormalization(
         mixed $value,
-        ConfigurationInterface $config,
+        Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
-        if ($config instanceof Configuration) {
-            // Enable strict-types for denormalization if option is not set
-            if (!$config->isStrictTypesOptionDefined()) {
-                $config = $config->withStrictTypes(true);
-            }
-
-            // ...
+        // Enable strict-types for denormalization if option is not set
+        if (!$config->isStrictTypesOptionDefined()) {
+            $config = $config->withStrictTypes(true);
         }
+
+        // ...
 
         return new self(
             value: $value,

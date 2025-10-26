@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Context;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Context\Path\Path;
 use TypeLang\Mapper\Context\Path\PathInterface;
-use TypeLang\Mapper\Runtime\ConfigurationInterface;
+use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
@@ -19,7 +19,7 @@ final class ChildContext extends Context
         private readonly EntryInterface $entry,
         mixed $value,
         Direction $direction,
-        ConfigurationInterface $config,
+        Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,

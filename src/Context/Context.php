@@ -5,19 +5,16 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context;
 
 use JetBrains\PhpStorm\Language;
-use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Context\Path\PathInterface;
-use TypeLang\Mapper\Runtime\ConfigurationInterface;
+use TypeLang\Mapper\Runtime\Configuration;
 use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
 use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
-use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 abstract class Context implements
-    ConfigurationInterface,
     TypeExtractorInterface,
     TypeParserInterface,
     TypeRepositoryInterface
@@ -25,7 +22,7 @@ abstract class Context implements
     protected function __construct(
         protected readonly mixed $value,
         protected readonly Direction $direction,
-        protected readonly ConfigurationInterface $config,
+        protected readonly Configuration $config,
         protected readonly TypeExtractorInterface $extractor,
         protected readonly TypeParserInterface $parser,
         protected readonly TypeRepositoryInterface $types,
@@ -67,16 +64,6 @@ abstract class Context implements
     public function isStrictTypesEnabled(): bool
     {
         return $this->config->isStrictTypesEnabled();
-    }
-
-    public function findLogger(): ?LoggerInterface
-    {
-        return $this->config->findLogger();
-    }
-
-    public function findTracer(): ?TracerInterface
-    {
-        return $this->config->findTracer();
     }
 
     /**

@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Runtime;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Runtime\Tracing\TracerInterface;
 
-final class Configuration implements ConfigurationInterface
+final class Configuration
 {
     /**
      * Default value for {@see $isObjectsAsArrays} option.
@@ -65,9 +65,16 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
+    /**
+     * Specifies the default normalization settings for the object.
+     *
+     * In case of the method returns {@see true}, the object will be converted
+     * to an associative array (hash map) unless otherwise specified.
+     */
     public function isObjectAsArray(): bool
     {
-        return $this->isObjectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+        return $this->isObjectsAsArrays
+            ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
 
     /**
@@ -97,9 +104,17 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
+    /**
+     * In case of method returns {@see true}, all types will be checked
+     * for compliance.
+     *
+     * Otherwise, the value will attempt to be converted to the
+     * required type if possible.
+     */
     public function isStrictTypesEnabled(): bool
     {
-        return $this->isStrictTypes ?? self::STRICT_TYPES_DEFAULT_VALUE;
+        return $this->isStrictTypes
+            ?? self::STRICT_TYPES_DEFAULT_VALUE;
     }
 
     /**
@@ -128,6 +143,10 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
+    /**
+     * If this method returns {@see LoggerInterface}, then the given logger
+     * will be enabled. Otherwise logger should be disabled.
+     */
     public function findLogger(): ?LoggerInterface
     {
         return $this->logger;
@@ -150,6 +169,10 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
+    /**
+     * If this method returns {@see TracerInterface}, then the application
+     * tracing will be enabled. Otherwise tracing should be disabled.
+     */
     public function findTracer(): ?TracerInterface
     {
         return $this->tracer;
