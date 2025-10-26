@@ -48,6 +48,7 @@ class StandardPlatform extends Platform
         yield new Builder\NonPositiveIntBuilder('non-positive-int');
         yield new Builder\NegativeIntBuilder('negative-int');
         yield new Builder\NonNegativeIntBuilder('non-negative-int');
+        yield new Builder\NonZeroIntBuilder('non-zero-int');
 
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
