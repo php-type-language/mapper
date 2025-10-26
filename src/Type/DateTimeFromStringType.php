@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\DateTimeType;
+namespace TypeLang\Mapper\Type;
 
+use DateTime as TDateTime;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable

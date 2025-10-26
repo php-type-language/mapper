@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\DateTimeType\DateTimeFromStringType;
+use TypeLang\Mapper\Type\DateTimeFromStringType;
 
 /**
  * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable

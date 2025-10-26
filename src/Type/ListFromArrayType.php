@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ListType;
+namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;

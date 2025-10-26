@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Mapper\Type\UnitEnumType\UnitEnumToStringType;
+use TypeLang\Mapper\Type\UnitEnumToStringType;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum

@@ -2,14 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ListType;
+namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\MixedType;
-use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template-covariant TItem of mixed = mixed

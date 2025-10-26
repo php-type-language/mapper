@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ClassType;
+namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
@@ -12,7 +12,6 @@ use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
-use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object

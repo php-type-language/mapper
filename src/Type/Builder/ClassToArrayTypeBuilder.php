@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Type\ClassType\ClassTypeToArrayType;
+use TypeLang\Mapper\Type\ClassTypeToArrayType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\ObjectType\ObjectTypeToArrayType;
+use TypeLang\Mapper\Type\ObjectTypeToArrayType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 class ObjectToArrayTypeBuilder extends ObjectTypeBuilder

@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type\ObjectType;
+namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
-use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template-implements TypeInterface<object|array<array-key, mixed>>

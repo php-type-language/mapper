@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\BackedEnumType\BackedEnumToScalarType;
+use TypeLang\Mapper\Type\BackedEnumToScalarType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
