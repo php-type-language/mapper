@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-final class NormalizeAsArray
+class NormalizeAsArray
 {
     public function __construct(
         /**
