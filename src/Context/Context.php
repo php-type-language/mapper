@@ -131,6 +131,6 @@ abstract class Context implements
      */
     public function count(): int
     {
-        return \iterator_count($this);
+        return \max(1, \iterator_count($this));
     }
 }
