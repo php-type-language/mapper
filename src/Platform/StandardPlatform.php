@@ -44,6 +44,10 @@ class StandardPlatform extends Platform
 
         // Adds support for the "int" type
         yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
+        yield new Builder\PositiveIntBuilder('positive-int');
+        yield new Builder\NonPositiveIntBuilder('non-positive-int');
+        yield new Builder\NegativeIntBuilder('negative-int');
+        yield new Builder\NonNegativeIntBuilder('non-negative-int');
 
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);

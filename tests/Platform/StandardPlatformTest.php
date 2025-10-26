@@ -42,6 +42,10 @@ final class StandardPlatformTest extends PlatformTestCase
         'array-key',
         'numeric-string',
         'non-empty-string',
+        'positive-int',
+        'non-positive-int',
+        'negative-int',
+        'non-negative-int',
         // composite
         '?int',
         'int|false',
