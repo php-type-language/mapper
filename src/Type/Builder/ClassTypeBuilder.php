@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Instantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Instantiator\DoctrineClassInstantiator;
+use TypeLang\Mapper\Instantiator\ReflectionClassInstantiator;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
-use TypeLang\Mapper\Runtime\ClassInstantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Runtime\ClassInstantiator\DoctrineClassInstantiator;
-use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
-use TypeLang\Mapper\Runtime\PropertyAccessor\ReflectionPropertyAccessor;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\PropertyAccessor\ReflectionPropertyAccessor;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

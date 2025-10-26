@@ -7,11 +7,11 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Exception\Mapping\FinalExceptionInterface;
-use TypeLang\Mapper\Exception\Mapping\InvalidObjectValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueOfTypeException;
+use TypeLang\Mapper\Exception\Runtime\FinalExceptionInterface;
+use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Runtime\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
 
 /**
  * @template TObject of object = object

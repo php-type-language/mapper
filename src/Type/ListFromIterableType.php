@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Exception\Mapping\InvalidIterableValueException;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-covariant TItem of mixed = mixed

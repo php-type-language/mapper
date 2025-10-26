@@ -5,17 +5,16 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Platform;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleClassStub;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleInterfaceStub;
 use TypeLang\Mapper\Tests\Platform\Stub\IntBackedEnumStub;
 use TypeLang\Mapper\Tests\Platform\Stub\StringBackedEnumStub;
 use TypeLang\Mapper\Tests\Platform\Stub\UnitEnumStub;
 use TypeLang\Mapper\Tests\TestCase;
+use TypeLang\Mapper\Type\Repository\TypeRepository;
 use TypeLang\Parser\Exception\ParseException;
 
 abstract class PlatformTestCase extends TestCase

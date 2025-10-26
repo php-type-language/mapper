@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Coercer;
 
 use TypeLang\Mapper\Context\Context;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-implements TypeCoercerInterface<float>

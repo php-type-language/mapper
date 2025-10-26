@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context;
 
 use JetBrains\PhpStorm\Language;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Context\Path\PathInterface;
-use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

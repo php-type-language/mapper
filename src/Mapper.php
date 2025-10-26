@@ -10,16 +10,15 @@ use TypeLang\Mapper\Context\RootContext;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Extractor\Factory\DefaultTypeExtractorFactory;
-use TypeLang\Mapper\Runtime\Extractor\Factory\TypeExtractorFactoryInterface;
-use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Runtime\Parser\Factory\DefaultTypeParserFactory;
-use TypeLang\Mapper\Runtime\Parser\Factory\TypeParserFactoryInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\Factory\DefaultTypeRepositoryFactory;
-use TypeLang\Mapper\Runtime\Repository\Factory\TypeRepositoryFactoryInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Extractor\Factory\DefaultTypeExtractorFactory;
+use TypeLang\Mapper\Type\Extractor\Factory\TypeExtractorFactoryInterface;
+use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Type\Parser\Factory\DefaultTypeParserFactory;
+use TypeLang\Mapper\Type\Parser\Factory\TypeParserFactoryInterface;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\Factory\DefaultTypeRepositoryFactory;
+use TypeLang\Mapper\Type\Repository\Factory\TypeRepositoryFactoryInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface

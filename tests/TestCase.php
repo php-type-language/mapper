@@ -5,18 +5,18 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\RootContext;
-use TypeLang\Mapper\Exception\Mapping\InvalidValueException;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Runtime\Configuration;
-use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
-use TypeLang\Mapper\Runtime\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeLangParser;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepository;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
+use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Type\Parser\TypeLangParser;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepository;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 abstract class TestCase extends BaseTestCase
 {

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
-use TypeLang\Mapper\Exception\Mapping\RuntimeException;
+use TypeLang\Mapper\Exception\Runtime\RuntimeException;
 
 interface DenormalizerInterface
 {

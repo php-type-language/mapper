@@ -9,7 +9,7 @@ use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
-use TypeLang\Mapper\Runtime\ClassInstantiator\ReflectionClassInstantiator;
+use TypeLang\Mapper\Instantiator\ReflectionClassInstantiator;
 
 #[Revs(50), Warmup(5), Iterations(20), BeforeMethods('prepare')]
 final class ReflectionInstantiatorBench extends InstantiatorBenchmark

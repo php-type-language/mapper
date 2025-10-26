@@ -8,7 +8,7 @@ use PhpBench\Attributes\BeforeMethods;
 use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
-use TypeLang\Mapper\Runtime\Extractor\NativeTypeExtractor;
+use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
 
 #[Revs(50), Warmup(5), Iterations(20), BeforeMethods('prepare')]
 final class NativeExtractorBench extends ExtractorBenchmark

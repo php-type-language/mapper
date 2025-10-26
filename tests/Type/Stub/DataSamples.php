@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type\Stub;
 
-use TypeLang\Mapper\Runtime\Value\JsonLikeValuePrinter;
+use TypeLang\Mapper\Exception\Value\JsonLikeValuePrinter;
 
 /**
  * @internal this is an internal library class, please do not use it in your code

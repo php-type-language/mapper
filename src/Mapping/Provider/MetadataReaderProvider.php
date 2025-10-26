@@ -35,8 +35,8 @@ use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class MetadataReaderProvider implements ProviderInterface
 {

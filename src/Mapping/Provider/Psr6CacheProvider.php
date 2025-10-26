@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Mapping\Provider;
 use Psr\Cache\CacheItemPoolInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
-use TypeLang\Mapper\Runtime\Parser\TypeParserInterface;
-use TypeLang\Mapper\Runtime\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class Psr6CacheProvider extends CacheProvider
 {
