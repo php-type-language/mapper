@@ -25,27 +25,32 @@ abstract class Context implements
     protected function __construct(
         protected readonly mixed $value,
         protected readonly Direction $direction,
+        protected readonly ConfigurationInterface $config,
         protected readonly TypeExtractorInterface $extractor,
         protected readonly TypeParserInterface $parser,
         protected readonly TypeRepositoryInterface $types,
-        protected readonly ConfigurationInterface $config,
     ) {}
 
     /**
      * Creates new child context.
      */
-    public function enter(mixed $value, EntryInterface $entry, ?bool $isStrictTypes = null): self
-    {
+    public function enter(
+        mixed $value,
+        EntryInterface $entry,
+        ?bool $strictTypes = null,
+        ?bool $objectAsArray = null,
+    ): self {
         return new ChildContext(
             parent: $this,
             entry: $entry,
             value: $value,
             direction: $this->direction,
+            config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
-            config: $this->config,
-            isStrictTypes: $isStrictTypes,
+            overrideStrictTypes: $strictTypes,
+            overrideObjectAsArray: $objectAsArray,
         );
     }
 
@@ -54,9 +59,9 @@ abstract class Context implements
         return $this->value;
     }
 
-    public function isObjectsAsArrays(): bool
+    public function isObjectAsArray(): bool
     {
-        return $this->config->isObjectsAsArrays();
+        return $this->config->isObjectAsArray();
     }
 
     public function isStrictTypesEnabled(): bool
@@ -64,14 +69,14 @@ abstract class Context implements
         return $this->config->isStrictTypesEnabled();
     }
 
-    public function getLogger(): ?LoggerInterface
+    public function findLogger(): ?LoggerInterface
     {
-        return $this->config->getLogger();
+        return $this->config->findLogger();
     }
 
-    public function getTracer(): ?TracerInterface
+    public function findTracer(): ?TracerInterface
     {
-        return $this->config->getTracer();
+        return $this->config->findTracer();
     }
 
     /**

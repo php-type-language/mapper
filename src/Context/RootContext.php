@@ -39,10 +39,10 @@ final class RootContext extends Context
         return new self(
             value: $value,
             direction: Direction::Normalize,
+            config: $config,
             extractor: $extractor,
             parser: $parser,
             types: $types,
-            config: $config,
         );
     }
 
@@ -65,10 +65,10 @@ final class RootContext extends Context
         return new self(
             value: $value,
             direction: Direction::Denormalize,
+            config: $config,
             extractor: $extractor,
             parser: $parser,
             types: $types,
-            config: $config,
         );
     }
 

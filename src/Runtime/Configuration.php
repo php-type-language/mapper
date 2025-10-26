@@ -65,7 +65,7 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
-    public function isObjectsAsArrays(): bool
+    public function isObjectAsArray(): bool
     {
         return $this->isObjectsAsArrays ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
     }
@@ -128,7 +128,7 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
-    public function getLogger(): ?LoggerInterface
+    public function findLogger(): ?LoggerInterface
     {
         return $this->logger;
     }
@@ -150,7 +150,7 @@ final class Configuration implements ConfigurationInterface
         );
     }
 
-    public function getTracer(): ?TracerInterface
+    public function findTracer(): ?TracerInterface
     {
         return $this->tracer;
     }

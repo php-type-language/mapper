@@ -28,7 +28,7 @@ final class ObjectTypeToArrayType implements TypeInterface
 
         $result = \get_object_vars($value);
 
-        if ($context->isObjectsAsArrays()) {
+        if ($context->isObjectAsArray()) {
             return $result;
         }
 

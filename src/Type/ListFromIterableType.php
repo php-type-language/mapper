@@ -58,7 +58,7 @@ class ListFromIterableType implements TypeInterface
             $entrance = $context->enter(
                 value: $item,
                 entry: new ArrayIndexEntry($index),
-                isStrictTypes: $context->isStrictTypesEnabled(),
+                strictTypes: $context->isStrictTypesEnabled(),
             );
 
             try {

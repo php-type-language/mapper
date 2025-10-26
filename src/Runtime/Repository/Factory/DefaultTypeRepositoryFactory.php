@@ -46,7 +46,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
 
     private function withTracing(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface
     {
-        $tracer = $config->getTracer();
+        $tracer = $config->findTracer();
 
         if ($tracer === null) {
             return $types;
@@ -57,7 +57,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
 
     private function withLogging(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface
     {
-        $logger = $config->getLogger();
+        $logger = $config->findLogger();
 
         if ($logger === null) {
             return $types;

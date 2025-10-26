@@ -121,7 +121,7 @@ class ClassTypeFromArrayType implements TypeInterface
             $entrance = $context->enter(
                 value: $value,
                 entry: new ObjectPropertyEntry($meta->alias),
-                isStrictTypes: $meta->write->strict,
+                strictTypes: $meta->write->strict,
             );
 
             // Skip the property when not writable

@@ -57,7 +57,7 @@ class ClassTypeToArrayType implements TypeInterface
 
         $result = $this->normalizeObject($value, $entrance);
 
-        if ($this->metadata->isNormalizeAsArray ?? $context->isObjectsAsArrays()) {
+        if ($this->metadata->isNormalizeAsArray ?? $context->isObjectAsArray()) {
             return $result;
         }
 
@@ -77,7 +77,7 @@ class ClassTypeToArrayType implements TypeInterface
             $entrance = $context->enter(
                 value: $object,
                 entry: new ObjectPropertyEntry($meta->name),
-                isStrictTypes: $meta->read->strict,
+                strictTypes: $meta->read->strict,
             );
 
             // Skip the property when not readable

@@ -35,7 +35,7 @@ final class DefaultTypeParserFactory implements TypeParserFactoryInterface
 
     private function withTracing(Configuration $config, TypeParserInterface $parser): TypeParserInterface
     {
-        $tracer = $config->getTracer();
+        $tracer = $config->findTracer();
 
         if ($tracer === null) {
             return $parser;
@@ -46,7 +46,7 @@ final class DefaultTypeParserFactory implements TypeParserFactoryInterface
 
     private function withLogging(Configuration $config, TypeParserInterface $parser): TypeParserInterface
     {
-        $logger = $config->getLogger();
+        $logger = $config->findLogger();
 
         if ($logger === null) {
             return $parser;

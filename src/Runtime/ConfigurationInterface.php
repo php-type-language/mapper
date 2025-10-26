@@ -15,7 +15,7 @@ interface ConfigurationInterface
      * In case of the method returns {@see true}, the object will be converted
      * to an associative array (hash map) unless otherwise specified.
      */
-    public function isObjectsAsArrays(): bool;
+    public function isObjectAsArray(): bool;
 
     /**
      * In case of method returns {@see true}, all types will be checked
@@ -30,11 +30,11 @@ interface ConfigurationInterface
      * If this method returns {@see LoggerInterface}, then the given logger
      * will be enabled. Otherwise logger should be disabled.
      */
-    public function getLogger(): ?LoggerInterface;
+    public function findLogger(): ?LoggerInterface;
 
     /**
      * If this method returns {@see TracerInterface}, then the application
      * tracing will be enabled. Otherwise tracing should be disabled.
      */
-    public function getTracer(): ?TracerInterface;
+    public function findTracer(): ?TracerInterface;
 }

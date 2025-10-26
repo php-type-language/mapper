@@ -19,30 +19,40 @@ final class ChildContext extends Context
         private readonly EntryInterface $entry,
         mixed $value,
         Direction $direction,
+        ConfigurationInterface $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
-        ConfigurationInterface $config,
-        private readonly ?bool $isStrictTypes = null,
+        private readonly ?bool $overrideStrictTypes = null,
+        private readonly ?bool $overrideObjectAsArray = null,
     ) {
         parent::__construct(
             value: $value,
             direction: $direction,
+            config: $config,
             extractor: $extractor,
             parser: $parser,
             types: $types,
-            config: $config,
         );
     }
 
     #[\Override]
     public function isStrictTypesEnabled(): bool
     {
-        return $this->isStrictTypes
-            ?? $this->config->isStrictTypesEnabled();
+        return $this->overrideStrictTypes
+            ?? parent::isStrictTypesEnabled();
+    }
+
+    #[\Override]
+    public function isObjectAsArray(): bool
+    {
+        return $this->overrideObjectAsArray
+            ?? parent::isObjectAsArray();
     }
 
     /**
+     * Gets parent context
+     *
      * @api
      */
     public function getParent(): Context
