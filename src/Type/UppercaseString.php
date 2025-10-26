@@ -35,11 +35,11 @@ class UppercaseString implements TypeInterface
             return true;
         }
 
-        if (\function_exists('\\ctype_upper')) {
-            return \ctype_upper($value);
+        if (\function_exists('\\ctype_lower')) {
+            return !\ctype_lower($value);
         }
 
-        return !\preg_match('/[^A-Z]/', $value);
+        return \preg_match('/[a-z]/', $value) <= 0;
     }
 
     public function cast(mixed $value, Context $context): string

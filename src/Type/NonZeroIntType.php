@@ -37,7 +37,7 @@ class NonZeroIntType implements TypeInterface
             $coerced = $this->coercer->coerce($value, $context);
         }
 
-        if (\is_int($value) && $value !== 0) {
+        if (\is_int($coerced) && $coerced !== 0) {
             return $coerced;
         }
 
