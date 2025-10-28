@@ -38,6 +38,10 @@ class ClassTypeToArrayType implements TypeInterface
     {
         $className = $this->metadata->name;
 
+        /**
+         * Do not allow non-compatible types: The `$value` instance
+         * must be compatible with declared type.
+         */
         if (!$value instanceof $className) {
             throw InvalidValueOfTypeException::createFromContext(
                 expected: $this->metadata->getTypeStatement($context, read: true),
@@ -46,16 +50,36 @@ class ClassTypeToArrayType implements TypeInterface
             );
         }
 
-        // Subtype normalization
+        /**
+         * Force subtype normalization in case of:
+         *
+         * ```php
+         * public AbstractClass $obj = new ClassImpl();
+         * ```
+         *
+         * Then the `$className` will contain `AbstractClass`,
+         * and `$value::class` will contain `ClassImpl`.
+         */
         if ($value::class !== $className) {
-            /** @var object|array<array-key, mixed> */
-            return $context->getTypeByValue($value)
-                ->cast($value, $context);
+            $type = $context->getTypeByValue($value);
+
+            /**
+             * Most likely, the `$type` will return the same result as the
+             * current type.
+             *
+             * However, this is not guaranteed.
+             *
+             * @var object|array<array-key, mixed>
+             */
+            return $type->cast($value, $context);
         }
 
-        $entrance = $context->enter($value, new ObjectEntry($this->metadata->name));
+        $entrance = $context->enter(
+            value: $value,
+            entry: new ObjectEntry($this->metadata->name),
+        );
 
-        $result = $this->normalizeObject($value, $entrance);
+        $result = $this->normalize($value, $entrance);
 
         if ($this->metadata->isNormalizeAsArray ?? $context->isObjectAsArray()) {
             return $result;
@@ -69,7 +93,7 @@ class ClassTypeToArrayType implements TypeInterface
      * @throws InvalidObjectValueException in case the value of a certain field is incorrect
      * @throws \Throwable in case of internal error occurs
      */
-    protected function normalizeObject(object $object, Context $context): array
+    protected function normalize(object $object, Context $context): array
     {
         $result = [];
 
