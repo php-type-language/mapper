@@ -31,6 +31,11 @@ final class RootContext extends Context
             $config = $config->withStrictTypes(false);
         }
 
+        // Disable specifiers for normalization if option is not set
+        if (!$config->isTypeSpecifierOptionDefined()) {
+            $config = $config->withTypeSpecifiers(false);
+        }
+
         // ...
 
         return new self(
@@ -53,6 +58,11 @@ final class RootContext extends Context
         // Enable strict-types for denormalization if option is not set
         if (!$config->isStrictTypesOptionDefined()) {
             $config = $config->withStrictTypes(true);
+        }
+
+        // Enable specifiers for denormalization if option is not set
+        if (!$config->isTypeSpecifierOptionDefined()) {
+            $config = $config->withTypeSpecifiers(true);
         }
 
         // ...

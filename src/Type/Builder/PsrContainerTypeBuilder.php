@@ -31,15 +31,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class PsrContainerTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-array<non-empty-string>|non-empty-string $name
      * @param class-string<TypeInterface> $serviceId
      */
     public function __construct(
-        array|string $names,
+        array|string $name,
         protected readonly string $serviceId,
         protected readonly ContainerInterface $container,
     ) {
-        parent::__construct($names);
+        parent::__construct($name);
     }
 
     public function build(

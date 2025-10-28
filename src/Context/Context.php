@@ -61,6 +61,11 @@ abstract class Context implements
         return $this->config->isStrictTypesEnabled();
     }
 
+    public function isTypeSpecifiersEnabled(): bool
+    {
+        return $this->config->isTypeSpecifiersEnabled();
+    }
+
     /**
      * @api
      */

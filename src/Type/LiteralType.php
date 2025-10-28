@@ -6,31 +6,35 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
- * @template-implements TypeInterface<string>
+ * @template T of mixed = mixed
+ *
+ * @template-implements TypeInterface<T>
  */
-class StringLiteralType implements TypeInterface
+class LiteralType implements TypeInterface
 {
     public function __construct(
-        protected readonly string $value,
         /**
-         * @var TypeCoercerInterface<string>
+         * @var T
          */
-        protected readonly TypeCoercerInterface $coercer = new StringTypeCoercer(),
+        protected readonly mixed $value,
+        /**
+         * @var TypeCoercerInterface<T>
+         */
+        protected readonly TypeCoercerInterface $coercer,
     ) {}
 
     /**
-     * @phpstan-assert-if-true string $value
+     * @phpstan-assert-if-true T $value
      */
     public function match(mixed $value, Context $context): bool
     {
         return $value === $this->value;
     }
 
-    public function cast(mixed $value, Context $context): string
+    public function cast(mixed $value, Context $context): mixed
     {
         // Fast return in case of value if not castable
         if ($value === $this->value) {

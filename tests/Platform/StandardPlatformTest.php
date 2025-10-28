@@ -48,7 +48,9 @@ final class StandardPlatformTest extends PlatformTestCase
         'non-negative-int',
         'non-zero-int',
         'lowercase-string',
+        'non-empty-lowercase-string',
         'uppercase-string',
+        'non-empty-uppercase-string',
         // composite
         '?int',
         'int|false',

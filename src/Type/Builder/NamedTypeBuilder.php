@@ -11,6 +11,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template-covariant TType of TypeInterface = TypeInterface<mixed>
+ *
  * @template-extends Builder<NamedTypeNode, TType>
  */
 abstract class NamedTypeBuilder extends Builder
@@ -21,11 +22,11 @@ abstract class NamedTypeBuilder extends Builder
     protected readonly array $lower;
 
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-array<non-empty-string>|non-empty-string $name
      */
-    public function __construct(array|string $names)
+    public function __construct(array|string $name)
     {
-        $this->lower = $this->formatNames($names);
+        $this->lower = $this->formatNames($name);
     }
 
     /**

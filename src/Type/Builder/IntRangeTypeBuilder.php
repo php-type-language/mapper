@@ -8,10 +8,16 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
-use TypeLang\Mapper\Type\IntRangeType;
+use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\Specifier\AllOfSpecifier;
+use TypeLang\Mapper\Type\Specifier\IntGreaterThanOrEqualSpecifier;
+use TypeLang\Mapper\Type\Specifier\IntRangeSpecifier;
+use TypeLang\Mapper\Type\Specifier\TypeSpecifierInterface;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -20,21 +26,36 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
- * @template-extends NamedTypeBuilder<IntRangeType|IntType>
+ * @template-extends NamedTypeBuilder<IntType>
  */
 class IntRangeTypeBuilder extends NamedTypeBuilder
 {
+    public function __construct(
+        array|string $name,
+        /**
+         * @var TypeCoercerInterface<int>
+         */
+        protected readonly TypeCoercerInterface $coercer,
+        /**
+         * @var TypeSpecifierInterface<int>|null
+         */
+        protected readonly ?TypeSpecifierInterface $specifier = null,
+    ) {
+        parent::__construct($name);
+    }
+
     /**
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      * @throws TooManyTemplateArgumentsException
      * @throws ShapeFieldsNotSupportedException
      */
+    #[\Override]
     public function build(
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): IntRangeType|IntType {
+    ): IntType {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
@@ -58,23 +79,35 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    private function buildWithMinValue(NamedTypeNode $statement, ArgNode $min): IntRangeType
+    private function buildWithMinValue(NamedTypeNode $statement, ArgNode $min): IntType
     {
-        $value = $this->fetchTemplateArgumentValue($statement, $min);
+        $specifier = new IntGreaterThanOrEqualSpecifier(
+            expected: $this->fetchTemplateArgumentValue($statement, $min),
+        );
 
-        return new IntRangeType($value);
+        if ($this->specifier !== null) {
+            $specifier = new AllOfSpecifier([$specifier, $this->specifier]);
+        }
+
+        return new IntType($this->coercer, $specifier);
     }
 
     /**
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    private function buildWithMinMaxValues(NamedTypeNode $statement, ArgNode $min, ArgNode $max): IntRangeType
+    private function buildWithMinMaxValues(NamedTypeNode $statement, ArgNode $min, ArgNode $max): IntType
     {
-        $from = $this->fetchTemplateArgumentValue($statement, $min);
-        $to = $this->fetchTemplateArgumentValue($statement, $max);
+        $specifier = new IntRangeSpecifier(
+            min: $this->fetchTemplateArgumentValue($statement, $min),
+            max: $this->fetchTemplateArgumentValue($statement, $max),
+        );
 
-        return new IntRangeType($from, $to);
+        if ($this->specifier !== null) {
+            $specifier = new AllOfSpecifier([$specifier, $this->specifier]);
+        }
+
+        return new IntType($this->coercer, $specifier);
     }
 
     /**
@@ -94,9 +127,9 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
         if ($value instanceof NamedTypeNode) {
             switch ($value->name->toLowerString()) {
                 case 'min':
-                    return IntRangeType::DEFAULT_INT_MIN;
+                    return IntRangeSpecifier::DEFAULT_MIN_VALUE;
                 case 'max':
-                    return IntRangeType::DEFAULT_INT_MAX;
+                    return IntRangeSpecifier::DEFAULT_MAX_VALUE;
             }
         }
 

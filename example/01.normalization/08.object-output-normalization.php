@@ -23,7 +23,7 @@ class ItemsResultDTO
 
 $mapper = new Mapper(
     config: new Configuration(
-        isObjectsAsArrays: true,
+        objectAsArray: true,
     ),
 );
 

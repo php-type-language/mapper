@@ -44,7 +44,7 @@ abstract class TestCase extends BaseTestCase
     protected function createConfiguration(bool $strictTypes = true): Configuration
     {
         return new Configuration(
-            isStrictTypes: $strictTypes,
+            strictTypes: $strictTypes,
         );
     }
 

@@ -5,36 +5,28 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
+use TypeLang\Mapper\Type\Specifier\TypeSpecifierInterface;
 
 /**
- * @template-implements TypeInterface<string>
+ * @template-extends ScalarType<string>
  */
-class StringType implements TypeInterface
+class StringType extends ScalarType
 {
+    /**
+     * @param TypeCoercerInterface<string> $coercer
+     * @param TypeSpecifierInterface<string>|null $specifier
+     */
     public function __construct(
-        /**
-         * @var TypeCoercerInterface<string>
-         */
-        protected readonly TypeCoercerInterface $coercer = new StringTypeCoercer(),
-    ) {}
+        TypeCoercerInterface $coercer = new StringTypeCoercer(),
+        ?TypeSpecifierInterface $specifier = null,
+    ) {
+        parent::__construct($coercer, $specifier);
+    }
 
     public function match(mixed $value, Context $context): bool
     {
         return \is_string($value);
-    }
-
-    public function cast(mixed $value, Context $context): string
-    {
-        return match (true) {
-            \is_string($value) => $value,
-            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
-        };
     }
 }

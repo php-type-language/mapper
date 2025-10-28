@@ -26,14 +26,14 @@ abstract class ListTypeBuilder extends NamedTypeBuilder
     public const DEFAULT_INNER_VALUE_TYPE = 'mixed';
 
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-array<non-empty-string>|non-empty-string $name
      * @param non-empty-string $valueType
      */
     public function __construct(
-        array|string $names,
+        array|string $name,
         protected readonly string $valueType = self::DEFAULT_INNER_VALUE_TYPE,
     ) {
-        parent::__construct($names);
+        parent::__construct($name);
     }
 
     /**

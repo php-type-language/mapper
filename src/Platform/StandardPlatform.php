@@ -7,7 +7,8 @@ namespace TypeLang\Mapper\Platform;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
-use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
+use TypeLang\Mapper\Type\Coercer;
+use TypeLang\Mapper\Type\Specifier;
 
 class StandardPlatform extends Platform
 {
@@ -20,8 +21,6 @@ class StandardPlatform extends Platform
         GrammarFeature::Generics,
         GrammarFeature::Union,
         GrammarFeature::List,
-        GrammarFeature::Hints,
-        GrammarFeature::Attributes,
     ];
 
     public function getName(): string
@@ -31,73 +30,204 @@ class StandardPlatform extends Platform
 
     public function getTypes(Direction $direction): iterable
     {
+        $intCoercer = new Coercer\IntTypeCoercer();
+        $boolCoercer = new Coercer\BoolTypeCoercer();
+        $floatCoercer = new Coercer\FloatTypeCoercer();
+        $stringCoercer = new Coercer\StringTypeCoercer();
+        $arrayKeyCoercer = new Coercer\ArrayKeyTypeCoercer();
+
         yield from parent::getTypes($direction);
 
+        //
         // Adds support for the "mixed" type
-        yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
+        //
 
+        yield new Builder\MixedTypeBuilder('mixed');
+
+        //
         // Adds support for the "bool" type
-        yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);
+        //
 
+        yield new Builder\Literal\BoolLiteralTypeBuilder();
+        yield $bool = new Builder\ScalarTypeBuilder(
+            name: 'bool',
+            class: Type\BoolType::class,
+            coercer: $boolCoercer,
+        );
+
+        yield new Builder\TypeAliasBuilder(
+            aliases: 'boolean',
+            delegate: $bool,
+        );
+
+        //
         // Adds support for the "string" type
-        yield new Builder\SimpleTypeBuilder(['string', \Stringable::class], Type\StringType::class);
-        if ($direction === Direction::Normalize) {
-            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\StringType::class);
-            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\StringType::class);
-        } else {
-            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\LowercaseString::class);
-            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\UppercaseString::class);
-        }
+        //
 
+        yield new Builder\Literal\StringLiteralTypeBuilder();
+        yield new Builder\ScalarTypeBuilder(
+            name: ['string', \Stringable::class],
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-empty-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\NonEmptyStringSpecifier(),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'lowercase-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\LowercaseStringSpecifier(),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-empty-lowercase-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\AllOfSpecifier([
+                new Specifier\LowercaseStringSpecifier(),
+                new Specifier\NonEmptyStringSpecifier(),
+            ]),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'uppercase-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\UppercaseStringSpecifier(),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-empty-uppercase-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\AllOfSpecifier([
+                new Specifier\UppercaseStringSpecifier(),
+                new Specifier\NonEmptyStringSpecifier(),
+            ]),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'numeric-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\NumericStringSpecifier(),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-empty-numeric-string',
+            class: Type\StringType::class,
+            coercer: $stringCoercer,
+            specifier: new Specifier\AllOfSpecifier([
+                new Specifier\NonEmptyStringSpecifier(),
+                new Specifier\NumericStringSpecifier(),
+            ])
+        );
+
+
+        //
         // Adds support for the "int" type
-        yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
-        if ($direction === Direction::Normalize) {
-            yield new Builder\SimpleTypeBuilder('positive-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-positive-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('negative-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-negative-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\IntType::class);
-        } else {
-            yield new Builder\PositiveIntBuilder('positive-int');
-            yield new Builder\NonPositiveIntBuilder('non-positive-int');
-            yield new Builder\NegativeIntBuilder('negative-int');
-            yield new Builder\NonNegativeIntBuilder('non-negative-int');
-            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\NonZeroIntType::class);
-        }
+        //
 
+        yield new Builder\Literal\IntLiteralTypeBuilder();
+        yield $int = new Builder\IntRangeTypeBuilder(
+            name: 'int',
+            coercer: $intCoercer,
+        );
+
+        yield new Builder\TypeAliasBuilder(
+            aliases: 'integer',
+            delegate: $int,
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'positive-int',
+            class: Type\IntType::class,
+            coercer: $intCoercer,
+            specifier: new Specifier\IntGreaterThanOrEqualSpecifier(1),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-positive-int',
+            class: Type\IntType::class,
+            coercer: $intCoercer,
+            specifier: new Specifier\IntLessThanOrEqualSpecifier(0),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'negative-int',
+            class: Type\IntType::class,
+            coercer: $intCoercer,
+            specifier: new Specifier\IntLessThanOrEqualSpecifier(-1),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-negative-int',
+            class: Type\IntType::class,
+            coercer: $intCoercer,
+            specifier: new Specifier\IntGreaterThanOrEqualSpecifier(0),
+        );
+
+        yield new Builder\ScalarTypeBuilder(
+            name: 'non-zero-int',
+            class: Type\IntType::class,
+            coercer: $intCoercer,
+            specifier: new Specifier\NotSpecifier(
+                delegate: new Specifier\SameSpecifier(0),
+            ),
+        );
+
+
+        //
         // Adds support for the "float" type
-        yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
+        //
+
+        yield new Builder\Literal\FloatLiteralTypeBuilder();
+
+        yield $float = new Builder\ScalarTypeBuilder(
+            name: 'float',
+            class: Type\FloatType::class,
+            coercer: $floatCoercer,
+        );
+
+        yield new Builder\TypeAliasBuilder(
+            aliases: ['double', 'real'],
+            delegate: $float,
+        );
+
+        //
+        // Other types
+        //
 
         // Adds support for the "array-key" type
-        yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
+        yield new Builder\ScalarTypeBuilder(
+            name: 'array-key',
+            class: Type\ArrayKeyType::class,
+            coercer: $arrayKeyCoercer,
+        );
 
         // Adds support for the "array" type
-        yield new Builder\ArrayTypeBuilder([
-            'array',
-            'iterable',
-            \Iterator::class,
-            \Generator::class,
-            \Traversable::class,
-            \IteratorAggregate::class,
-        ], 'array-key', 'mixed');
+        yield new Builder\ArrayTypeBuilder(
+            name: [
+                'array',
+                'iterable',
+                \Iterator::class,
+                \Generator::class,
+                \Traversable::class,
+                \IteratorAggregate::class,
+            ],
+            keyType: 'array-key',
+            valueType: 'mixed',
+        );
 
-        // Adds support for the "?T" statement
+        // Adds support for the "null" and "?T" statement
         yield new Builder\NullableTypeBuilder();
-
-        // Adds support for the "null" literal and/or named type statement
         yield new Builder\NullTypeBuilder();
-
-        // Adds support for the "true" and "false" literals
-        yield new Builder\BoolLiteralTypeBuilder();
-
-        // Adds support for the integer literal types
-        yield new Builder\IntLiteralTypeBuilder();
-
-        // Adds support for the float literal types
-        yield new Builder\FloatLiteralTypeBuilder();
-
-        // Adds support for the string literal types
-        yield new Builder\StringLiteralTypeBuilder();
 
         // Adds support for the "T[]" statement
         yield new Builder\TypesListBuilder();
@@ -106,12 +236,6 @@ class StandardPlatform extends Platform
         yield new Builder\UnionTypeBuilder();
 
         if ($direction === Direction::Normalize) {
-            // Adds support for "non-empty-string", "numeric-string" which
-            // are similar to simple string
-            yield new Builder\SimpleTypeBuilder(
-                names: ['non-empty-string', 'numeric-string'],
-                type: Type\StringType::class,
-            );
             // Adds support for the "iterable<T> -> list<T>" type
             yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
@@ -125,10 +249,6 @@ class StandardPlatform extends Platform
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder($this->meta);
         } else {
-            // Adds support for "non-empty-string"
-            yield new Builder\SimpleTypeBuilder('non-empty-string', Type\NonEmptyString::class);
-            // Adds support for "numeric-string"
-            yield new Builder\SimpleTypeBuilder('numeric-string', Type\NumericString::class);
             // Adds support for the "array<T> -> list<T>" type
             yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
@@ -140,7 +260,7 @@ class StandardPlatform extends Platform
             // Adds support for the "string -> DateTime|DateTimeImmutable" type
             yield new Builder\DateTimeFromStringTypeBuilder();
             // Adds support for the "array{ ... } -> object(ClassName)" type
-            yield new ClassFromArrayTypeBuilder($this->meta);
+            yield new Builder\ClassFromArrayTypeBuilder($this->meta);
         }
     }
 

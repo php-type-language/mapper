@@ -19,14 +19,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class SimpleTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-string $name
      * @param class-string<TypeInterface<TResult>> $type
      */
     public function __construct(
-        array|string $names,
+        string $name,
         protected readonly string $type,
     ) {
-        parent::__construct($names);
+        parent::__construct($name);
     }
 
     /**

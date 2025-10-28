@@ -6,17 +6,13 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
+use TypeLang\Mapper\Type\Specifier\TypeSpecifierInterface;
 
 /**
  * @template-covariant TResult of mixed = mixed
  */
-interface TypeInterface
+interface TypeInterface extends TypeSpecifierInterface
 {
-    /**
-     * Checks that the value matches the selected type
-     */
-    public function match(mixed $value, Context $context): bool;
-
     /**
      * @return TResult
      * @throws RuntimeException in case of known mapping issue

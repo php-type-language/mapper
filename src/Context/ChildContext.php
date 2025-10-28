@@ -49,6 +49,13 @@ final class ChildContext extends Context
             ?? parent::isObjectAsArray();
     }
 
+    #[\Override]
+    public function isTypeSpecifiersEnabled(): bool
+    {
+        return $this->override?->isTypeSpecifiersEnabled()
+            ?? parent::isTypeSpecifiersEnabled();
+    }
+
     public function getIterator(): \Traversable
     {
         yield $current = $this;

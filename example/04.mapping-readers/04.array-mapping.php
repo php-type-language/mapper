@@ -26,7 +26,7 @@ $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
 );
 
 $mapper = new Mapper($platform, new Configuration(
-    isStrictTypes: false,
+    strictTypes: false,
 ));
 
 var_dump($mapper->denormalize([

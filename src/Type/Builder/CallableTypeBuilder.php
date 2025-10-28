@@ -28,14 +28,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 class CallableTypeBuilder extends NamedTypeBuilder
 {
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @param non-empty-array<non-empty-string>|non-empty-string $name
      * @param \Closure(): TypeInterface<TValue> $factory
      */
     public function __construct(
-        array|string $names,
+        array|string $name,
         protected readonly \Closure $factory,
     ) {
-        parent::__construct($names);
+        parent::__construct($name);
     }
 
     public function build(

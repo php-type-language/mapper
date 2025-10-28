@@ -10,14 +10,19 @@ use TypeLang\Mapper\Tracing\TracerInterface;
 final class Configuration
 {
     /**
-     * Default value for {@see $isObjectsAsArrays} option.
+     * Default value for {@see $objectAsArray} option.
      */
-    public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
+    public const DEFAULT_OBJECT_AS_ARRAY_OPTION = true;
 
     /**
-     * Default value for {@see $isStrictTypes} option.
+     * Default value for {@see $strictTypes} option.
      */
-    public const STRICT_TYPES_DEFAULT_VALUE = true;
+    public const DEFAULT_STRICT_TYPES_OPTION = true;
+
+    /**
+     * Default value for {@see $typeSpecifiers} option.
+     */
+    public const DEFAULT_TYPE_SPECIFIERS_OPTION = true;
 
     public function __construct(
         /**
@@ -25,12 +30,17 @@ final class Configuration
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        private readonly ?bool $isObjectsAsArrays = null,
+        private readonly ?bool $objectAsArray = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
          */
-        private readonly ?bool $isStrictTypes = null,
+        private readonly ?bool $strictTypes = null,
+        /**
+         * If this option contains {@see true}, then type specifiers will
+         * be applied.
+         */
+        private readonly ?bool $typeSpecifiers = null,
         /**
          * If this option contains {@see LoggerInterface}, then logger
          * will be enabled.
@@ -55,11 +65,12 @@ final class Configuration
      *
      * @api
      */
-    public function withObjectsAsArrays(?bool $enabled = null): self
+    public function withObjectAsArray(?bool $enabled = null): self
     {
         return new self(
-            isObjectsAsArrays: $enabled,
-            isStrictTypes: $this->isStrictTypes,
+            objectAsArray: $enabled,
+            strictTypes: $this->strictTypes,
+            typeSpecifiers: $this->typeSpecifiers,
             logger: $this->logger,
             tracer: $this->tracer,
         );
@@ -73,8 +84,8 @@ final class Configuration
      */
     public function isObjectAsArray(): bool
     {
-        return $this->isObjectsAsArrays
-            ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+        return $this->objectAsArray
+            ?? self::DEFAULT_OBJECT_AS_ARRAY_OPTION;
     }
 
     /**
@@ -82,9 +93,9 @@ final class Configuration
      *
      * @api
      */
-    public function isObjectsAsArraysOptionDefined(): bool
+    public function isObjectAsArrayOptionDefined(): bool
     {
-        return $this->isObjectsAsArrays !== null;
+        return $this->objectAsArray !== null;
     }
 
     /**
@@ -97,8 +108,9 @@ final class Configuration
     public function withStrictTypes(?bool $enabled = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
-            isStrictTypes: $enabled,
+            objectAsArray: $this->objectAsArray,
+            strictTypes: $enabled,
+            typeSpecifiers: $this->typeSpecifiers,
             logger: $this->logger,
             tracer: $this->tracer,
         );
@@ -113,8 +125,8 @@ final class Configuration
      */
     public function isStrictTypesEnabled(): bool
     {
-        return $this->isStrictTypes
-            ?? self::STRICT_TYPES_DEFAULT_VALUE;
+        return $this->strictTypes
+            ?? self::DEFAULT_STRICT_TYPES_OPTION;
     }
 
     /**
@@ -124,7 +136,45 @@ final class Configuration
      */
     public function isStrictTypesOptionDefined(): bool
     {
-        return $this->isStrictTypes !== null;
+        return $this->strictTypes !== null;
+    }
+
+    /**
+     * Enables or disables type specifiers while casting.
+     *
+     * In case of $enabled is {@see null} a default value will be defined.
+     *
+     * @api
+     */
+    public function withTypeSpecifiers(?bool $enabled = null): self
+    {
+        return new self(
+            objectAsArray: $this->objectAsArray,
+            strictTypes: $this->strictTypes,
+            typeSpecifiers: $enabled,
+            logger: $this->logger,
+            tracer: $this->tracer,
+        );
+    }
+
+    /**
+     * In case of method returns {@see true}, all types will be checked
+     * for additional assertions.
+     */
+    public function isTypeSpecifiersEnabled(): bool
+    {
+        return $this->typeSpecifiers
+            ?? self::DEFAULT_TYPE_SPECIFIERS_OPTION;
+    }
+
+    /**
+     * Returns {@see true} in case option is user-defined.
+     *
+     * @api
+     */
+    public function isTypeSpecifierOptionDefined(): bool
+    {
+        return $this->typeSpecifiers !== null;
     }
 
     /**
@@ -136,8 +186,9 @@ final class Configuration
     public function withLogger(?LoggerInterface $logger = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
-            isStrictTypes: $this->isStrictTypes,
+            objectAsArray: $this->objectAsArray,
+            strictTypes: $this->strictTypes,
+            typeSpecifiers: $this->typeSpecifiers,
             logger: $logger,
             tracer: $this->tracer,
         );
@@ -162,8 +213,9 @@ final class Configuration
     public function withTracer(?TracerInterface $tracer = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
-            isStrictTypes: $this->isStrictTypes,
+            objectAsArray: $this->objectAsArray,
+            strictTypes: $this->strictTypes,
+            typeSpecifiers: $this->typeSpecifiers,
             logger: $this->logger,
             tracer: $tracer,
         );

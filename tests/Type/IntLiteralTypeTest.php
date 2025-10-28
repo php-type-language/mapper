@@ -6,21 +6,20 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
-use TypeLang\Mapper\Type\IntLiteralType;
+use TypeLang\Mapper\Type\LiteralType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
-#[CoversClass(IntLiteralType::class)]
+#[CoversClass(LiteralType::class)]
 final class IntLiteralTypeTest extends CoercibleTypeTestCase
 {
     protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
     {
-        if ($coercer !== null) {
-            return new IntLiteralType(42, coercer: $coercer);
-        }
+        $coercer ??= new IntTypeCoercer();
 
-        return new IntLiteralType(42);
+        return new LiteralType(42, coercer: $coercer);
     }
 
     protected static function matchValues(bool $normalize): iterable
