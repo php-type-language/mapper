@@ -70,6 +70,7 @@ abstract class TestCase extends BaseTestCase
         return new TypeRepository(
             parser: $this->createTypeParser(),
             builders: $platform->getTypes($direction),
+            coercers: $platform->getTypeCoercers($direction),
         );
     }
 

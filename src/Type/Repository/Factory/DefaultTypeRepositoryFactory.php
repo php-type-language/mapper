@@ -39,9 +39,11 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         PlatformInterface $platform,
         Direction $direction,
     ): TypeRepository {
-        $builders = $platform->getTypes($direction);
-
-        return new TypeRepository($parser, $builders);
+        return new TypeRepository(
+            parser: $parser,
+            builders: $platform->getTypes($direction),
+            coercers: $platform->getTypeCoercers($direction),
+        );
     }
 
     private function withTracing(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface

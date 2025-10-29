@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<int>
@@ -20,10 +18,6 @@ class IntRangeType implements TypeInterface
     public function __construct(
         protected readonly int $min = self::DEFAULT_INT_MIN,
         protected readonly int $max = self::DEFAULT_INT_MAX,
-        /**
-         * @var TypeCoercerInterface<int>
-         */
-        protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
     ) {}
 
     /**
@@ -38,14 +32,8 @@ class IntRangeType implements TypeInterface
 
     public function cast(mixed $value, Context $context): int
     {
-        $coerced = $value;
-
-        if (!\is_int($value) && !$context->isStrictTypesEnabled()) {
-            $coerced = $this->coercer->coerce($value, $context);
-        }
-
-        if ($this->match($coerced, $context)) {
-            return $coerced;
+        if ($this->match($value, $context)) {
+            return $value;
         }
 
         throw InvalidValueException::createFromContext(

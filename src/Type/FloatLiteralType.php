@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\Coercer\FloatTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<float>
@@ -18,10 +16,6 @@ class FloatLiteralType implements TypeInterface
 
     public function __construct(
         int|float $value,
-        /**
-         * @var TypeCoercerInterface<float>
-         */
-        protected readonly TypeCoercerInterface $coercer = new FloatTypeCoercer(),
     ) {
         $this->value = (float) $value;
     }
@@ -38,14 +32,6 @@ class FloatLiteralType implements TypeInterface
     {
         if ($value === $this->value) {
             return $value;
-        }
-
-        if (!$context->isStrictTypesEnabled()) {
-            $coerced = $this->coercer->coerce($value, $context);
-
-            if ($coerced === $this->value) {
-                return $coerced;
-            }
         }
 
         throw InvalidValueException::createFromContext(

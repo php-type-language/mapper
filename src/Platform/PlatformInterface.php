@@ -6,6 +6,8 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 
 interface PlatformInterface
 {
@@ -40,6 +42,39 @@ interface PlatformInterface
      * @return iterable<array-key, TypeBuilderInterface>
      */
     public function getTypes(Direction $direction): iterable;
+
+    /**
+     * Returns a list of registered type coercers for the specific platform.
+     *
+     * Type coercion is highly recommended if you're working in an environment
+     * that handles undefined types. For example, when working with HTTP query
+     * or body parameters, all values are {@see string}, so attempting to read
+     * and map an {@see int} will result in a type incompatibility error.
+     *
+     * Type coercion objects contain rules that ensure such an external
+     * {@see string} can be safely converted to an {@see int} number.
+     *
+     * ```
+     * final readonly class QueryRequest
+     * {
+     *     public function __construct(
+     *         public int $int,
+     *         public float $float,
+     *     ) {}
+     * }
+     *
+     * // parsed result of "int=23&float=42.2" query string
+     * $value = ['int' => '23', 'float' => '42.2'];
+     *
+     * $mapper->denormalize($value, QueryRequest::class);
+     * ```
+     *
+     * In the example above, in case of {@see int} and {@see float} type
+     * coercers are missing, then there will be a mapper type error.
+     *
+     * @return iterable<class-string<TypeInterface>, TypeCoercerInterface>
+     */
+    public function getTypeCoercers(Direction $direction): iterable;
 
     /**
      * Returns {@see true} in case of feature is supported.

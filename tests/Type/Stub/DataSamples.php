@@ -56,15 +56,15 @@ final class DataSamples implements \IteratorAggregate
         yield \PHP_INT_MIN - 1;
 
         // Numeric integer-like string values
-        yield "9223372036854775808";
-        yield "9223372036854775807";
-        yield "42";
-        yield "1";
-        yield "0";
-        yield "-1";
-        yield "-42";
-        yield "-9223372036854775808";
-        yield "-9223372036854775809";
+        yield '9223372036854775808';
+        yield '9223372036854775807';
+        yield '42';
+        yield '1';
+        yield '0';
+        yield '-1';
+        yield '-42';
+        yield '-9223372036854775808';
+        yield '-9223372036854775809';
 
         // Float values
         yield 9223372036854775808.0;
@@ -84,17 +84,17 @@ final class DataSamples implements \IteratorAggregate
         yield NAN;
 
         // Numeric float-like string values
-        yield "9223372036854775808.0";
-        yield "9223372036854775807.0";
-        yield "42.5";
-        yield "42.0";
-        yield "1.0";
-        yield "0.0";
-        yield "-1.0";
-        yield "-42.0";
-        yield "-42.5";
-        yield "-9223372036854775808.0";
-        yield "-9223372036854775809.0";
+        yield '9223372036854775808.0';
+        yield '9223372036854775807.0';
+        yield '42.5';
+        yield '42.0';
+        yield '1.0';
+        yield '0.0';
+        yield '-1.0';
+        yield '-42.0';
+        yield '-42.5';
+        yield '-9223372036854775808.0';
+        yield '-9223372036854775809.0';
 
         // Null
         yield null;
@@ -104,12 +104,12 @@ final class DataSamples implements \IteratorAggregate
         yield false;
 
         // Boolean-like strings
-        yield "true";
-        yield "false";
+        yield 'true';
+        yield 'false';
 
         // Strings
-        yield "non empty";
-        yield "";
+        yield 'non empty';
+        yield '';
 
         // Array values
         yield [];
@@ -117,9 +117,9 @@ final class DataSamples implements \IteratorAggregate
         yield ['key' => 42];
 
         // Object values
-        yield (object)[];
-        yield (object)['key' => 'val'];
-        yield (object)['val'];
+        yield (object) [];
+        yield (object) ['key' => 'val'];
+        yield (object) ['val'];
 
         // Resource
         yield \fopen('php://memory', 'rb');

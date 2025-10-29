@@ -9,11 +9,18 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
+ * @template-covariant TResult of mixed = mixed
+ *
  * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Runtime\Repository
+ * @psalm-internal TypeLang\Mapper\Type\Repository
+ *
+ * @template-extends TypeDecorator<TResult>
  */
 final class LoggableType extends TypeDecorator
 {
+    /**
+     * @param TypeInterface<TResult> $delegate
+     */
     public function __construct(
         private readonly LoggerInterface $logger,
         TypeInterface $delegate,
@@ -79,5 +86,14 @@ final class LoggableType extends TypeDecorator
         ]);
 
         return $result;
+    }
+
+    public function __serialize(): array
+    {
+        throw new \LogicException(<<<'MESSAGE'
+            Cannot serialize a loggable type.
+
+            Please disable cache in case you are using debug mode.
+            MESSAGE);
     }
 }

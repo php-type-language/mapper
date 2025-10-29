@@ -6,37 +6,16 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
 #[CoversClass(IntType::class)]
-final class IntTypeTest extends CoercibleTypeTestCase
+final class IntTypeTest extends TypeTestCase
 {
-    protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
+    protected static function createType(): TypeInterface
     {
-        if ($coercer !== null) {
-            return new IntType(coercer: $coercer);
-        }
-
         return new IntType();
-    }
-
-    public function testCallsCoercion(): void
-    {
-        $this->expectException(\BadMethodCallException::class);
-        $this->expectExceptionMessage('on-coerce');
-
-        $coercer = $this->createMock(TypeCoercerInterface::class);
-        $coercer->method('coerce')
-            ->willThrowException(new \BadMethodCallException('on-coerce'));
-
-        $type = new IntType($coercer);
-        $type->cast(
-            value: \fopen('php://memory', 'rb'),
-            context: $this->createNormalizationContext('42', false),
-        );
     }
 
     protected static function matchValues(bool $normalize): iterable

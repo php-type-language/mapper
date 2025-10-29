@@ -6,21 +6,12 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\Coercer\IntTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<int>
  */
 class IntType implements TypeInterface
 {
-    public function __construct(
-        /**
-         * @var TypeCoercerInterface<int>
-         */
-        protected readonly TypeCoercerInterface $coercer = new IntTypeCoercer(),
-    ) {}
-
     /**
      * @phpstan-assert-if-true int $value
      */
@@ -33,7 +24,6 @@ class IntType implements TypeInterface
     {
         return match (true) {
             \is_int($value) => $value,
-            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,

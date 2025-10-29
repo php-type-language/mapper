@@ -7,19 +7,14 @@ namespace TypeLang\Mapper\Tests\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Type\ArrayKeyType;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
 #[CoversClass(ArrayKeyType::class)]
-final class ArrayKeyTypeTest extends CoercibleTypeTestCase
+final class ArrayKeyTypeTest extends TypeTestCase
 {
-    protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
+    protected static function createType(): TypeInterface
     {
-        if ($coercer !== null) {
-            return new ArrayKeyType(coercer: $coercer);
-        }
-
         return new ArrayKeyType();
     }
 

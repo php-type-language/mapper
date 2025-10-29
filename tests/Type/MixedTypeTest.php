@@ -58,22 +58,22 @@ final class MixedTypeTest extends TypeTestCase
                         // String backed enum coverts to enum's string value
                         $value === StringBackedEnumStub::ExampleCase => $value->value,
                         // Empty object converts to empty array
-                        $value == (object)[] => [],
+                        $value == (object) [] => [],
                         // Object with 1 property converts to hash-map
-                        $value == (object)['key' => 'val'] => ['key' => 'val'],
+                        $value == (object) ['key' => 'val'] => ['key' => 'val'],
                         // Object without named properties converts to list<string>
-                        $value == (object)['val'] => ['val'],
+                        $value == (object) ['val'] => ['val'],
                         default => $value,
                     },
                     default => $value,
                 }
-                : match (true) {
-                    // Denormalization does not supports enums
-                    $value === UnitEnumStub::ExampleCase => new \ValueError('Passed value "ExampleCase" is invalid'),
-                    $value === IntBackedEnumStub::ExampleCase => new \ValueError('Passed value 3735928559 is invalid'),
-                    $value === StringBackedEnumStub::ExampleCase => new \ValueError('Passed value "case" is invalid'),
-                    default => $value,
-                };
+            : match (true) {
+                // Denormalization does not supports enums
+                $value === UnitEnumStub::ExampleCase => new \ValueError('Passed value "ExampleCase" is invalid'),
+                $value === IntBackedEnumStub::ExampleCase => new \ValueError('Passed value 3735928559 is invalid'),
+                $value === StringBackedEnumStub::ExampleCase => new \ValueError('Passed value "case" is invalid'),
+                default => $value,
+            };
         }
     }
 }

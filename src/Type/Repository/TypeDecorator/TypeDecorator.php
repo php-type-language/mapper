@@ -8,12 +8,19 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
+ * @template-covariant TResult of mixed = mixed
+ *
  * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Runtime\Repository
+ * @psalm-internal TypeLang\Mapper\Type\Repository
+ *
+ * @template-implements TypeDecoratorInterface<TResult>
  */
 abstract class TypeDecorator implements TypeDecoratorInterface
 {
     public function __construct(
+        /**
+         * @var TypeInterface<TResult>
+         */
         protected readonly TypeInterface $delegate,
     ) {}
 
@@ -34,14 +41,5 @@ abstract class TypeDecorator implements TypeDecoratorInterface
     public function cast(mixed $value, Context $context): mixed
     {
         return $this->delegate->cast($value, $context);
-    }
-
-    public function __serialize(): array
-    {
-        throw new \LogicException(<<<'MESSAGE'
-            Cannot serialize a type decorator.
-
-            Please disable cache in case you are using debug mode.
-            MESSAGE);
     }
 }

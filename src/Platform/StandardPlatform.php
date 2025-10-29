@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Platform;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
-use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
+use TypeLang\Mapper\Type\Coercer;
 
 class StandardPlatform extends Platform
 {
@@ -41,29 +41,9 @@ class StandardPlatform extends Platform
 
         // Adds support for the "string" type
         yield new Builder\SimpleTypeBuilder(['string', \Stringable::class], Type\StringType::class);
-        if ($direction === Direction::Normalize) {
-            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\StringType::class);
-            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\StringType::class);
-        } else {
-            yield new Builder\SimpleTypeBuilder('lowercase-string', Type\LowercaseString::class);
-            yield new Builder\SimpleTypeBuilder('uppercase-string', Type\UppercaseString::class);
-        }
 
         // Adds support for the "int" type
         yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
-        if ($direction === Direction::Normalize) {
-            yield new Builder\SimpleTypeBuilder('positive-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-positive-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('negative-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-negative-int', Type\IntType::class);
-            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\IntType::class);
-        } else {
-            yield new Builder\PositiveIntBuilder('positive-int');
-            yield new Builder\NonPositiveIntBuilder('non-positive-int');
-            yield new Builder\NegativeIntBuilder('negative-int');
-            yield new Builder\NonNegativeIntBuilder('non-negative-int');
-            yield new Builder\SimpleTypeBuilder('non-zero-int', Type\NonZeroIntType::class);
-        }
 
         // Adds support for the "float" type
         yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
@@ -106,12 +86,6 @@ class StandardPlatform extends Platform
         yield new Builder\UnionTypeBuilder();
 
         if ($direction === Direction::Normalize) {
-            // Adds support for "non-empty-string", "numeric-string" which
-            // are similar to simple string
-            yield new Builder\SimpleTypeBuilder(
-                names: ['non-empty-string', 'numeric-string'],
-                type: Type\StringType::class,
-            );
             // Adds support for the "iterable<T> -> list<T>" type
             yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
@@ -125,10 +99,6 @@ class StandardPlatform extends Platform
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder($this->meta);
         } else {
-            // Adds support for "non-empty-string"
-            yield new Builder\SimpleTypeBuilder('non-empty-string', Type\NonEmptyString::class);
-            // Adds support for "numeric-string"
-            yield new Builder\SimpleTypeBuilder('numeric-string', Type\NumericString::class);
             // Adds support for the "array<T> -> list<T>" type
             yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
@@ -140,8 +110,36 @@ class StandardPlatform extends Platform
             // Adds support for the "string -> DateTime|DateTimeImmutable" type
             yield new Builder\DateTimeFromStringTypeBuilder();
             // Adds support for the "array{ ... } -> object(ClassName)" type
-            yield new ClassFromArrayTypeBuilder($this->meta);
+            yield new Builder\ClassFromArrayTypeBuilder($this->meta);
         }
+    }
+
+    public function getTypeCoercers(Direction $direction): iterable
+    {
+        yield from parent::getTypeCoercers($direction);
+
+        // array-key
+        yield Type\ArrayKeyType::class => $arrayKey = new Coercer\ArrayKeyTypeCoercer();
+        yield Type\BackedEnumFromScalarType::class => $arrayKey;
+
+        // bool
+        yield Type\BoolType::class => $bool = new Coercer\BoolTypeCoercer();
+        yield Type\BoolLiteralType::class => $bool;
+
+        // float
+        yield Type\FloatType::class => $float = new Coercer\FloatTypeCoercer();
+        yield Type\FloatLiteralType::class => $float;
+
+        // int
+        yield Type\IntType::class => $int = new Coercer\IntTypeCoercer();
+        yield Type\IntRangeType::class => $int;
+        yield Type\IntLiteralType::class => $int;
+
+        // string
+        yield Type\StringType::class => $string = new Coercer\StringTypeCoercer();
+        yield Type\StringLiteralType::class => $string;
+        yield Type\DateTimeFromStringType::class => $string;
+        yield Type\UnitEnumFromStringType::class => $string;
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

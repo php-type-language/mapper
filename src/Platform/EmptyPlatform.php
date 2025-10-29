@@ -13,7 +13,12 @@ final class EmptyPlatform implements PlatformInterface
         return 'empty';
     }
 
-    public function getTypes(Direction $direction): iterable
+    public function getTypeCoercers(Direction $direction): array
+    {
+        return [];
+    }
+
+    public function getTypes(Direction $direction): array
     {
         return [];
     }

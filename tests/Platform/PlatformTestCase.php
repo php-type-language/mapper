@@ -244,12 +244,12 @@ abstract class PlatformTestCase extends TestCase
         'iterable',
         'object',
         'int|false',
-        # TODO: Static references not supported yet
+        // TODO: Static references not supported yet
         'static',
         'mixed',
-        # TODO: Void types not supported yet
+        // TODO: Void types not supported yet
         'never',
-        # TODO: Intersection types not supported yet
+        // TODO: Intersection types not supported yet
         'int&string',
         UnitEnumStub::class,
         IntBackedEnumStub::class,
@@ -257,10 +257,9 @@ abstract class PlatformTestCase extends TestCase
         'null',
         'false',
         'true',
-        # TODO: Intersection types not supported yet
+        // TODO: Intersection types not supported yet
         'int|(true&int)',
     ];
-
 
     public static function typesDataProvider(): iterable
     {
@@ -301,7 +300,12 @@ abstract class PlatformTestCase extends TestCase
             $this->expectNotToPerformAssertions();
         }
 
-        $repository = new TypeRepository($parser, $platform->getTypes($direction));
+        $repository = new TypeRepository(
+            parser: $parser,
+            builders: $platform->getTypes($direction),
+            coercers: $platform->getTypeCoercers($direction),
+        );
+
         $repository->getTypeByStatement($statement);
     }
 

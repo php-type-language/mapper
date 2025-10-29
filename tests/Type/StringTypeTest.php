@@ -6,20 +6,15 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
 #[CoversClass(StringType::class)]
-final class StringTypeTest extends CoercibleTypeTestCase
+final class StringTypeTest extends TypeTestCase
 {
-    protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
+    protected static function createType(): TypeInterface
     {
-        if ($coercer !== null) {
-            return new StringType(coercer: $coercer);
-        }
-
         return new StringType();
     }
 

@@ -9,8 +9,12 @@ use TypeLang\Mapper\Tracing\TracerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
+ * @template-covariant TResult of mixed = mixed
+ *
  * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Runtime\Repository
+ * @psalm-internal TypeLang\Mapper\Type\Repository
+ *
+ * @template-extends TypeDecorator<TResult>
  */
 final class TraceableType extends TypeDecorator
 {
@@ -19,6 +23,9 @@ final class TraceableType extends TypeDecorator
      */
     private readonly string $name;
 
+    /**
+     * @param TypeInterface<TResult> $delegate
+     */
     public function __construct(
         private readonly string $definition,
         private readonly TracerInterface $tracer,
@@ -63,5 +70,14 @@ final class TraceableType extends TypeDecorator
         } finally {
             $span->stop();
         }
+    }
+
+    public function __serialize(): array
+    {
+        throw new \LogicException(<<<'MESSAGE'
+            Cannot serialize a traceable type.
+
+            Please disable cache in case you are using debug mode.
+            MESSAGE);
     }
 }

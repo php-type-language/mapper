@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\Coercer\ArrayKeyTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 /**
  * @template-implements TypeInterface<array-key>
@@ -23,10 +21,6 @@ class ArrayKeyType implements TypeInterface
          * @var TypeInterface<int>
          */
         protected readonly TypeInterface $int = new IntType(),
-        /**
-         * @var TypeCoercerInterface<array-key>
-         */
-        protected readonly TypeCoercerInterface $coercer = new ArrayKeyTypeCoercer(),
     ) {}
 
     /**
@@ -52,7 +46,6 @@ class ArrayKeyType implements TypeInterface
         return match (true) {
             \is_string($value),
             \is_int($value) => $value,
-            !$context->isStrictTypesEnabled() => $this->coercer->coerce($value, $context),
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,

@@ -12,6 +12,10 @@ use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
+use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
+use TypeLang\Mapper\Type\TypeInterface;
+
+use function TypeLang\Mapper\iterable_to_array;
 
 abstract class Platform implements PlatformInterface
 {
@@ -23,28 +27,31 @@ abstract class Platform implements PlatformInterface
     protected readonly array $types;
 
     /**
+     * @var list<TypeCoercerInterface>
+     */
+    protected readonly array $coercers;
+
+    /**
      * @param iterable<mixed, TypeBuilderInterface> $types
+     * @param iterable<class-string<TypeInterface>, TypeCoercerInterface> $coercers
      */
     public function __construct(
         ProviderInterface|ReaderInterface|null $meta = null,
         iterable $types = [],
+        iterable $coercers = [],
     ) {
-        $this->meta = match (true) {
+        $this->meta = $this->formatMetadataProvider($meta);
+        $this->types = $this->formatTypes($types);
+        $this->coercers = $this->formatCoercers($coercers);
+    }
+
+    protected function formatMetadataProvider(ProviderInterface|ReaderInterface|null $meta): ProviderInterface
+    {
+        return match (true) {
             $meta instanceof ProviderInterface => $meta,
             $meta instanceof ReaderInterface => $this->createDefaultMetadataProvider($meta),
             default => $this->createDefaultMetadataProvider(),
         };
-
-        $this->types = match (true) {
-            $types instanceof \Traversable => \iterator_to_array($types, false),
-            \array_is_list($types) => $types,
-            default => \array_values($types),
-        };
-    }
-
-    public function getTypes(Direction $direction): iterable
-    {
-        return $this->types;
     }
 
     protected function createDefaultMetadataProvider(?ReaderInterface $reader = null): ProviderInterface
@@ -61,5 +68,35 @@ abstract class Platform implements PlatformInterface
         return new AttributeReader(
             delegate: new ReflectionReader(),
         );
+    }
+
+    /**
+     * @param iterable<mixed, TypeBuilderInterface> $types
+     *
+     * @return list<TypeBuilderInterface>
+     */
+    protected function formatTypes(iterable $types): array
+    {
+        return iterable_to_array($types, false);
+    }
+
+    public function getTypes(Direction $direction): iterable
+    {
+        return $this->types;
+    }
+
+    /**
+     * @param iterable<mixed, TypeCoercerInterface> $coercers
+     *
+     * @return list<TypeCoercerInterface>
+     */
+    protected function formatCoercers(iterable $coercers): array
+    {
+        return iterable_to_array($coercers, true);
+    }
+
+    public function getTypeCoercers(Direction $direction): iterable
+    {
+        return $this->coercers;
     }
 }

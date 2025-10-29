@@ -6,20 +6,15 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\FloatType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
 #[CoversClass(FloatType::class)]
-final class FloatTypeTest extends CoercibleTypeTestCase
+final class FloatTypeTest extends TypeTestCase
 {
-    protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
+    protected static function createType(): TypeInterface
     {
-        if ($coercer !== null) {
-            return new FloatType(coercer: $coercer);
-        }
-
         return new FloatType();
     }
 

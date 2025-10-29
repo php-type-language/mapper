@@ -19,7 +19,10 @@
     "autoload": {
         "psr-4": {
             "TypeLang\\Mapper\\": "src"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "require-dev": {
         "doctrine/instantiator": "^2.0",

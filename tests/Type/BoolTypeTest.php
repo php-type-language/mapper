@@ -7,19 +7,14 @@ namespace TypeLang\Mapper\Tests\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Type\BoolType;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 #[Group('type')]
 #[CoversClass(BoolType::class)]
-final class BoolTypeTest extends CoercibleTypeTestCase
+final class BoolTypeTest extends TypeTestCase
 {
-    protected static function createType(?TypeCoercerInterface $coercer = null): TypeInterface
+    protected static function createType(): TypeInterface
     {
-        if ($coercer !== null) {
-            return new BoolType(coercer: $coercer);
-        }
-
         return new BoolType();
     }
 
