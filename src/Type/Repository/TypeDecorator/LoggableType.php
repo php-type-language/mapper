@@ -9,6 +9,8 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
+ * Decorates calls of each type by adding logging functionality
+ *
  * @template-covariant TResult of mixed = mixed
  *
  * @internal this is an internal library class, please do not use it in your code
@@ -19,13 +21,43 @@ use TypeLang\Mapper\Type\TypeInterface;
 final class LoggableType extends TypeDecorator
 {
     /**
+     * @var non-empty-string
+     */
+    public const DEFAULT_TYPE_GROUP_NAME = 'TYPE';
+
+    /**
      * @param TypeInterface<TResult> $delegate
      */
     public function __construct(
-        private readonly LoggerInterface $logger,
         TypeInterface $delegate,
+        /**
+         * @var non-empty-string
+         */
+        private readonly string $group = self::DEFAULT_TYPE_GROUP_NAME,
     ) {
         parent::__construct($delegate);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getInstanceName(object $entry): string
+    {
+        return $entry::class . '#' . \spl_object_id($entry);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function getPathAsStringArray(Context $context): array
+    {
+        $result = [];
+
+        foreach ($context->getPath() as $entry) {
+            $result[] = (string) $entry;
+        }
+
+        return $result;
     }
 
     /**
@@ -33,67 +65,126 @@ final class LoggableType extends TypeDecorator
      */
     private function getLoggerArguments(mixed $value, Context $context): array
     {
-        $path = $context->getPath();
-        $delegate = $this->getDecoratedType();
+        $realType = $this->getDecoratedType();
 
         return [
             'value' => $value,
-            'type' => $delegate,
-            'type_name' => $delegate::class . '#' . \spl_object_id($delegate),
-            'path' => $path->toArray(),
+            'type_name' => $this->getInstanceName($realType),
+            'path' => $this->getPathAsStringArray($context),
+            'type' => $realType,
+            'group' => $this->group,
         ];
+    }
+
+    private function logBeforeMatch(LoggerInterface $logger, mixed $value, Context $context): void
+    {
+        $logger->debug('[{group}] Matching {value} by {type_name} type', [
+            ...$this->getLoggerArguments($value, $context),
+        ]);
+    }
+
+    private function logAfterMatch(LoggerInterface $logger, mixed $value, Context $context, bool $status): void
+    {
+        $logger->info('[{group}] {match_verbose} {value} by {type_name} type', [
+            'match' => $status,
+            'match_verbose' => $status ? '✔ Matched' : '✘ Not matched',
+            ...$this->getLoggerArguments($value, $context),
+        ]);
+    }
+
+    private function logErrorMatch(LoggerInterface $logger, mixed $value, Context $context, \Throwable $e): void
+    {
+        $logger->info('[{group}] Match error: {message}', [
+            'error' => $e->getMessage(),
+            ...$this->getLoggerArguments($value, $context),
+        ]);
     }
 
     public function match(mixed $value, Context $context): bool
     {
-        $this->logger->debug(
-            'Matching by the {type_name}',
-            $this->getLoggerArguments($value, $context),
-        );
+        $logger = $context->config->findLogger();
 
-        $result = parent::match($value, $context);
+        if ($logger === null) {
+            return parent::match($value, $context);
+        }
 
-        $this->logger->info(
-            $result === true
-                ? 'Matched by the {type_name}'
-                : 'Not matched by the {type_name}',
-            $this->getLoggerArguments($value, $context),
-        );
+        return $this->matchThroughLogger($logger, $value, $context);
+    }
+
+    /**
+     * @throws \Throwable in case of any internal error occurs
+     */
+    private function matchThroughLogger(LoggerInterface $logger, mixed $value, Context $context): bool
+    {
+
+        $this->logBeforeMatch($logger, $value, $context);
+
+        try {
+            $result = parent::match($value, $context);
+        } catch (\Throwable $e) {
+            $this->logErrorMatch($logger, $value, $context, $e);
+
+            throw $e;
+        }
+
+        $this->logAfterMatch($logger, $value, $context, $result);
 
         return $result;
+    }
+
+    private function logBeforeCast(LoggerInterface $logger, mixed $value, Context $context): void
+    {
+        $logger->debug('[{group}] Casting "{value}" by {type_name} type', [
+            ...$this->getLoggerArguments($value, $context),
+        ]);
+    }
+
+    private function logAfterCast(LoggerInterface $logger, mixed $value, Context $context, mixed $result): void
+    {
+        $logger->info('[{group}] Casted "{value}" to "{result}" by {type_name} type', [
+            'result' => $result,
+            ...$this->getLoggerArguments($value, $context),
+        ]);
+    }
+
+    private function logErrorCast(LoggerInterface $logger, mixed $value, Context $context, \Throwable $e): void
+    {
+        $logger->info('[{group}] Casting error: {message}', [
+            'error' => $e->getMessage(),
+            ...$this->getLoggerArguments($value, $context),
+        ]);
     }
 
     public function cast(mixed $value, Context $context): mixed
     {
-        $this->logger->debug(
-            'Casting by the {type_name}',
-            $this->getLoggerArguments($value, $context),
-        );
+        $logger = $context->config->findLogger();
+
+        if ($logger === null) {
+            return parent::cast($value, $context);
+        }
+
+        return $this->castThroughLogger($logger, $value, $context);
+    }
+
+    /**
+     * @return TResult
+     *
+     * @throws \Throwable in case of any internal error occurs
+     */
+    private function castThroughLogger(LoggerInterface $logger, mixed $value, Context $context): mixed
+    {
+        $this->logBeforeCast($logger, $value, $context);
 
         try {
             $result = parent::cast($value, $context);
         } catch (\Throwable $e) {
-            $this->logger->error('Casting by the {type_name} was failed', [
-                ...$this->getLoggerArguments($value, $context),
-                'error' => $e,
-            ]);
+            $this->logErrorCast($logger, $value, $context, $e);
+
             throw $e;
         }
 
-        $this->logger->info('Casted by the {type_name}', [
-            ...$this->getLoggerArguments($value, $context),
-            'result' => $result,
-        ]);
+        $this->logAfterCast($logger, $value, $context, $result);
 
         return $result;
-    }
-
-    public function __serialize(): array
-    {
-        throw new \LogicException(<<<'MESSAGE'
-            Cannot serialize a loggable type.
-
-            Please disable cache in case you are using debug mode.
-            MESSAGE);
     }
 }

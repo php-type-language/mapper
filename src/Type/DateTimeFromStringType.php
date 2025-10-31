@@ -20,6 +20,10 @@ class DateTimeFromStringType implements TypeInterface
          */
         protected readonly string $class,
         protected readonly ?string $format = null,
+        /**
+         * @var TypeInterface<string>
+         */
+        protected readonly TypeInterface $input = new StringType(),
     ) {}
 
     /**
@@ -27,7 +31,7 @@ class DateTimeFromStringType implements TypeInterface
      */
     public function match(mixed $value, Context $context): bool
     {
-        if (!\is_string($value)) {
+        if (!$this->input->match($value, $context)) {
             return false;
         }
 
@@ -40,14 +44,9 @@ class DateTimeFromStringType implements TypeInterface
 
     public function cast(mixed $value, Context $context): \DateTimeInterface
     {
-        if (!\is_string($value)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
-        }
-
-        $result = $this->tryParseDateTime($value);
+        $result = $this->tryParseDateTime(
+            value: $this->input->cast($value, $context),
+        );
 
         if ($result instanceof \DateTimeInterface) {
             /** @var TDateTime */

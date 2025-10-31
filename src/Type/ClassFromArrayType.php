@@ -21,7 +21,7 @@ use TypeLang\Mapper\Type\ClassType\DiscriminatorTypeSelector;
  * @template TObject of object = object
  * @template-implements TypeInterface<TObject>
  */
-class ClassTypeFromArrayType implements TypeInterface
+class ClassFromArrayType implements TypeInterface
 {
     /**
      * @var DiscriminatorTypeSelector<TObject>

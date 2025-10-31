@@ -10,7 +10,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 /**
  * @template-implements TypeInterface<object>
  */
-final class ObjectTypeFromArrayType implements TypeInterface
+final class ObjectFromArrayType implements TypeInterface
 {
     public function match(mixed $value, Context $context): bool
     {

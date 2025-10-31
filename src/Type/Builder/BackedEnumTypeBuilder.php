@@ -62,25 +62,27 @@ abstract class BackedEnumTypeBuilder extends Builder
 
         $reflection = $this->createReflectionEnum($statement);
 
+        $definition = $this->getBackedEnumType($reflection, $statement);
+
         return $this->create(
             /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
             class: $statement->name->toString(),
+            definition: $definition,
             /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
             type: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition(
-                    definition: $this->getBackedEnumType($reflection, $statement),
-                ),
+                statement: $parser->getStatementByDefinition($definition),
             ),
         );
     }
 
     /**
-     * @param TypeInterface<value-of<TEnum>> $type
      * @param class-string<TEnum> $class
+     * @param non-empty-string $definition
+     * @param TypeInterface<value-of<TEnum>> $type
      *
      * @return TypeInterface<TResult>
      */
-    abstract protected function create(string $class, TypeInterface $type): TypeInterface;
+    abstract protected function create(string $class, string $definition, TypeInterface $type): TypeInterface;
 
     /**
      * @return \ReflectionEnum<\BackedEnum>

@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Platform;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
+use TypeLang\Mapper\Type\Builder\TypeAliasBuilder\Reason;
 use TypeLang\Mapper\Type\Coercer;
 
 class StandardPlatform extends Platform
@@ -20,8 +21,6 @@ class StandardPlatform extends Platform
         GrammarFeature::Generics,
         GrammarFeature::Union,
         GrammarFeature::List,
-        GrammarFeature::Hints,
-        GrammarFeature::Attributes,
     ];
 
     public function getName(): string
@@ -37,29 +36,32 @@ class StandardPlatform extends Platform
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
 
         // Adds support for the "bool" type
-        yield new Builder\SimpleTypeBuilder(['bool', 'boolean'], Type\BoolType::class);
+        yield $bool = new Builder\SimpleTypeBuilder('bool', Type\BoolType::class);
+        yield new Builder\TypeAliasBuilder('boolean', $bool, Reason::NonCanonical);
 
         // Adds support for the "string" type
-        yield new Builder\SimpleTypeBuilder(['string', \Stringable::class], Type\StringType::class);
+        yield $string = new Builder\SimpleTypeBuilder('string', Type\StringType::class);
+        yield new Builder\TypeAliasBuilder(\Stringable::class, $string);
 
         // Adds support for the "int" type
-        yield new Builder\IntRangeTypeBuilder(['int', 'integer']);
+        yield $int = new Builder\IntRangeTypeBuilder('int');
+        yield new Builder\TypeAliasBuilder('integer', $int, Reason::NonCanonical);
 
         // Adds support for the "float" type
-        yield new Builder\SimpleTypeBuilder(['float', 'double', 'real'], Type\FloatType::class);
+        yield $float = new Builder\SimpleTypeBuilder('float', Type\FloatType::class);
+        yield new Builder\TypeAliasBuilder('double', $float, Reason::NonCanonical);
+        yield new Builder\TypeAliasBuilder('real', $float, Reason::Deprecated);
 
         // Adds support for the "array-key" type
         yield new Builder\SimpleTypeBuilder('array-key', Type\ArrayKeyType::class);
 
         // Adds support for the "array" type
-        yield new Builder\ArrayTypeBuilder([
-            'array',
-            'iterable',
-            \Iterator::class,
-            \Generator::class,
-            \Traversable::class,
-            \IteratorAggregate::class,
-        ], 'array-key', 'mixed');
+        yield $array = new Builder\ArrayTypeBuilder('array', 'array-key', 'mixed');
+        yield new Builder\TypeAliasBuilder('iterable', $array);
+        yield new Builder\TypeAliasBuilder(\Iterator::class, $array);
+        yield new Builder\TypeAliasBuilder(\Generator::class, $array);
+        yield new Builder\TypeAliasBuilder(\Traversable::class, $array);
+        yield new Builder\TypeAliasBuilder(\IteratorAggregate::class, $array);
 
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
@@ -89,7 +91,7 @@ class StandardPlatform extends Platform
             // Adds support for the "iterable<T> -> list<T>" type
             yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
-            yield new Builder\ObjectToArrayTypeBuilder(['object', \stdClass::class]);
+            yield $object = new Builder\ObjectToArrayTypeBuilder('object');
             // Adds support for the "BackedEnum -> scalar" type
             yield new Builder\BackedEnumToScalarTypeBuilder();
             // Adds support for the "UnitEnum -> scalar" type
@@ -102,7 +104,7 @@ class StandardPlatform extends Platform
             // Adds support for the "array<T> -> list<T>" type
             yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
-            yield new Builder\ObjectFromArrayTypeBuilder(['object', \stdClass::class]);
+            yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
             // Adds support for the "scalar -> BackedEnum" type
             yield new Builder\BackedEnumFromScalarTypeBuilder();
             // Adds support for the "scalar -> UnitEnum" type
@@ -112,6 +114,8 @@ class StandardPlatform extends Platform
             // Adds support for the "array{ ... } -> object(ClassName)" type
             yield new Builder\ClassFromArrayTypeBuilder($this->meta);
         }
+
+        yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
     }
 
     public function getTypeCoercers(Direction $direction): iterable
@@ -120,7 +124,6 @@ class StandardPlatform extends Platform
 
         // array-key
         yield Type\ArrayKeyType::class => $arrayKey = new Coercer\ArrayKeyTypeCoercer();
-        yield Type\BackedEnumFromScalarType::class => $arrayKey;
 
         // bool
         yield Type\BoolType::class => $bool = new Coercer\BoolTypeCoercer();
@@ -138,8 +141,6 @@ class StandardPlatform extends Platform
         // string
         yield Type\StringType::class => $string = new Coercer\StringTypeCoercer();
         yield Type\StringLiteralType::class => $string;
-        yield Type\DateTimeFromStringType::class => $string;
-        yield Type\UnitEnumFromStringType::class => $string;
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

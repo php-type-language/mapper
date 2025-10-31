@@ -27,11 +27,11 @@ abstract class ListTypeBuilder extends NamedTypeBuilder
 
     /**
      * @param non-empty-array<non-empty-string>|non-empty-string $names
-     * @param non-empty-string $valueType
+     * @param non-empty-string $defaultValueType
      */
     public function __construct(
         array|string $names,
-        protected readonly string $valueType = self::DEFAULT_INNER_VALUE_TYPE,
+        protected readonly string $defaultValueType = self::DEFAULT_INNER_VALUE_TYPE,
     ) {
         parent::__construct($names);
     }
@@ -75,7 +75,7 @@ abstract class ListTypeBuilder extends NamedTypeBuilder
         return $this->create(
             type: $types->getTypeByStatement(
                 statement: $parser->getStatementByDefinition(
-                    definition: $this->valueType,
+                    definition: $this->defaultValueType,
                 ),
             ),
         );

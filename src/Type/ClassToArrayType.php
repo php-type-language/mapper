@@ -17,7 +17,7 @@ use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
  * @template TObject of object = object
  * @template-implements TypeInterface<object|array<array-key, mixed>>
  */
-class ClassTypeToArrayType implements TypeInterface
+class ClassToArrayType implements TypeInterface
 {
     public function __construct(
         /**

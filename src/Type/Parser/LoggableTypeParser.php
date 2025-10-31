@@ -10,17 +10,27 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class LoggableTypeParser implements TypeParserInterface
 {
+    /**
+     * @var non-empty-string
+     */
+    public const DEFAULT_PARSER_GROUP_NAME = 'PARSE';
+
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly TypeParserInterface $delegate,
+        /**
+         * @var non-empty-string
+         */
+        private readonly string $group = self::DEFAULT_PARSER_GROUP_NAME,
     ) {}
 
     /**
      * @param non-empty-string $definition
      */
-    private function before(string $definition): void
+    private function logBefore(string $definition): void
     {
-        $this->logger->debug('Fetching an AST by "{definition}"', [
+        $this->logger->debug('[{group}] Parsing "{definition}" definition', [
+            'group' => $this->group,
             'definition' => $definition,
         ]);
     }
@@ -28,21 +38,37 @@ final class LoggableTypeParser implements TypeParserInterface
     /**
      * @param non-empty-string $definition
      */
-    private function after(string $definition, TypeStatement $statement): void
+    private function logAfter(string $definition, TypeStatement $statement): void
     {
-        $this->logger->info('AST was fetched by "{definition}"', [
+        $this->logger->info('[{group}] Parsed "{definition}" definition', [
+            'group' => $this->group,
             'definition' => $definition,
             'statement' => $statement,
         ]);
     }
 
+    private function logError(string $definition, \Throwable $e): void
+    {
+        $this->logger->error('[{group}] Parsing error: {error}', [
+            'group' => $this->group,
+            'definition' => $definition,
+            'error' => $e->getMessage(),
+        ]);
+    }
+
     public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
     {
-        $this->before($definition);
+        $this->logBefore($definition);
 
-        $statement = $this->delegate->getStatementByDefinition($definition);
+        try {
+            $statement = $this->delegate->getStatementByDefinition($definition);
+        } catch (\Throwable $e) {
+            $this->logError($definition, $e);
 
-        $this->after($definition, $statement);
+            throw $e;
+        }
+
+        $this->logAfter($definition, $statement);
 
         return $statement;
     }

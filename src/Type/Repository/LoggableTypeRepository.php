@@ -12,38 +12,107 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class LoggableTypeRepository extends TypeRepositoryDecorator
 {
+    /**
+     * @var non-empty-string
+     */
+    public const DEFAULT_REPOSITORY_GROUP_NAME = 'REPOSITORY';
+
     public function __construct(
         private readonly LoggerInterface $logger,
         TypeRepositoryInterface $delegate,
+        /**
+         * @var non-empty-string
+         */
+        private readonly string $group = self::DEFAULT_REPOSITORY_GROUP_NAME,
     ) {
         parent::__construct($delegate);
+    }
+
+    /**
+     * @return non-empty-string
+     */
+    private function getInstanceName(object $entry): string
+    {
+        return $entry::class . '#' . \spl_object_id($entry);
+    }
+
+    private function logBefore(TypeStatement $statement): void
+    {
+        $this->logger->debug('[{group}] Fetching type by {statement_name} statement', [
+            'group' => $this->group,
+            'statement_name' => $this->getInstanceName($statement),
+            'statement' => $statement,
+        ]);
+    }
+
+    private function logAfter(TypeStatement $statement, TypeInterface $type): void
+    {
+        $unwrapped = $this->unwrap($type);
+
+        $this->logger->info('[{group}] Fetched {type_name} type', [
+            'group' => $this->group,
+            'statement_name' => $this->getInstanceName($statement),
+            'type_name' => $this->getInstanceName($unwrapped),
+            'statement' => $statement,
+            'type' => $unwrapped,
+        ]);
+    }
+
+    private function logError(TypeStatement $statement, \Throwable $e): void
+    {
+        $this->logger->error('[{group}] Fetch error: {error}', [
+            'group' => $this->group,
+            'statement_name' => $this->getInstanceName($statement),
+            'statement' => $statement,
+            'error' => $e->getMessage(),
+        ]);
     }
 
     #[\Override]
     public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        $this->logger->debug('Fetching the type by the AST statement {statement_name}', [
-            'statement' => $statement,
-            'statement_name' => $statement::class . '#' . \spl_object_id($statement),
-        ]);
+        $this->logBefore($statement);
 
-        $type = $result = parent::getTypeByStatement($statement);
+        try {
+            $type = parent::getTypeByStatement($statement);
+        } catch (\Throwable $e) {
+            $this->logError($statement, $e);
 
+            throw $e;
+        }
+
+        $this->logAfter($statement, $type);
+
+        return $this->wrap($type);
+    }
+
+    /**
+     * @template TArgResult of mixed
+     *
+     * @param TypeInterface<TArgResult> $type
+     * @return TypeInterface<TArgResult>
+     */
+    private function unwrap(TypeInterface $type): TypeInterface
+    {
         if ($type instanceof TypeDecoratorInterface) {
-            $type = $type->getDecoratedType();
+            return $type->getDecoratedType();
         }
 
-        $this->logger->info('The {type_name} was fetched by the AST statement {statement_name}', [
-            'statement' => $statement,
-            'statement_name' => $statement::class . '#' . \spl_object_id($statement),
-            'type' => $type,
-            'type_name' => $type::class . '#' . \spl_object_id($type),
-        ]);
+        return $type;
+    }
 
-        if ($result instanceof LoggableType) {
-            return $result;
+    /**
+     * @template TArgResult of mixed
+     *
+     * @param TypeInterface<TArgResult> $type
+     * @return TypeInterface<TArgResult>
+     */
+    private function wrap(TypeInterface $type): TypeInterface
+    {
+        if ($type instanceof LoggableType) {
+            return $type;
         }
 
-        return new LoggableType($this->logger, $result);
+        return new LoggableType($type);
     }
 }

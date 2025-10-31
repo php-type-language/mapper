@@ -56,6 +56,17 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         );
     }
 
+    private function createNormalizationContext(mixed $value): RootContext
+    {
+        return RootContext::forNormalization(
+            value: $value,
+            config: $this->config,
+            extractor: $this->extractor,
+            parser: $this->parser,
+            types: $this->normalize,
+        );
+    }
+
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
         $type ??= $this->extractor->getDefinitionByValue($value);
@@ -64,13 +75,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             statement: $this->parser->getStatementByDefinition($type),
         );
 
-        return $instance->cast($value, RootContext::forNormalization(
-            value: $value,
-            config: $this->config,
-            extractor: $this->extractor,
-            parser: $this->parser,
-            types: $this->normalize,
-        ));
+        return $instance->cast($value, $this->createNormalizationContext($value));
     }
 
     public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
@@ -81,13 +86,19 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             statement: $this->parser->getStatementByDefinition($type),
         );
 
-        return $instance->match($value, RootContext::forNormalization(
+        return $instance->match($value, $this->createNormalizationContext($value));
+    }
+
+
+    private function createDenormalizationContext(mixed $value): RootContext
+    {
+        return RootContext::forDenormalization(
             value: $value,
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->normalize,
-        ));
+            types: $this->denormalize,
+        );
     }
 
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
@@ -96,13 +107,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             statement: $this->parser->getStatementByDefinition($type),
         );
 
-        return $instance->cast($value, RootContext::forDenormalization(
-            value: $value,
-            config: $this->config,
-            extractor: $this->extractor,
-            parser: $this->parser,
-            types: $this->denormalize,
-        ));
+        return $instance->cast($value, $this->createDenormalizationContext($value));
     }
 
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
@@ -111,13 +116,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             statement: $this->parser->getStatementByDefinition($type),
         );
 
-        return $instance->match($value, RootContext::forDenormalization(
-            value: $value,
-            config: $this->config,
-            extractor: $this->extractor,
-            parser: $this->parser,
-            types: $this->denormalize,
-        ));
+        return $instance->match($value, $this->createDenormalizationContext($value));
     }
 
     /**

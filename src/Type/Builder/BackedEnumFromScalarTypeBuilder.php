@@ -13,9 +13,8 @@ use TypeLang\Mapper\Type\TypeInterface;
  */
 class BackedEnumFromScalarTypeBuilder extends BackedEnumTypeBuilder
 {
-    protected function create(string $class, TypeInterface $type): BackedEnumFromScalarType
+    protected function create(string $class, string $definition, TypeInterface $type): BackedEnumFromScalarType
     {
-        /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return new BackedEnumFromScalarType($class, $type);
     }
 }

@@ -28,6 +28,15 @@ final class CoercibleType extends TypeDecorator
         parent::__construct($delegate);
     }
 
+    public function match(mixed $value, Context $context): bool
+    {
+        if (!$context->isStrictTypesEnabled()) {
+            $value = $this->coercer->coerce($value, $context);
+        }
+
+        return parent::match($value, $context);
+    }
+
     public function cast(mixed $value, Context $context): mixed
     {
         if (!$context->isStrictTypesEnabled()) {

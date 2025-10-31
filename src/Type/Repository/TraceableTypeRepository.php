@@ -45,7 +45,6 @@ final class TraceableTypeRepository extends TypeRepositoryDecorator
 
         return new TraceableType(
             definition: $this->printer->print($statement),
-            tracer: $this->tracer,
             delegate: $result,
         );
     }
