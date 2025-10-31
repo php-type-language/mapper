@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Metadata;
@@ -95,7 +96,7 @@ final class PropertyMetadata extends Metadata
 
         $name = $this->name;
 
-        if ($context->isDenormalization()) {
+        if ($context->direction === Direction::Denormalize) {
             $name = $this->alias;
         }
 
