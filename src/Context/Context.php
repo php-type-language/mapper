@@ -31,6 +31,7 @@ abstract class Context implements
         public readonly TypeExtractorInterface $extractor,
         public readonly TypeParserInterface $parser,
         public readonly TypeRepositoryInterface $types,
+        protected readonly ?Configuration $previous = null,
     ) {}
 
     /**
@@ -38,22 +39,36 @@ abstract class Context implements
      */
     public function enter(mixed $value, EntryInterface $entry, ?Configuration $override = null): self
     {
+        $current = $this->previous ?? $this->config;
+
         return new ChildContext(
             parent: $this,
             entry: $entry,
             value: $value,
             direction: $this->direction,
-            config: $this->config,
+            config: $override ?? $current,
             extractor: $this->extractor,
             parser: $this->parser,
             types: $this->types,
-            override: $override,
+            previous: $current,
         );
+    }
+
+    public function withObjectAsArray(bool $enabled): Configuration
+    {
+        return ($this->previous ?? $this->config)
+            ->withObjectAsArray($enabled);
     }
 
     public function isObjectAsArray(): bool
     {
         return $this->config->isObjectAsArray();
+    }
+
+    public function withStrictTypes(bool $enabled): Configuration
+    {
+        return ($this->previous ?? $this->config)
+            ->withStrictTypes($enabled);
     }
 
     public function isStrictTypesEnabled(): bool

@@ -10,9 +10,9 @@ use TypeLang\Mapper\Tracing\TracerInterface;
 final class Configuration
 {
     /**
-     * Default value for {@see $isObjectsAsArrays} option.
+     * Default value for {@see $isObjectAsArray} option.
      */
-    public const OBJECTS_AS_ARRAYS_DEFAULT_VALUE = true;
+    public const OBJECT_AS_ARRAY_DEFAULT_VALUE = true;
 
     /**
      * Default value for {@see $isStrictTypes} option.
@@ -25,7 +25,7 @@ final class Configuration
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        private readonly ?bool $isObjectsAsArrays = null,
+        private readonly ?bool $isObjectAsArray = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
@@ -55,10 +55,10 @@ final class Configuration
      *
      * @api
      */
-    public function withObjectsAsArrays(?bool $enabled = null): self
+    public function withObjectAsArray(?bool $enabled = null): self
     {
         return new self(
-            isObjectsAsArrays: $enabled,
+            isObjectAsArray: $enabled,
             isStrictTypes: $this->isStrictTypes,
             logger: $this->logger,
             tracer: $this->tracer,
@@ -73,8 +73,8 @@ final class Configuration
      */
     public function isObjectAsArray(): bool
     {
-        return $this->isObjectsAsArrays
-            ?? self::OBJECTS_AS_ARRAYS_DEFAULT_VALUE;
+        return $this->isObjectAsArray
+            ?? self::OBJECT_AS_ARRAY_DEFAULT_VALUE;
     }
 
     /**
@@ -82,9 +82,9 @@ final class Configuration
      *
      * @api
      */
-    public function isObjectsAsArraysOptionDefined(): bool
+    public function isObjectAsArrayOptionDefined(): bool
     {
-        return $this->isObjectsAsArrays !== null;
+        return $this->isObjectAsArray !== null;
     }
 
     /**
@@ -97,7 +97,7 @@ final class Configuration
     public function withStrictTypes(?bool $enabled = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $enabled,
             logger: $this->logger,
             tracer: $this->tracer,
@@ -136,7 +136,7 @@ final class Configuration
     public function withLogger(?LoggerInterface $logger = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $this->isStrictTypes,
             logger: $logger,
             tracer: $this->tracer,
@@ -162,7 +162,7 @@ final class Configuration
     public function withTracer(?TracerInterface $tracer = null): self
     {
         return new self(
-            isObjectsAsArrays: $this->isObjectsAsArrays,
+            isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $this->isStrictTypes,
             logger: $this->logger,
             tracer: $tracer,

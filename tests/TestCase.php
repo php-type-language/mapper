@@ -41,9 +41,12 @@ abstract class TestCase extends BaseTestCase
         ]);
     }
 
-    protected function createConfiguration(bool $strictTypes = true): Configuration
-    {
+    protected function createConfiguration(
+        bool $strictTypes = Configuration::STRICT_TYPES_DEFAULT_VALUE,
+        bool $objectAsArray = Configuration::OBJECT_AS_ARRAY_DEFAULT_VALUE,
+    ): Configuration {
         return new Configuration(
+            isObjectAsArray: $objectAsArray,
             isStrictTypes: $strictTypes,
         );
     }
@@ -74,22 +77,22 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function createNormalizationContext(mixed $value, bool $strictTypes = true): RootContext
+    protected function createNormalizationContext(mixed $value, ?Configuration $config = null): RootContext
     {
         return RootContext::forNormalization(
             value: $value,
-            config: $this->createConfiguration($strictTypes),
+            config: $config ?? $this->createConfiguration(),
             extractor: $this->createTypeExtractor(),
             parser: $this->createTypeParser(),
             types: $this->createTypeRepository(Direction::Normalize),
         );
     }
 
-    protected function createDenormalizationContext(mixed $value, bool $strictTypes = true): RootContext
+    protected function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootContext
     {
         return RootContext::forDenormalization(
             value: $value,
-            config: $this->createConfiguration($strictTypes),
+            config: $config ?? $this->createConfiguration(),
             extractor: $this->createTypeExtractor(),
             parser: $this->createTypeParser(),
             types: $this->createTypeRepository(Direction::Denormalize),

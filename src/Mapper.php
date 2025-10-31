@@ -56,7 +56,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         );
     }
 
-    private function createNormalizationContext(mixed $value): RootContext
+    public function createNormalizationContext(mixed $value): RootContext
     {
         return RootContext::forNormalization(
             value: $value,

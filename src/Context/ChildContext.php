@@ -23,7 +23,7 @@ final class ChildContext extends Context
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
-        public readonly ?Configuration $override = null,
+        ?Configuration $previous = null,
     ) {
         parent::__construct(
             value: $value,
@@ -32,27 +32,8 @@ final class ChildContext extends Context
             extractor: $extractor,
             parser: $parser,
             types: $types,
+            previous: $previous,
         );
-    }
-
-    #[\Override]
-    public function isStrictTypesEnabled(): bool
-    {
-        if ($this->override?->isStrictTypesOptionDefined()) {
-            return $this->override->isStrictTypesEnabled();
-        }
-
-        return parent::isStrictTypesEnabled();
-    }
-
-    #[\Override]
-    public function isObjectAsArray(): bool
-    {
-        if ($this->override?->isObjectsAsArraysOptionDefined()) {
-            return $this->override->isObjectAsArray();
-        }
-
-        return parent::isObjectAsArray();
     }
 
     public function getIterator(): \Traversable
