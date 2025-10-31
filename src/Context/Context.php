@@ -61,22 +61,6 @@ abstract class Context implements
         return $this->config->isStrictTypesEnabled();
     }
 
-    /**
-     * @api
-     */
-    public function isNormalization(): bool
-    {
-        return $this->direction === Direction::Normalize;
-    }
-
-    /**
-     * @api
-     */
-    public function isDenormalization(): bool
-    {
-        return $this->direction === Direction::Denormalize;
-    }
-
     abstract public function getPath(): PathInterface;
 
     public function getTypeByStatement(TypeStatement $statement): TypeInterface

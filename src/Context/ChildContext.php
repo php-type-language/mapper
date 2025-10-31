@@ -38,15 +38,21 @@ final class ChildContext extends Context
     #[\Override]
     public function isStrictTypesEnabled(): bool
     {
-        return $this->override?->isStrictTypesEnabled()
-            ?? parent::isStrictTypesEnabled();
+        if ($this->override?->isStrictTypesOptionDefined()) {
+            return $this->override->isStrictTypesEnabled();
+        }
+
+        return parent::isStrictTypesEnabled();
     }
 
     #[\Override]
     public function isObjectAsArray(): bool
     {
-        return $this->override?->isObjectAsArray()
-            ?? parent::isObjectAsArray();
+        if ($this->override?->isObjectsAsArraysOptionDefined()) {
+            return $this->override->isObjectAsArray();
+        }
+
+        return parent::isObjectAsArray();
     }
 
     public function getIterator(): \Traversable
