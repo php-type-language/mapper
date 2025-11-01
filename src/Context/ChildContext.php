@@ -23,7 +23,7 @@ final class ChildContext extends Context
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
-        ?Configuration $previous = null,
+        ?Configuration $original = null,
     ) {
         parent::__construct(
             value: $value,
@@ -32,7 +32,7 @@ final class ChildContext extends Context
             extractor: $extractor,
             parser: $parser,
             types: $types,
-            previous: $previous,
+            original: $original,
         );
     }
 
