@@ -9,6 +9,7 @@ use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\DecorateByLoggableTypeRepository;
+use TypeLang\Mapper\Type\Repository\DecorateByTraceableTypeRepository;
 use TypeLang\Mapper\Type\Repository\InMemoryTypeRepository;
 use TypeLang\Mapper\Type\Repository\LoggableTypeRepository;
 use TypeLang\Mapper\Type\Repository\TraceableTypeRepository;
@@ -55,7 +56,15 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        return new TraceableTypeRepository($tracer, $types);
+        if ($config->shouldTraceTypeMatch() || $config->shouldTraceTypeCast()) {
+            $types = new DecorateByTraceableTypeRepository($types);
+        }
+
+        if ($config->shouldTraceTypeFind()) {
+            return new TraceableTypeRepository($tracer, $types);
+        }
+
+        return $types;
     }
 
     private function withLogging(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface
@@ -66,7 +75,9 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        $types = new DecorateByLoggableTypeRepository($types);
+        if ($config->shouldLogTypeCast() || $config->shouldLogTypeMatch()) {
+            $types = new DecorateByLoggableTypeRepository($types);
+        }
 
         if ($config->shouldLogTypeFind()) {
             return new LoggableTypeRepository($logger, $types);
