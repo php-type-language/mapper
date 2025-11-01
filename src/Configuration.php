@@ -32,6 +32,22 @@ final class Configuration
          */
         private readonly ?bool $isStrictTypes = null,
         /**
+         * Enable or disable type parsing logs
+         */
+        private readonly bool $logParser = false,
+        /**
+         * Enable or disable type lookup logs
+         */
+        private readonly bool $logTypeFind = false,
+        /**
+         * Enable or disable type match logs
+         */
+        private readonly bool $logTypeMatch = true,
+        /**
+         * Enable or disable type cast logs
+         */
+        private readonly bool $logTypeCast = true,
+        /**
          * If this option contains {@see LoggerInterface}, then logger
          * will be enabled.
          *
@@ -60,6 +76,10 @@ final class Configuration
         return new self(
             isObjectAsArray: $enabled,
             isStrictTypes: $this->isStrictTypes,
+            logParser: $this->logParser,
+            logTypeFind: $this->logTypeFind,
+            logTypeMatch: $this->logTypeMatch,
+            logTypeCast: $this->logTypeCast,
             logger: $this->logger,
             tracer: $this->tracer,
         );
@@ -99,6 +119,10 @@ final class Configuration
         return new self(
             isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $enabled,
+            logParser: $this->logParser,
+            logTypeFind: $this->logTypeFind,
+            logTypeMatch: $this->logTypeMatch,
+            logTypeCast: $this->logTypeCast,
             logger: $this->logger,
             tracer: $this->tracer,
         );
@@ -138,6 +162,10 @@ final class Configuration
         return new self(
             isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $this->isStrictTypes,
+            logParser: $this->logParser,
+            logTypeFind: $this->logTypeFind,
+            logTypeMatch: $this->logTypeMatch,
+            logTypeCast: $this->logTypeCast,
             logger: $logger,
             tracer: $this->tracer,
         );
@@ -164,6 +192,10 @@ final class Configuration
         return new self(
             isObjectAsArray: $this->isObjectAsArray,
             isStrictTypes: $this->isStrictTypes,
+            logParser: $this->logParser,
+            logTypeFind: $this->logTypeFind,
+            logTypeMatch: $this->logTypeMatch,
+            logTypeCast: $this->logTypeCast,
             logger: $this->logger,
             tracer: $tracer,
         );
@@ -176,5 +208,37 @@ final class Configuration
     public function findTracer(): ?TracerInterface
     {
         return $this->tracer;
+    }
+
+    /**
+     * Returns {@see true} in case of parser logs should be enabled
+     */
+    public function shouldLogParser(): bool
+    {
+        return $this->logParser;
+    }
+
+    /**
+     * Returns {@see true} in case of type find process logs should be enabled
+     */
+    public function shouldLogTypeFind(): bool
+    {
+        return $this->logTypeFind;
+    }
+
+    /**
+     * Returns {@see true} in case of type match logs should be enabled
+     */
+    public function shouldLogTypeMatch(): bool
+    {
+        return $this->logTypeMatch;
+    }
+
+    /**
+     * Returns {@see true} in case of type cast logs should be enabled
+     */
+    public function shouldLogTypeCast(): bool
+    {
+        return $this->logTypeCast;
     }
 }

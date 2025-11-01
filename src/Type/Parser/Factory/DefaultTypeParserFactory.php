@@ -48,7 +48,7 @@ final class DefaultTypeParserFactory implements TypeParserFactoryInterface
     {
         $logger = $config->findLogger();
 
-        if ($logger === null) {
+        if ($logger === null || !$config->shouldLogParser()) {
             return $parser;
         }
 

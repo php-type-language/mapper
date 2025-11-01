@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Repository;
 
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Type\Repository\TypeDecorator\LoggableType;
 use TypeLang\Mapper\Type\Repository\TypeDecorator\TypeDecoratorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -83,7 +82,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
 
         $this->logAfter($statement, $type);
 
-        return $this->wrap($type);
+        return $type;
     }
 
     /**
@@ -99,20 +98,5 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
         }
 
         return $type;
-    }
-
-    /**
-     * @template TArgResult of mixed
-     *
-     * @param TypeInterface<TArgResult> $type
-     * @return TypeInterface<TArgResult>
-     */
-    private function wrap(TypeInterface $type): TypeInterface
-    {
-        if ($type instanceof LoggableType) {
-            return $type;
-        }
-
-        return new LoggableType($type);
     }
 }

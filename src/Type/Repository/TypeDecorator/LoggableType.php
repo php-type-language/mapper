@@ -23,7 +23,12 @@ final class LoggableType extends TypeDecorator
     /**
      * @var non-empty-string
      */
-    public const DEFAULT_TYPE_GROUP_NAME = 'TYPE';
+    public const DEFAULT_CAST_GROUP_NAME = 'CAST';
+
+    /**
+     * @var non-empty-string
+     */
+    public const DEFAULT_MATCH_GROUP_NAME = 'MATCH';
 
     /**
      * @param TypeInterface<TResult> $delegate
@@ -33,7 +38,11 @@ final class LoggableType extends TypeDecorator
         /**
          * @var non-empty-string
          */
-        private readonly string $group = self::DEFAULT_TYPE_GROUP_NAME,
+        private readonly string $cast = self::DEFAULT_CAST_GROUP_NAME,
+        /**
+         * @var non-empty-string
+         */
+        private readonly string $match = self::DEFAULT_MATCH_GROUP_NAME,
     ) {
         parent::__construct($delegate);
     }
@@ -63,7 +72,7 @@ final class LoggableType extends TypeDecorator
     /**
      * @return array<array-key, mixed>
      */
-    private function getLoggerArguments(mixed $value, Context $context): array
+    private function getLoggerArguments(mixed $value, Context $context, string $group): array
     {
         $realType = $this->getDecoratedType();
 
@@ -72,14 +81,14 @@ final class LoggableType extends TypeDecorator
             'type_name' => $this->getInstanceName($realType),
             'path' => $this->getPathAsStringArray($context),
             'type' => $realType,
-            'group' => $this->group,
+            'group' => $group,
         ];
     }
 
     private function logBeforeMatch(LoggerInterface $logger, mixed $value, Context $context): void
     {
         $logger->debug('[{group}] Matching {value} by {type_name} type', [
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->match),
         ]);
     }
 
@@ -88,7 +97,7 @@ final class LoggableType extends TypeDecorator
         $logger->info('[{group}] {match_verbose} {value} by {type_name} type', [
             'match' => $status,
             'match_verbose' => $status ? '✔ Matched' : '✘ Not matched',
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->match),
         ]);
     }
 
@@ -96,7 +105,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger->info('[{group}] Match error: {message}', [
             'error' => $e->getMessage(),
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->match),
         ]);
     }
 
@@ -104,7 +113,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger = $context->config->findLogger();
 
-        if ($logger === null) {
+        if ($logger === null || !$context->config->shouldLogTypeMatch()) {
             return parent::match($value, $context);
         }
 
@@ -135,7 +144,7 @@ final class LoggableType extends TypeDecorator
     private function logBeforeCast(LoggerInterface $logger, mixed $value, Context $context): void
     {
         $logger->debug('[{group}] Casting "{value}" by {type_name} type', [
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->cast),
         ]);
     }
 
@@ -143,7 +152,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger->info('[{group}] Casted "{value}" to "{result}" by {type_name} type', [
             'result' => $result,
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->cast),
         ]);
     }
 
@@ -151,7 +160,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger->info('[{group}] Casting error: {message}', [
             'error' => $e->getMessage(),
-            ...$this->getLoggerArguments($value, $context),
+            ...$this->getLoggerArguments($value, $context, $this->cast),
         ]);
     }
 
@@ -159,7 +168,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger = $context->config->findLogger();
 
-        if ($logger === null) {
+        if ($logger === null || !$context->config->shouldLogTypeCast()) {
             return parent::cast($value, $context);
         }
 
