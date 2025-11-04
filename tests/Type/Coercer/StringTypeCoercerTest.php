@@ -75,6 +75,7 @@ final class StringTypeCoercerTest extends TypeCoercerTestCase
                     'stream' => 'stream',
                     default => $default,
                 },
+                \get_debug_type($value) === 'resource (closed)' => 'resource',
                 $value === IntBackedEnumStub::ExampleCase => (string) IntBackedEnumStub::ExampleCase->value,
                 $value === StringBackedEnumStub::ExampleCase => StringBackedEnumStub::ExampleCase->value,
                 $value === UnitEnumStub::ExampleCase => UnitEnumStub::ExampleCase->name,
