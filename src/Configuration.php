@@ -10,12 +10,12 @@ use TypeLang\Mapper\Tracing\TracerInterface;
 final class Configuration
 {
     /**
-     * Default value for {@see $isObjectAsArray} option.
+     * Default value for {@see $objectAsArray} option.
      */
     public const OBJECT_AS_ARRAY_DEFAULT_VALUE = true;
 
     /**
-     * Default value for {@see $isStrictTypes} option.
+     * Default value for {@see $strictTypes} option.
      */
     public const STRICT_TYPES_DEFAULT_VALUE = true;
 
@@ -25,12 +25,12 @@ final class Configuration
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
          */
-        private readonly ?bool $isObjectAsArray = null,
+        private readonly ?bool $objectAsArray = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
          */
-        private readonly ?bool $isStrictTypes = null,
+        private readonly ?bool $strictTypes = null,
         /**
          * Enable or disable type parsing logs
          */
@@ -90,8 +90,8 @@ final class Configuration
     public function withObjectAsArray(?bool $enabled = null): self
     {
         return new self(
-            isObjectAsArray: $enabled,
-            isStrictTypes: $this->isStrictTypes,
+            objectAsArray: $enabled,
+            strictTypes: $this->strictTypes,
             logTypeParse: $this->logTypeParse,
             logTypeFind: $this->logTypeFind,
             logTypeMatch: $this->logTypeMatch,
@@ -113,7 +113,7 @@ final class Configuration
      */
     public function isObjectAsArray(): bool
     {
-        return $this->isObjectAsArray
+        return $this->objectAsArray
             ?? self::OBJECT_AS_ARRAY_DEFAULT_VALUE;
     }
 
@@ -124,7 +124,7 @@ final class Configuration
      */
     public function isObjectAsArrayOptionDefined(): bool
     {
-        return $this->isObjectAsArray !== null;
+        return $this->objectAsArray !== null;
     }
 
     /**
@@ -137,8 +137,8 @@ final class Configuration
     public function withStrictTypes(?bool $enabled = null): self
     {
         return new self(
-            isObjectAsArray: $this->isObjectAsArray,
-            isStrictTypes: $enabled,
+            objectAsArray: $this->objectAsArray,
+            strictTypes: $enabled,
             logTypeParse: $this->logTypeParse,
             logTypeFind: $this->logTypeFind,
             logTypeMatch: $this->logTypeMatch,
@@ -161,7 +161,7 @@ final class Configuration
      */
     public function isStrictTypesEnabled(): bool
     {
-        return $this->isStrictTypes
+        return $this->strictTypes
             ?? self::STRICT_TYPES_DEFAULT_VALUE;
     }
 
@@ -172,7 +172,7 @@ final class Configuration
      */
     public function isStrictTypesOptionDefined(): bool
     {
-        return $this->isStrictTypes !== null;
+        return $this->strictTypes !== null;
     }
 
     /**

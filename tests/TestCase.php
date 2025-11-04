@@ -46,8 +46,8 @@ abstract class TestCase extends BaseTestCase
         bool $objectAsArray = Configuration::OBJECT_AS_ARRAY_DEFAULT_VALUE,
     ): Configuration {
         return new Configuration(
-            isObjectAsArray: $objectAsArray,
-            isStrictTypes: $strictTypes,
+            objectAsArray: $objectAsArray,
+            strictTypes: $strictTypes,
         );
     }
 

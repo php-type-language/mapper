@@ -78,8 +78,8 @@ final class ContextConfigMutationTest extends ContextTestCase
     public function testNonDefaultConfigRollbackAfterMultipleEntrance(): void
     {
         $context = $this->createNormalizationContext(42, new Configuration(
-            isObjectAsArray: false,
-            isStrictTypes: false,
+            objectAsArray: false,
+            strictTypes: false,
         ));
 
         self::assertFalse($context->config->isStrictTypesEnabled());
@@ -106,8 +106,8 @@ final class ContextConfigMutationTest extends ContextTestCase
     public function testOnlyOneConfigChanged(): void
     {
         $context = $this->createNormalizationContext(42, new Configuration(
-            isObjectAsArray: false,
-            isStrictTypes: false,
+            objectAsArray: false,
+            strictTypes: false,
         ));
 
         self::assertFalse($context->config->isStrictTypesEnabled());
