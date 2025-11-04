@@ -125,7 +125,6 @@ final class LoggableType extends TypeDecorator
      */
     private function matchThroughLogger(LoggerInterface $logger, mixed $value, Context $context): bool
     {
-
         $this->logBeforeMatch($logger, $value, $context);
 
         try {
@@ -177,7 +176,6 @@ final class LoggableType extends TypeDecorator
 
     /**
      * @return TResult
-     *
      * @throws \Throwable in case of any internal error occurs
      */
     private function castThroughLogger(LoggerInterface $logger, mixed $value, Context $context): mixed

@@ -12,7 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template-covariant TType of TypeInterface = TypeInterface<mixed>
- *
  * @template-extends NamedTypeBuilder<TType>
  */
 class TypeAliasBuilder extends NamedTypeBuilder
@@ -27,8 +26,8 @@ class TypeAliasBuilder extends NamedTypeBuilder
          */
         protected readonly NamedTypeBuilder $delegate,
         /**
-         * @internal Will be used in the future to notify about the
-         *           use of incorrect types.
+         * @internal will be used in the future to notify about the
+         *           use of incorrect types
          */
         protected readonly Reason $reason = Reason::DEFAULT,
     ) {

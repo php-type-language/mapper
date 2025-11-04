@@ -158,6 +158,7 @@ abstract class Context implements
      * configuration value.
      *
      * @see Configuration::isObjectAsArray()
+     *
      * @link https://en.wikipedia.org/wiki/Law_of_Demeter
      */
     public function isObjectAsArray(): bool
@@ -185,6 +186,7 @@ abstract class Context implements
      * configuration value.
      *
      * @see Configuration::isStrictTypesEnabled()
+     *
      * @link https://en.wikipedia.org/wiki/Law_of_Demeter
      */
     public function isStrictTypesEnabled(): bool

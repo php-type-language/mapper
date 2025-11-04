@@ -89,6 +89,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
      * @template TArgResult of mixed
      *
      * @param TypeInterface<TArgResult> $type
+     *
      * @return TypeInterface<TArgResult>
      */
     private function unwrap(TypeInterface $type): TypeInterface

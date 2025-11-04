@@ -89,7 +89,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $instance->match($value, $this->createNormalizationContext($value));
     }
 
-
     private function createDenormalizationContext(mixed $value): RootContext
     {
         return RootContext::forDenormalization(
