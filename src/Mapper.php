@@ -34,11 +34,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     public function __construct(
         PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
-        TypeExtractorFactoryInterface $extractorFactory = new DefaultTypeExtractorFactory(),
+        TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
         TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
         TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
-        $this->extractor = $extractorFactory->createTypeExtractor($config);
+        $this->extractor = $typeExtractorFactory->createTypeExtractor($config);
         $this->parser = $typeParserFactory->createTypeParser($config, $platform);
 
         $this->normalize = $typeRepositoryFactory->createTypeRepository(
