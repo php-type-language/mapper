@@ -99,4 +99,9 @@ abstract class Platform implements PlatformInterface
     {
         return $this->coercers;
     }
+
+    public function isFeatureSupported(GrammarFeature $feature): bool
+    {
+        return true;
+    }
 }

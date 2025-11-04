@@ -28,6 +28,7 @@ class StandardPlatform extends Platform
         return 'standard';
     }
 
+    #[\Override]
     public function getTypes(Direction $direction): iterable
     {
         yield from parent::getTypes($direction);
@@ -145,6 +146,7 @@ class StandardPlatform extends Platform
         }
     }
 
+    #[\Override]
     public function getTypeCoercers(Direction $direction): iterable
     {
         yield from parent::getTypeCoercers($direction);
@@ -170,6 +172,7 @@ class StandardPlatform extends Platform
         yield Type\StringLiteralType::class => $string;
     }
 
+    #[\Override]
     public function isFeatureSupported(GrammarFeature $feature): bool
     {
         return \in_array($feature, self::FEATURES_LIST, true);
