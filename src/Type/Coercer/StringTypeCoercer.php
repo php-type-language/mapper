@@ -45,6 +45,7 @@ class StringTypeCoercer implements TypeCoercerInterface
 
     /**
      * @param int<1, 53> $precision
+     *
      * @return non-empty-string
      */
     private function createFloatTemplate(int $precision): string
