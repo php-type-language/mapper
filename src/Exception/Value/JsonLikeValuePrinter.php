@@ -151,14 +151,8 @@ final class JsonLikeValuePrinter implements ValuePrinterInterface
      */
     private function printWellFormedFloat(float $value): string
     {
-        /** @var non-empty-string $formatted */
-        $formatted = \rtrim(\sprintf('%f', $value), '0');
-
-        if (\str_ends_with($formatted, '.')) {
-            $formatted .= '0';
-        }
-
-        return $formatted;
+        /** @var non-empty-string */
+        return \sprintf('%h', $value);
     }
 
     /**
