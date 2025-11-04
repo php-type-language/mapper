@@ -12,6 +12,11 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class StringTypeCoercer implements TypeCoercerInterface
 {
+    /**
+     * @var int<1, 53>
+     */
+    private const DEFAULT_FLOAT_PRECISION = 14;
+
     /** @var string */
     public const NULL_TO_STRING = '';
     /** @var string */
@@ -22,6 +27,44 @@ class StringTypeCoercer implements TypeCoercerInterface
     public const NAN_TO_STRING = 'nan';
     /** @var string */
     public const INF_TO_STRING = 'inf';
+
+    /**
+     * @var non-empty-string
+     */
+    private string $floatTemplate;
+
+    /**
+     * @param int<1, 53>|null $floatPrecision
+     */
+    public function __construct(?int $floatPrecision = null)
+    {
+        $this->floatTemplate = $this->createFloatTemplate(
+            precision: $floatPrecision ?? $this->getDefaultFloatPrecision(),
+        );
+    }
+
+    /**
+     * @param int<1, 53> $precision
+     * @return non-empty-string
+     */
+    private function createFloatTemplate(int $precision): string
+    {
+        return \sprintf('%%01.%df', $precision);
+    }
+
+    /**
+     * @return int<1, 53>
+     */
+    private function getDefaultFloatPrecision(): int
+    {
+        $result = \ini_get('precision');
+
+        if (\is_numeric($result) && IntTypeCoercer::isSafeFloat((float) $result)) {
+            return (int) $result;
+        }
+
+        return self::DEFAULT_FLOAT_PRECISION;
+    }
 
     /**
      * @throws InvalidValueException
@@ -45,23 +88,41 @@ class StringTypeCoercer implements TypeCoercerInterface
                 $value === \INF => static::INF_TO_STRING,
                 $value === -\INF => '-' . static::INF_TO_STRING,
                 // Other floating point values
-                default => \str_ends_with(
-                    haystack: $formatted = \rtrim(\sprintf('%f', $value), '0'),
-                    needle: '.',
-                ) ? $formatted . '0' : $formatted,
+                default => $this->floatToString($value, $context),
             },
             // Int
             \is_int($value),
             // Stringable
             $value instanceof \Stringable => (string) $value,
-            \is_resource($value) => \get_resource_type($value),
             // Enum
             $value instanceof \BackedEnum => (string) $value->value,
             $value instanceof \UnitEnum => $value->name,
+            // Resource
+            \is_resource($value) => \get_resource_type($value),
+            \get_debug_type($value) === 'resource (closed)' => 'resource',
             default => throw InvalidValueException::createFromContext(
                 value: $value,
                 context: $context,
             ),
         };
+    }
+
+    private function floatToString(float $value, Context $context): string
+    {
+        $formatted = \sprintf($this->floatTemplate, $value);
+        $formatted = \rtrim($formatted, '0');
+
+        if (\str_ends_with($formatted, '.')) {
+            $formatted .= '0';
+        }
+
+        if ((float) $formatted === $value) {
+            return $formatted;
+        }
+
+        throw InvalidValueException::createFromContext(
+            value: $value,
+            context: $context,
+        );
     }
 }
