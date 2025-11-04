@@ -68,10 +68,9 @@ final class MixedTypeTest extends TypeTestCase
                     default => $value,
                 }
             : match (true) {
-                // Denormalization does not supports enums
-                $value === UnitEnumStub::ExampleCase => new \ValueError('Passed value "ExampleCase" is invalid'),
-                $value === IntBackedEnumStub::ExampleCase => new \ValueError('Passed value 3735928559 is invalid'),
-                $value === StringBackedEnumStub::ExampleCase => new \ValueError('Passed value "case" is invalid'),
+                $value === UnitEnumStub::ExampleCase => UnitEnumStub::ExampleCase,
+                $value === IntBackedEnumStub::ExampleCase => IntBackedEnumStub::ExampleCase,
+                $value === StringBackedEnumStub::ExampleCase => StringBackedEnumStub::ExampleCase,
                 default => $value,
             };
         }
