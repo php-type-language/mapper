@@ -15,7 +15,7 @@ final class ContextConfigMutationTest extends ContextTestCase
     {
         $context = $this->createNormalizationContext(42);
 
-        self::assertTrue($context->config->isStrictTypesEnabled());
+        self::assertFalse($context->config->isStrictTypesEnabled());
         self::assertTrue($context->config->isObjectAsArray());
 
         $context = $context->enter(42, new ObjectEntry('object'),
@@ -29,7 +29,7 @@ final class ContextConfigMutationTest extends ContextTestCase
     {
         $context = $this->createNormalizationContext(42);
 
-        self::assertTrue($context->config->isStrictTypesEnabled());
+        self::assertFalse($context->config->isStrictTypesEnabled());
         self::assertTrue($context->config->isObjectAsArray());
 
         $context = $context->enter(42, new ObjectEntry('object'),
@@ -40,7 +40,7 @@ final class ContextConfigMutationTest extends ContextTestCase
 
         $context = $context->enter(42, new ObjectEntry('object'));
 
-        self::assertTrue($context->config->isStrictTypesEnabled());
+        self::assertFalse($context->config->isStrictTypesEnabled());
         self::assertTrue($context->config->isObjectAsArray());
     }
 
@@ -48,7 +48,7 @@ final class ContextConfigMutationTest extends ContextTestCase
     {
         $context = $this->createNormalizationContext(42);
 
-        self::assertTrue($context->config->isStrictTypesEnabled());
+        self::assertFalse($context->config->isStrictTypesEnabled());
         self::assertTrue($context->config->isObjectAsArray());
 
         $context = $context->enter(42, new ObjectEntry('object'),
@@ -71,7 +71,7 @@ final class ContextConfigMutationTest extends ContextTestCase
 
         $context = $context->enter(42, new ObjectEntry('object'));
 
-        self::assertTrue($context->config->isStrictTypesEnabled());
+        self::assertFalse($context->config->isStrictTypesEnabled());
         self::assertTrue($context->config->isObjectAsArray());
     }
 

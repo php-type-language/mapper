@@ -26,13 +26,6 @@ final class RootContext extends Context
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
-        // Enable strict-types for normalization if option is not set
-        if (!$config->isStrictTypesOptionDefined()) {
-            $config = $config->withStrictTypes(true);
-        }
-
-        // ...
-
         return new self(
             value: $value,
             direction: Direction::Normalize,
@@ -50,13 +43,6 @@ final class RootContext extends Context
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
-        // Disable strict-types for denormalization if option is not set
-        if (!$config->isStrictTypesOptionDefined()) {
-            $config = $config->withStrictTypes(false);
-        }
-
-        // ...
-
         return new self(
             value: $value,
             direction: Direction::Denormalize,
