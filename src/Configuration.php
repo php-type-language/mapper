@@ -7,7 +7,7 @@ namespace TypeLang\Mapper;
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Tracing\TracerInterface;
 
-final class Configuration
+class Configuration
 {
     /**
      * Default value for {@see $objectAsArray} option.
@@ -17,7 +17,7 @@ final class Configuration
     /**
      * Default value for {@see $strictTypes} option.
      */
-    public const STRICT_TYPES_DEFAULT_VALUE = true;
+    public const STRICT_TYPES_DEFAULT_VALUE = false;
 
     public function __construct(
         /**
