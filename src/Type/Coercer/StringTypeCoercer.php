@@ -60,8 +60,8 @@ class StringTypeCoercer implements TypeCoercerInterface
     {
         $result = \ini_get('precision');
 
-        if (\is_numeric($result) && IntTypeCoercer::isSafeFloat((float) $result)) {
-            return (int) $result;
+        if (IntTypeCoercer::isSafeFloat((float) $result)) {
+            return \max(1, \min(53, (int) $result));
         }
 
         return self::DEFAULT_FLOAT_PRECISION;
