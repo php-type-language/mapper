@@ -87,11 +87,39 @@ class StandardPlatform extends Platform
         // Adds support for the "T|U" union types
         yield new Builder\UnionTypeBuilder();
 
+        // Temporary aliases
+        yield new Builder\TypeAliasBuilder('non-empty-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('lowercase-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-empty-lowercase-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('uppercase-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-empty-uppercase-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('numeric-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('literal-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-empty-literal-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('class-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('interface-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('trait-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('enum-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('callable-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('truthy-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-falsy-string', $string, Reason::Deprecated);
+
+        yield new Builder\TypeAliasBuilder('positive-int', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-positive-int', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('negative-int', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-negative-int', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-zero-int', $int, Reason::Deprecated);
+
+        yield new Builder\TypeAliasBuilder('number', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Deprecated);
+
+        // Other
         if ($direction === Direction::Normalize) {
             // Adds support for the "iterable<T> -> list<T>" type
             yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
             yield $object = new Builder\ObjectToArrayTypeBuilder('object');
+            yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
             // Adds support for the "BackedEnum -> scalar" type
             yield new Builder\BackedEnumToScalarTypeBuilder();
             // Adds support for the "UnitEnum -> scalar" type
@@ -105,6 +133,7 @@ class StandardPlatform extends Platform
             yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
             yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
+            yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
             // Adds support for the "scalar -> BackedEnum" type
             yield new Builder\BackedEnumFromScalarTypeBuilder();
             // Adds support for the "scalar -> UnitEnum" type
@@ -114,8 +143,6 @@ class StandardPlatform extends Platform
             // Adds support for the "array{ ... } -> object(ClassName)" type
             yield new Builder\ClassFromArrayTypeBuilder($this->meta);
         }
-
-        yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
     }
 
     public function getTypeCoercers(Direction $direction): iterable
