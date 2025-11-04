@@ -27,6 +27,7 @@ abstract class TypeDecorator implements TypeDecoratorInterface
     public function getDecoratedType(): TypeInterface
     {
         if ($this->delegate instanceof TypeDecoratorInterface) {
+            /** @var TypeInterface<TResult> */
             return $this->delegate->getDecoratedType();
         }
 

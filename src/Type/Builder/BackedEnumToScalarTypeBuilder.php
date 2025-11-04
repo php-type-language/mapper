@@ -15,6 +15,7 @@ class BackedEnumToScalarTypeBuilder extends BackedEnumTypeBuilder
 {
     protected function create(string $class, string $definition, TypeInterface $type): BackedEnumToScalarType
     {
+        /** @phpstan-ignore-next-line : Too complicated checks for PHPStan */
         return new BackedEnumToScalarType($class);
     }
 }

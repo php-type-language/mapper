@@ -36,6 +36,7 @@ class DateTimeFromStringType implements TypeInterface
         }
 
         try {
+            /** @var string $value */
             return $this->tryParseDateTime($value) !== null;
         } catch (\Throwable) {
             return false;

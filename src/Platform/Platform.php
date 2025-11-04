@@ -27,7 +27,7 @@ abstract class Platform implements PlatformInterface
     protected readonly array $types;
 
     /**
-     * @var list<TypeCoercerInterface>
+     * @var array<class-string<TypeInterface>, TypeCoercerInterface>
      */
     protected readonly array $coercers;
 
@@ -86,13 +86,13 @@ abstract class Platform implements PlatformInterface
     }
 
     /**
-     * @param iterable<mixed, TypeCoercerInterface> $coercers
+     * @param iterable<class-string<TypeInterface>, TypeCoercerInterface> $coercers
      *
-     * @return list<TypeCoercerInterface>
+     * @return array<class-string<TypeInterface>, TypeCoercerInterface>
      */
     protected function formatCoercers(iterable $coercers): array
     {
-        return iterable_to_array($coercers, true);
+        return iterable_to_array($coercers);
     }
 
     public function getTypeCoercers(Direction $direction): iterable

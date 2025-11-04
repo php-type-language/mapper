@@ -41,7 +41,7 @@ final class TypeRepository implements
     ) {
         $this->context = $this;
         $this->builders = iterable_to_array($builders, false);
-        $this->coercers = iterable_to_array($coercers, true);
+        $this->coercers = iterable_to_array($coercers);
     }
 
     /**

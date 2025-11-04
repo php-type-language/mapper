@@ -95,6 +95,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
     private function unwrap(TypeInterface $type): TypeInterface
     {
         if ($type instanceof TypeDecoratorInterface) {
+            /** @var TypeInterface<TArgResult> */
             return $type->getDecoratedType();
         }
 
