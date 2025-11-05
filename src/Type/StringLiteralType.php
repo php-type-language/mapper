@@ -30,9 +30,6 @@ class StringLiteralType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

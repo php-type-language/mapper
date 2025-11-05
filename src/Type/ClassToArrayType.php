@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Exception\Runtime\FinalExceptionInterface;
+use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
@@ -45,7 +45,6 @@ class ClassToArrayType implements TypeInterface
         if (!$value instanceof $className) {
             throw InvalidValueOfTypeException::createFromContext(
                 expected: $this->metadata->getTypeStatement($context, read: true),
-                value: $value,
                 context: $context,
             );
         }
@@ -121,14 +120,13 @@ class ClassToArrayType implements TypeInterface
             try {
                 // Insert field value into result
                 $result[$meta->alias] = $meta->read->type->cast($element, $entrance);
-            } catch (FinalExceptionInterface $e) {
+            } catch (NotInterceptableExceptionInterface $e) {
                 throw $e;
             } catch (\Throwable $e) {
                 $exception = InvalidObjectValueException::createFromContext(
                     element: $element,
                     field: $meta->alias,
                     expected: $meta->getTypeStatement($entrance, read: true),
-                    value: $object,
                     context: $entrance,
                     previous: $e,
                 );

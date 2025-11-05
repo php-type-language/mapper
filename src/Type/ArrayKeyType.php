@@ -46,10 +46,7 @@ class ArrayKeyType implements TypeInterface
         return match (true) {
             \is_string($value),
             \is_int($value) => $value,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

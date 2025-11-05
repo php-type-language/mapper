@@ -33,10 +33,7 @@ class ListFromIterableType implements TypeInterface
     public function cast(mixed $value, Context $context): array
     {
         if (!\is_iterable($value)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         return $this->process($value, $context);
@@ -67,7 +64,6 @@ class ListFromIterableType implements TypeInterface
                     element: $item,
                     index: $index,
                     key: $key,
-                    value: $value,
                     context: $entrance,
                     previous: $e,
                 );

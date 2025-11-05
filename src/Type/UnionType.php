@@ -76,9 +76,6 @@ class UnionType implements TypeInterface
             return $type->cast($value, $context);
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

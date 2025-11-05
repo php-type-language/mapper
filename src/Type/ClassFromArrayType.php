@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
-use TypeLang\Mapper\Exception\Runtime\FinalExceptionInterface;
+use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\MissingRequiredObjectFieldException;
@@ -79,7 +79,6 @@ class ClassFromArrayType implements TypeInterface
         if (!\is_array($value)) {
             throw InvalidValueOfTypeException::createFromContext(
                 expected: $this->metadata->getTypeStatement($context, read: false),
-                value: $value,
                 context: $context,
             );
         }
@@ -119,7 +118,7 @@ class ClassFromArrayType implements TypeInterface
     {
         foreach ($this->metadata->properties as $meta) {
             $entrance = $context->enter(
-                value: $value,
+                value: (object) $value,
                 entry: new ObjectPropertyEntry($meta->alias),
                 override: $context->withStrictTypes($meta->write->strict)
             );
@@ -136,14 +135,13 @@ class ClassFromArrayType implements TypeInterface
 
                     try {
                         $element = $meta->write->type->cast($element, $entrance);
-                    } catch (FinalExceptionInterface $e) {
+                    } catch (NotInterceptableExceptionInterface $e) {
                         throw $e;
                     } catch (\Throwable $e) {
                         $exception = InvalidObjectValueException::createFromContext(
                             element: $element,
                             field: $meta->alias,
                             expected: $meta->getTypeStatement($entrance, read: false),
-                            value: (object) $value,
                             context: $entrance,
                             previous: $e,
                         );
@@ -165,7 +163,6 @@ class ClassFromArrayType implements TypeInterface
                     $exception = MissingRequiredObjectFieldException::createFromContext(
                         field: $meta->alias,
                         expected: $meta->getTypeStatement($entrance, read: false),
-                        value: (object) $value,
                         context: $entrance,
                     );
 

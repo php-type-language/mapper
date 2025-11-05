@@ -30,10 +30,7 @@ class ListFromArrayType extends ListFromIterableType
     public function cast(mixed $value, Context $context): array
     {
         if (!$this->match($value, $context)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         return $this->process($value, $context);

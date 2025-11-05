@@ -12,7 +12,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * @template-extends ValueOfTypeException<class-string<TObject>>
  */
 abstract class ClassException extends ValueOfTypeException implements
-    FinalExceptionInterface
+    NotInterceptableExceptionInterface
 {
     /**
      * @param class-string<TObject> $class unlike {@see ValueException::$value},

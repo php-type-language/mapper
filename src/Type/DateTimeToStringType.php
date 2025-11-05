@@ -32,9 +32,6 @@ class DateTimeToStringType implements TypeInterface
             return $value->format($this->format);
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

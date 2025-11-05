@@ -21,10 +21,7 @@ class StringType implements TypeInterface
     {
         return match (true) {
             \is_string($value) => $value,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

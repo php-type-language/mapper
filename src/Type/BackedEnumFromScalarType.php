@@ -50,15 +50,11 @@ class BackedEnumFromScalarType implements TypeInterface
             $case = $this->class::tryFrom($denormalized);
         } catch (\TypeError $e) {
             throw InvalidValueException::createFromContext(
-                value: $value,
                 context: $context,
                 previous: $e,
             );
         }
 
-        return $case ?? throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        return $case ?? throw InvalidValueException::createFromContext($context);
     }
 }

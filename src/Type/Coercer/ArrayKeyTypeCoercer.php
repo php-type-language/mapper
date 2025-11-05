@@ -26,10 +26,7 @@ class ArrayKeyTypeCoercer implements TypeCoercerInterface
             // Enum
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

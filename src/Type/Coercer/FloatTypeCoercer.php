@@ -25,10 +25,7 @@ class FloatTypeCoercer implements TypeCoercerInterface
             $value === false,
             $value === null => 0.0,
             $value === true => 1.0,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

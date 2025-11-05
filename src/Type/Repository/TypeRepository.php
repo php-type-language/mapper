@@ -6,9 +6,7 @@ namespace TypeLang\Mapper\Type\Repository;
 
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeDecorator\CoercibleType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -23,25 +21,17 @@ final class TypeRepository implements
      */
     private array $builders = [];
 
-    /**
-     * @var array<class-string<TypeInterface>, TypeCoercerInterface>
-     */
-    private array $coercers = [];
-
     private TypeRepositoryInterface $context;
 
     /**
      * @param iterable<mixed, TypeBuilderInterface> $builders
-     * @param iterable<class-string<TypeInterface>, TypeCoercerInterface> $coercers
      */
     public function __construct(
         private readonly TypeParserInterface $parser,
         iterable $builders,
-        iterable $coercers,
     ) {
         $this->context = $this;
         $this->builders = iterable_to_array($builders, false);
-        $this->coercers = iterable_to_array($coercers);
     }
 
     /**
@@ -64,24 +54,8 @@ final class TypeRepository implements
         throw TypeNotFoundException::becauseTypeNotDefined($statement);
     }
 
-    private function buildCoercedType(TypeStatement $statement): TypeInterface
-    {
-        $type = $this->buildType($statement);
-
-        $coercer = $this->coercers[$type::class] ?? null;
-
-        if ($coercer === null) {
-            return $type;
-        }
-
-        return new CoercibleType(
-            coercer: $coercer,
-            delegate: $type,
-        );
-    }
-
     public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        return $this->buildCoercedType($statement);
+        return $this->buildType($statement);
     }
 }

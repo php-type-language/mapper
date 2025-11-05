@@ -70,10 +70,7 @@ class DateTimeFromStringType implements TypeInterface
             return $result;
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 
     /**

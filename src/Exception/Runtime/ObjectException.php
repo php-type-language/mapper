@@ -12,7 +12,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * @template-extends ValueOfTypeException<TValue>
  */
 abstract class ObjectException extends ValueOfTypeException implements
-    FinalExceptionInterface
+    NotInterceptableExceptionInterface
 {
     /**
      * @param TValue $value unlike {@see ValueException::$value}, this property

@@ -8,6 +8,7 @@ use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Type\Repository\DecorateByCoercibleTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByLoggableTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByTraceableTypeRepository;
 use TypeLang\Mapper\Type\Repository\InMemoryTypeRepository;
@@ -32,6 +33,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
 
         $types = $this->withTracing($config, $types);
         $types = $this->withLogging($config, $types);
+        $types = $this->withCoercers($types, $platform, $direction);
 
         return $this->withMemoization($types);
     }
@@ -43,7 +45,17 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
     ): TypeRepository {
         return new TypeRepository(
             parser: $parser,
-            builders: $platform->getTypes($direction),
+            builders: $platform->getTypes($direction)
+        );
+    }
+
+    private function withCoercers(
+        TypeRepositoryInterface $types,
+        PlatformInterface $platform,
+        Direction $direction,
+    ): TypeRepositoryInterface {
+        return new DecorateByCoercibleTypeRepository(
+            delegate: $types,
             coercers: $platform->getTypeCoercers($direction),
         );
     }

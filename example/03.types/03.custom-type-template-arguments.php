@@ -63,7 +63,7 @@ class MyNonEmptyType implements TypeInterface
             return $this->type->cast($value, $context);
         }
 
-        throw InvalidValueException::createFromContext($value, $context);
+        throw InvalidValueException::createFromContext($context);
     }
 }
 

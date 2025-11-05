@@ -37,19 +37,14 @@ class InvalidValueException extends ValueException
     }
 
     /**
-     * @template TArgValue of mixed
-     *
-     * @param TArgValue $value
-     *
-     * @return self<TArgValue>
+     * @return self<mixed>
      */
     public static function createFromContext(
-        mixed $value,
         Context $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(
-            value: $value,
+            value: $context->value,
             path: $context->getPath(),
             previous: $previous,
         );

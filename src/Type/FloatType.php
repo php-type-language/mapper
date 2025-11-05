@@ -21,10 +21,7 @@ class FloatType implements TypeInterface
     {
         return match (true) {
             \is_float($value) => $value,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

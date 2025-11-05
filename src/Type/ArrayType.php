@@ -44,10 +44,7 @@ class ArrayType implements TypeInterface
     public function cast(mixed $value, Context $context): array
     {
         if (!$this->match($value, $context)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         return $this->process($value, $context);
@@ -71,7 +68,6 @@ class ArrayType implements TypeInterface
                 throw InvalidIterableKeyException::createFromContext(
                     index: $index,
                     key: $key,
-                    value: $value,
                     context: $context,
                     previous: $e,
                 );
@@ -86,7 +82,6 @@ class ArrayType implements TypeInterface
                     element: $item,
                     index: $index,
                     key: $key,
-                    value: $value,
                     context: $entrance,
                     previous: $e,
                 );

@@ -38,10 +38,7 @@ class UnitEnumFromStringType implements TypeInterface
         $string = $this->string->cast($value, $context);
 
         if (!$this->match($string, $context)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         try {
@@ -49,7 +46,6 @@ class UnitEnumFromStringType implements TypeInterface
             return \constant($this->class . '::' . $string);
         } catch (\Error $e) {
             throw InvalidValueException::createFromContext(
-                value: $value,
                 context: $context,
                 previous: $e,
             );

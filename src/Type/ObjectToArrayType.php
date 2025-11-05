@@ -20,10 +20,7 @@ final class ObjectToArrayType implements TypeInterface
     public function cast(mixed $value, Context $context): array|object
     {
         if (!\is_object($value)) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         $result = \get_object_vars($value);

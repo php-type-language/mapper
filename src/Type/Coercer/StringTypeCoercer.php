@@ -101,10 +101,7 @@ class StringTypeCoercer implements TypeCoercerInterface
             // Resource
             \is_resource($value) => \get_resource_type($value),
             \get_debug_type($value) === 'resource (closed)' => 'resource',
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 
@@ -121,9 +118,6 @@ class StringTypeCoercer implements TypeCoercerInterface
             return $formatted;
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

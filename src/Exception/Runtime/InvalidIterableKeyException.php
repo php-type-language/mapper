@@ -42,24 +42,19 @@ class InvalidIterableKeyException extends IterableKeyException
     }
 
     /**
-     * @template TArgValue of iterable
-     *
-     * @param int<0, max> $index
-     * @param TArgValue $value
-     *
-     * @return self<TArgValue>
+     * @return self<iterable<array-key, mixed>>
      */
     public static function createFromContext(
         int $index,
         mixed $key,
-        iterable $value,
         Context $context,
         ?\Throwable $previous = null,
     ): self {
+        /** @var self<iterable<array-key, mixed>> */
         return self::createFromPath(
             index: $index,
             key: $key,
-            value: $value,
+            value: $context->value,
             path: $context->getPath(),
             previous: $previous,
         );

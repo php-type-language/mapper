@@ -11,7 +11,7 @@ use TypeLang\Mapper\Context\Path\PathInterface;
  * @template-extends ValueException<TValue>
  */
 abstract class IterableException extends ValueException implements
-    FinalExceptionInterface
+    NotInterceptableExceptionInterface
 {
     /**
      * @param TValue $value unlike {@see ValueException::$value}, this exception

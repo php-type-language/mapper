@@ -32,9 +32,6 @@ class UnitEnumToStringType implements TypeInterface
             return $value->name;
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

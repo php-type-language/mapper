@@ -26,9 +26,6 @@ class NullType implements TypeInterface
             return null;
         }
 
-        throw InvalidValueException::createFromContext(
-            value: $value,
-            context: $context,
-        );
+        throw InvalidValueException::createFromContext($context);
     }
 }

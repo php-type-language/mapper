@@ -54,7 +54,6 @@ final class DiscriminatorTypeSelector
             throw MissingRequiredObjectFieldException::createFromContext(
                 field: $field,
                 expected: $discriminator->getTypeStatement(),
-                value: $value,
                 context: $context,
             );
         }
@@ -72,7 +71,6 @@ final class DiscriminatorTypeSelector
                 element: $element,
                 field: $field,
                 expected: $discriminator->getTypeStatement(),
-                value: $value,
                 context: $context,
             );
         }
@@ -90,7 +88,6 @@ final class DiscriminatorTypeSelector
                 element: $element,
                 field: $field,
                 expected: $discriminator->getTypeStatement(),
-                value: $value,
                 context: $context,
             );
         }

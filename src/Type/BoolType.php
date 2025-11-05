@@ -24,10 +24,7 @@ class BoolType implements TypeInterface
     {
         return match (true) {
             \is_bool($value) => $value,
-            default => throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            ),
+            default => throw InvalidValueException::createFromContext($context),
         };
     }
 }

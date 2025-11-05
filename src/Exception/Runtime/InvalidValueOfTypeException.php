@@ -13,7 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * @template-extends ValueOfTypeException<TValue>
  */
 class InvalidValueOfTypeException extends ValueOfTypeException implements
-    FinalExceptionInterface
+    NotInterceptableExceptionInterface
 {
     /**
      * @template TArgValue of mixed
@@ -41,21 +41,16 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
     }
 
     /**
-     * @template TArgValue of mixed
-     *
-     * @param TArgValue $value
-     *
-     * @return self<TArgValue>
+     * @return self<mixed>
      */
     public static function createFromContext(
         TypeStatement $expected,
-        mixed $value,
         Context $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(
             expected: $expected,
-            value: $value,
+            value: $context->value,
             path: $context->getPath(),
             previous: $previous,
         );

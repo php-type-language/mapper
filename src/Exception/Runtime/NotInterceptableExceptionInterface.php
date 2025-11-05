@@ -33,4 +33,4 @@ use TypeLang\Mapper\Exception\MapperExceptionInterface;
  * }
  * ```
  */
-interface FinalExceptionInterface extends MapperExceptionInterface {}
+interface NotInterceptableExceptionInterface extends MapperExceptionInterface {}

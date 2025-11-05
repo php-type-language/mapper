@@ -45,26 +45,21 @@ class InvalidObjectValueException extends ObjectValueException
     }
 
     /**
-     * @template TArgValue of array|object
-     *
-     * @param non-empty-string $field
-     * @param TArgValue $value
-     *
-     * @return self<TArgValue>
+     * @return self<array<array-key, mixed>|object>
      */
     public static function createFromContext(
         mixed $element,
         string $field,
         ?TypeStatement $expected,
-        array|object $value,
         Context $context,
         ?\Throwable $previous = null,
     ): self {
+        /** @var self<array<array-key, mixed>|object> */
         return self::createFromPath(
             element: $element,
             field: $field,
             expected: $expected,
-            value: $value,
+            value: $context->value,
             path: $context->getPath(),
             previous: $previous,
         );

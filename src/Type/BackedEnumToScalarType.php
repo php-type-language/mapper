@@ -28,10 +28,7 @@ class BackedEnumToScalarType implements TypeInterface
     public function cast(mixed $value, Context $context): int|string
     {
         if (!$value instanceof $this->class) {
-            throw InvalidValueException::createFromContext(
-                value: $value,
-                context: $context,
-            );
+            throw InvalidValueException::createFromContext($context);
         }
 
         return $value->value;
