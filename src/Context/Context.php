@@ -6,7 +6,11 @@ namespace TypeLang\Mapper\Context;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Configuration;
+use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
+use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
+use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
+use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
@@ -126,13 +130,13 @@ abstract class Context implements
     /**
      * Creates new child context.
      */
-    public function enter(mixed $value, EntryInterface $entry, ?Configuration $override = null): self
+    public function enter(mixed $value, EntryInterface $entry, ?Configuration $config = null): self
     {
         // Original configuration
         $original = $this->original ?? $this->config;
 
         // Configuration of the current context
-        $current = $override ?? $original;
+        $current = $config ?? $original;
 
         // Do not set "previous" config in case of
         // "current" config is original
@@ -151,6 +155,46 @@ abstract class Context implements
             types: $this->types,
             original: $current === $original ? null : $original,
         );
+    }
+
+    /**
+     * Creates an "array index" child context
+     *
+     * @param array-key $index
+     */
+    public function enterIntoArrayIndex(mixed $value, int|string $index, ?Configuration $config = null): self
+    {
+        return $this->enter($value, new ArrayIndexEntry($index), $config);
+    }
+
+    /**
+     * Creates an "object" child context
+     *
+     * @param class-string $class
+     */
+    public function enterIntoObject(mixed $value, string $class, ?Configuration $config = null): self
+    {
+        return $this->enter($value, new ObjectEntry($class), $config);
+    }
+
+    /**
+     * Creates an "object's property" child context
+     *
+     * @param non-empty-string $name
+     */
+    public function enterIntoObjectProperty(mixed $value, string $name, ?Configuration $override = null): self
+    {
+        return $this->enter($value, new ObjectPropertyEntry($name), $override);
+    }
+
+    /**
+     * Creates an "union leaf" child context
+     *
+     * @param int<0, max> $index
+     */
+    public function enterIntoUnionLeaf(mixed $value, int $index, ?Configuration $override = null): self
+    {
+        return $this->enter($value, new UnionLeafEntry($index), $override);
     }
 
     /**
