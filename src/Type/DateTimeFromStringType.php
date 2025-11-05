@@ -8,7 +8,7 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
- * @template TDateTime of \DateTimeInterface = \DateTimeInterface
+ * @template TDateTime of \DateTimeImmutable|\DateTime = \DateTimeImmutable
  * @template-implements TypeInterface<TDateTime>
  */
 class DateTimeFromStringType implements TypeInterface
@@ -82,8 +82,11 @@ class DateTimeFromStringType implements TypeInterface
     private function tryParseDateTime(string $value): ?\DateTimeInterface
     {
         if ($this->format !== null) {
+            /** @var class-string<TDateTime> $class */
+            $class = $this->class;
+
             try {
-                $result = ($this->class)::createFromFormat($this->format, $value);
+                $result = $class::createFromFormat($this->format, $value);
             } catch (\Throwable) {
                 return null;
             }

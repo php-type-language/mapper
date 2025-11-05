@@ -14,7 +14,6 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template TDateTime of \DateTimeInterface = \DateTimeInterface
  * @template TResult of mixed = mixed
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
@@ -34,8 +33,11 @@ abstract class DateTimeTypeBuilder extends Builder
         $this->expectNoShapeFields($statement);
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
 
+        /** @var class-string<\DateTimeInterface> $class */
+        $class = $statement->name->toString();
+
         if ($statement->arguments === null) {
-            return $this->create($statement, $statement->name->toString());
+            return $this->create($statement, $class);
         }
 
         /** @var TemplateArgumentNode $formatArgument */
@@ -53,13 +55,13 @@ abstract class DateTimeTypeBuilder extends Builder
 
         return $this->create(
             stmt: $statement,
-            class: $statement->name->toString(),
+            class: $class,
             format: $formatArgument->value->value,
         );
     }
 
     /**
-     * @param class-string<TDateTime> $class
+     * @param class-string<\DateTimeInterface> $class
      *
      * @return TypeInterface<TResult>
      */

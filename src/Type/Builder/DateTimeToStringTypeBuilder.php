@@ -8,8 +8,7 @@ use TypeLang\Mapper\Type\DateTimeToStringType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
- * @template TDateTime of \DateTimeInterface = \DateTimeInterface
- * @template-extends DateTimeTypeBuilder<TDateTime, string>
+ * @template-extends DateTimeTypeBuilder<string>
  */
 class DateTimeToStringTypeBuilder extends DateTimeTypeBuilder
 {
