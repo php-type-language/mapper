@@ -32,7 +32,7 @@ class UnionType implements TypeInterface
             $entrance = $context->enter(
                 value: $value,
                 entry: new UnionLeafEntry($index),
-                override: $context->withStrictTypes($strict),
+                config: $context->withStrictTypes($strict),
             );
 
             if ($type->match($value, $entrance)) {
