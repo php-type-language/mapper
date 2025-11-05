@@ -5,7 +5,6 @@ declare(strict_types=1);
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
 use TypeLang\Mapper\Type\TypeInterface;
