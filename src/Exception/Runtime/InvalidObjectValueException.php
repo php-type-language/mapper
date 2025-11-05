@@ -45,6 +45,7 @@ class InvalidObjectValueException extends ObjectValueException
     }
 
     /**
+     * @param non-empty-string $field
      * @return self<array<array-key, mixed>|object>
      */
     public static function createFromContext(
@@ -54,12 +55,14 @@ class InvalidObjectValueException extends ObjectValueException
         Context $context,
         ?\Throwable $previous = null,
     ): self {
-        /** @var self<array<array-key, mixed>|object> */
+        /** @var array<array-key, mixed>|object $value */
+        $value = $context->value;
+
         return self::createFromPath(
             element: $element,
             field: $field,
             expected: $expected,
-            value: $context->value,
+            value: $value,
             path: $context->getPath(),
             previous: $previous,
         );
