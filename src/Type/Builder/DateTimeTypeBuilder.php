@@ -14,7 +14,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ * @template TDateTime of \DateTimeInterface = \DateTimeInterface
  * @template TResult of mixed = mixed
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
@@ -26,21 +26,6 @@ abstract class DateTimeTypeBuilder extends Builder
             && \is_a($statement->name->toLowerString(), \DateTimeInterface::class, true);
     }
 
-    /**
-     * @return class-string<TDateTime>
-     * @return class-string<TDateTime>
-     */
-    private function getDateTimeClass(string $name): string
-    {
-        if ($name === \DateTimeInterface::class || \interface_exists($name)) {
-            /** @phpstan-ignore-next-line : If an interface is passed, then return the base class */
-            return \DateTimeImmutable::class;
-        }
-
-        /** @var class-string<TDateTime> */
-        return $name;
-    }
-
     public function build(
         TypeStatement $statement,
         TypeRepositoryInterface $types,
@@ -50,11 +35,7 @@ abstract class DateTimeTypeBuilder extends Builder
         $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
 
         if ($statement->arguments === null) {
-            return $this->create(
-                class: $this->getDateTimeClass(
-                    name: $statement->name->toString(),
-                ),
-            );
+            return $this->create($statement, $statement->name->toString());
         }
 
         /** @var TemplateArgumentNode $formatArgument */
@@ -71,9 +52,8 @@ abstract class DateTimeTypeBuilder extends Builder
         }
 
         return $this->create(
-            class: $this->getDateTimeClass(
-                name: $statement->name->toString(),
-            ),
+            stmt: $statement,
+            class: $statement->name->toString(),
             format: $formatArgument->value->value,
         );
     }
@@ -83,5 +63,5 @@ abstract class DateTimeTypeBuilder extends Builder
      *
      * @return TypeInterface<TResult>
      */
-    abstract protected function create(string $class, ?string $format = null): TypeInterface;
+    abstract protected function create(NamedTypeNode $stmt, string $class, ?string $format = null): TypeInterface;
 }

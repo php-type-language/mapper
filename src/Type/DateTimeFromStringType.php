@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use DateTime as TDateTime;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
- * @template TDateTime of \DateTime|\DateTimeImmutable = \DateTimeImmutable
+ * @template TDateTime of \DateTimeInterface = \DateTimeInterface
  * @template-implements TypeInterface<TDateTime>
  */
 class DateTimeFromStringType implements TypeInterface
@@ -24,7 +23,24 @@ class DateTimeFromStringType implements TypeInterface
          * @var TypeInterface<string>
          */
         protected readonly TypeInterface $input = new StringType(),
-    ) {}
+    ) {
+        $this->assertDateTimeClassExists($class);
+    }
+
+    /**
+     * @param class-string<TDateTime> $class
+     */
+    private function assertDateTimeClassExists(string $class): void
+    {
+        if (\class_exists($class)) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(\sprintf(
+            'Creating a date instance requires a date class, but %s is not one',
+            $class,
+        ));
+    }
 
     /**
      * @phpstan-assert-if-true string $value
