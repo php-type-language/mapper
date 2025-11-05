@@ -177,6 +177,10 @@ abstract class Context implements
      */
     public function withObjectAsArray(?bool $enabled): Configuration
     {
+        if ($enabled === null) {
+            return $this->original ?? $this->config;
+        }
+
         return ($this->original ?? $this->config)
             ->withObjectAsArray($enabled);
     }
@@ -205,6 +209,10 @@ abstract class Context implements
      */
     public function withStrictTypes(?bool $enabled): Configuration
     {
+        if ($enabled === null) {
+            return $this->original ?? $this->config;
+        }
+
         return ($this->original ?? $this->config)
             ->withStrictTypes($enabled);
     }
