@@ -11,7 +11,7 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 $platform = new \TypeLang\Mapper\Platform\StandardPlatform(
     // Default metadata provider
-    meta: new \TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider(
+    meta: new \TypeLang\Mapper\Mapping\Provider\MetadataBuilder(
         reader: new DefaultReader(),
     ),
 );

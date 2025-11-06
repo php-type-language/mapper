@@ -38,7 +38,7 @@ use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
-final class MetadataReaderProvider implements ProviderInterface
+final class MetadataBuilder implements ProviderInterface
 {
     /**
      * @var array<class-string, ClassMetadata<object>>

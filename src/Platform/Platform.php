@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
-use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
+use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
@@ -57,7 +57,7 @@ abstract class Platform implements PlatformInterface
     protected function createDefaultMetadataProvider(?ReaderInterface $reader = null): ProviderInterface
     {
         return new InMemoryProvider(
-            delegate: new MetadataReaderProvider(
+            delegate: new MetadataBuilder(
                 reader: $reader ?? $this->createDefaultMetadataReader(),
             ),
         );

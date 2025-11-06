@@ -30,7 +30,7 @@ abstract class Decorator implements ProviderInterface
 
     private function createDefaultProvider(ReaderInterface $reader): ProviderInterface
     {
-        return new MetadataReaderProvider($reader);
+        return new MetadataBuilder($reader);
     }
 
     public function getClassMetadata(

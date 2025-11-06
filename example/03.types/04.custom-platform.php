@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Provider\MetadataReaderProvider;
+use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
@@ -28,7 +28,7 @@ class SimplePlatform implements PlatformInterface
 
     public function getTypes(Direction $direction): iterable
     {
-        $driver = new MetadataReaderProvider(new AttributeReader());
+        $driver = new MetadataBuilder(new AttributeReader());
 
         // The platform will only support objects, that is,
         // references to existing classes.
