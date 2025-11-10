@@ -13,7 +13,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  * @template-covariant TItem of mixed = mixed
  * @template-implements TypeInterface<list<TItem>>
  */
-class ListFromIterableType implements TypeInterface
+class ListType implements TypeInterface
 {
     public function __construct(
         /**
@@ -27,7 +27,7 @@ class ListFromIterableType implements TypeInterface
      */
     public function match(mixed $value, Context $context): bool
     {
-        return \is_iterable($value);
+        return \is_array($value) && \array_is_list($value);
     }
 
     public function cast(mixed $value, Context $context): array

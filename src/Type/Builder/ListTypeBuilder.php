@@ -8,6 +8,7 @@ use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Type\ListType;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -18,7 +19,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template-extends NamedTypeBuilder<TypeInterface>
  */
-abstract class ListTypeBuilder extends NamedTypeBuilder
+class ListTypeBuilder extends NamedTypeBuilder
 {
     /**
      * @var non-empty-lowercase-string
@@ -72,8 +73,8 @@ abstract class ListTypeBuilder extends NamedTypeBuilder
      */
     private function buildWithNoValue(TypeRepositoryInterface $types, TypeParserInterface $parser): TypeInterface
     {
-        return $this->create(
-            type: $types->getTypeByStatement(
+        return new ListType(
+            value: $types->getTypeByStatement(
                 statement: $parser->getStatementByDefinition(
                     definition: $this->defaultValueType,
                 ),
@@ -97,12 +98,10 @@ abstract class ListTypeBuilder extends NamedTypeBuilder
 
         $this->expectNoTemplateArgumentHint($statement, $value);
 
-        return $this->create(
-            type: $types->getTypeByStatement(
+        return new ListType(
+            value: $types->getTypeByStatement(
                 statement: $value->value,
             ),
         );
     }
-
-    abstract protected function create(TypeInterface $type): TypeInterface;
 }

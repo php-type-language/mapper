@@ -64,6 +64,9 @@ class StandardPlatform extends Platform
         yield new Builder\TypeAliasBuilder(\Traversable::class, $array);
         yield new Builder\TypeAliasBuilder(\IteratorAggregate::class, $array);
 
+        // Adds support for the "iterable<T> -> list<T>" type
+        yield new Builder\ListTypeBuilder('list', 'mixed');
+
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
 
@@ -116,8 +119,6 @@ class StandardPlatform extends Platform
 
         // Other
         if ($direction === Direction::Normalize) {
-            // Adds support for the "iterable<T> -> list<T>" type
-            yield new Builder\ListFromIterableTypeBuilder('list', 'mixed');
             // Adds support for the "object -> array{ ... }" type
             yield $object = new Builder\ObjectToArrayTypeBuilder('object');
             yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
@@ -130,8 +131,6 @@ class StandardPlatform extends Platform
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder($this->meta);
         } else {
-            // Adds support for the "array<T> -> list<T>" type
-            yield new Builder\ListFromArrayTypeBuilder('list', 'mixed');
             // Adds support for the "array{ ... } -> object" type
             yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
             yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
@@ -170,6 +169,12 @@ class StandardPlatform extends Platform
         // string
         yield Type\StringType::class => $string = new Coercer\StringTypeCoercer();
         yield Type\StringLiteralType::class => $string;
+
+        // array
+        yield Type\ArrayType::class => $array = new Coercer\ArrayTypeCoercer();
+
+        // list
+        yield Type\ListType::class => $list = new Coercer\ListTypeCoercer();
     }
 
     #[\Override]

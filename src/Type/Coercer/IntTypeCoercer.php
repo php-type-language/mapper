@@ -18,8 +18,6 @@ class IntTypeCoercer implements TypeCoercerInterface
             return $value->value;
         }
 
-        $original = $value;
-
         if (\is_string($value) && \is_numeric($value)) {
             $value = (float) $value;
         }
