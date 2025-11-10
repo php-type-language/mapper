@@ -58,11 +58,12 @@ class StandardPlatform extends Platform
 
         // Adds support for the "array" type
         yield $array = new Builder\ArrayTypeBuilder('array', 'array-key', 'mixed');
-        yield new Builder\TypeAliasBuilder('iterable', $array);
-        yield new Builder\TypeAliasBuilder(\Iterator::class, $array);
-        yield new Builder\TypeAliasBuilder(\Generator::class, $array);
-        yield new Builder\TypeAliasBuilder(\Traversable::class, $array);
-        yield new Builder\TypeAliasBuilder(\IteratorAggregate::class, $array);
+        // Adds support for the "iterable" type
+        yield $iterable = new Builder\IterableToArrayTypeBuilder('iterable', 'array-key', 'mixed');
+        yield new Builder\TypeAliasBuilder(\Iterator::class, $iterable);
+        yield new Builder\TypeAliasBuilder(\Generator::class, $iterable);
+        yield new Builder\TypeAliasBuilder(\Traversable::class, $iterable);
+        yield new Builder\TypeAliasBuilder(\IteratorAggregate::class, $iterable);
 
         // Adds support for the "iterable<T> -> list<T>" type
         yield new Builder\ListTypeBuilder('list', 'mixed');

@@ -6,18 +6,24 @@ namespace TypeLang\Mapper\Type;
 
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Exception\Runtime\InvalidIterableKeyException;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
- * @template-covariant TItem of mixed = mixed
- * @template-implements TypeInterface<list<TItem>>
+ * @template TKey of array-key = array-key
+ * @template TValue of mixed = mixed
+ * @template-implements TypeInterface<array<TKey, TValue>>
  */
-class ListType implements TypeInterface
+class IterableToArrayType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var TypeInterface<TItem>
+         * @var TypeInterface<TKey>
+         */
+        protected readonly TypeInterface $key = new ArrayKeyType(),
+        /**
+         * @var TypeInterface<TValue>
          */
         protected readonly TypeInterface $value = new MixedType(),
     ) {}
@@ -27,12 +33,12 @@ class ListType implements TypeInterface
      */
     public function match(mixed $value, Context $context): bool
     {
-        return \is_array($value) && \array_is_list($value);
+        return \is_iterable($value);
     }
 
     public function cast(mixed $value, Context $context): array
     {
-        if (!\is_array($value) || !\array_is_list($value)) {
+        if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext($context);
         }
 
@@ -42,7 +48,7 @@ class ListType implements TypeInterface
     /**
      * @param iterable<mixed, mixed> $value
      *
-     * @return list<TItem>
+     * @return array<TKey, TValue>
      * @throws \Throwable
      */
     protected function process(iterable $value, Context $context): array
@@ -50,15 +56,22 @@ class ListType implements TypeInterface
         $result = [];
         $index = 0;
 
-        /** @var iterable<mixed, mixed> $value */
         foreach ($value as $key => $item) {
-            $entrance = $context->enter(
-                value: $item,
-                entry: new ArrayIndexEntry($index),
-            );
+            try {
+                $key = $this->key->cast($key, $context);
+            } catch (InvalidValueException $e) {
+                throw InvalidIterableKeyException::createFromContext(
+                    index: $index,
+                    key: $key,
+                    context: $context,
+                    previous: $e,
+                );
+            }
+
+            $entrance = $context->enter($item, new ArrayIndexEntry($key));
 
             try {
-                $result[] = $this->value->cast($item, $entrance);
+                $result[$key] = $this->value->cast($item, $entrance);
             } catch (InvalidValueException $e) {
                 throw InvalidIterableValueException::createFromContext(
                     element: $item,

@@ -46,6 +46,7 @@ class InvalidObjectValueException extends ObjectValueException
 
     /**
      * @param non-empty-string $field
+     *
      * @return self<array<array-key, mixed>|object>
      */
     public static function createFromContext(

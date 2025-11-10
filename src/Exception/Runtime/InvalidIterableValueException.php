@@ -51,6 +51,7 @@ class InvalidIterableValueException extends IterableValueException
 
     /**
      * @param int<0, max> $index
+     *
      * @return self<iterable<array-key, mixed>>
      */
     public static function createFromContext(
