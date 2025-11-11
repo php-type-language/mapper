@@ -36,7 +36,11 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
     {
         $index = 0;
 
-        foreach ($type->arguments ?? [] as $actual) {
+        if ($type->arguments === null) {
+            return $index;
+        }
+
+        foreach ($type->arguments as $actual) {
             if ($actual === $argument) {
                 return $index + 1;
             }
