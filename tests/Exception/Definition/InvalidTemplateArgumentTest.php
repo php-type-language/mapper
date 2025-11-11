@@ -19,10 +19,29 @@ final class InvalidTemplateArgumentTest extends DefinitionExceptionTestCase
     public function testInvalidArgumentGiven(): void
     {
         $this->expectException(InvalidTemplateArgumentException::class);
-        $this->expectExceptionMessage('Passed template argument #1 of type int<T> must be of type string, but T given');
+        $this->expectExceptionMessage('Passed template argument #2 of type int<T, U> must be of type string, but U given');
+
+        $type = self::parse('int<T, U>');
+
+        assert($type instanceof NamedTypeNode);
+
+        $argument = $type->arguments?->last();
+        assert($argument instanceof TemplateArgumentNode);
+
+        throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
+            argument: $argument,
+            expected: new NamedTypeNode('string'),
+            type: $type,
+        );
+    }
+
+    #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
+    public function testOfNonOwnArgument(): void
+    {
+        $this->expectException(InvalidTemplateArgumentException::class);
+        $this->expectExceptionMessage('Passed template argument #0 of type another-type must be of type string, but T given');
 
         $type = self::parse('int<T>');
-
         assert($type instanceof NamedTypeNode);
 
         $argument = $type->arguments?->first();
@@ -31,7 +50,7 @@ final class InvalidTemplateArgumentTest extends DefinitionExceptionTestCase
         throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
             argument: $argument,
             expected: new NamedTypeNode('string'),
-            type: $type,
+            type: self::parse('another-type'),
         );
     }
 }

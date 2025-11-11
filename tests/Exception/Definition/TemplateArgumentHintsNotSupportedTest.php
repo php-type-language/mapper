@@ -22,7 +22,6 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $this->expectExceptionMessage('Template argument #1 (T) of "int<out T>" does not support any hints, but "out" were passed');
 
         $type = self::parse('int<out T>');
-
         assert($type instanceof NamedTypeNode);
 
         $argument = $type->arguments?->first();
@@ -34,6 +33,24 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         );
     }
 
+    #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
+    public function testOfNonOwnArgument(): void
+    {
+        $this->expectException(TemplateArgumentHintsNotSupportedException::class);
+        $this->expectExceptionMessage('Template argument #1 (T) of "another-type<out T>" does not support any hints, but "in" were passed');
+
+        $type = self::parse('int<in T>');
+        assert($type instanceof NamedTypeNode);
+
+        $argument = $type->arguments?->first();
+        assert($argument instanceof TemplateArgumentNode);
+
+        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
+            argument: $argument,
+            type: self::parse('another-type<out T>'),
+        );
+    }
+
     #[TestDox('[not applicable] expected int (0 arguments), passed int (0 arguments)')]
     public function testManyArgumentsPassedWithBasicType(): void
     {
@@ -41,7 +58,6 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $this->expectExceptionMessage('Incorrect exception usage');
 
         $type = self::parse('int<T>');
-
         assert($type instanceof NamedTypeNode);
 
         $argument = $type->arguments?->first();
