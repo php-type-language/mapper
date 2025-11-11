@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Type\Coercer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Tests\Concerns\InteractWithContext;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Tests\Type\Stub\DataSamples;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 abstract class TypeCoercerTestCase extends TestCase
 {
+    use InteractWithContext;
+
     /**
      * @return iterable<mixed, mixed>
      */

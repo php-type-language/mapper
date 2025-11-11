@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -32,7 +32,7 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw TemplateArgumentsNotSupportedException::becauseTemplateArgumentsNotSupported(
+        throw TemplateArgumentsNotSupportedException::becauseTooManyArguments(
             type: $stmt,
         );
     }
@@ -48,7 +48,7 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw ShapeFieldsNotSupportedException::becauseShapeFieldsNotSupported(
+        throw ShapeFieldsNotSupportedException::becauseTooManyShapeFields(
             type: $stmt,
         );
     }
@@ -56,8 +56,8 @@ abstract class Builder implements TypeBuilderInterface
     /**
      * @param int<0, max> $count
      *
-     * @throws MissingTemplateArgumentsException
-     * @throws TooManyTemplateArgumentsException
+     * @throws MissingTemplateArgumentsInRangeException
+     * @throws TooManyTemplateArgumentsInRangeException
      */
     protected function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
     {
@@ -66,12 +66,12 @@ abstract class Builder implements TypeBuilderInterface
     }
 
     /**
-     * @api
-     *
      * @param int<0, max> $max
      * @param int<0, max> $min
      *
-     * @throws TooManyTemplateArgumentsException
+     * @throws TooManyTemplateArgumentsInRangeException
+     * @api
+     *
      */
     protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
@@ -79,12 +79,12 @@ abstract class Builder implements TypeBuilderInterface
     }
 
     /**
-     * @api
-     *
      * @param int<0, max> $max
      * @param int<0, max> $min
      *
-     * @throws TooManyTemplateArgumentsException
+     * @throws TooManyTemplateArgumentsInRangeException
+     * @api
+     *
      */
     protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, int $min = 0): void
     {
@@ -92,7 +92,7 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
+        throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
             minSupportedArgumentsCount: $min,
             maxSupportedArgumentsCount: $max,
             type: $stmt,
@@ -100,12 +100,12 @@ abstract class Builder implements TypeBuilderInterface
     }
 
     /**
-     * @api
-     *
      * @param int<0, max> $min
      * @param int<0, max>|null $max
      *
-     * @throws MissingTemplateArgumentsException
+     * @throws MissingTemplateArgumentsInRangeException
+     * @api
+     *
      */
     protected function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
     {
@@ -113,12 +113,12 @@ abstract class Builder implements TypeBuilderInterface
     }
 
     /**
-     * @api
-     *
      * @param int<0, max> $min
      * @param int<0, max>|null $max
      *
-     * @throws MissingTemplateArgumentsException
+     * @throws MissingTemplateArgumentsInRangeException
+     * @api
+     *
      */
     protected function expectTemplateArgumentsGreaterOrEqualThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
     {
@@ -128,7 +128,7 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw MissingTemplateArgumentsException::becauseTemplateArgumentsRangeRequired(
+        throw MissingTemplateArgumentsInRangeException::becauseTemplateArgumentsRequired(
             minSupportedArgumentsCount: $min,
             maxSupportedArgumentsCount: $max ?? $min,
             type: $stmt,
@@ -146,7 +146,7 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTemplateArgumentHintsNotSupported(
+        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
             argument: $argument,
             type: $stmt,
         );

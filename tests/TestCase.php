@@ -5,18 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Context\RootContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeLangParser;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepository;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -39,64 +28,6 @@ abstract class TestCase extends BaseTestCase
             \is_array($value) || \is_object($value) ? \json_encode($value) : \var_export($value, true),
             ++self::$dataProviderIndex,
         ]);
-    }
-
-    protected function createConfiguration(
-        bool $strictTypes = Configuration::STRICT_TYPES_DEFAULT_VALUE,
-        bool $objectAsArray = Configuration::OBJECT_AS_ARRAY_DEFAULT_VALUE,
-    ): Configuration {
-        return new Configuration(
-            objectAsArray: $objectAsArray,
-            strictTypes: $strictTypes,
-        );
-    }
-
-    protected function createTypeExtractor(): TypeExtractorInterface
-    {
-        return new NativeTypeExtractor();
-    }
-
-    protected function createPlatform(): PlatformInterface
-    {
-        return new StandardPlatform();
-    }
-
-    protected function createTypeParser(): TypeParserInterface
-    {
-        return TypeLangParser::createFromPlatform($this->createPlatform());
-    }
-
-    protected function createTypeRepository(Direction $direction): TypeRepositoryInterface
-    {
-        $platform = $this->createPlatform();
-
-        return new TypeRepository(
-            parser: $this->createTypeParser(),
-            builders: $platform->getTypes($direction),
-            coercers: $platform->getTypeCoercers($direction),
-        );
-    }
-
-    protected function createNormalizationContext(mixed $value, ?Configuration $config = null): RootContext
-    {
-        return RootContext::forNormalization(
-            value: $value,
-            config: $config ?? $this->createConfiguration(),
-            extractor: $this->createTypeExtractor(),
-            parser: $this->createTypeParser(),
-            types: $this->createTypeRepository(Direction::Normalize),
-        );
-    }
-
-    protected function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootContext
-    {
-        return RootContext::forDenormalization(
-            value: $value,
-            config: $config ?? $this->createConfiguration(),
-            extractor: $this->createTypeExtractor(),
-            parser: $this->createTypeParser(),
-            types: $this->createTypeRepository(Direction::Denormalize),
-        );
     }
 
     protected function expectTypeErrorIfException(mixed $expected): void

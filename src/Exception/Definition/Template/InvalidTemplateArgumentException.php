@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition\Template;
 
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -23,7 +24,7 @@ class InvalidTemplateArgumentException extends TemplateArgumentException
          */
         public readonly TypeStatement $expected,
         TemplateArgumentNode $argument,
-        TypeStatement $type,
+        NamedTypeNode $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
@@ -39,10 +40,10 @@ class InvalidTemplateArgumentException extends TemplateArgumentException
         );
     }
 
-    public static function becauseTemplateArgumentIsInvalid(
-        TypeStatement $expected,
+    public static function becauseTemplateArgumentMustBe(
         TemplateArgumentNode $argument,
-        TypeStatement $type,
+        TypeStatement $expected,
+        NamedTypeNode $type,
         ?\Throwable $previous = null,
     ): self {
         $template = 'Passed template argument #{{index}} of type {{type}} must '

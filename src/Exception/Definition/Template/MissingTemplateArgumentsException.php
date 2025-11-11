@@ -9,29 +9,28 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 /**
  * Occurs when a type requires more template arguments to be specified than required
  */
-class MissingTemplateArgumentsException extends TemplateArgumentsRangeException
+class MissingTemplateArgumentsException extends TemplateArgumentsCountException
 {
     /**
-     * @param int<0, max> $minSupportedArgumentsCount
-     * @param int<0, max> $maxSupportedArgumentsCount
+     * @param int<0, max> $minArgumentsCount
      */
-    public static function becauseTemplateArgumentsRangeRequired(
-        int $minSupportedArgumentsCount,
-        int $maxSupportedArgumentsCount,
+    public static function becauseNoRequiredArgument(
+        int $minArgumentsCount,
         NamedTypeNode $type,
-        ?\Throwable $previous = null
+        ?\Throwable $previous = null,
     ): self {
-        $template = 'Type "{{type}}" expects at least %s template argument(s), '
-            . 'but {{passedArgumentsCount}} were passed';
+        $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
-        $template = $minSupportedArgumentsCount === $maxSupportedArgumentsCount
-            ? \sprintf($template, '{{minSupportedArgumentsCount}}')
-            : \sprintf($template, 'from {{minSupportedArgumentsCount}} to {{maxSupportedArgumentsCount}}');
+        assert($passedArgumentsCount < $minArgumentsCount, new \InvalidArgumentException(
+            'Incorrect exception usage',
+        ));
+
+        $template = 'Type "{{type}}" expects at least {{expectedArgumentsCount}}'
+            . ' template argument(s), but {{passedArgumentsCount}} were passed';
 
         return new self(
             passedArgumentsCount: $type->arguments?->count() ?? 0,
-            minSupportedArgumentsCount: $minSupportedArgumentsCount,
-            maxSupportedArgumentsCount: $maxSupportedArgumentsCount,
+            expectedArgumentsCount: $minArgumentsCount,
             type: $type,
             template: $template,
             previous: $previous,

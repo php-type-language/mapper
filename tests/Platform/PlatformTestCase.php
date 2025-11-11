@@ -289,7 +289,7 @@ abstract class PlatformTestCase extends TestCase
             $this->expectExceptionMessage('not allowed');
         }
 
-        $parser = $this->createTypeParser();
+        $parser = self::getTypeParser();
         $platform = $this->createTypePlatform();
         $statement = $parser->getStatementByDefinition($definition);
 
@@ -303,7 +303,6 @@ abstract class PlatformTestCase extends TestCase
         $repository = new TypeRepository(
             parser: $parser,
             builders: $platform->getTypes($direction),
-            coercers: $platform->getTypeCoercers($direction),
         );
 
         $repository->getTypeByStatement($statement);

@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\ListType;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
@@ -40,7 +40,7 @@ class ListTypeBuilder extends NamedTypeBuilder
     /**
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentHintsNotSupportedException
-     * @throws TooManyTemplateArgumentsException
+     * @throws TooManyTemplateArgumentsInRangeException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
@@ -59,7 +59,7 @@ class ListTypeBuilder extends NamedTypeBuilder
         return match (\count($arguments)) {
             0 => $this->buildWithNoValue($types, $parser),
             1 => $this->buildWithValue($statement, $types),
-            default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
+            default => throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
                 minSupportedArgumentsCount: 0,
                 maxSupportedArgumentsCount: 1,
                 type: $statement,

@@ -9,6 +9,7 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Condition\NullConditionMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Tests\Concerns\InteractWithContext;
 use TypeLang\Mapper\Type\StringType;
 use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -16,6 +17,8 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 #[Group('meta')]
 final class PropertyMetadataTest extends MetadataTestCase
 {
+    use InteractWithContext;
+
     public function testConstructAndFields(): void
     {
         $type = $this->createMock(StringType::class);

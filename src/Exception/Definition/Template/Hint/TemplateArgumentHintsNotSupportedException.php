@@ -4,21 +4,25 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Definition\Template\Hint;
 
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * Occurs when a type's template argument does not hints
+ * Occurs when a type's template argument does not support hints
  */
 class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintException
 {
-    public static function becauseTemplateArgumentHintsNotSupported(
+    public static function becauseTooManyHints(
         TemplateArgumentNode $argument,
-        TypeStatement $type,
+        NamedTypeNode $type,
         ?\Throwable $previous = null
     ): self {
         $template = 'Template argument #{{index}} ({{argument}}) of "{{type}}" does not support any hints, '
             . 'but "{{hint}}" were passed';
+
+        assert($argument->hint !== null, new \InvalidArgumentException(
+            'Incorrect exception usage',
+        ));
 
         return new self(
             argument: $argument,

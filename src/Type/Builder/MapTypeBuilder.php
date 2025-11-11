@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
@@ -61,7 +61,7 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
             0 => $this->buildWithNoKeyValue($types, $parser),
             1 => $this->buildWithValue($statement, $types, $parser),
             2 => $this->buildWithKeyValue($statement, $types),
-            default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
+            default => throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
                 minSupportedArgumentsCount: 0,
                 maxSupportedArgumentsCount: 2,
                 type: $statement,

@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Type\IntRangeType;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
@@ -27,7 +27,7 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
     /**
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
-     * @throws TooManyTemplateArgumentsException
+     * @throws TooManyTemplateArgumentsInRangeException
      * @throws ShapeFieldsNotSupportedException
      */
     public function build(
@@ -46,7 +46,7 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
             0 => new IntType(),
             1 => $this->buildWithMinValue($statement, $arguments[0]),
             2 => $this->buildWithMinMaxValues($statement, $arguments[0], $arguments[1]),
-            default => throw TooManyTemplateArgumentsException::becauseTemplateArgumentsRangeOverflows(
+            default => throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
                 minSupportedArgumentsCount: 0,
                 maxSupportedArgumentsCount: 2,
                 type: $statement,
@@ -100,13 +100,13 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
             }
         }
 
-        throw InvalidTemplateArgumentException::becauseTemplateArgumentIsInvalid(
+        throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
+            argument: $argument,
             expected: new UnionTypeNode(
                 new NamedTypeNode('int'),
                 StringLiteralNode::createFromValue('min'),
                 StringLiteralNode::createFromValue('max'),
             ),
-            argument: $argument,
             type: $statement,
         );
     }

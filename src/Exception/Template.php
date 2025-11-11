@@ -9,6 +9,7 @@ use TypeLang\Mapper\Context\Path\Printer\JsonPathPrinter;
 use TypeLang\Mapper\Context\Path\Printer\PathPrinterInterface;
 use TypeLang\Mapper\Exception\Value\JsonLikeValuePrinter;
 use TypeLang\Mapper\Exception\Value\ValuePrinterInterface;
+use TypeLang\Parser\Node\Identifier;
 use TypeLang\Parser\Node\Statement;
 use TypeLang\Parser\Node\Stmt\Shape\FieldNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -78,6 +79,7 @@ final class Template implements \Stringable
     private function formatValueToString(mixed $value): string
     {
         return match (true) {
+            $value instanceof Identifier => $value->toString(),
             $value instanceof Statement => $this->types->print($value),
             $value instanceof TemplateArgumentNode => $this->types->print($value->value),
             $value instanceof FieldNode => $this->types->print($value->type),

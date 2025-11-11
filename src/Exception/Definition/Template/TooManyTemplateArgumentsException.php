@@ -7,34 +7,54 @@ namespace TypeLang\Mapper\Exception\Definition\Template;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
- * Occurs when a type supports fewer arguments than were passed
+ * Occurs when a type requires more template arguments to be specified than required
  */
-class TooManyTemplateArgumentsException extends TemplateArgumentsRangeException
+class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
 {
     /**
-     * @param int<0, max> $minSupportedArgumentsCount
-     * @param int<0, max> $maxSupportedArgumentsCount
+     * @param int<0, max> $maxArgumentsCount
      */
-    public static function becauseTemplateArgumentsRangeOverflows(
-        int $minSupportedArgumentsCount,
-        int $maxSupportedArgumentsCount,
+    public static function becauseHasRedundantArgument(
+        int $maxArgumentsCount,
         NamedTypeNode $type,
         ?\Throwable $previous = null,
-    ): self {
-        $template = 'Type "{{type}}" only accepts %s template argument(s), '
-            . 'but {{passedArgumentsCount}} were passed';
+    ): self|TemplateArgumentsException {
+        $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
-        $template = $minSupportedArgumentsCount === $maxSupportedArgumentsCount
-            ? \sprintf($template, '{{minSupportedArgumentsCount}}')
-            : \sprintf($template, 'from {{minSupportedArgumentsCount}} to {{maxSupportedArgumentsCount}}');
+        assert($passedArgumentsCount > $maxArgumentsCount, new \InvalidArgumentException(
+            'Incorrect exception usage',
+        ));
+
+        $simplified = self::simplifyException($maxArgumentsCount, $type, $previous);
+
+        if ($simplified !== null) {
+            return $simplified;
+        }
+
+        $template = 'Type "{{type}}" only accepts {{expectedArgumentsCount}}'
+            . ' template argument(s), but {{passedArgumentsCount}} were passed';
 
         return new self(
-            passedArgumentsCount: $type->arguments?->count() ?? 0,
-            minSupportedArgumentsCount: $minSupportedArgumentsCount,
-            maxSupportedArgumentsCount: $maxSupportedArgumentsCount,
+            passedArgumentsCount: $passedArgumentsCount,
+            expectedArgumentsCount: $maxArgumentsCount,
             type: $type,
             template: $template,
             previous: $previous,
         );
+    }
+
+    /**
+     * @param int<0, max> $maxArgumentsCount
+     */
+    private static function simplifyException(
+        int $maxArgumentsCount,
+        NamedTypeNode $type,
+        ?\Throwable $previous = null,
+    ): ?TemplateArgumentsException {
+        if ($maxArgumentsCount <= 0) {
+            return TemplateArgumentsNotSupportedException::becauseTooManyArguments($type, $previous);
+        }
+
+        return null;
     }
 }

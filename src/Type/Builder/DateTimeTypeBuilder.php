@@ -46,9 +46,9 @@ abstract class DateTimeTypeBuilder extends Builder
         $this->expectNoTemplateArgumentHint($statement, $formatArgument);
 
         if (!$formatArgument->value instanceof StringLiteralNode) {
-            throw InvalidTemplateArgumentException::becauseTemplateArgumentIsInvalid(
-                expected: new NamedTypeNode('string'),
+            throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
                 argument: $formatArgument,
+                expected: new NamedTypeNode('string'),
                 type: $statement,
             );
         }

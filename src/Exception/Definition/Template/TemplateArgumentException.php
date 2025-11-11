@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Exception\Definition\Template;
 
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * An exception associated with ONE specific template argument.
@@ -20,12 +19,12 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
 
     public function __construct(
         public readonly TemplateArgumentNode $argument,
-        TypeStatement $type,
+        NamedTypeNode $type,
         string $template,
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
-        $this->index = self::fetchArgumentIndex($argument, $type);
+        $this->index = self::getArgumentIndex($argument, $type);
 
         parent::__construct($type, $template, $code, $previous);
     }
@@ -33,13 +32,9 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
     /**
      * @return int<0, max>
      */
-    private static function fetchArgumentIndex(TemplateArgumentNode $argument, TypeStatement $type): int
+    private static function getArgumentIndex(TemplateArgumentNode $argument, NamedTypeNode $type): int
     {
         $index = 0;
-
-        if (!$type instanceof NamedTypeNode) {
-            return $index;
-        }
 
         foreach ($type->arguments ?? [] as $actual) {
             if ($actual === $argument) {

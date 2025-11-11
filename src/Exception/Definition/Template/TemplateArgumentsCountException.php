@@ -9,7 +9,7 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 /**
  * Group of errors related to incorrect number of template arguments
  */
-abstract class TemplateArgumentsRangeException extends TemplateArgumentsException
+abstract class TemplateArgumentsCountException extends TemplateArgumentsException
 {
     public function __construct(
         /**
@@ -19,11 +19,7 @@ abstract class TemplateArgumentsRangeException extends TemplateArgumentsExceptio
         /**
          * @var int<0, max>
          */
-        public readonly int $minSupportedArgumentsCount,
-        /**
-         * @var int<0, max>
-         */
-        public readonly int $maxSupportedArgumentsCount,
+        public readonly int $expectedArgumentsCount,
         NamedTypeNode $type,
         string $template,
         int $code = 0,
