@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
-use TypeLang\Mapper\Type\Parser\TypeLangParser;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 
@@ -25,10 +24,12 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $type = self::parse('int<out T>');
 
         assert($type instanceof NamedTypeNode);
-        assert($type->arguments->first() instanceof TemplateArgumentNode);
+
+        $argument = $type->arguments?->first();
+        assert($argument instanceof TemplateArgumentNode);
 
         throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
-            argument: $type->arguments->first(),
+            argument: $argument,
             type: $type,
         );
     }
@@ -42,10 +43,12 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $type = self::parse('int<T>');
 
         assert($type instanceof NamedTypeNode);
-        assert($type->arguments->first() instanceof TemplateArgumentNode);
+
+        $argument = $type->arguments?->first();
+        assert($argument instanceof TemplateArgumentNode);
 
         throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
-            argument: $type->arguments->first(),
+            argument: $argument,
             type: $type,
         );
     }
