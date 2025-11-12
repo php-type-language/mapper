@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository\TypeDecorator;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -55,7 +55,7 @@ final class TraceableType extends TypeDecorator
         ]);
     }
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         $tracer = $context->config->findTracer();
 
@@ -72,7 +72,7 @@ final class TraceableType extends TypeDecorator
         }
     }
 
-    public function cast(mixed $value, Context $context): mixed
+    public function cast(mixed $value, MappingContext $context): mixed
     {
         $tracer = $context->config->findTracer();
 

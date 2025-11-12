@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -45,7 +45,7 @@ class DateTimeFromStringType implements TypeInterface
     /**
      * @phpstan-assert-if-true string $value
      */
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         if (!$this->input->match($value, $context)) {
             return false;
@@ -59,7 +59,7 @@ class DateTimeFromStringType implements TypeInterface
         }
     }
 
-    public function cast(mixed $value, Context $context): \DateTimeInterface
+    public function cast(mixed $value, MappingContext $context): \DateTimeInterface
     {
         $result = $this->tryParseDateTime(
             value: $this->input->cast($value, $context),

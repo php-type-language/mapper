@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Runtime;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -45,7 +45,7 @@ class InvalidValueOfTypeException extends ValueOfTypeException implements
      */
     public static function createFromContext(
         TypeStatement $expected,
-        Context $context,
+        MappingContext $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

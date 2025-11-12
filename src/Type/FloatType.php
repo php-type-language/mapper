@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -12,12 +12,12 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class FloatType implements TypeInterface
 {
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return \is_float($value);
     }
 
-    public function cast(mixed $value, Context $context): float
+    public function cast(mixed $value, MappingContext $context): float
     {
         return match (true) {
             \is_float($value) => $value,

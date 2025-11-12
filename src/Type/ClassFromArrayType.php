@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
@@ -39,7 +39,7 @@ class ClassFromArrayType implements TypeInterface
         $this->discriminator = new DiscriminatorTypeSelector($metadata);
     }
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return (\is_array($value) || \is_object($value))
             && $this->matchRequiredProperties((array) $value, $context);
@@ -48,7 +48,7 @@ class ClassFromArrayType implements TypeInterface
     /**
      * @param array<array-key, mixed> $payload
      */
-    private function matchRequiredProperties(array $payload, Context $context): bool
+    private function matchRequiredProperties(array $payload, MappingContext $context): bool
     {
         foreach ($this->metadata->properties as $meta) {
             // Match property for existence
@@ -70,7 +70,7 @@ class ClassFromArrayType implements TypeInterface
         return true;
     }
 
-    public function cast(mixed $value, Context $context): mixed
+    public function cast(mixed $value, MappingContext $context): mixed
     {
         if (\is_object($value)) {
             $value = (array) $value;
@@ -114,7 +114,7 @@ class ClassFromArrayType implements TypeInterface
      * @throws InvalidObjectValueException in case the value of a certain field is incorrect
      * @throws \Throwable in case of object's property is not accessible
      */
-    private function denormalizeObject(array $value, object $object, Context $context): void
+    private function denormalizeObject(array $value, object $object, MappingContext $context): void
     {
         foreach ($this->metadata->properties as $meta) {
             $entrance = $context->enter(

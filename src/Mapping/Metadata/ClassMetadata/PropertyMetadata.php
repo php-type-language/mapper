@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ConditionMetadata;
@@ -72,7 +72,7 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(Context $context, bool $read): TypeStatement
+    public function getTypeStatement(MappingContext $context, bool $read): TypeStatement
     {
         $info = $read ? $this->read : $this->write;
 
@@ -90,7 +90,7 @@ final class PropertyMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getFieldNode(Context $context, bool $read): NamedFieldNode
+    public function getFieldNode(MappingContext $context, bool $read): NamedFieldNode
     {
         $statement = $this->getTypeStatement($context, $read);
 

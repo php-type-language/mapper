@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -28,12 +28,12 @@ class UnitEnumFromStringType implements TypeInterface
         protected readonly TypeInterface $string = new StringType(),
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return \in_array($value, $this->cases, true);
     }
 
-    public function cast(mixed $value, Context $context): \UnitEnum
+    public function cast(mixed $value, MappingContext $context): \UnitEnum
     {
         $string = $this->string->cast($value, $context);
 

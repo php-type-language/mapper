@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -14,12 +14,12 @@ require __DIR__ . '/../../vendor/autoload.php';
 // Add new type (must implement TypeInterface)
 class MyNonEmptyStringType implements TypeInterface
 {
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return \is_string($value) && $value !== '';
     }
 
-    public function cast(mixed $value, Context $context): string
+    public function cast(mixed $value, MappingContext $context): string
     {
         if (\is_string($value) && $value !== '') {
             return $value;

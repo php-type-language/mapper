@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Coercer;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 
 /**
  * @template-covariant TResult of mixed = mixed
@@ -17,5 +17,5 @@ interface TypeCoercerInterface
      *
      * @return TResult
      */
-    public function coerce(mixed $value, Context $context): mixed;
+    public function coerce(mixed $value, MappingContext $context): mixed;
 }

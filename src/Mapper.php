@@ -6,7 +6,7 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Context\RootContext;
+use TypeLang\Mapper\Context\RootMappingContext;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
@@ -56,9 +56,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         );
     }
 
-    private function createNormalizationContext(mixed $value): RootContext
+    private function createNormalizationContext(mixed $value): RootMappingContext
     {
-        return RootContext::forNormalization(
+        return RootMappingContext::forNormalization(
             value: $value,
             config: $this->config,
             extractor: $this->extractor,
@@ -89,9 +89,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $instance->match($value, $this->createNormalizationContext($value));
     }
 
-    private function createDenormalizationContext(mixed $value): RootContext
+    private function createDenormalizationContext(mixed $value): RootMappingContext
     {
-        return RootContext::forDenormalization(
+        return RootMappingContext::forDenormalization(
             value: $value,
             config: $this->config,
             extractor: $this->extractor,

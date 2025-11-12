@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
@@ -52,12 +52,12 @@ class MyNonEmptyType implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return !empty($value);
     }
 
-    public function cast(mixed $value, Context $context): mixed
+    public function cast(mixed $value, MappingContext $context): mixed
     {
         if (!empty($value)) {
             return $this->type->cast($value, $context);

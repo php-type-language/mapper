@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\ClassType;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Runtime\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
@@ -32,7 +32,7 @@ final class DiscriminatorTypeSelector
      * @throws RuntimeException in case of mapped type casting error occurs
      * @throws \Throwable in case of internal error occurs
      */
-    public function select(mixed $value, Context $context): ?TypeInterface
+    public function select(mixed $value, MappingContext $context): ?TypeInterface
     {
         $discriminator = $this->meta->discriminator;
 

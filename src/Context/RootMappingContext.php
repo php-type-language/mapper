@@ -15,7 +15,7 @@ use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper
  */
-final class RootContext extends Context
+final class RootMappingContext extends MappingContext
 {
     private PathInterface $path;
 

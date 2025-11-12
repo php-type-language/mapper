@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Tests\Concerns;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Context\RootContext;
+use TypeLang\Mapper\Context\RootMappingContext;
 
 trait InteractWithContext
 {
@@ -15,9 +15,9 @@ trait InteractWithContext
     use InteractWithConfiguration;
     use InteractWithTypeRepository;
 
-    protected static function createNormalizationContext(mixed $value, ?Configuration $config = null): RootContext
+    protected static function createNormalizationContext(mixed $value, ?Configuration $config = null): RootMappingContext
     {
-        return RootContext::forNormalization(
+        return RootMappingContext::forNormalization(
             value: $value,
             config: $config ?? self::getConfiguration(),
             extractor: self::getTypeExtractor(),
@@ -26,9 +26,9 @@ trait InteractWithContext
         );
     }
 
-    protected static function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootContext
+    protected static function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootMappingContext
     {
-        return RootContext::forDenormalization(
+        return RootMappingContext::forDenormalization(
             value: $value,
             config: $config ?? self::getConfiguration(),
             extractor: self::getTypeExtractor(),

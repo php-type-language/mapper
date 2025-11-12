@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Coercer;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -70,7 +70,7 @@ class StringTypeCoercer implements TypeCoercerInterface
     /**
      * @throws InvalidValueException
      */
-    public function coerce(mixed $value, Context $context): string
+    public function coerce(mixed $value, MappingContext $context): string
     {
         return match (true) {
             // string
@@ -105,7 +105,7 @@ class StringTypeCoercer implements TypeCoercerInterface
         };
     }
 
-    private function floatToString(float $value, Context $context): string
+    private function floatToString(float $value, MappingContext $context): string
     {
         $formatted = \sprintf($this->floatTemplate, $value);
         $formatted = \rtrim($formatted, '0');

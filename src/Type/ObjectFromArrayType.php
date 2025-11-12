@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -12,13 +12,13 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 final class ObjectFromArrayType implements TypeInterface
 {
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return \is_object($value)
             || \is_array($value);
     }
 
-    public function cast(mixed $value, Context $context): object
+    public function cast(mixed $value, MappingContext $context): object
     {
         if (\is_array($value)) {
             $value = (object) $value;

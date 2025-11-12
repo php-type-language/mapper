@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -18,13 +18,13 @@ class ArrayType extends IterableToArrayType
      * @phpstan-assert-if-true array<array-key, mixed> $value
      */
     #[\Override]
-    public function match(mixed $value, Context $context): bool
+    public function match(mixed $value, MappingContext $context): bool
     {
         return \is_array($value);
     }
 
     #[\Override]
-    public function cast(mixed $value, Context $context): array
+    public function cast(mixed $value, MappingContext $context): array
     {
         if (!\is_array($value)) {
             throw InvalidValueException::createFromContext($context);

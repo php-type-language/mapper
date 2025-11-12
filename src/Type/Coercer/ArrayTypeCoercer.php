@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Coercer;
 
-use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Context\MappingContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -12,7 +12,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class ArrayTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, Context $context): array
+    public function coerce(mixed $value, MappingContext $context): array
     {
         return match (true) {
             \is_array($value) => $value,
