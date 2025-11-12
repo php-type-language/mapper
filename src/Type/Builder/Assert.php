@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
@@ -152,7 +152,7 @@ final class Assert
     }
 
     /**
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      */
     public static function expectNoTemplateArgumentHints(NamedTypeNode $stmt, TemplateArgumentNode $argument): void
     {
@@ -165,14 +165,14 @@ final class Assert
             return;
         }
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
+        throw TemplateArgumentHintNotSupportedException::becauseTooManyHints(
             argument: $argument,
             type: $stmt,
         );
     }
 
     /**
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      */
     public static function expectNoAnyTemplateArgumentsHints(NamedTypeNode $stmt): void
     {

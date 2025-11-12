@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
@@ -93,7 +93,7 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
 
     /**
      * @return TypeInterface<iterable<TKey, TValue>>
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
@@ -121,7 +121,7 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
 
     /**
      * @return TypeInterface<iterable<TKey, TValue>>
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */

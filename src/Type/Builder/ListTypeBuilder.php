@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\ListType;
@@ -39,7 +39,7 @@ class ListTypeBuilder extends NamedTypeBuilder
 
     /**
      * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      * @throws TooManyTemplateArgumentsInRangeException
      * @throws TypeNotFoundException
      * @throws \Throwable
@@ -83,7 +83,7 @@ class ListTypeBuilder extends NamedTypeBuilder
     }
 
     /**
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      * @throws TypeNotFoundException
      * @throws \Throwable
      */

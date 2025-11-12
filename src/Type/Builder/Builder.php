@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
@@ -131,7 +131,7 @@ abstract class Builder implements TypeBuilderInterface
     /**
      * @api
      *
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      */
     protected function expectNoTemplateArgumentHint(TypeStatement $stmt, TemplateArgumentNode $argument): void
     {
@@ -145,7 +145,7 @@ abstract class Builder implements TypeBuilderInterface
     /**
      * @api
      *
-     * @throws TemplateArgumentHintsNotSupportedException
+     * @throws TemplateArgumentHintNotSupportedException
      */
     protected function expectNoAnyTemplateArgumentHint(TypeStatement $stmt): void
     {

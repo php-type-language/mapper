@@ -10,7 +10,7 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 /**
  * Occurs when a type's template argument does not support hints
  */
-class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintException
+class TemplateArgumentHintNotSupportedException extends TemplateArgumentHintException
 {
     public static function becauseTooManyHints(
         TemplateArgumentNode $argument,
