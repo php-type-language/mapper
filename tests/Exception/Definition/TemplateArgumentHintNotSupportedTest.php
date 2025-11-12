@@ -7,18 +7,18 @@ namespace TypeLang\Mapper\Tests\Exception\Definition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestDox;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 
 #[Group('exception')]
-#[CoversClass(TemplateArgumentHintsNotSupportedException::class)]
-final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTestCase
+#[CoversClass(TemplateArgumentHintNotSupportedException::class)]
+final class TemplateArgumentHintNotSupportedTest extends DefinitionExceptionTestCase
 {
     #[TestDox('expected int<T> (0 hints), passed int<out T> (1 hint)')]
     public function testManyArgumentsPassedWithGenericType(): void
     {
-        $this->expectException(TemplateArgumentHintsNotSupportedException::class);
+        $this->expectException(TemplateArgumentHintNotSupportedException::class);
         $this->expectExceptionMessage('Template argument #1 (T) of "int<out T>" does not support any hints, but "out" were passed');
 
         $type = self::parse('int<out T>');
@@ -27,7 +27,7 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $argument = $type->arguments?->first();
         assert($argument instanceof TemplateArgumentNode);
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
+        throw TemplateArgumentHintNotSupportedException::becauseTooManyHints(
             argument: $argument,
             type: $type,
         );
@@ -45,7 +45,7 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $argument = $type->arguments?->first();
         assert($argument instanceof TemplateArgumentNode);
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
+        throw TemplateArgumentHintNotSupportedException::becauseTooManyHints(
             argument: $argument,
             type: self::parse('another-type<out T>'),
         );
@@ -63,7 +63,7 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         $argument = $type->arguments?->first();
         assert($argument instanceof TemplateArgumentNode);
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
+        throw TemplateArgumentHintNotSupportedException::becauseTooManyHints(
             argument: $argument,
             type: $type,
         );
