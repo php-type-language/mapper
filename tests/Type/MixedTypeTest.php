@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Tests\Type;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Type\Stub\AnyTypeStub;
@@ -16,6 +18,7 @@ use TypeLang\Mapper\Tests\Type\Stub\UnitEnumStub;
 use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
 use TypeLang\Mapper\Type\MixedType;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 #[Group('type')]
 #[CoversClass(MixedType::class)]
@@ -65,12 +68,16 @@ final class MixedTypeTest extends TypeTestCase
                         $value == (object) ['val'] => ['val'],
                         default => $value,
                     },
+                    \get_debug_type($value) === 'resource (closed)',
+                    \is_resource($value) => new \ValueError('Type "resource" is not defined'),
                     default => $value,
                 }
             : match (true) {
-                $value === UnitEnumStub::ExampleCase => UnitEnumStub::ExampleCase,
-                $value === IntBackedEnumStub::ExampleCase => IntBackedEnumStub::ExampleCase,
-                $value === StringBackedEnumStub::ExampleCase => StringBackedEnumStub::ExampleCase,
+                \get_debug_type($value) === 'resource (closed)',
+                \is_resource($value) => new \ValueError('Type "resource" is not defined'),
+                $value === UnitEnumStub::ExampleCase => new \ValueError('Passed value "ExampleCase" is invalid'),
+                $value === IntBackedEnumStub::ExampleCase => new \ValueError('Passed value 3735928559 is invalid'),
+                $value === StringBackedEnumStub::ExampleCase => new \ValueError('Passed value "case" is invalid'),
                 default => $value,
             };
         }

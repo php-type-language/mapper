@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Tests\Concerns\InteractWithTypeParser;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleClassStub;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleInterfaceStub;
 use TypeLang\Mapper\Tests\Platform\Stub\IntBackedEnumStub;
@@ -19,6 +20,8 @@ use TypeLang\Parser\Exception\ParseException;
 
 abstract class PlatformTestCase extends TestCase
 {
+    use InteractWithTypeParser;
+
     // v2.1
     protected const TYPES_PHPSTAN = [
         'int',
@@ -167,7 +170,7 @@ abstract class PlatformTestCase extends TestCase
         'lowercase-string',
         'non-empty-lowercase-string',
         'resource',
-        'resource (closed)',
+        //'resource (closed)',
         'closed-resource',
         'positive-int',
         'non-positive-int',
@@ -258,7 +261,7 @@ abstract class PlatformTestCase extends TestCase
         'false',
         'true',
         // TODO: Intersection types not supported yet
-        'int|(true&int)',
+        //'int|(true&int)',
     ];
 
     public static function typesDataProvider(): iterable

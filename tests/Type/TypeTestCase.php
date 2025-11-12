@@ -63,7 +63,7 @@ abstract class TypeTestCase extends TestCase
     {
         $type = static::createType();
 
-        $actual = $type->match($value, $this->createNormalizationContext(
+        $actual = $type->match($value, self::createNormalizationContext(
             value: $value,
         ));
 
@@ -86,7 +86,7 @@ abstract class TypeTestCase extends TestCase
     {
         $type = static::createType();
 
-        $actual = $type->match($value, $this->createDenormalizationContext(
+        $actual = $type->match($value, self::createDenormalizationContext(
             value: $value,
         ));
 
@@ -111,7 +111,7 @@ abstract class TypeTestCase extends TestCase
 
         $type = static::createType();
 
-        $actual = $type->cast($value, $this->createNormalizationContext(
+        $actual = $type->cast($value, self::createNormalizationContext(
             value: $value,
         ));
 
@@ -136,7 +136,7 @@ abstract class TypeTestCase extends TestCase
 
         $type = static::createType();
 
-        $actual = $type->cast($value, $this->createDenormalizationContext(
+        $actual = $type->cast($value, self::createDenormalizationContext(
             value: $value,
         ));
 

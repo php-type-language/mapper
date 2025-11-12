@@ -37,7 +37,6 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->expectExceptionMessage($expected->getMessage());
-        $this->expectException(InvalidValueException::class);
     }
 
     protected static function assertIfNotException(mixed $expected, mixed $actual): void

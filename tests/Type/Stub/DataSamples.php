@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type\Stub;
 
+use TypeLang\Mapper\Context\Path\Path;
+use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Exception\Value\JsonLikeValuePrinter;
 
 /**
@@ -34,7 +36,7 @@ final class DataSamples implements \IteratorAggregate
         foreach ($this as $value) {
             yield $value => new \ValueError(\sprintf(
                 'Passed value %s is invalid',
-                $printer->print($value),
+                $printer->print($value)
             ));
         }
     }

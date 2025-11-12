@@ -48,7 +48,7 @@ abstract class TypeCoercerTestCase extends TestCase
 
         $coercer = static::createCoercer();
 
-        $actual = $coercer->coerce($value, $this->createNormalizationContext(
+        $actual = $coercer->coerce($value, self::createNormalizationContext(
             value: $value,
         ));
 
@@ -73,7 +73,7 @@ abstract class TypeCoercerTestCase extends TestCase
 
         $coercer = static::createCoercer();
 
-        $actual = $coercer->coerce($value, $this->createNormalizationContext(
+        $actual = $coercer->coerce($value, self::createNormalizationContext(
             value: $value,
         ));
 

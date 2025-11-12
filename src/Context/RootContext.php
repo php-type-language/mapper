@@ -26,6 +26,10 @@ final class RootContext extends Context
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
+        if (!$config->isStrictTypesOptionDefined()) {
+            $config = $config->withStrictTypes(true);
+        }
+
         return new self(
             value: $value,
             direction: Direction::Normalize,
@@ -43,6 +47,10 @@ final class RootContext extends Context
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
+        if (!$config->isStrictTypesOptionDefined()) {
+            $config = $config->withStrictTypes(false);
+        }
+
         return new self(
             value: $value,
             direction: Direction::Denormalize,
