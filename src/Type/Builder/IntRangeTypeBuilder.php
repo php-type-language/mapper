@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
+use TypeLang\Mapper\Exception\Definition\Template\OneOfTemplateArgumentsCountException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Type\IntRangeType;
 use TypeLang\Mapper\Type\IntType;
@@ -44,25 +45,12 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
 
         return match (\count($arguments)) {
             0 => new IntType(),
-            1 => $this->buildWithMinValue($statement, $arguments[0]),
             2 => $this->buildWithMinMaxValues($statement, $arguments[0], $arguments[1]),
-            default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
-                minArgumentsCount: 0,
-                maxArgumentsCount: 2,
+            default => throw OneOfTemplateArgumentsCountException::becauseArgumentsCountDoesNotMatch(
+                variants: [0, 2],
                 type: $statement,
             ),
         };
-    }
-
-    /**
-     * @throws InvalidTemplateArgumentException
-     * @throws TemplateArgumentHintsNotSupportedException
-     */
-    private function buildWithMinValue(NamedTypeNode $statement, ArgNode $min): IntRangeType
-    {
-        $value = $this->fetchTemplateArgumentValue($statement, $min);
-
-        return new IntRangeType($value);
     }
 
     /**
