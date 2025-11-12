@@ -6,8 +6,10 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\Template\TemplateArgumentsNotSupportedException;
+use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -26,15 +28,13 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws TemplateArgumentsNotSupportedException
      */
-    protected function expectNoTemplateArguments(NamedTypeNode $stmt): void
+    protected function expectNoTemplateArguments(TypeStatement $stmt): void
     {
-        if ($stmt->arguments === null) {
+        if (!$stmt instanceof NamedTypeNode) {
             return;
         }
 
-        throw TemplateArgumentsNotSupportedException::becauseTooManyArguments(
-            type: $stmt,
-        );
+        Assert::expectNoTemplateArguments($stmt);
     }
 
     /**
@@ -42,97 +42,108 @@ abstract class Builder implements TypeBuilderInterface
      *
      * @throws ShapeFieldsNotSupportedException
      */
-    protected function expectNoShapeFields(NamedTypeNode $stmt): void
+    protected function expectNoShapeFields(TypeStatement $stmt): void
     {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
         if ($stmt->fields === null) {
             return;
         }
 
-        throw ShapeFieldsNotSupportedException::becauseTooManyShapeFields(
-            type: $stmt,
-        );
+        throw ShapeFieldsNotSupportedException::becauseTooManyShapeFields($stmt);
     }
 
     /**
-     * @param int<0, max> $count
-     *
-     * @throws MissingTemplateArgumentsInRangeException
-     * @throws TooManyTemplateArgumentsInRangeException
-     */
-    protected function expectTemplateArgumentsCount(NamedTypeNode $stmt, int $count): void
-    {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $count, $count);
-        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $count, $count);
-    }
-
-    /**
-     * @param int<0, max> $max
-     * @param int<0, max> $min
-     *
-     * @throws TooManyTemplateArgumentsInRangeException
      * @api
      *
+     * @throws TooManyTemplateArgumentsException
+     * @throws MissingTemplateArgumentsException
+     * @throws TemplateArgumentsNotSupportedException
      */
-    protected function expectTemplateArgumentsLessThan(NamedTypeNode $stmt, int $max, int $min = 0): void
+    protected function expectTemplateArgumentsCount(TypeStatement $stmt, int $count): void
     {
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, $max + 1, $min);
-    }
-
-    /**
-     * @param int<0, max> $max
-     * @param int<0, max> $min
-     *
-     * @throws TooManyTemplateArgumentsInRangeException
-     * @api
-     *
-     */
-    protected function expectTemplateArgumentsLessOrEqualThan(NamedTypeNode $stmt, int $max, int $min = 0): void
-    {
-        if ($stmt->arguments === null || $stmt->arguments->count() <= $max) {
+        if (!$stmt instanceof NamedTypeNode) {
             return;
         }
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
-            minArgumentsCount: $min,
-            maxArgumentsCount: $max,
-            type: $stmt,
-        );
+        Assert::expectTemplateArgumentsCount($stmt, $count);
     }
 
     /**
-     * @param int<0, max> $min
-     * @param int<0, max>|null $max
-     *
-     * @throws MissingTemplateArgumentsInRangeException
      * @api
      *
-     */
-    protected function expectTemplateArgumentsGreaterThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
-    {
-        $this->expectTemplateArgumentsGreaterOrEqualThan($stmt, $min + 1, $max);
-    }
-
-    /**
-     * @param int<0, max> $min
-     * @param int<0, max>|null $max
-     *
+     * @throws TooManyTemplateArgumentsException
+     * @throws MissingTemplateArgumentsException
+     * @throws TemplateArgumentsNotSupportedException
+     * @throws TooManyTemplateArgumentsInRangeException
      * @throws MissingTemplateArgumentsInRangeException
-     * @api
-     *
      */
-    protected function expectTemplateArgumentsGreaterOrEqualThan(NamedTypeNode $stmt, int $min, ?int $max = null): void
+    protected function expectTemplateArgumentsInRange(TypeStatement $stmt, int $from, int $to): void
     {
-        $actualArgumentsCount = $stmt->arguments?->count() ?? 0;
-
-        if ($actualArgumentsCount >= $min) {
+        if (!$stmt instanceof NamedTypeNode) {
             return;
         }
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
-            minArgumentsCount: $min,
-            maxArgumentsCount: $max ?? $min,
-            type: $stmt,
-        );
+        Assert::expectTemplateArgumentsCountInRange($stmt, $from, $to);
+    }
+
+    /**
+     * @api
+     *
+     * @throws MissingTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsLessThan(TypeStatement $stmt, int $count): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectTemplateArgumentsCountLessThan($stmt, $count);
+    }
+
+    /**
+     * @api
+     *
+     * @throws MissingTemplateArgumentsException
+     * @throws TemplateArgumentsNotSupportedException
+     */
+    protected function expectTemplateArgumentsLessOrEqualThan(TypeStatement $stmt, int $count): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectTemplateArgumentsCountLessOrEqualThan($stmt, $count);
+    }
+
+    /**
+     * @api
+     *
+     * @throws TooManyTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsGreaterThan(TypeStatement $stmt, int $count): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectTemplateArgumentsCountGreaterThan($stmt, $count);
+    }
+
+    /**
+     * @api
+     *
+     * @throws TooManyTemplateArgumentsException
+     */
+    protected function expectTemplateArgumentsGreaterOrEqualThan(TypeStatement $stmt, int $count): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectTemplateArgumentsCountGreaterOrEqualThan($stmt, $count);
     }
 
     /**
@@ -142,13 +153,24 @@ abstract class Builder implements TypeBuilderInterface
      */
     protected function expectNoTemplateArgumentHint(TypeStatement $stmt, TemplateArgumentNode $argument): void
     {
-        if ($argument->hint === null) {
+        if (!$stmt instanceof NamedTypeNode) {
             return;
         }
 
-        throw TemplateArgumentHintsNotSupportedException::becauseTooManyHints(
-            argument: $argument,
-            type: $stmt,
-        );
+        Assert::expectNoTemplateArgumentHints($stmt, $argument);
+    }
+
+    /**
+     * @api
+     *
+     * @throws TemplateArgumentHintsNotSupportedException
+     */
+    protected function expectNoAnyTemplateArgumentHint(TypeStatement $stmt): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectNoAnyTemplateArgumentsHints($stmt);
     }
 }

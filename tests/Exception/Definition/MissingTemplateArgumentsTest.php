@@ -19,7 +19,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->expectException(MissingTemplateArgumentsException::class);
         $this->expectExceptionMessage('Type "int<min, max>" expects at least 3 template argument(s), but 2 were passed');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 3,
             type: self::parse('int<min, max>'),
         );
@@ -31,7 +31,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->expectException(MissingTemplateArgumentsException::class);
         $this->expectExceptionMessage('Type "int" expects at least 3 template argument(s), but 0 were passed');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 3,
             type: self::parse('int'),
         );
@@ -43,7 +43,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             type: self::parse('int<min, max>'),
         );
@@ -55,7 +55,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 0,
             type: self::parse('int'),
         );
@@ -67,7 +67,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 0,
             type: self::parse('int<min, max>'),
         );
@@ -79,7 +79,7 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsException::becauseArgumentsCountRequired(
             minArgumentsCount: 2,
             type: self::parse('int<min, max>'),
         );

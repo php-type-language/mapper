@@ -41,6 +41,7 @@ class OneOfTemplateArgumentsCountException extends TemplateArgumentsException
         NamedTypeNode $type,
         ?\Throwable $previous = null,
     ): self {
+        /** @phpstan-ignore-next-line : Additional DbC precondition */
         assert(\count($variants) !== 0, new \InvalidArgumentException(
             'Semantic Violation: Argument variants should be greater than 0',
         ));

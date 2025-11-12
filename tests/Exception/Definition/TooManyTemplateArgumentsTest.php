@@ -19,8 +19,8 @@ final class TooManyTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->expectException(TooManyTemplateArgumentsException::class);
         $this->expectExceptionMessage('Type "int<min, max>" only accepts 1 template argument(s), but 2 were passed');
 
-        throw TooManyTemplateArgumentsException::becauseHasRedundantArgument(
-            maxArgumentsCount: 1,
+        throw TooManyTemplateArgumentsException::becauseArgumentsCountRequired(
+            expectedArgumentsCount: 1,
             type: self::parse('int<min, max>'),
         );
     }
@@ -31,8 +31,8 @@ final class TooManyTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->expectException(TooManyTemplateArgumentsException::class);
         $this->expectExceptionMessage('Type "int<min, max>" only accepts 0 template argument(s), but 2 were passed');
 
-        throw TooManyTemplateArgumentsException::becauseHasRedundantArgument(
-            maxArgumentsCount: 0,
+        throw TooManyTemplateArgumentsException::becauseArgumentsCountRequired(
+            expectedArgumentsCount: 0,
             type: self::parse('int<min, max>'),
         );
     }
@@ -43,8 +43,8 @@ final class TooManyTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsException::becauseHasRedundantArgument(
-            maxArgumentsCount: 0,
+        throw TooManyTemplateArgumentsException::becauseArgumentsCountRequired(
+            expectedArgumentsCount: 0,
             type: self::parse('int'),
         );
     }
@@ -55,8 +55,8 @@ final class TooManyTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsException::becauseHasRedundantArgument(
-            maxArgumentsCount: 3,
+        throw TooManyTemplateArgumentsException::becauseArgumentsCountRequired(
+            expectedArgumentsCount: 3,
             type: self::parse('int<min, max>'),
         );
     }
@@ -67,8 +67,8 @@ final class TooManyTemplateArgumentsTest extends DefinitionExceptionTestCase
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsException::becauseHasRedundantArgument(
-            maxArgumentsCount: 2,
+        throw TooManyTemplateArgumentsException::becauseArgumentsCountRequired(
+            expectedArgumentsCount: 2,
             type: self::parse('int<min, max>'),
         );
     }

@@ -46,7 +46,7 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
             0 => new IntType(),
             1 => $this->buildWithMinValue($statement, $arguments[0]),
             2 => $this->buildWithMinMaxValues($statement, $arguments[0], $arguments[1]),
-            default => throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+            default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
                 minArgumentsCount: 0,
                 maxArgumentsCount: 2,
                 type: $statement,
@@ -81,7 +81,7 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintsNotSupportedException
      */
-    private function fetchTemplateArgumentValue(TypeStatement $statement, ArgNode $argument): int
+    private function fetchTemplateArgumentValue(NamedTypeNode $statement, ArgNode $argument): int
     {
         $this->expectNoTemplateArgumentHint($statement, $argument);
 

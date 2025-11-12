@@ -19,7 +19,7 @@ final class MissingTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->expectException(MissingTemplateArgumentsInRangeException::class);
         $this->expectExceptionMessage('Type "int" expects at least from 1 to 2 template argument(s), but 0 were passed');
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int'),
@@ -32,7 +32,7 @@ final class MissingTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int<T>'),
@@ -45,7 +45,7 @@ final class MissingTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int<T, U, V>'),
@@ -58,7 +58,7 @@ final class MissingTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 2,
             maxArgumentsCount: 2,
             type: self::parse('int<T, U>'),
@@ -71,7 +71,7 @@ final class MissingTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+        throw MissingTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 2,
             maxArgumentsCount: 1,
             type: self::parse('int<T, U>'),

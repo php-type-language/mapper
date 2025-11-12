@@ -11,13 +11,11 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
  */
 class TooManyTemplateArgumentsInRangeException extends TemplateArgumentsInRangeException
 {
-    public const ERROR_CODE_IN_RANGE = 0x01;
-
     /**
      * @param int<0, max> $minArgumentsCount
      * @param int<1, max> $maxArgumentsCount
      */
-    public static function becauseHasRedundantArgument(
+    public static function becauseArgumentsCountRequired(
         int $minArgumentsCount,
         int $maxArgumentsCount,
         NamedTypeNode $type,
@@ -43,7 +41,6 @@ class TooManyTemplateArgumentsInRangeException extends TemplateArgumentsInRangeE
             maxArgumentsCount: $maxArgumentsCount,
             type: $type,
             template: $template,
-            code: self::ERROR_CODE_IN_RANGE,
             previous: $previous,
         );
     }

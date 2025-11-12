@@ -19,7 +19,7 @@ final class TooManyTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->expectException(TooManyTemplateArgumentsInRangeException::class);
         $this->expectExceptionMessage('Type "int<T, U, V>" only accepts from 1 to 2 template argument(s), but 3 were passed');
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+        throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int<T, U, V>'),
@@ -32,7 +32,7 @@ final class TooManyTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+        throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int<T>'),
@@ -45,7 +45,7 @@ final class TooManyTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+        throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 1,
             maxArgumentsCount: 2,
             type: self::parse('int'),
@@ -58,7 +58,7 @@ final class TooManyTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+        throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 2,
             maxArgumentsCount: 2,
             type: self::parse('int<T, U>'),
@@ -71,7 +71,7 @@ final class TooManyTemplateArgumentsInRangeTest extends DefinitionExceptionTestC
         $this->skipIfAssertionsDisabled();
         $this->expectExceptionMessage('Semantic Violation');
 
-        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+        throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
             minArgumentsCount: 2,
             maxArgumentsCount: 1,
             type: self::parse('int<T, U>'),

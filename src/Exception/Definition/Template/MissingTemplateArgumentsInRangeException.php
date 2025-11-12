@@ -15,7 +15,7 @@ class MissingTemplateArgumentsInRangeException extends TemplateArgumentsInRangeE
      * @param int<0, max> $minArgumentsCount
      * @param int<1, max> $maxArgumentsCount
      */
-    public static function becauseNoRequiredArgument(
+    public static function becauseArgumentsCountRequired(
         int $minArgumentsCount,
         int $maxArgumentsCount,
         NamedTypeNode $type,
