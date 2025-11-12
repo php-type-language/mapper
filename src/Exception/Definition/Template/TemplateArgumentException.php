@@ -29,6 +29,9 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
         parent::__construct($type, $template, $code, $previous);
     }
 
+    /**
+     * @return int<0, max>
+     */
     private function getArgumentIndex(NamedTypeNode $type, TemplateArgumentNode $argument): int
     {
         $index = $type->arguments?->findIndex($argument);

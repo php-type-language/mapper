@@ -31,7 +31,7 @@ abstract class DateTimeTypeBuilder extends Builder
         TypeParserInterface $parser,
     ): TypeInterface {
         $this->expectNoShapeFields($statement);
-        $this->expectTemplateArgumentsLessOrEqualThan($statement, 1, 0);
+        $this->expectTemplateArgumentsLessOrEqualThan($statement, 1);
 
         /** @var class-string<\DateTimeInterface> $class */
         $class = $statement->name->toString();
