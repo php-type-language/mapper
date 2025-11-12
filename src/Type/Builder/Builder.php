@@ -40,24 +40,6 @@ abstract class Builder implements TypeBuilderInterface
     /**
      * @api
      *
-     * @throws ShapeFieldsNotSupportedException
-     */
-    protected function expectNoShapeFields(TypeStatement $stmt): void
-    {
-        if (!$stmt instanceof NamedTypeNode) {
-            return;
-        }
-
-        if ($stmt->fields === null) {
-            return;
-        }
-
-        throw ShapeFieldsNotSupportedException::becauseTooManyShapeFields($stmt);
-    }
-
-    /**
-     * @api
-     *
      * @throws TooManyTemplateArgumentsException
      * @throws MissingTemplateArgumentsException
      * @throws TemplateArgumentsNotSupportedException
@@ -172,5 +154,19 @@ abstract class Builder implements TypeBuilderInterface
         }
 
         Assert::expectNoAnyTemplateArgumentsHints($stmt);
+    }
+
+    /**
+     * @api
+     *
+     * @throws ShapeFieldsNotSupportedException
+     */
+    protected function expectNoShapeFields(TypeStatement $stmt): void
+    {
+        if (!$stmt instanceof NamedTypeNode) {
+            return;
+        }
+
+        Assert::expectNoShapeFields($stmt);
     }
 }

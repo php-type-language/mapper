@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsException;
 use TypeLang\Mapper\Exception\Definition\Template\MissingTemplateArgumentsInRangeException;
@@ -15,6 +16,18 @@ use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
 
 final class Assert
 {
+    /**
+     * @throws ShapeFieldsNotSupportedException
+     */
+    public static function expectNoShapeFields(NamedTypeNode $stmt): void
+    {
+        if ($stmt->fields === null) {
+            return;
+        }
+
+        throw ShapeFieldsNotSupportedException::becauseTooManyShapeFields($stmt);
+    }
+
     /**
      * @throws TemplateArgumentsNotSupportedException
      */
