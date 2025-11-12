@@ -17,7 +17,7 @@ class OneOfTemplateArgumentsCountException extends TemplateArgumentsException
          */
         public readonly int $passedArgumentsCount,
         /**
-         * @var list<int<0, max>>
+         * @var non-empty-list<int<0, max>>
          */
         public readonly array $expectedArgumentCountVariants,
         NamedTypeNode $type,
@@ -56,6 +56,7 @@ class OneOfTemplateArgumentsCountException extends TemplateArgumentsException
         $template = 'Type "{{type}}" only accepts {{expectedArgumentCountVariants}}'
             . ' template argument(s), but {{passedArgumentsCount}} were passed';
 
+        /** @var non-empty-array<array-key, int<0, max>> $variants */
         return new self(
             passedArgumentsCount: $passedArgumentsCount,
             expectedArgumentCountVariants: \array_values($variants),

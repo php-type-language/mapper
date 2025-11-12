@@ -36,8 +36,8 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
     #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
     public function testOfNonOwnArgument(): void
     {
-        $this->expectException(TemplateArgumentHintsNotSupportedException::class);
-        $this->expectExceptionMessage('Template argument #1 (T) of "another-type<out T>" does not support any hints, but "in" were passed');
+        $this->skipIfAssertionsDisabled();
+        $this->expectExceptionMessage('Template argument is not a part of passed type');
 
         $type = self::parse('int<in T>');
         assert($type instanceof NamedTypeNode);

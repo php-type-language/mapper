@@ -24,30 +24,19 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
         int $code = 0,
         ?\Throwable $previous = null,
     ) {
-        $this->index = self::getArgumentIndex($argument, $type);
+        $this->index = $this->getArgumentIndex($type, $argument);
 
         parent::__construct($type, $template, $code, $previous);
     }
 
-    /**
-     * @return int<0, max>
-     */
-    private static function getArgumentIndex(TemplateArgumentNode $argument, NamedTypeNode $type): int
+    private function getArgumentIndex(NamedTypeNode $type, TemplateArgumentNode $argument): int
     {
-        $index = 0;
+        $index = $type->arguments?->findIndex($argument);
 
-        if ($type->arguments === null) {
-            return $index;
-        }
+        assert($index !== null, new \InvalidArgumentException(
+            'Template argument is not a part of passed type',
+        ));
 
-        foreach ($type->arguments as $actual) {
-            if ($actual === $argument) {
-                return $index + 1;
-            }
-
-            ++$index;
-        }
-
-        return $index;
+        return $index + 1;
     }
 }

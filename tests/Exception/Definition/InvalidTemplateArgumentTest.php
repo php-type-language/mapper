@@ -38,8 +38,8 @@ final class InvalidTemplateArgumentTest extends DefinitionExceptionTestCase
     #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
     public function testOfNonOwnArgument(): void
     {
-        $this->expectException(InvalidTemplateArgumentException::class);
-        $this->expectExceptionMessage('Passed template argument #0 of type another-type must be of type string, but T given');
+        $this->skipIfAssertionsDisabled();
+        $this->expectExceptionMessage('Template argument is not a part of passed type');
 
         $type = self::parse('int<T>');
         assert($type instanceof NamedTypeNode);
