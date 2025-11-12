@@ -8,8 +8,6 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 /**
  * Group of errors related to incorrect number (range) of template arguments
- *
- * @deprecated TODO
  */
 abstract class TemplateArgumentsInRangeException extends TemplateArgumentsException
 {
@@ -21,11 +19,11 @@ abstract class TemplateArgumentsInRangeException extends TemplateArgumentsExcept
         /**
          * @var int<0, max>
          */
-        public readonly int $minSupportedArgumentsCount,
+        public readonly int $minArgumentsCount,
         /**
          * @var int<0, max>
          */
-        public readonly int $maxSupportedArgumentsCount,
+        public readonly int $maxArgumentsCount,
         NamedTypeNode $type,
         string $template,
         int $code = 0,

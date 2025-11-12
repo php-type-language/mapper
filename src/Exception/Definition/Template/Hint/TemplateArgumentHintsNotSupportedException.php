@@ -21,7 +21,7 @@ class TemplateArgumentHintsNotSupportedException extends TemplateArgumentHintExc
             . 'but "{{hint}}" were passed';
 
         assert($argument->hint !== null, new \InvalidArgumentException(
-            'Incorrect exception usage',
+            'Semantic Violation: Argument should contain argument hint',
         ));
 
         return new self(

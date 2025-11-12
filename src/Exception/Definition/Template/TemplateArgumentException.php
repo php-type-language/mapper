@@ -34,7 +34,7 @@ abstract class TemplateArgumentException extends TemplateArgumentsException
         $index = $type->arguments?->findIndex($argument);
 
         assert($index !== null, new \InvalidArgumentException(
-            'Template argument is not a part of passed type',
+            'Semantic Violation: Template argument is not a part of passed type',
         ));
 
         return $index + 1;

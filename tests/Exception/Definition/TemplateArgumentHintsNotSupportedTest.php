@@ -33,11 +33,11 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         );
     }
 
-    #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
+    #[TestDox('[UB] all works if pass an non-node\'s argument')]
     public function testOfNonOwnArgument(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Template argument is not a part of passed type');
+        $this->expectExceptionMessage('Semantic Violation');
 
         $type = self::parse('int<in T>');
         assert($type instanceof NamedTypeNode);
@@ -51,11 +51,11 @@ final class TemplateArgumentHintsNotSupportedTest extends DefinitionExceptionTes
         );
     }
 
-    #[TestDox('[not applicable] expected int (0 arguments), passed int (0 arguments)')]
+    #[TestDox('[UB] expected int (0 arguments), passed int (0 arguments)')]
     public function testManyArgumentsPassedWithBasicType(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         $type = self::parse('int<T>');
         assert($type instanceof NamedTypeNode);

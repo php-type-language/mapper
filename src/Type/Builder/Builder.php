@@ -92,9 +92,9 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
-            minSupportedArgumentsCount: $min,
-            maxSupportedArgumentsCount: $max,
+        throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+            minArgumentsCount: $min,
+            maxArgumentsCount: $max,
             type: $stmt,
         );
     }
@@ -128,9 +128,9 @@ abstract class Builder implements TypeBuilderInterface
             return;
         }
 
-        throw MissingTemplateArgumentsInRangeException::becauseTemplateArgumentsRequired(
-            minSupportedArgumentsCount: $min,
-            maxSupportedArgumentsCount: $max ?? $min,
+        throw MissingTemplateArgumentsInRangeException::becauseNoRequiredArgument(
+            minArgumentsCount: $min,
+            maxArgumentsCount: $max ?? $min,
             type: $stmt,
         );
     }

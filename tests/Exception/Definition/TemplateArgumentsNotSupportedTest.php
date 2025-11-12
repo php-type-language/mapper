@@ -24,11 +24,11 @@ final class TemplateArgumentsNotSupportedTest extends DefinitionExceptionTestCas
         );
     }
 
-    #[TestDox('[not applicable] expected int (0 arguments), passed int (0 arguments)')]
+    #[TestDox('[UB] expected int (0 arguments), passed int (0 arguments)')]
     public function testManyArgumentsPassedWithBasicType(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         throw TemplateArgumentsNotSupportedException::becauseTooManyArguments(
             type: self::parse('int'),

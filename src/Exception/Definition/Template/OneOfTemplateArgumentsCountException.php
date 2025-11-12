@@ -34,52 +34,33 @@ class OneOfTemplateArgumentsCountException extends TemplateArgumentsException
     }
 
     /**
-     * @param array<array-key, int<0, max>> $variants
+     * @param non-empty-array<array-key, int<0, max>> $variants
      */
     public static function becauseArgumentsCountDoesNotMatch(
         array $variants,
         NamedTypeNode $type,
         ?\Throwable $previous = null,
-    ): self|TemplateArgumentsException {
+    ): self {
+        assert(\count($variants) !== 0, new \InvalidArgumentException(
+            'Semantic Violation: Argument variants should be greater than 0',
+        ));
+
         $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
         assert(!\in_array($passedArgumentsCount, $variants, true), new \InvalidArgumentException(
-            'Incorrect exception usage',
+            'Semantic Violation: Passed arguments count should not be in variants',
         ));
-
-        $simplified = self::simplifyException($variants, $type, $previous);
-
-        if ($simplified !== null) {
-            return $simplified;
-        }
 
         $template = 'Type "{{type}}" only accepts {{expectedArgumentCountVariants}}'
             . ' template argument(s), but {{passedArgumentsCount}} were passed';
 
         /** @var non-empty-array<array-key, int<0, max>> $variants */
         return new self(
-            passedArgumentsCount: $passedArgumentsCount,
+            passedArgumentsCount: $type->arguments?->count() ?? 0,
             expectedArgumentCountVariants: \array_values($variants),
             type: $type,
             template: $template,
             previous: $previous,
         );
-    }
-
-    /**
-     * @param array<array-key, int<0, max>> $variants
-     */
-    private static function simplifyException(
-        array $variants,
-        NamedTypeNode $type,
-        ?\Throwable $previous = null,
-    ): ?TemplateArgumentsException {
-        return match (\count($variants)) {
-            0 => TemplateArgumentsNotSupportedException::becauseTooManyArguments($type),
-            1 => ($expectedArgumentsCount = \reset($variants)) < ($type->arguments?->count() ?? 0)
-                ? TooManyTemplateArgumentsException::becauseHasRedundantArgument($expectedArgumentsCount, $type, $previous)
-                : MissingTemplateArgumentsException::becauseNoRequiredArgument($expectedArgumentsCount, $type, $previous),
-            default => null,
-        };
     }
 }

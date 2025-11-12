@@ -37,11 +37,11 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         );
     }
 
-    #[TestDox('[not applicable] expected int<T> (1 argument), passed int<T, U> (2 arguments)')]
+    #[TestDox('[UB] expected int<T> (1 argument), passed int<T, U> (2 arguments)')]
     public function testManyArgumentsPassedWithInvalidGenericType(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
             minArgumentsCount: 1,
@@ -49,11 +49,11 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         );
     }
 
-    #[TestDox('[not applicable] expected int (0 argument), passed int (0 arguments)')]
+    #[TestDox('[UB] expected int (0 argument), passed int (0 arguments)')]
     public function testNoArgumentsPassedWithInvalidType(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
             minArgumentsCount: 0,
@@ -61,11 +61,11 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         );
     }
 
-    #[TestDox('[not applicable] expected int (0 argument), passed int<T, U> (2 arguments)')]
+    #[TestDox('[UB] expected int (0 argument), passed int<T, U> (2 arguments)')]
     public function testNoArgumentsPassedWithInvalidGenericType(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
             minArgumentsCount: 0,
@@ -73,11 +73,11 @@ final class MissingTemplateArgumentsTest extends DefinitionExceptionTestCase
         );
     }
 
-    #[TestDox('[not applicable] expected int<T, U> (2 arguments), passed int<T, U> (2 arguments)')]
+    #[TestDox('[UB] expected int<T, U> (2 arguments), passed int<T, U> (2 arguments)')]
     public function testInvalidGenericTypeWithSameArgumentsCount(): void
     {
         $this->skipIfAssertionsDisabled();
-        $this->expectExceptionMessage('Incorrect exception usage');
+        $this->expectExceptionMessage('Semantic Violation');
 
         throw MissingTemplateArgumentsException::becauseNoRequiredArgument(
             minArgumentsCount: 2,

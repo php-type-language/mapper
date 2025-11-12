@@ -18,7 +18,7 @@ class TemplateArgumentsNotSupportedException extends TemplateArgumentsCountExcep
         $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
         assert($passedArgumentsCount > 0, new \InvalidArgumentException(
-            'Incorrect exception usage',
+            'Semantic Violation: Passed type should contain template arguments',
         ));
 
         $template = 'Type "{{type}}" does not support template arguments, '

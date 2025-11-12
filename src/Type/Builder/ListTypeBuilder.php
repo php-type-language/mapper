@@ -59,9 +59,9 @@ class ListTypeBuilder extends NamedTypeBuilder
         return match (\count($arguments)) {
             0 => $this->buildWithNoValue($types, $parser),
             1 => $this->buildWithValue($statement, $types),
-            default => throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
-                minSupportedArgumentsCount: 0,
-                maxSupportedArgumentsCount: 1,
+            default => throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+                minArgumentsCount: 0,
+                maxArgumentsCount: 1,
                 type: $statement,
             ),
         };

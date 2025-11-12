@@ -61,9 +61,9 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
             0 => $this->buildWithNoKeyValue($types, $parser),
             1 => $this->buildWithValue($statement, $types, $parser),
             2 => $this->buildWithKeyValue($statement, $types),
-            default => throw TooManyTemplateArgumentsInRangeException::becauseTooManyThanRangeTemplateArguments(
-                minSupportedArgumentsCount: 0,
-                maxSupportedArgumentsCount: 2,
+            default => throw TooManyTemplateArgumentsInRangeException::becauseHasRedundantArgument(
+                minArgumentsCount: 0,
+                maxArgumentsCount: 2,
                 type: $statement,
             ),
         };

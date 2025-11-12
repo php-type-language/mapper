@@ -18,18 +18,12 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
         int $maxArgumentsCount,
         NamedTypeNode $type,
         ?\Throwable $previous = null,
-    ): self|TemplateArgumentsException {
+    ): self {
         $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
         assert($passedArgumentsCount > $maxArgumentsCount, new \InvalidArgumentException(
-            'Incorrect exception usage',
+            'Semantic Violation: Passed type`s argument count should be greater than max bound',
         ));
-
-        $simplified = self::simplifyException($maxArgumentsCount, $type, $previous);
-
-        if ($simplified !== null) {
-            return $simplified;
-        }
 
         $template = 'Type "{{type}}" only accepts {{expectedArgumentsCount}}'
             . ' template argument(s), but {{passedArgumentsCount}} were passed';
@@ -41,20 +35,5 @@ class TooManyTemplateArgumentsException extends TemplateArgumentsCountException
             template: $template,
             previous: $previous,
         );
-    }
-
-    /**
-     * @param int<0, max> $maxArgumentsCount
-     */
-    private static function simplifyException(
-        int $maxArgumentsCount,
-        NamedTypeNode $type,
-        ?\Throwable $previous = null,
-    ): ?TemplateArgumentsException {
-        if ($maxArgumentsCount <= 0) {
-            return TemplateArgumentsNotSupportedException::becauseTooManyArguments($type, $previous);
-        }
-
-        return null;
     }
 }

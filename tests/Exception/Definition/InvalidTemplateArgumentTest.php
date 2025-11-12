@@ -35,7 +35,7 @@ final class InvalidTemplateArgumentTest extends DefinitionExceptionTestCase
         );
     }
 
-    #[TestDox('[undefined behaviour] all works if pass an non-node\'s argument')]
+    #[TestDox('[UB] all works if pass an non-node\'s argument')]
     public function testOfNonOwnArgument(): void
     {
         $this->skipIfAssertionsDisabled();

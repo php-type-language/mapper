@@ -22,7 +22,7 @@ class MissingTemplateArgumentsException extends TemplateArgumentsCountException
         $passedArgumentsCount = $type->arguments?->count() ?? 0;
 
         assert($passedArgumentsCount < $minArgumentsCount, new \InvalidArgumentException(
-            'Incorrect exception usage',
+            'Semantic Violation: Passed type`s argument count should be less than min bound',
         ));
 
         $template = 'Type "{{type}}" expects at least {{expectedArgumentsCount}}'
