@@ -13,6 +13,7 @@ use TypeLang\Mapper\Type\IntRangeType;
 use TypeLang\Mapper\Type\IntType;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -21,7 +22,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Node\Stmt\UnionTypeNode;
 
 /**
- * @template-extends NamedTypeBuilder<IntRangeType|IntType>
+ * @template-extends NamedTypeBuilder<TypeInterface<int>>
  */
 class IntRangeTypeBuilder extends NamedTypeBuilder
 {
@@ -35,7 +36,7 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
         TypeStatement $statement,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
-    ): IntRangeType|IntType {
+    ): TypeInterface {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
@@ -44,8 +45,11 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
         $arguments = $statement->arguments->items ?? [];
 
         return match (\count($arguments)) {
-            0 => new IntType(),
-            2 => $this->buildWithMinMaxValues($statement, $arguments[0], $arguments[1]),
+            0 => $this->createIntType(),
+            2 => $this->createIntRangeType(
+                min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
+                max: $this->fetchTemplateArgumentValue($statement, $arguments[1]),
+            ),
             default => throw OneOfTemplateArgumentsCountException::becauseArgumentsCountDoesNotMatch(
                 variants: [0, 2],
                 type: $statement,
@@ -54,15 +58,21 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
     }
 
     /**
+     * @return TypeInterface<int>
+     */
+    protected function createIntType(): TypeInterface
+    {
+        return new IntType();
+    }
+
+    /**
+     * @return TypeInterface<int>
      * @throws InvalidTemplateArgumentException
      * @throws TemplateArgumentHintNotSupportedException
      */
-    private function buildWithMinMaxValues(NamedTypeNode $statement, ArgNode $min, ArgNode $max): IntRangeType
+    protected function createIntRangeType(int $min, int $max): TypeInterface
     {
-        $from = $this->fetchTemplateArgumentValue($statement, $min);
-        $to = $this->fetchTemplateArgumentValue($statement, $max);
-
-        return new IntRangeType($from, $to);
+        return new IntRangeType($min, $max, $this->createIntType());
     }
 
     /**

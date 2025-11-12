@@ -18,6 +18,10 @@ class IntRangeType implements TypeInterface
     public function __construct(
         protected readonly int $min = self::DEFAULT_INT_MIN,
         protected readonly int $max = self::DEFAULT_INT_MAX,
+        /**
+         * @var TypeInterface<int>
+         */
+        protected readonly TypeInterface $type = new IntType(),
     ) {}
 
     /**
@@ -25,7 +29,7 @@ class IntRangeType implements TypeInterface
      */
     public function match(mixed $value, Context $context): bool
     {
-        return \is_int($value)
+        return $this->type->match($value, $context)
             && $value >= $this->min
             && $value <= $this->max;
     }
