@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Runtime;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -49,7 +49,7 @@ class NonInstantiatableException extends ClassException
     public static function createFromContext(
         ?TypeStatement $expected,
         string $class,
-        MappingContext $context,
+        RuntimeContext $context,
         ?\Throwable $previous = null,
     ): self {
         return self::createFromPath(

@@ -24,8 +24,8 @@ abstract class Context implements
          * If you need to retrieve configuration's settings, it is recommended
          * to use the following methods:
          *
-         * - {@see MappingContext::isObjectAsArray()}
-         * - {@see MappingContext::isStrictTypesEnabled()}
+         * - {@see RuntimeContext::isObjectAsArray()}
+         * - {@see RuntimeContext::isStrictTypesEnabled()}
          */
         public readonly Configuration $config,
         /**
@@ -37,7 +37,7 @@ abstract class Context implements
          * You can safely use all the methods of this interface, but for ease of
          * use, the following methods are available to you:
          *
-         * - {@see MappingContext::getDefinitionByValue()} - returns definition string
+         * - {@see RuntimeContext::getDefinitionByValue()} - returns definition string
          *   by the passed value.
          */
         public readonly TypeExtractorInterface $extractor,
@@ -51,9 +51,9 @@ abstract class Context implements
          * You can safely use all the methods of this interface, but for ease of
          * use, the following methods are available to you:
          *
-         * - {@see MappingContext::getStatementByValue()} - returns statement node by
+         * - {@see RuntimeContext::getStatementByValue()} - returns statement node by
          *   the value.
-         * - {@see MappingContext::getStatementByDefinition()} - returns statement node
+         * - {@see RuntimeContext::getStatementByDefinition()} - returns statement node
          *   by the definition string.
          */
         public readonly TypeParserInterface $parser,
@@ -67,11 +67,11 @@ abstract class Context implements
          * You can safely use all the methods of this interface, but for ease of
          * use, the following methods are available to you:
          *
-         * - {@see MappingContext::getTypeByValue()} - returns type instance by the
+         * - {@see RuntimeContext::getTypeByValue()} - returns type instance by the
          *   passed value.
-         * - {@see MappingContext::getTypeByDefinition()} - returns type instance by
+         * - {@see RuntimeContext::getTypeByDefinition()} - returns type instance by
          *   the type definition string.
-         * - {@see MappingContext::getTypeByStatement()} - returns type instance by
+         * - {@see RuntimeContext::getTypeByStatement()} - returns type instance by
          *   the type statement.
          */
         public readonly TypeRepositoryInterface $types,

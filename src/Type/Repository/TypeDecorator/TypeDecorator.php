@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository\TypeDecorator;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -34,12 +34,12 @@ abstract class TypeDecorator implements TypeDecoratorInterface
         return $this->delegate;
     }
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return $this->delegate->match($value, $context);
     }
 
-    public function cast(mixed $value, MappingContext $context): mixed
+    public function cast(mixed $value, RuntimeContext $context): mixed
     {
         return $this->delegate->cast($value, $context);
     }

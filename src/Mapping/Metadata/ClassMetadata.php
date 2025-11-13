@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata\PropertyMetadata;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
@@ -75,7 +75,7 @@ final class ClassMetadata extends Metadata
      *
      * @codeCoverageIgnore
      */
-    public function getTypeStatement(MappingContext $context, bool $read): TypeStatement
+    public function getTypeStatement(RuntimeContext $context, bool $read): TypeStatement
     {
         $fields = [];
 

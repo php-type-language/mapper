@@ -12,10 +12,10 @@ use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
-final class ChildMappingContext extends MappingContext
+final class ChildRuntimeContext extends RuntimeContext
 {
     protected function __construct(
-        public readonly MappingContext $parent,
+        public readonly RuntimeContext $parent,
         public readonly EntryInterface $entry,
         mixed $value,
         DirectionInterface $direction,

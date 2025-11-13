@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -15,12 +15,12 @@ class IntType implements TypeInterface
     /**
      * @phpstan-assert-if-true int $value
      */
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return \is_int($value);
     }
 
-    public function cast(mixed $value, MappingContext $context): int
+    public function cast(mixed $value, RuntimeContext $context): int
     {
         return match (true) {
             \is_int($value) => $value,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -21,12 +21,12 @@ class DateTimeToStringType implements TypeInterface
         protected readonly string $format = self::DEFAULT_DATETIME_FORMAT,
     ) {}
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return $value instanceof \DateTimeInterface;
     }
 
-    public function cast(mixed $value, MappingContext $context): string
+    public function cast(mixed $value, RuntimeContext $context): string
     {
         if ($value instanceof \DateTimeInterface) {
             return $value->format($this->format);

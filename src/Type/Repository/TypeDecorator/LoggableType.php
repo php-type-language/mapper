@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Repository\TypeDecorator;
 
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -58,7 +58,7 @@ final class LoggableType extends TypeDecorator
     /**
      * @return list<string>
      */
-    private function getPathAsStringArray(MappingContext $context): array
+    private function getPathAsStringArray(RuntimeContext $context): array
     {
         $result = [];
 
@@ -72,7 +72,7 @@ final class LoggableType extends TypeDecorator
     /**
      * @return array<array-key, mixed>
      */
-    private function getLoggerArguments(mixed $value, MappingContext $context, string $group): array
+    private function getLoggerArguments(mixed $value, RuntimeContext $context, string $group): array
     {
         $realType = $this->getDecoratedType();
 
@@ -85,14 +85,14 @@ final class LoggableType extends TypeDecorator
         ];
     }
 
-    private function logBeforeMatch(LoggerInterface $logger, mixed $value, MappingContext $context): void
+    private function logBeforeMatch(LoggerInterface $logger, mixed $value, RuntimeContext $context): void
     {
         $logger->debug('[{group}] Matching {value} by {type_name} type', [
             ...$this->getLoggerArguments($value, $context, $this->match),
         ]);
     }
 
-    private function logAfterMatch(LoggerInterface $logger, mixed $value, MappingContext $context, bool $status): void
+    private function logAfterMatch(LoggerInterface $logger, mixed $value, RuntimeContext $context, bool $status): void
     {
         $logger->info('[{group}] {match_verbose} {value} by {type_name} type', [
             'match' => $status,
@@ -101,7 +101,7 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    private function logErrorMatch(LoggerInterface $logger, mixed $value, MappingContext $context, \Throwable $e): void
+    private function logErrorMatch(LoggerInterface $logger, mixed $value, RuntimeContext $context, \Throwable $e): void
     {
         $logger->info('[{group}] Match error: {message}', [
             'error' => $e->getMessage(),
@@ -109,7 +109,7 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         $logger = $context->config->findLogger();
 
@@ -123,7 +123,7 @@ final class LoggableType extends TypeDecorator
     /**
      * @throws \Throwable in case of any internal error occurs
      */
-    private function matchThroughLogger(LoggerInterface $logger, mixed $value, MappingContext $context): bool
+    private function matchThroughLogger(LoggerInterface $logger, mixed $value, RuntimeContext $context): bool
     {
         $this->logBeforeMatch($logger, $value, $context);
 
@@ -140,14 +140,14 @@ final class LoggableType extends TypeDecorator
         return $result;
     }
 
-    private function logBeforeCast(LoggerInterface $logger, mixed $value, MappingContext $context): void
+    private function logBeforeCast(LoggerInterface $logger, mixed $value, RuntimeContext $context): void
     {
         $logger->debug('[{group}] Casting "{value}" by {type_name} type', [
             ...$this->getLoggerArguments($value, $context, $this->cast),
         ]);
     }
 
-    private function logAfterCast(LoggerInterface $logger, mixed $value, MappingContext $context, mixed $result): void
+    private function logAfterCast(LoggerInterface $logger, mixed $value, RuntimeContext $context, mixed $result): void
     {
         $logger->info('[{group}] Casted "{value}" to "{result}" by {type_name} type', [
             'result' => $result,
@@ -155,7 +155,7 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    private function logErrorCast(LoggerInterface $logger, mixed $value, MappingContext $context, \Throwable $e): void
+    private function logErrorCast(LoggerInterface $logger, mixed $value, RuntimeContext $context, \Throwable $e): void
     {
         $logger->info('[{group}] Casting error: {message}', [
             'error' => $e->getMessage(),
@@ -163,7 +163,7 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    public function cast(mixed $value, MappingContext $context): mixed
+    public function cast(mixed $value, RuntimeContext $context): mixed
     {
         $logger = $context->config->findLogger();
 
@@ -178,7 +178,7 @@ final class LoggableType extends TypeDecorator
      * @return TResult
      * @throws \Throwable in case of any internal error occurs
      */
-    private function castThroughLogger(LoggerInterface $logger, mixed $value, MappingContext $context): mixed
+    private function castThroughLogger(LoggerInterface $logger, mixed $value, RuntimeContext $context): mixed
     {
         $this->logBeforeCast($logger, $value, $context);
 

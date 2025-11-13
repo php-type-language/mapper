@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
@@ -25,12 +25,12 @@ class ListType implements TypeInterface
     /**
      * @phpstan-assert-if-true iterable<mixed, mixed> $value
      */
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return \is_array($value) && \array_is_list($value);
     }
 
-    public function cast(mixed $value, MappingContext $context): array
+    public function cast(mixed $value, RuntimeContext $context): array
     {
         if (!\is_array($value) || !\array_is_list($value)) {
             throw InvalidValueException::createFromContext($context);
@@ -45,7 +45,7 @@ class ListType implements TypeInterface
      * @return list<TItem>
      * @throws \Throwable
      */
-    protected function process(iterable $value, MappingContext $context): array
+    protected function process(iterable $value, RuntimeContext $context): array
     {
         $result = [];
         $index = 0;

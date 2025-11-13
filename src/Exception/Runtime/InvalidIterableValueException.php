@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Runtime;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\PathInterface;
 
 /**
@@ -58,7 +58,7 @@ class InvalidIterableValueException extends IterableValueException
         mixed $element,
         int $index,
         mixed $key,
-        MappingContext $context,
+        RuntimeContext $context,
         ?\Throwable $previous = null,
     ): self {
         /** @var iterable<array-key, mixed> $value */

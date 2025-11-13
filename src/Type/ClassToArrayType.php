@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
@@ -27,14 +27,14 @@ class ClassToArrayType implements TypeInterface
         protected readonly PropertyAccessorInterface $accessor,
     ) {}
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         $class = $this->metadata->name;
 
         return $value instanceof $class;
     }
 
-    public function cast(mixed $value, MappingContext $context): object|array
+    public function cast(mixed $value, RuntimeContext $context): object|array
     {
         $className = $this->metadata->name;
 
@@ -92,7 +92,7 @@ class ClassToArrayType implements TypeInterface
      * @throws InvalidObjectValueException in case the value of a certain field is incorrect
      * @throws \Throwable in case of internal error occurs
      */
-    protected function normalize(object $object, MappingContext $context): array
+    protected function normalize(object $object, RuntimeContext $context): array
     {
         $result = [];
 

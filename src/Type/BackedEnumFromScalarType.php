@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -24,7 +24,7 @@ class BackedEnumFromScalarType implements TypeInterface
         protected readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         $isSupportsType = $this->type->match($value, $context);
 
@@ -42,7 +42,7 @@ class BackedEnumFromScalarType implements TypeInterface
         }
     }
 
-    public function cast(mixed $value, MappingContext $context): \BackedEnum
+    public function cast(mixed $value, RuntimeContext $context): \BackedEnum
     {
         $denormalized = $this->type->cast($value, $context);
 

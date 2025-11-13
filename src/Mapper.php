@@ -7,7 +7,7 @@ namespace TypeLang\Mapper;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\DirectionInterface;
-use TypeLang\Mapper\Context\RootMappingContext;
+use TypeLang\Mapper\Context\RootRuntimeContext;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
@@ -77,9 +77,9 @@ final class Mapper implements
             );
     }
 
-    private function createContext(mixed $value, DirectionInterface $direction): RootMappingContext
+    private function createContext(mixed $value, DirectionInterface $direction): RootRuntimeContext
     {
-        return RootMappingContext::create(
+        return RootRuntimeContext::create(
             value: $value,
             direction: $direction,
             config: $this->config,

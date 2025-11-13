@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -15,12 +15,12 @@ class BoolType implements TypeInterface
     /**
      * @phpstan-assert-if-true bool $value
      */
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return \is_bool($value);
     }
 
-    public function cast(mixed $value, MappingContext $context): bool
+    public function cast(mixed $value, RuntimeContext $context): bool
     {
         return match (true) {
             \is_bool($value) => $value,

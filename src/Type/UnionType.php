@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
@@ -26,7 +26,7 @@ class UnionType implements TypeInterface
      *
      * @return TypeInterface<TResult>|null
      */
-    protected function findType(mixed $value, MappingContext $context, bool $strict = true): ?TypeInterface
+    protected function findType(mixed $value, RuntimeContext $context, bool $strict = true): ?TypeInterface
     {
         foreach ($this->types as $index => $type) {
             $entrance = $context->enter(
@@ -53,7 +53,7 @@ class UnionType implements TypeInterface
      *
      * @return TypeInterface<TResult>|null
      */
-    protected function findTypeWithFallback(mixed $value, MappingContext $context): ?TypeInterface
+    protected function findTypeWithFallback(mixed $value, RuntimeContext $context): ?TypeInterface
     {
         if ($context->isStrictTypesEnabled()) {
             return $this->findType($value, $context);
@@ -63,12 +63,12 @@ class UnionType implements TypeInterface
             ?? $this->findType($value, $context, false);
     }
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return $this->findTypeWithFallback($value, $context) !== null;
     }
 
-    public function cast(mixed $value, MappingContext $context): mixed
+    public function cast(mixed $value, RuntimeContext $context): mixed
     {
         $type = $this->findTypeWithFallback($value, $context);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -26,7 +26,7 @@ class ArrayKeyType implements TypeInterface
     /**
      * @phpstan-assert-if-true array-key $value
      */
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         // TBD (?)
         // It is not entirely clear whether a zero ("0") string
@@ -41,7 +41,7 @@ class ArrayKeyType implements TypeInterface
             || $this->string->match($value, $context);
     }
 
-    public function cast(mixed $value, MappingContext $context): string|int
+    public function cast(mixed $value, RuntimeContext $context): string|int
     {
         return match (true) {
             \is_string($value),

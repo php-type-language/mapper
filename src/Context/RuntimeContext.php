@@ -17,9 +17,9 @@ use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 /**
- * @template-implements \IteratorAggregate<array-key, MappingContext>
+ * @template-implements \IteratorAggregate<array-key, RuntimeContext>
  */
-abstract class MappingContext extends Context implements
+abstract class RuntimeContext extends Context implements
     \IteratorAggregate,
     \Countable
 {
@@ -30,7 +30,7 @@ abstract class MappingContext extends Context implements
          * Please note that the value may be changed during type manipulation
          * (casting), for example, using {@see TypeCoercerInterface}.
          *
-         * In this case, the `$value` in the {@see MappingContext} remains the original
+         * In this case, the `$value` in the {@see RuntimeContext} remains the original
          * value, without any mutations from type coercions.
          */
         public readonly mixed $value,
@@ -76,7 +76,7 @@ abstract class MappingContext extends Context implements
             $original = null;
         }
 
-        return new ChildMappingContext(
+        return new ChildRuntimeContext(
             parent: $this,
             entry: $entry,
             value: $value,
@@ -143,7 +143,7 @@ abstract class MappingContext extends Context implements
      *
      * Note that the {@see $config} property contains the **current** context
      * configuration settings, which may differ from the original ones.
-     * Therefore, method {@see MappingContext::withObjectAsArray()} is not equivalent
+     * Therefore, method {@see RuntimeContext::withObjectAsArray()} is not equivalent
      * to calling {@see Configuration::withObjectAsArray()}.
      */
     public function withObjectAsArray(?bool $enabled): Configuration
@@ -162,7 +162,7 @@ abstract class MappingContext extends Context implements
      *
      * Note that the {@see $config} property contains the **current** context
      * configuration settings, which may differ from the original ones.
-     * Therefore, method {@see MappingContext::withStrictTypes()} is not equivalent
+     * Therefore, method {@see RuntimeContext::withStrictTypes()} is not equivalent
      * to calling {@see Configuration::withStrictTypes()}.
      */
     public function withStrictTypes(?bool $enabled): Configuration

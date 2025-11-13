@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template-covariant TResult of mixed = mixed
@@ -19,12 +19,12 @@ class NullableType implements TypeInterface
         private readonly TypeInterface $parent,
     ) {}
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return $value === null || $this->parent->match($value, $context);
     }
 
-    public function cast(mixed $value, MappingContext $context): mixed
+    public function cast(mixed $value, RuntimeContext $context): mixed
     {
         if ($value === null) {
             return null;

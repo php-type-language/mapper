@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository\TypeDecorator;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -28,7 +28,7 @@ final class CoercibleType extends TypeDecorator
         parent::__construct($delegate);
     }
 
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->coercer->coerce($value, $context);
@@ -37,7 +37,7 @@ final class CoercibleType extends TypeDecorator
         return parent::match($value, $context);
     }
 
-    public function cast(mixed $value, MappingContext $context): mixed
+    public function cast(mixed $value, RuntimeContext $context): mixed
     {
         if (!$context->isStrictTypesEnabled()) {
             $value = $this->coercer->coerce($value, $context);

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableKeyException;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
@@ -31,12 +31,12 @@ class IterableToArrayType implements TypeInterface
     /**
      * @phpstan-assert-if-true iterable<mixed, mixed> $value
      */
-    public function match(mixed $value, MappingContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): bool
     {
         return \is_iterable($value);
     }
 
-    public function cast(mixed $value, MappingContext $context): array
+    public function cast(mixed $value, RuntimeContext $context): array
     {
         if (!\is_iterable($value)) {
             throw InvalidValueException::createFromContext($context);
@@ -51,7 +51,7 @@ class IterableToArrayType implements TypeInterface
      * @return array<TKey, TValue>
      * @throws \Throwable
      */
-    protected function process(iterable $value, MappingContext $context): array
+    protected function process(iterable $value, RuntimeContext $context): array
     {
         $result = [];
         $index = 0;

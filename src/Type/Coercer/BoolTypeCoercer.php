@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Coercer;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template-implements TypeCoercerInterface<bool>
  */
 class BoolTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, MappingContext $context): bool
+    public function coerce(mixed $value, RuntimeContext $context): bool
     {
         //
         // Each value should be checked EXPLICITLY, instead

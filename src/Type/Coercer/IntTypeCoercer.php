@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Coercer;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
@@ -12,7 +12,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class IntTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, MappingContext $context): int
+    public function coerce(mixed $value, RuntimeContext $context): int
     {
         if ($value instanceof \BackedEnum && \is_int($value->value)) {
             return $value->value;

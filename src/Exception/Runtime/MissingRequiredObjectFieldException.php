@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Runtime;
 
-use TypeLang\Mapper\Context\MappingContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -50,7 +50,7 @@ class MissingRequiredObjectFieldException extends ObjectFieldException
     public static function createFromContext(
         string $field,
         ?TypeStatement $expected,
-        MappingContext $context,
+        RuntimeContext $context,
         ?\Throwable $previous = null,
     ): self {
         /** @var array<array-key, mixed>|object $value */
