@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
@@ -44,11 +43,8 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 
@@ -58,9 +54,9 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
 
         /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return match (\count($arguments)) {
-            0 => $this->buildWithNoKeyValue($types, $parser),
-            1 => $this->buildWithValue($statement, $types, $parser),
-            2 => $this->buildWithKeyValue($statement, $types),
+            0 => $this->buildWithNoKeyValue($context),
+            1 => $this->buildWithValue($statement, $context),
+            2 => $this->buildWithKeyValue($statement, $context),
             default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
                 minArgumentsCount: 0,
                 maxArgumentsCount: 2,
@@ -74,19 +70,15 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildWithNoKeyValue(TypeRepositoryInterface $types, TypeParserInterface $parser): TypeInterface
+    private function buildWithNoKeyValue(BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return $this->create(
-            key: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition(
-                    definition: $this->keyType,
-                ),
+            key: $context->getTypeByDefinition(
+                definition: $this->keyType,
             ),
-            value: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition(
-                    definition: $this->valueType,
-                ),
+            value: $context->getTypeByDefinition(
+                definition: $this->valueType,
             ),
         );
     }
@@ -97,7 +89,7 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildWithKeyValue(NamedTypeNode $statement, TypeRepositoryInterface $types): TypeInterface
+    private function buildWithKeyValue(NamedTypeNode $statement, BuildingContext $context): TypeInterface
     {
         $arguments = $statement->arguments->items ?? [];
 
@@ -114,8 +106,8 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
 
         /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return $this->create(
-            key: $types->getTypeByStatement($key->value),
-            value: $types->getTypeByStatement($value->value),
+            key: $context->getTypeByStatement($key->value),
+            value: $context->getTypeByStatement($value->value),
         );
     }
 
@@ -125,11 +117,8 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    private function buildWithValue(
-        NamedTypeNode $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    private function buildWithValue(NamedTypeNode $statement, BuildingContext $context): TypeInterface
+    {
         $arguments = $statement->arguments->items ?? [];
 
         assert(\array_key_exists(0, $arguments));
@@ -141,10 +130,8 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
 
         /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return $this->create(
-            key: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition($this->keyType),
-            ),
-            value: $types->getTypeByStatement($value->value),
+            key: $context->getTypeByDefinition($this->keyType),
+            value: $context->getTypeByStatement($value->value),
         );
     }
 

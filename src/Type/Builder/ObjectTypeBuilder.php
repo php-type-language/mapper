@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -15,11 +14,8 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class ObjectTypeBuilder extends NamedTypeBuilder
 {
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 

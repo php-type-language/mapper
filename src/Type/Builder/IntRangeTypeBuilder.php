@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
 use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
@@ -11,8 +12,6 @@ use TypeLang\Mapper\Exception\Definition\Template\OneOfTemplateArgumentsCountExc
 use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
 use TypeLang\Mapper\Type\IntRangeType;
 use TypeLang\Mapper\Type\IntType;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Literal\IntLiteralNode;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
@@ -32,11 +31,8 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
      * @throws TooManyTemplateArgumentsInRangeException
      * @throws ShapeFieldsNotSupportedException
      */
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($statement instanceof NamedTypeNode);
 

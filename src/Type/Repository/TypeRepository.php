@@ -55,8 +55,7 @@ final class TypeRepository implements
 
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
-                // @phpstan-ignore-next-line : Statement expects a bottom type (never), but TypeStatement passed
-                return $factory->build($statement, $this->repository, $this->context->parser);
+                return $factory->build($statement, $context);
             }
         }
 

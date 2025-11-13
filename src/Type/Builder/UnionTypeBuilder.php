@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Type\NullableType;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Mapper\Type\UnionType;
 use TypeLang\Parser\Node\Literal\NullLiteralNode;
@@ -23,11 +22,8 @@ class UnionTypeBuilder implements TypeBuilderInterface
         return $statement instanceof UnionTypeNode;
     }
 
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         $result = [];
         $nullable = false;
 
@@ -35,7 +31,7 @@ class UnionTypeBuilder implements TypeBuilderInterface
             if ($leaf instanceof NullLiteralNode) {
                 $nullable = true;
             } else {
-                $result[] = $types->getTypeByStatement($leaf);
+                $result[] = $context->getTypeByStatement($leaf);
             }
         }
 

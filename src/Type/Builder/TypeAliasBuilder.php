@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Type\Builder\TypeAliasBuilder\Reason;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -34,11 +33,8 @@ class TypeAliasBuilder extends NamedTypeBuilder
         parent::__construct($aliases);
     }
 
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
-        return $this->delegate->build($statement, $types, $parser);
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
+        return $this->delegate->build($statement, $context);
     }
 }

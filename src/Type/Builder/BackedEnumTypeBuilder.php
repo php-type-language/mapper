@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Exception\Definition\InternalTypeException;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -54,8 +53,7 @@ abstract class BackedEnumTypeBuilder extends Builder
 
     public function build(
         TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context,
     ): TypeInterface {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
@@ -69,9 +67,7 @@ abstract class BackedEnumTypeBuilder extends Builder
             class: $statement->name->toString(),
             definition: $definition,
             /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
-            type: $types->getTypeByStatement(
-                statement: $parser->getStatementByDefinition($definition),
-            ),
+            type: $context->getTypeByDefinition($definition),
         );
     }
 

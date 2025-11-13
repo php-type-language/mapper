@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Instantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Instantiator\DoctrineClassInstantiator;
 use TypeLang\Mapper\Instantiator\ReflectionClassInstantiator;
@@ -11,8 +12,6 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\PropertyAccessor\ReflectionPropertyAccessor;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -75,11 +74,8 @@ abstract class ClassTypeBuilder extends Builder
             || $reflection->isInterface();
     }
 
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 
@@ -89,8 +85,8 @@ abstract class ClassTypeBuilder extends Builder
         return $this->create(
             metadata: $this->driver->getClassMetadata(
                 class: new \ReflectionClass($class),
-                types: $types,
-                parser: $parser,
+                types: $context->types,
+                parser: $context->parser,
             ),
         );
     }

@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Type\StringLiteralType;
 use TypeLang\Parser\Node\Literal\StringLiteralNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -20,11 +19,8 @@ class StringLiteralTypeBuilder implements TypeBuilderInterface
         return $statement instanceof StringLiteralNode;
     }
 
-    public function build(
-        TypeStatement $statement,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): StringLiteralType {
+    public function build(TypeStatement $statement, BuildingContext $context): StringLiteralType
+    {
         return new StringLiteralType($statement->value);
     }
 }
