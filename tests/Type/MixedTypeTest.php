@@ -6,10 +6,7 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Context\Direction;
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Tests\Type\Stub\AnyTypeStub;
 use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
@@ -18,22 +15,23 @@ use TypeLang\Mapper\Tests\Type\Stub\UnitEnumStub;
 use TypeLang\Mapper\Type\Builder\SimpleTypeBuilder;
 use TypeLang\Mapper\Type\MixedType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 #[Group('type')]
 #[CoversClass(MixedType::class)]
 final class MixedTypeTest extends TypeTestCase
 {
-    protected function createPlatform(): PlatformInterface
+    protected function setUp(): void
     {
-        return new class extends StandardPlatform {
-            public function getTypes(Direction $direction): iterable
+        parent::setUp();
+
+        self::withPlatform(new class extends StandardPlatform {
+            public function getTypes(DirectionInterface $direction): iterable
             {
                 yield new SimpleTypeBuilder('resource', AnyTypeStub::class);
 
                 yield from parent::getTypes($direction);
             }
-        };
+        });
     }
 
     protected static function createType(): TypeInterface
@@ -68,13 +66,9 @@ final class MixedTypeTest extends TypeTestCase
                         $value == (object) ['val'] => ['val'],
                         default => $value,
                     },
-                    \get_debug_type($value) === 'resource (closed)',
-                    \is_resource($value) => new \ValueError('Type "resource" is not defined'),
                     default => $value,
                 }
             : match (true) {
-                \get_debug_type($value) === 'resource (closed)',
-                \is_resource($value) => new \ValueError('Type "resource" is not defined'),
                 $value === UnitEnumStub::ExampleCase => new \ValueError('Passed value "ExampleCase" is invalid'),
                 $value === IntBackedEnumStub::ExampleCase => new \ValueError('Passed value 3735928559 is invalid'),
                 $value === StringBackedEnumStub::ExampleCase => new \ValueError('Passed value "case" is invalid'),

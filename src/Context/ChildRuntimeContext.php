@@ -19,19 +19,19 @@ final class ChildRuntimeContext extends RuntimeContext
         public readonly EntryInterface $entry,
         mixed $value,
         DirectionInterface $direction,
-        Configuration $config,
+        TypeRepositoryInterface $types,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
-        TypeRepositoryInterface $types,
+        Configuration $config,
         ?Configuration $original = null,
     ) {
         parent::__construct(
             value: $value,
             direction: $direction,
-            config: $config,
+            types: $types,
             extractor: $extractor,
             parser: $parser,
-            types: $types,
+            config: $config,
             original: $original,
         );
     }

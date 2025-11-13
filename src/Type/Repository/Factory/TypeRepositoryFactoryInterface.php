@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository\Factory;
 
-use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\DirectionInterface;
+use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 /**
@@ -21,9 +20,8 @@ use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 interface TypeRepositoryFactoryInterface
 {
     public function createTypeRepository(
-        Configuration $config,
+        MapperContext $context,
         PlatformInterface $platform,
-        TypeParserInterface $parser,
         DirectionInterface $direction,
     ): TypeRepositoryInterface;
 }

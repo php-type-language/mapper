@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository;
 
+use TypeLang\Mapper\Context\BuildingContext;
+use TypeLang\Mapper\Context\DirectionInterface;
+use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -21,16 +23,17 @@ final class TypeRepository implements
      */
     private array $builders = [];
 
-    private TypeRepositoryInterface $context;
+    private TypeRepositoryInterface $repository;
 
     /**
      * @param iterable<mixed, TypeBuilderInterface> $builders
      */
     public function __construct(
-        private readonly TypeParserInterface $parser,
+        private readonly MapperContext $context,
+        private readonly DirectionInterface $direction,
         iterable $builders,
     ) {
-        $this->context = $this;
+        $this->repository = $this;
         $this->builders = iterable_to_array($builders, false);
     }
 
@@ -39,15 +42,21 @@ final class TypeRepository implements
      */
     public function setTypeRepository(TypeRepositoryInterface $parent): void
     {
-        $this->context = $parent;
+        $this->repository = $parent;
     }
 
     private function buildType(TypeStatement $statement): TypeInterface
     {
+        $context = BuildingContext::createFromMapperContext(
+            context: $this->context,
+            direction: $this->direction,
+            types: $this->repository,
+        );
+
         foreach ($this->builders as $factory) {
             if ($factory->isSupported($statement)) {
                 // @phpstan-ignore-next-line : Statement expects a bottom type (never), but TypeStatement passed
-                return $factory->build($statement, $this->context, $this->parser);
+                return $factory->build($statement, $this->repository, $this->context->parser);
             }
         }
 

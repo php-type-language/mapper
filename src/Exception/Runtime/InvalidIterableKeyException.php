@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Runtime;
 
-use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableKeyException;
 use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;

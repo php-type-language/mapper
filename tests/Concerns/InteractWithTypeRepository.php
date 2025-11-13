@@ -6,16 +6,17 @@ namespace TypeLang\Mapper\Tests\Concerns;
 
 use PHPUnit\Framework\Attributes\Before;
 use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepository;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 trait InteractWithTypeRepository
 {
+    use InteractWithMapperContext;
     use InteractWithPlatform;
-    use InteractWithTypeParser;
 
     /**
-     * @var \WeakMap<Direction, TypeRepositoryInterface>
+     * @var \WeakMap<DirectionInterface, TypeRepositoryInterface>
      */
     protected static \WeakMap $currentTypeRepository;
 
@@ -32,18 +33,20 @@ trait InteractWithTypeRepository
         }
     }
 
-    private static function createTypeRepository(Direction $direction): TypeRepositoryInterface
+    private static function createTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
     {
         $platform = self::getPlatform();
 
         return new TypeRepository(
-            parser: self::getTypeParser(),
+            context: self::createMapperContext(),
+            direction: $direction,
             builders: $platform->getTypes($direction)
         );
     }
 
-    protected static function getTypeRepository(Direction $direction): TypeRepositoryInterface
+    protected static function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
     {
-        return self::$currentTypeRepository[$direction] ??= self::createTypeRepository($direction);
+        return self::$currentTypeRepository[$direction]
+            ??= self::createTypeRepository($direction);
     }
 }

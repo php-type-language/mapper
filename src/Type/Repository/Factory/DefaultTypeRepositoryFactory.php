@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Type\Repository\Factory;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\DirectionInterface;
+use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\DecorateByCoercibleTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByLoggableTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByTraceableTypeRepository;
@@ -24,27 +24,27 @@ use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterface
 {
     public function createTypeRepository(
-        Configuration $config,
+        MapperContext $context,
         PlatformInterface $platform,
-        TypeParserInterface $parser,
         DirectionInterface $direction,
     ): TypeRepositoryInterface {
-        $types = $this->createDefaultRepository($parser, $platform, $direction);
+        $types = $this->createDefaultRepository($context, $direction, $platform);
 
-        $types = $this->withTracing($config, $types);
-        $types = $this->withLogging($config, $types);
+        $types = $this->withTracing($types, $context->config);
+        $types = $this->withLogging($types, $context->config);
         $types = $this->withCoercers($types, $platform, $direction);
 
         return $this->withMemoization($types);
     }
 
     private function createDefaultRepository(
-        TypeParserInterface $parser,
-        PlatformInterface $platform,
+        MapperContext $context,
         DirectionInterface $direction,
+        PlatformInterface $platform,
     ): TypeRepository {
         return new TypeRepository(
-            parser: $parser,
+            context: $context,
+            direction: $direction,
             builders: $platform->getTypes($direction)
         );
     }
@@ -60,7 +60,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         );
     }
 
-    private function withTracing(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface
+    private function withTracing(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
     {
         $tracer = $config->findTracer();
 
@@ -79,7 +79,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         return $types;
     }
 
-    private function withLogging(Configuration $config, TypeRepositoryInterface $types): TypeRepositoryInterface
+    private function withLogging(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
     {
         $logger = $config->findLogger();
 

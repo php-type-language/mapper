@@ -6,21 +6,21 @@ namespace TypeLang\Mapper\Tests\Platform;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Tests\Concerns\InteractWithTypeParser;
+use TypeLang\Mapper\Tests\Concerns\InteractWithTypeRepository;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleClassStub;
 use TypeLang\Mapper\Tests\Platform\Stub\ExampleInterfaceStub;
 use TypeLang\Mapper\Tests\Platform\Stub\IntBackedEnumStub;
 use TypeLang\Mapper\Tests\Platform\Stub\StringBackedEnumStub;
 use TypeLang\Mapper\Tests\Platform\Stub\UnitEnumStub;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\Repository\TypeRepository;
 use TypeLang\Parser\Exception\ParseException;
 
 abstract class PlatformTestCase extends TestCase
 {
-    use InteractWithTypeParser;
+    use InteractWithTypeRepository;
 
     // v2.1
     protected const TYPES_PHPSTAN = [
@@ -285,7 +285,7 @@ abstract class PlatformTestCase extends TestCase
 
     abstract protected function createTypePlatform(): PlatformInterface;
 
-    private function testTypeIsAvailable(string $definition, bool $supports, Direction $direction): void
+    private function testTypeIsAvailable(string $definition, bool $supports, DirectionInterface $direction): void
     {
         if (!$supports) {
             $this->expectException(ParseException::class);
@@ -293,7 +293,6 @@ abstract class PlatformTestCase extends TestCase
         }
 
         $parser = self::getTypeParser();
-        $platform = $this->createTypePlatform();
         $statement = $parser->getStatementByDefinition($definition);
 
         if (!$supports) {
@@ -303,11 +302,7 @@ abstract class PlatformTestCase extends TestCase
             $this->expectNotToPerformAssertions();
         }
 
-        $repository = new TypeRepository(
-            parser: $parser,
-            builders: $platform->getTypes($direction),
-        );
-
+        $repository = self::createTypeRepository($direction);
         $repository->getTypeByStatement($statement);
     }
 

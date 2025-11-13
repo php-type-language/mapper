@@ -19,7 +19,7 @@ final class RootRuntimeContext extends RuntimeContext
 {
     private PathInterface $path;
 
-    public static function create(
+    public static function createContext(
         mixed $value,
         DirectionInterface $direction,
         Configuration $config,
@@ -36,10 +36,34 @@ final class RootRuntimeContext extends RuntimeContext
         return new self(
             value: $value,
             direction: $direction,
-            config: $config,
+            types: $types,
             extractor: $extractor,
             parser: $parser,
+            config: $config,
+        );
+    }
+
+    public static function createFromMapperContext(
+        MapperContext $context,
+        mixed $value,
+        DirectionInterface $direction,
+        TypeRepositoryInterface $types,
+    ): self {
+        $config = $context->config;
+
+        if (!$config->isStrictTypesOptionDefined()) {
+            $config = $config->withStrictTypes(
+                enabled: $direction->isSafeTypes(),
+            );
+        }
+
+        return new self(
+            value: $value,
+            direction: $direction,
             types: $types,
+            extractor: $context->extractor,
+            parser: $context->parser,
+            config: $config,
         );
     }
 

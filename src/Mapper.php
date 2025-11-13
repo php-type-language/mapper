@@ -7,7 +7,9 @@ namespace TypeLang\Mapper;
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\DirectionInterface;
+use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Context\RootRuntimeContext;
+use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
@@ -26,17 +28,14 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements
     NormalizerInterface,
-    DenormalizerInterface,
-    TypeExtractorInterface
+    DenormalizerInterface
 {
-    private readonly TypeExtractorInterface $extractor;
-
-    private readonly TypeParserInterface $parser;
-
     /**
      * @var \WeakMap<DirectionInterface, TypeRepositoryInterface>
      */
     private readonly \WeakMap $repository;
+
+    private readonly MapperContext $context;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
@@ -46,8 +45,12 @@ final class Mapper implements
         private readonly TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
         $this->repository = new \WeakMap();
-        $this->extractor = $this->createTypeExtractor();
-        $this->parser = $this->createTypeParser();
+
+        $this->context = MapperContext::create(
+            config: $this->config,
+            extractor: $this->createTypeExtractor(),
+            parser: $this->createTypeParser(),
+        );
     }
 
     private function createTypeExtractor(): TypeExtractorInterface
@@ -70,35 +73,32 @@ final class Mapper implements
     {
         return $this->repository[$direction]
             ??= $this->typeRepositoryFactory->createTypeRepository(
-                config: $this->config,
+                context: $this->context,
                 platform: $this->platform,
-                parser: $this->parser,
                 direction: $direction,
             );
     }
 
-    private function createContext(mixed $value, DirectionInterface $direction): RootRuntimeContext
+    private function createRuntimeContext(mixed $value, DirectionInterface $direction): RuntimeContext
     {
-        return RootRuntimeContext::create(
+        return RootRuntimeContext::createFromMapperContext(
+            context: $this->context,
             value: $value,
             direction: $direction,
-            config: $this->config,
-            extractor: $this->extractor,
-            parser: $this->parser,
             types: $this->getTypeRepository($direction),
         );
     }
 
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
-        $type ??= $this->getDefinitionByValue($value);
+        $type ??= $this->context->getDefinitionByValue($value);
 
         return $this->map(Direction::Normalize, $value, $type);
     }
 
     public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
     {
-        $type ??= $this->getDefinitionByValue($value);
+        $type ??= $this->context->getDefinitionByValue($value);
 
         return $this->canMap(Direction::Normalize, $value, $type);
     }
@@ -124,10 +124,10 @@ final class Mapper implements
      */
     public function map(DirectionInterface $direction, mixed $value, #[Language('PHP')] string $type): mixed
     {
-        $context = $this->createContext($value, $direction);
+        $context = $this->createRuntimeContext($value, $direction);
 
         $instance = $context->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
+            statement: $this->context->parser->getStatementByDefinition($type),
         );
 
         return $instance->cast($value, $context);
@@ -143,18 +143,13 @@ final class Mapper implements
      */
     public function canMap(DirectionInterface $direction, mixed $value, #[Language('PHP')] string $type): bool
     {
-        $context = $this->createContext($value, $direction);
+        $context = $this->createRuntimeContext($value, $direction);
 
         $instance = $context->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
+            statement: $this->context->getStatementByDefinition($type),
         );
 
         return $instance->match($value, $context);
-    }
-
-    public function getDefinitionByValue(mixed $value): string
-    {
-        return $this->extractor->getDefinitionByValue($value);
     }
 
     /**
@@ -172,7 +167,7 @@ final class Mapper implements
         $repository = $this->getTypeRepository($direction);
 
         return $repository->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
+            statement: $this->context->getStatementByDefinition($type),
         );
     }
 
@@ -188,7 +183,7 @@ final class Mapper implements
     {
         return $this->getType(
             direction: $direction,
-            type: $this->extractor->getDefinitionByValue($value),
+            type: $this->context->getDefinitionByValue($value),
         );
     }
 

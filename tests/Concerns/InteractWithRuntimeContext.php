@@ -8,33 +8,27 @@ use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\RootRuntimeContext;
 
-trait InteractWithContext
+trait InteractWithRuntimeContext
 {
-    use InteractWithTypeParser;
-    use InteractWithTypeExtractor;
-    use InteractWithConfiguration;
+    use InteractWithMapperContext;
     use InteractWithTypeRepository;
 
     protected static function createNormalizationContext(mixed $value, ?Configuration $config = null): RootRuntimeContext
     {
-        return RootRuntimeContext::create(
+        return RootRuntimeContext::createFromMapperContext(
+            context: self::createMapperContext($config),
             value: $value,
             direction: Direction::Normalize,
-            config: $config ?? self::getConfiguration(),
-            extractor: self::getTypeExtractor(),
-            parser: self::getTypeParser(),
             types: self::getTypeRepository(Direction::Normalize),
         );
     }
 
     protected static function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootRuntimeContext
     {
-        return RootRuntimeContext::create(
+        return RootRuntimeContext::createFromMapperContext(
+            context: self::createMapperContext($config),
             value: $value,
             direction: Direction::Denormalize,
-            config: $config ?? self::getConfiguration(),
-            extractor: self::getTypeExtractor(),
-            parser: self::getTypeParser(),
             types: self::getTypeRepository(Direction::Denormalize),
         );
     }
