@@ -9,6 +9,7 @@ use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
+use TypeLang\Mapper\Mapper;
 
 abstract class MapperBenchmark
 {
@@ -40,6 +41,12 @@ abstract class MapperBenchmark
 
     protected function prepare(): void
     {
+        $mapperFilename = new \ReflectionClass(Mapper::class)
+            ->getFileName();
+        $mapperDirectory = \dirname($mapperFilename);
+
+        require_once $mapperDirectory . '/helpers.php';
+
         $this->denormalized = new ExampleRequestDTO(
             name: 'Example1',
             items: [
@@ -79,5 +86,6 @@ abstract class MapperBenchmark
     }
 
     abstract public function benchNormalization(): void;
+
     abstract public function benchDenormalization(): void;
 }

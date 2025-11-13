@@ -72,68 +72,6 @@ final class MetadataBuilder implements ProviderInterface
      */
     public function getClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
     {
-        if (\PHP_VERSION_ID >= 80400) {
-            /** @var ClassMetadata<TArg> */
-            return $this->toProxyClassMetadata($class, $context);
-        }
-
-        /** @var ClassMetadata<TArg> */
-        return $this->toLazyInitializedClassMetadata($class, $context);
-    }
-
-    /**
-     * @template TArg of object
-     *
-     * @param \ReflectionClass<TArg> $class
-     *
-     * @return ClassMetadata<TArg>
-     * @throws \Throwable
-     */
-    private function toProxyClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
-    {
-        /** @var ClassMetadata<TArg> */
-        return $this->metadata[$class->name] ??=
-            (new \ReflectionClass(ClassMetadata::class))
-                ->newLazyProxy(function () use ($class, $context): ClassMetadata {
-                    $info = $this->reader->read($class);
-
-                    $metadata = new ClassMetadata(
-                        name: $info->name,
-                        properties: $this->toPropertiesMetadata(
-                            class: $class,
-                            parent: $info,
-                            properties: $info->properties,
-                            context: $context,
-                        ),
-                        discriminator: $this->toOptionalDiscriminator(
-                            class: $class,
-                            parent: $info,
-                            info: $info->discriminator,
-                            context: $context,
-                        ),
-                        isNormalizeAsArray: $info->isNormalizeAsArray,
-                        typeErrorMessage: $info->typeErrorMessage,
-                        createdAt: $this->now(),
-                    );
-
-                    unset($this->metadata[$class->name]);
-
-                    return $metadata;
-                });
-    }
-
-    /**
-     * @template TArg of object
-     *
-     * @param \ReflectionClass<TArg> $class
-     *
-     * @return ClassMetadata<TArg>
-     * @throws \Throwable
-     */
-    private function toLazyInitializedClassMetadata(
-        \ReflectionClass $class,
-        BuildingContext $context
-    ): ClassMetadata {
         if (isset($this->metadata[$class->name])) {
             /** @var ClassMetadata<TArg> */
             return $this->metadata[$class->name];
