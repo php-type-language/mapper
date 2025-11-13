@@ -11,12 +11,19 @@ use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
  */
 final class Path implements PathInterface, \IteratorAggregate
 {
+    private static ?self $empty = null;
+
     public function __construct(
         /**
          * @var list<EntryInterface>
          */
         protected readonly array $entries = [],
     ) {}
+
+    public static function empty(): self
+    {
+        return self::$empty ??= new self();
+    }
 
     public function getIterator(): \Traversable
     {

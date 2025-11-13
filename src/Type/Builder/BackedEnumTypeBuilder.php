@@ -51,10 +51,8 @@ abstract class BackedEnumTypeBuilder extends Builder
         return $type->getName();
     }
 
-    public function build(
-        TypeStatement $statement,
-        BuildingContext $context,
-    ): TypeInterface {
+    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    {
         $this->expectNoShapeFields($statement);
         $this->expectNoTemplateArguments($statement);
 

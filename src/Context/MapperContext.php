@@ -4,46 +4,22 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context;
 
-use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Configuration;
+use TypeLang\Mapper\Context\Common\InteractWithTypeExtractor;
+use TypeLang\Mapper\Context\Common\InteractWithTypeParser;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 class MapperContext implements
     TypeExtractorInterface,
     TypeParserInterface
 {
+    use InteractWithTypeExtractor;
+    use InteractWithTypeParser;
+
     protected function __construct(
-        /**
-         * Responsible for obtaining the type declaration from its value.
-         *
-         * This extractor belongs to the current context and may differ from the
-         * initial (mappers) one.
-         *
-         * You can safely use all the methods of this interface, but for ease of
-         * use, the following methods are available to you:
-         *
-         * - {@see RuntimeContext::getDefinitionByValue()} - returns definition string
-         *   by the passed value.
-         */
-        public readonly TypeExtractorInterface $extractor,
-        /**
-         * Responsible for obtaining the type AST (Abstract Syntax Tree)
-         * statements by the definition.
-         *
-         * This parser belongs to the current context and may differ from the
-         * initial (mappers) one.
-         *
-         * You can safely use all the methods of this interface, but for ease of
-         * use, the following methods are available to you:
-         *
-         * - {@see RuntimeContext::getStatementByValue()} - returns statement node by
-         *   the value.
-         * - {@see RuntimeContext::getStatementByDefinition()} - returns statement node
-         *   by the definition string.
-         */
-        public readonly TypeParserInterface $parser,
+        TypeParserInterface $parser,
+        TypeExtractorInterface $extractor,
         /**
          * Gets current configuration.
          *
@@ -54,7 +30,10 @@ class MapperContext implements
          * - {@see RuntimeContext::isStrictTypesEnabled()}
          */
         public readonly Configuration $config,
-    ) {}
+    ) {
+        $this->extractor = $extractor;
+        $this->parser = $parser;
+    }
 
     public static function create(
         Configuration $config,
@@ -62,8 +41,8 @@ class MapperContext implements
         TypeParserInterface $parser,
     ): self {
         return new self(
-            extractor: $extractor,
             parser: $parser,
+            extractor: $extractor,
             config: $config,
         );
     }
@@ -92,45 +71,5 @@ class MapperContext implements
     public function isStrictTypesEnabled(): bool
     {
         return $this->config->isStrictTypesEnabled();
-    }
-
-    public function getDefinitionByValue(mixed $value): string
-    {
-        return $this->extractor->getDefinitionByValue($value);
-    }
-
-    /**
-     * Returns an AST statement describing the type by the value.
-     *
-     * ```
-     * $statement = $context->getStatementByValue(42);
-     *
-     * // TypeLang\Parser\Node\Stmt\NamedTypeNode {
-     * //     +name: TypeLang\Parser\Node\Name {
-     * //         +parts: array:1 [
-     * //             TypeLang\Parser\Node\Identifier { +value: "int" }
-     * //         ]
-     * //     }
-     * //     +arguments: null
-     * //     +fields: null
-     * // }
-     * ```
-     *
-     * @throws \Throwable
-     */
-    public function getStatementByValue(mixed $value): TypeStatement
-    {
-        return $this->parser->getStatementByDefinition(
-            definition: $this->extractor->getDefinitionByValue(
-                value: $value,
-            ),
-        );
-    }
-
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
-        return $this->parser->getStatementByDefinition(
-            definition: $definition,
-        );
     }
 }
