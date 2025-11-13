@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Repository\Factory;
 
 use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\DecorateByCoercibleTypeRepository;
@@ -27,7 +27,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         Configuration $config,
         PlatformInterface $platform,
         TypeParserInterface $parser,
-        Direction $direction,
+        DirectionInterface $direction,
     ): TypeRepositoryInterface {
         $types = $this->createDefaultRepository($parser, $platform, $direction);
 
@@ -41,7 +41,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
     private function createDefaultRepository(
         TypeParserInterface $parser,
         PlatformInterface $platform,
-        Direction $direction,
+        DirectionInterface $direction,
     ): TypeRepository {
         return new TypeRepository(
             parser: $parser,
@@ -52,7 +52,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
     private function withCoercers(
         TypeRepositoryInterface $types,
         PlatformInterface $platform,
-        Direction $direction,
+        DirectionInterface $direction,
     ): TypeRepositoryInterface {
         return new DecorateByCoercibleTypeRepository(
             delegate: $types,

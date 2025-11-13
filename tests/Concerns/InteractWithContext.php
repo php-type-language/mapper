@@ -17,8 +17,9 @@ trait InteractWithContext
 
     protected static function createNormalizationContext(mixed $value, ?Configuration $config = null): RootMappingContext
     {
-        return RootMappingContext::forNormalization(
+        return RootMappingContext::create(
             value: $value,
+            direction: Direction::Normalize,
             config: $config ?? self::getConfiguration(),
             extractor: self::getTypeExtractor(),
             parser: self::getTypeParser(),
@@ -28,8 +29,9 @@ trait InteractWithContext
 
     protected static function createDenormalizationContext(mixed $value, ?Configuration $config = null): RootMappingContext
     {
-        return RootMappingContext::forDenormalization(
+        return RootMappingContext::create(
             value: $value,
+            direction: Direction::Denormalize,
             config: $config ?? self::getConfiguration(),
             extractor: self::getTypeExtractor(),
             parser: self::getTypeParser(),

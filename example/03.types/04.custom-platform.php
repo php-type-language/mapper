@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
 use TypeLang\Mapper\Type\Builder\ClassToArrayTypeBuilder;
 
@@ -26,13 +26,13 @@ class SimplePlatform implements PlatformInterface
         return 'simple';
     }
 
-    public function getTypes(Direction $direction): iterable
+    public function getTypes(DirectionInterface $direction): iterable
     {
         $driver = new MetadataBuilder(new AttributeReader());
 
         // The platform will only support objects, that is,
         // references to existing classes.
-        if ($direction === Direction::Normalize) {
+        if ($direction->isOutput()) {
             yield new ClassToArrayTypeBuilder($driver);
         } else {
             yield new ClassFromArrayTypeBuilder($driver);

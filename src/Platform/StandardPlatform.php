@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type;
 use TypeLang\Mapper\Type\Builder;
 use TypeLang\Mapper\Type\Builder\TypeAliasBuilder\Reason;
@@ -29,7 +29,7 @@ class StandardPlatform extends Platform
     }
 
     #[\Override]
-    public function getTypes(Direction $direction): iterable
+    public function getTypes(DirectionInterface $direction): iterable
     {
         yield from parent::getTypes($direction);
 
@@ -119,7 +119,7 @@ class StandardPlatform extends Platform
         yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Deprecated);
 
         // Other
-        if ($direction === Direction::Normalize) {
+        if ($direction->isOutput()) {
             // Adds support for the "object -> array{ ... }" type
             yield $object = new Builder\ObjectToArrayTypeBuilder('object');
             yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
@@ -147,7 +147,7 @@ class StandardPlatform extends Platform
     }
 
     #[\Override]
-    public function getTypeCoercers(Direction $direction): iterable
+    public function getTypeCoercers(DirectionInterface $direction): iterable
     {
         yield from parent::getTypeCoercers($direction);
 

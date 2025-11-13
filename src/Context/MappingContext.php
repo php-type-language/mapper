@@ -37,7 +37,7 @@ abstract class MappingContext extends Context implements
         /**
          * Gets data transformation direction.
          */
-        public readonly Direction $direction,
+        public readonly DirectionInterface $direction,
         Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,

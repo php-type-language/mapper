@@ -18,7 +18,7 @@ final class ChildMappingContext extends MappingContext
         public readonly MappingContext $parent,
         public readonly EntryInterface $entry,
         mixed $value,
-        Direction $direction,
+        DirectionInterface $direction,
         Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,

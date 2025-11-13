@@ -19,41 +19,23 @@ final class RootMappingContext extends MappingContext
 {
     private PathInterface $path;
 
-    public static function forNormalization(
+    public static function create(
         mixed $value,
+        DirectionInterface $direction,
         Configuration $config,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
         TypeRepositoryInterface $types,
     ): self {
         if (!$config->isStrictTypesOptionDefined()) {
-            $config = $config->withStrictTypes(true);
+            $config = $config->withStrictTypes(
+                enabled: $direction->isSafeTypes(),
+            );
         }
 
         return new self(
             value: $value,
-            direction: Direction::Normalize,
-            config: $config,
-            extractor: $extractor,
-            parser: $parser,
-            types: $types,
-        );
-    }
-
-    public static function forDenormalization(
-        mixed $value,
-        Configuration $config,
-        TypeExtractorInterface $extractor,
-        TypeParserInterface $parser,
-        TypeRepositoryInterface $types,
-    ): self {
-        if (!$config->isStrictTypesOptionDefined()) {
-            $config = $config->withStrictTypes(false);
-        }
-
-        return new self(
-            value: $value,
-            direction: Direction::Denormalize,
+            direction: $direction,
             config: $config,
             extractor: $extractor,
             parser: $parser,

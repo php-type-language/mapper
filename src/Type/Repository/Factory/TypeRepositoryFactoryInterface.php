@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Repository\Factory;
 
 use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
@@ -24,6 +24,6 @@ interface TypeRepositoryFactoryInterface
         Configuration $config,
         PlatformInterface $platform,
         TypeParserInterface $parser,
-        Direction $direction,
+        DirectionInterface $direction,
     ): TypeRepositoryInterface;
 }

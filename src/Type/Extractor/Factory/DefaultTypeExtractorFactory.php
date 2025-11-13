@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Extractor\Factory;
 
 use TypeLang\Mapper\Configuration;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
 
 /**
@@ -13,7 +14,7 @@ use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
  */
 final class DefaultTypeExtractorFactory implements TypeExtractorFactoryInterface
 {
-    public function createTypeExtractor(Configuration $config): NativeTypeExtractor
+    public function createTypeExtractor(Configuration $config, PlatformInterface $platform): NativeTypeExtractor
     {
         return new NativeTypeExtractor();
     }

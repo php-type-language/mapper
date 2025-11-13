@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
 use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
@@ -80,7 +80,7 @@ abstract class Platform implements PlatformInterface
         return iterable_to_array($types, false);
     }
 
-    public function getTypes(Direction $direction): iterable
+    public function getTypes(DirectionInterface $direction): iterable
     {
         return $this->types;
     }
@@ -95,7 +95,7 @@ abstract class Platform implements PlatformInterface
         return iterable_to_array($coercers);
     }
 
-    public function getTypeCoercers(Direction $direction): iterable
+    public function getTypeCoercers(DirectionInterface $direction): iterable
     {
         return $this->coercers;
     }

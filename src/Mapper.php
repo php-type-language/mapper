@@ -6,8 +6,11 @@ namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\RootMappingContext;
+use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Exception\Runtime\RuntimeException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Extractor\Factory\DefaultTypeExtractorFactory;
@@ -21,101 +24,137 @@ use TypeLang\Mapper\Type\Repository\Factory\TypeRepositoryFactoryInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class Mapper implements NormalizerInterface, DenormalizerInterface
+final class Mapper implements
+    NormalizerInterface,
+    DenormalizerInterface,
+    TypeExtractorInterface
 {
     private readonly TypeExtractorInterface $extractor;
 
     private readonly TypeParserInterface $parser;
 
-    private readonly TypeRepositoryInterface $normalize;
-
-    private readonly TypeRepositoryInterface $denormalize;
+    /**
+     * @var \WeakMap<DirectionInterface, TypeRepositoryInterface>
+     */
+    private readonly \WeakMap $repository;
 
     public function __construct(
-        PlatformInterface $platform = new StandardPlatform(),
+        private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
-        TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
-        TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
-        TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
+        private readonly TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
+        private readonly TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
+        private readonly TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
-        $this->extractor = $typeExtractorFactory->createTypeExtractor($config);
-        $this->parser = $typeParserFactory->createTypeParser($config, $platform);
+        $this->repository = new \WeakMap();
+        $this->extractor = $this->createTypeExtractor();
+        $this->parser = $this->createTypeParser();
+    }
 
-        $this->normalize = $typeRepositoryFactory->createTypeRepository(
-            config: $config,
-            platform: $platform,
-            parser: $this->parser,
-            direction: Direction::Normalize,
-        );
-
-        $this->denormalize = $typeRepositoryFactory->createTypeRepository(
-            config: $config,
-            platform: $platform,
-            parser: $this->parser,
-            direction: Direction::Denormalize,
+    private function createTypeExtractor(): TypeExtractorInterface
+    {
+        return $this->typeExtractorFactory->createTypeExtractor(
+            config: $this->config,
+            platform: $this->platform,
         );
     }
 
-    private function createNormalizationContext(mixed $value): RootMappingContext
+    private function createTypeParser(): TypeParserInterface
     {
-        return RootMappingContext::forNormalization(
+        return $this->typeParserFactory->createTypeParser(
+            config: $this->config,
+            platform: $this->platform,
+        );
+    }
+
+    private function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
+    {
+        return $this->repository[$direction]
+            ??= $this->typeRepositoryFactory->createTypeRepository(
+                config: $this->config,
+                platform: $this->platform,
+                parser: $this->parser,
+                direction: $direction,
+            );
+    }
+
+    private function createContext(mixed $value, DirectionInterface $direction): RootMappingContext
+    {
+        return RootMappingContext::create(
             value: $value,
+            direction: $direction,
             config: $this->config,
             extractor: $this->extractor,
             parser: $this->parser,
-            types: $this->normalize,
+            types: $this->getTypeRepository($direction),
         );
     }
 
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {
-        $type ??= $this->extractor->getDefinitionByValue($value);
+        $type ??= $this->getDefinitionByValue($value);
 
-        $instance = $this->normalize->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
-        );
-
-        return $instance->cast($value, $this->createNormalizationContext($value));
+        return $this->map(Direction::Normalize, $value, $type);
     }
 
     public function isNormalizable(mixed $value, #[Language('PHP')] ?string $type = null): bool
     {
-        $type ??= $this->extractor->getDefinitionByValue($value);
+        $type ??= $this->getDefinitionByValue($value);
 
-        $instance = $this->normalize->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
-        );
-
-        return $instance->match($value, $this->createNormalizationContext($value));
-    }
-
-    private function createDenormalizationContext(mixed $value): RootMappingContext
-    {
-        return RootMappingContext::forDenormalization(
-            value: $value,
-            config: $this->config,
-            extractor: $this->extractor,
-            parser: $this->parser,
-            types: $this->denormalize,
-        );
+        return $this->canMap(Direction::Normalize, $value, $type);
     }
 
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
     {
-        $instance = $this->denormalize->getTypeByStatement(
-            statement: $this->parser->getStatementByDefinition($type),
-        );
-
-        return $instance->cast($value, $this->createDenormalizationContext($value));
+        return $this->map(Direction::Denormalize, $value, $type);
     }
 
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool
     {
-        $instance = $this->denormalize->getTypeByStatement(
+        return $this->canMap(Direction::Denormalize, $value, $type);
+    }
+
+    /**
+     * Map a specific data to another one using specific type.
+     *
+     * @param non-empty-string $type
+     *
+     * @throws RuntimeException in case of runtime mapping exception occurs
+     * @throws DefinitionException in case of type building exception occurs
+     * @throws \Throwable in case of any internal error occurs
+     */
+    public function map(DirectionInterface $direction, mixed $value, #[Language('PHP')] string $type): mixed
+    {
+        $context = $this->createContext($value, $direction);
+
+        $instance = $context->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
 
-        return $instance->match($value, $this->createDenormalizationContext($value));
+        return $instance->cast($value, $context);
+    }
+
+    /**
+     * Returns {@see true} if the value can be mapped for the given type.
+     *
+     * @param non-empty-string $type
+     *
+     * @throws DefinitionException in case of type building exception occurs
+     * @throws \Throwable in case of any internal error occurs
+     */
+    public function canMap(DirectionInterface $direction, mixed $value, #[Language('PHP')] string $type): bool
+    {
+        $context = $this->createContext($value, $direction);
+
+        $instance = $context->getTypeByStatement(
+            statement: $this->parser->getStatementByDefinition($type),
+        );
+
+        return $instance->match($value, $context);
+    }
+
+    public function getDefinitionByValue(mixed $value): string
+    {
+        return $this->extractor->getDefinitionByValue($value);
     }
 
     /**
@@ -128,15 +167,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getType(#[Language('PHP')] string $type, Direction $direction): TypeInterface
+    public function getType(DirectionInterface $direction, #[Language('PHP')] string $type): TypeInterface
     {
-        if ($direction === Direction::Normalize) {
-            return $this->normalize->getTypeByStatement(
-                statement: $this->parser->getStatementByDefinition($type),
-            );
-        }
+        $repository = $this->getTypeRepository($direction);
 
-        return $this->denormalize->getTypeByStatement(
+        return $repository->getTypeByStatement(
             statement: $this->parser->getStatementByDefinition($type),
         );
     }
@@ -149,11 +184,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getTypeByValue(mixed $value, Direction $direction): TypeInterface
+    public function getTypeByValue(DirectionInterface $direction, mixed $value): TypeInterface
     {
         return $this->getType(
-            type: $this->extractor->getDefinitionByValue($value),
             direction: $direction,
+            type: $this->extractor->getDefinitionByValue($value),
         );
     }
 
@@ -170,14 +205,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function warmup(string|object $class): void
+    public function warmup(DirectionInterface $direction, string|object $class): void
     {
         if (\is_object($class)) {
             $class = $class::class;
         }
 
-        foreach (Direction::cases() as $direction) {
-            $this->getType($class, $direction);
-        }
+        $this->getType($direction, $class);
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
-use TypeLang\Mapper\Context\Direction;
+use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -19,7 +19,7 @@ final class EmptyPlatform implements PlatformInterface
     /**
      * @return array<class-string<TypeInterface>, TypeCoercerInterface>
      */
-    public function getTypeCoercers(Direction $direction): array
+    public function getTypeCoercers(DirectionInterface $direction): array
     {
         return [];
     }
@@ -27,7 +27,7 @@ final class EmptyPlatform implements PlatformInterface
     /**
      * @return array<array-key, TypeBuilderInterface>
      */
-    public function getTypes(Direction $direction): array
+    public function getTypes(DirectionInterface $direction): array
     {
         return [];
     }
