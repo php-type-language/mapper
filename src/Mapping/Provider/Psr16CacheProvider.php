@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Provider;
 
 use Psr\SimpleCache\CacheInterface;
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class Psr16CacheProvider extends CacheProvider
 {
@@ -21,15 +20,12 @@ final class Psr16CacheProvider extends CacheProvider
         parent::__construct($prefix, $ttl, $delegate);
     }
 
-    public function getClassMetadata(
-        \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): ClassMetadata {
+    public function getClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
+    {
         $result = $this->psr16->get($key = $this->getKey($class));
 
         if (!$result instanceof ClassMetadata) {
-            $result = parent::getClassMetadata($class, $types, $parser);
+            $result = parent::getClassMetadata($class, $context);
 
             $this->psr16->set($key, $result, $this->ttl);
         }

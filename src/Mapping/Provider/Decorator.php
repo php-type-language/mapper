@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Provider;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 abstract class Decorator implements ProviderInterface
 {
@@ -33,11 +32,8 @@ abstract class Decorator implements ProviderInterface
         return new MetadataBuilder($reader);
     }
 
-    public function getClassMetadata(
-        \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): ClassMetadata {
-        return $this->delegate->getClassMetadata($class, $types, $parser);
+    public function getClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
+    {
+        return $this->delegate->getClassMetadata($class, $context);
     }
 }

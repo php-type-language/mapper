@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Mapping\Provider;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Exception\Definition\PropertyTypeNotFoundException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Environment\ComposerPackageRequiredException;
@@ -35,8 +36,6 @@ use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Mapping\Reference\Reader\NativeReferencesReader;
 use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class MetadataBuilder implements ProviderInterface
 {
@@ -71,18 +70,15 @@ final class MetadataBuilder implements ProviderInterface
      * @return ClassMetadata<TArg>
      * @throws \Throwable
      */
-    public function getClassMetadata(
-        \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): ClassMetadata {
+    public function getClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
+    {
         if (\PHP_VERSION_ID >= 80400) {
             /** @var ClassMetadata<TArg> */
-            return $this->toProxyClassMetadata($class, $types, $parser);
+            return $this->toProxyClassMetadata($class, $context);
         }
 
         /** @var ClassMetadata<TArg> */
-        return $this->toLazyInitializedClassMetadata($class, $types, $parser);
+        return $this->toLazyInitializedClassMetadata($class, $context);
     }
 
     /**
@@ -93,32 +89,27 @@ final class MetadataBuilder implements ProviderInterface
      * @return ClassMetadata<TArg>
      * @throws \Throwable
      */
-    private function toProxyClassMetadata(
-        \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): ClassMetadata {
+    private function toProxyClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
+    {
         /** @var ClassMetadata<TArg> */
         return $this->metadata[$class->name] ??=
             (new \ReflectionClass(ClassMetadata::class))
-                ->newLazyProxy(function () use ($class, $types, $parser): ClassMetadata {
+                ->newLazyProxy(function () use ($class, $context): ClassMetadata {
                     $info = $this->reader->read($class);
 
                     $metadata = new ClassMetadata(
                         name: $info->name,
                         properties: $this->toPropertiesMetadata(
-                            context: $class,
+                            class: $class,
                             parent: $info,
                             properties: $info->properties,
-                            types: $types,
-                            parser: $parser,
+                            context: $context,
                         ),
                         discriminator: $this->toOptionalDiscriminator(
-                            context: $class,
+                            class: $class,
                             parent: $info,
                             info: $info->discriminator,
-                            types: $types,
-                            parser: $parser,
+                            context: $context,
                         ),
                         isNormalizeAsArray: $info->isNormalizeAsArray,
                         typeErrorMessage: $info->typeErrorMessage,
@@ -141,8 +132,7 @@ final class MetadataBuilder implements ProviderInterface
      */
     private function toLazyInitializedClassMetadata(
         \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): ClassMetadata {
         if (isset($this->metadata[$class->name])) {
             /** @var ClassMetadata<TArg> */
@@ -160,20 +150,18 @@ final class MetadataBuilder implements ProviderInterface
 
         /** @phpstan-ignore-next-line : Allow readonly writing */
         $metadata->properties = $this->toPropertiesMetadata(
-            context: $class,
+            class: $class,
             parent: $info,
             properties: $info->properties,
-            types: $types,
-            parser: $parser,
+            context: $context,
         );
 
         /** @phpstan-ignore-next-line : Allow readonly writing */
         $metadata->discriminator = $this->toOptionalDiscriminator(
-            context: $class,
+            class: $class,
             parent: $info,
             info: $info->discriminator,
-            types: $types,
-            parser: $parser,
+            context: $context,
         );
 
         unset($this->metadata[$class->name]);
@@ -183,7 +171,7 @@ final class MetadataBuilder implements ProviderInterface
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      * @param ClassInfo<object> $parent
      * @param iterable<mixed, PropertyInfo> $properties
      *
@@ -191,42 +179,40 @@ final class MetadataBuilder implements ProviderInterface
      * @throws \Throwable
      */
     private function toPropertiesMetadata(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         ClassInfo $parent,
         iterable $properties,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): array {
         $result = [];
 
         foreach ($properties as $property) {
-            $result[$property->name] = $this->toPropertyMetadata($context, $parent, $property, $types, $parser);
+            $result[$property->name] = $this->toPropertyMetadata($class, $parent, $property, $context);
         }
 
         return $result;
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toPropertyMetadata(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         ClassInfo $parent,
         PropertyInfo $property,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): PropertyMetadata {
         try {
-            $read = $this->toTypeMetadata($context, $property->read, $types, $parser);
+            $read = $this->toTypeMetadata($class, $property->read, $context);
         } catch (TypeNotFoundException $e) {
             throw $this->toPropertyTypeException($e, $parent, $property, $property->read);
         }
 
         try {
-            $write = $this->toTypeMetadata($context, $property->write, $types, $parser);
+            $write = $this->toTypeMetadata($class, $property->write, $context);
         } catch (TypeNotFoundException $e) {
             throw $this->toPropertyTypeException($e, $parent, $property, $property->write);
         }
@@ -324,65 +310,62 @@ final class MetadataBuilder implements ProviderInterface
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toOptionalDiscriminator(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         ClassInfo $parent,
         ?DiscriminatorInfo $info,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): ?DiscriminatorMetadata {
         if ($info === null) {
             return null;
         }
 
-        return $this->toDiscriminator($context, $parent, $info, $types, $parser);
+        return $this->toDiscriminator($class, $parent, $info, $context);
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      * @param ClassInfo<object> $parent
      *
      * @throws \Throwable
      */
     private function toDiscriminator(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         ClassInfo $parent,
         DiscriminatorInfo $info,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): DiscriminatorMetadata {
         // TODO Customize discriminator errors
 
         return new DiscriminatorMetadata(
             field: $info->field,
-            map: $this->toDiscriminatorMap($context, $info->map, $types, $parser),
-            default: $this->toOptionalTypeMetadata($context, $info->default, $types, $parser),
+            map: $this->toDiscriminatorMap($class, $info->map, $context),
+            default: $this->toOptionalTypeMetadata($class, $info->default, $context),
             createdAt: $this->now(),
         );
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      * @param non-empty-array<non-empty-string, TypeInfo> $map
      *
      * @return non-empty-array<non-empty-string, TypeMetadata>
      * @throws \Throwable
      */
     private function toDiscriminatorMap(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         array $map,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): array {
         $result = [];
 
         foreach ($map as $value => $type) {
-            $result[$value] = $this->toTypeMetadata($context, $type, $types, $parser);
+            $result[$value] = $this->toTypeMetadata($class, $type, $context);
         }
 
         /** @var non-empty-array<non-empty-string, TypeMetadata> $result */
@@ -390,36 +373,36 @@ final class MetadataBuilder implements ProviderInterface
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      *
      * @throws \Throwable
      */
     private function toOptionalTypeMetadata(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         ?TypeInfo $type,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): ?TypeMetadata {
         if ($type === null) {
             return null;
         }
 
-        return $this->toTypeMetadata($context, $type, $types, $parser);
+        return $this->toTypeMetadata($class, $type, $context);
     }
 
     /**
-     * @param \ReflectionClass<object> $context
+     * @param \ReflectionClass<object> $class
      *
      * @throws \Throwable
      */
     private function toTypeMetadata(
-        \ReflectionClass $context,
+        \ReflectionClass $class,
         TypeInfo $info,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
+        BuildingContext $context
     ): TypeMetadata {
         $statement = match (true) {
-            $info instanceof RawTypeInfo => $parser->getStatementByDefinition($info->definition),
+            $info instanceof RawTypeInfo => $context->parser->getStatementByDefinition(
+                definition: $info->definition,
+            ),
             $info instanceof ParsedTypeInfo => $info->statement,
             default => throw new \InvalidArgumentException(\sprintf(
                 'Unsupported type info "%s"',
@@ -427,9 +410,9 @@ final class MetadataBuilder implements ProviderInterface
             ))
         };
 
-        $statement = $this->references->resolve($statement, $context);
+        $statement = $this->references->resolve($statement, $class);
 
-        $type = $types->getTypeByStatement($statement);
+        $type = $context->types->getTypeByStatement($statement);
 
         return new TypeMetadata(
             type: $type,

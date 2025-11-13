@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Provider;
 
+use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class InMemoryProvider extends Decorator
 {
@@ -15,13 +14,10 @@ final class InMemoryProvider extends Decorator
      */
     private array $memory = [];
 
-    public function getClassMetadata(
-        \ReflectionClass $class,
-        TypeRepositoryInterface $types,
-        TypeParserInterface $parser,
-    ): ClassMetadata {
+    public function getClassMetadata(\ReflectionClass $class, BuildingContext $context): ClassMetadata
+    {
         // @phpstan-ignore-next-line : class-string<T> key contains ClassMetadata<T> instance
         return $this->memory[$class->name]
-            ??= parent::getClassMetadata($class, $types, $parser);
+            ??= parent::getClassMetadata($class, $context);
     }
 }

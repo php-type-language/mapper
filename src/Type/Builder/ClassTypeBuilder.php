@@ -85,8 +85,7 @@ abstract class ClassTypeBuilder extends Builder
         return $this->create(
             metadata: $this->driver->getClassMetadata(
                 class: new \ReflectionClass($class),
-                types: $context->types,
-                parser: $context->parser,
+                context: $context,
             ),
         );
     }
