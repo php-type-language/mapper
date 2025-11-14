@@ -30,7 +30,9 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
     ): TypeRepositoryInterface {
         $types = $this->createDefaultRepository($context, $direction, $platform);
 
+        $types = $this->withTypeTracing($types, $context->config);
         $types = $this->withTracing($types, $context->config);
+        $types = $this->withTypeLogging($types, $context->config);
         $types = $this->withLogging($types, $context->config);
         $types = $this->withCoercers($types, $platform, $direction);
 
@@ -45,7 +47,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         return new TypeRepository(
             context: $context,
             direction: $direction,
-            builders: $platform->getTypes($direction)
+            builders: $platform->getTypes($direction),
         );
     }
 
@@ -60,6 +62,21 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         );
     }
 
+    private function withTypeTracing(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
+    {
+        $tracer = $config->findTracer();
+
+        if ($tracer === null) {
+            return $types;
+        }
+
+        if (!$config->shouldTraceTypeMatch() && !$config->shouldTraceTypeCast()) {
+            return $types;
+        }
+
+        return new DecorateByTraceableTypeRepository($types);
+    }
+
     private function withTracing(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
     {
         $tracer = $config->findTracer();
@@ -68,15 +85,26 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        if ($config->shouldTraceTypeMatch() || $config->shouldTraceTypeCast()) {
-            $types = new DecorateByTraceableTypeRepository($types);
+        if (!$config->shouldTraceTypeFind()) {
+            return $types;
         }
 
-        if ($config->shouldTraceTypeFind()) {
-            return new TraceableTypeRepository($tracer, $types);
+        return new TraceableTypeRepository($tracer, $types);
+    }
+
+    private function withTypeLogging(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
+    {
+        $logger = $config->findLogger();
+
+        if ($logger === null) {
+            return $types;
         }
 
-        return $types;
+        if (!$config->shouldLogTypeCast() && !$config->shouldLogTypeMatch()) {
+            return $types;
+        }
+
+        return new DecorateByLoggableTypeRepository($types);
     }
 
     private function withLogging(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
@@ -87,15 +115,11 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        if ($config->shouldLogTypeCast() || $config->shouldLogTypeMatch()) {
-            $types = new DecorateByLoggableTypeRepository($types);
+        if (!$config->shouldLogTypeFind()) {
+            return $types;
         }
 
-        if ($config->shouldLogTypeFind()) {
-            return new LoggableTypeRepository($logger, $types);
-        }
-
-        return $types;
+        return new LoggableTypeRepository($logger, $types);
     }
 
     private function withMemoization(TypeRepositoryInterface $types): InMemoryTypeRepository
