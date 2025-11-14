@@ -59,7 +59,7 @@ final class TraceableType extends TypeDecorator
     {
         $tracer = $context->config->findTracer();
 
-        if ($tracer === null || !$context->config->shouldTraceTypeMatch()) {
+        if ($tracer === null) {
             return parent::match($value, $context);
         }
 
@@ -76,7 +76,7 @@ final class TraceableType extends TypeDecorator
     {
         $tracer = $context->config->findTracer();
 
-        if ($tracer === null || !$context->config->shouldTraceTypeCast()) {
+        if ($tracer === null) {
             return parent::cast($value, $context);
         }
 

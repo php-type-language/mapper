@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Parser\Factory;
 
-use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Context\BootContext;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 
 /**
@@ -17,5 +16,5 @@ use TypeLang\Mapper\Type\Parser\TypeParserInterface;
  */
 interface TypeParserFactoryInterface
 {
-    public function createTypeParser(Configuration $config, PlatformInterface $platform): TypeParserInterface;
+    public function createTypeParser(BootContext $context): TypeParserInterface;
 }

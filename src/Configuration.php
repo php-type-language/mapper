@@ -42,44 +42,12 @@ class Configuration
          */
         private ?bool $strictTypes = null,
         /**
-         * Enable or disable type parsing logs
-         */
-        private readonly bool $logTypeParse = false,
-        /**
-         * Enable or disable type lookup logs
-         */
-        private readonly bool $logTypeFind = false,
-        /**
-         * Enable or disable type match logs
-         */
-        private readonly bool $logTypeMatch = true,
-        /**
-         * Enable or disable type cast logs
-         */
-        private readonly bool $logTypeCast = true,
-        /**
          * If this option contains {@see LoggerInterface}, then logger
          * will be enabled.
          *
          * Logger will be disabled in case of argument contain {@see null}.
          */
         private readonly ?LoggerInterface $logger = null,
-        /**
-         * Enable or disable type parse tracing
-         */
-        private readonly bool $traceTypeParse = false,
-        /**
-         * Enable or disable type lookup tracing
-         */
-        private readonly bool $traceTypeFind = false,
-        /**
-         * Enable or disable type match tracing
-         */
-        private readonly bool $traceTypeMatch = true,
-        /**
-         * Enable or disable type cast tracing
-         */
-        private readonly bool $traceTypeCast = true,
         /**
          * If this option contains {@see TracerInterface}, then an application
          * tracing will be enabled using given tracer.
@@ -204,70 +172,6 @@ class Configuration
     public function findTracer(): ?TracerInterface
     {
         return $this->tracer;
-    }
-
-    /**
-     * Returns {@see true} in case of parser logs should be enabled
-     */
-    public function shouldLogTypeParse(): bool
-    {
-        return $this->logTypeParse;
-    }
-
-    /**
-     * Returns {@see true} in case of type find process logs should be enabled
-     */
-    public function shouldLogTypeFind(): bool
-    {
-        return $this->logTypeFind;
-    }
-
-    /**
-     * Returns {@see true} in case of type match logs should be enabled
-     */
-    public function shouldLogTypeMatch(): bool
-    {
-        return $this->logTypeMatch;
-    }
-
-    /**
-     * Returns {@see true} in case of type cast logs should be enabled
-     */
-    public function shouldLogTypeCast(): bool
-    {
-        return $this->logTypeCast;
-    }
-
-    /**
-     * Returns {@see true} in case of parser tracing should be enabled
-     */
-    public function shouldTraceTypeParse(): bool
-    {
-        return $this->traceTypeParse;
-    }
-
-    /**
-     * Returns {@see true} in case of type lookup tracing should be enabled
-     */
-    public function shouldTraceTypeFind(): bool
-    {
-        return $this->traceTypeFind;
-    }
-
-    /**
-     * Returns {@see true} in case of type match tracing should be enabled
-     */
-    public function shouldTraceTypeMatch(): bool
-    {
-        return $this->traceTypeMatch;
-    }
-
-    /**
-     * Returns {@see true} in case of type cast tracing should be enabled
-     */
-    public function shouldTraceTypeCast(): bool
-    {
-        return $this->traceTypeCast;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
+use TypeLang\Mapper\Context\BootContext;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
@@ -15,9 +16,7 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Extractor\Factory\TypeExtractorFactoryInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\Factory\TypeParserFactoryInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -37,27 +36,40 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
     ) {
         $this->repository = new \WeakMap();
 
-        $this->context = MapperContext::create(
-            config: $this->config,
-            extractor: $this->createTypeExtractor($this->config->getTypeExtractorFactory()),
-            parser: $this->createTypeParser($this->config->getTypeParserFactory()),
+        $this->context = $this->createMapperContext(
+            context: $this->createBootContext(),
         );
     }
 
-    private function createTypeExtractor(TypeExtractorFactoryInterface $typeExtractorFactory): TypeExtractorInterface
+    private function createBootContext(): BootContext
     {
-        return $typeExtractorFactory->createTypeExtractor(
-            config: $this->config,
+        return BootContext::create(
             platform: $this->platform,
+            config: $this->config,
         );
     }
 
-    private function createTypeParser(TypeParserFactoryInterface $typeParserFactory): TypeParserInterface
+    private function createMapperContext(BootContext $context): MapperContext
     {
-        return $typeParserFactory->createTypeParser(
+        return MapperContext::create(
             config: $this->config,
-            platform: $this->platform,
+            extractor: $this->createTypeExtractor($context),
+            parser: $this->createTypeParser($context),
         );
+    }
+
+    private function createTypeExtractor(BootContext $context): TypeExtractorInterface
+    {
+        $factory = $context->config->getTypeExtractorFactory();
+
+        return $factory->createTypeExtractor($context);
+    }
+
+    private function createTypeParser(BootContext $context): TypeParserInterface
+    {
+        $factory = $context->config->getTypeParserFactory();
+
+        return $factory->createTypeParser($context);
     }
 
     private function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface

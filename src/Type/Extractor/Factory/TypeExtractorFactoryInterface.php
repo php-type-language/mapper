@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Extractor\Factory;
 
-use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Platform\PlatformInterface;
+use TypeLang\Mapper\Context\BootContext;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 
 /**
@@ -17,5 +16,5 @@ use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
  */
 interface TypeExtractorFactoryInterface
 {
-    public function createTypeExtractor(Configuration $config, PlatformInterface $platform): TypeExtractorInterface;
+    public function createTypeExtractor(BootContext $context): TypeExtractorInterface;
 }

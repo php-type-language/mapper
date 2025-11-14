@@ -23,6 +23,20 @@ use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
  */
 final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterface
 {
+    public const DEFAULT_TRACING_OPTION = false;
+    public const DEFAULT_TYPE_TRACING_OPTION = true;
+    public const DEFAULT_LOGGING_OPTION = false;
+    public const DEFAULT_TYPE_LOGGING_OPTION = true;
+    public const DEFAULT_MEMOIZATION_OPTION = true;
+
+    public function __construct(
+        private readonly bool $enableLogging = self::DEFAULT_LOGGING_OPTION,
+        private readonly bool $enableTypeLogging = self::DEFAULT_TYPE_LOGGING_OPTION,
+        private readonly bool $enableTracing = self::DEFAULT_TRACING_OPTION,
+        private readonly bool $enableTypeTracing = self::DEFAULT_TYPE_TRACING_OPTION,
+        private readonly bool $enableMemoization = self::DEFAULT_MEMOIZATION_OPTION,
+    ) {}
+
     public function createTypeRepository(
         MapperContext $context,
         PlatformInterface $platform,
@@ -30,13 +44,29 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
     ): TypeRepositoryInterface {
         $types = $this->createDefaultRepository($context, $direction, $platform);
 
-        $types = $this->withTypeTracing($types, $context->config);
-        $types = $this->withTracing($types, $context->config);
-        $types = $this->withTypeLogging($types, $context->config);
-        $types = $this->withLogging($types, $context->config);
+        if ($this->enableTypeTracing) {
+            $types = $this->withTypeTracing($types, $context->config);
+        }
+
+        if ($this->enableTracing) {
+            $types = $this->withTracing($types, $context->config);
+        }
+
+        if ($this->enableTypeLogging) {
+            $types = $this->withTypeLogging($types, $context->config);
+        }
+
+        if ($this->enableLogging) {
+            $types = $this->withLogging($types, $context->config);
+        }
+
         $types = $this->withCoercers($types, $platform, $direction);
 
-        return $this->withMemoization($types);
+        if ($this->enableMemoization) {
+            $types = $this->withMemoization($types);
+        }
+
+        return $types;
     }
 
     private function createDefaultRepository(
@@ -70,10 +100,6 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        if (!$config->shouldTraceTypeMatch() && !$config->shouldTraceTypeCast()) {
-            return $types;
-        }
-
         return new DecorateByTraceableTypeRepository($types);
     }
 
@@ -82,10 +108,6 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         $tracer = $config->findTracer();
 
         if ($tracer === null) {
-            return $types;
-        }
-
-        if (!$config->shouldTraceTypeFind()) {
             return $types;
         }
 
@@ -100,10 +122,6 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        if (!$config->shouldLogTypeCast() && !$config->shouldLogTypeMatch()) {
-            return $types;
-        }
-
         return new DecorateByLoggableTypeRepository($types);
     }
 
@@ -112,10 +130,6 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         $logger = $config->findLogger();
 
         if ($logger === null) {
-            return $types;
-        }
-
-        if (!$config->shouldLogTypeFind()) {
             return $types;
         }
 

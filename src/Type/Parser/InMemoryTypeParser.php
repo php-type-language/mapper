@@ -14,6 +14,16 @@ final class InMemoryTypeParser implements TypeParserInterface
      */
     private array $types = [];
 
+    /**
+     * @var int<0, max>
+     */
+    public const DEFAULT_MAX_IN_MEMORY_TYPES = 100;
+
+    /**
+     * @var int<0, max>
+     */
+    public const DEFAULT_MIN_IN_MEMORY_TYPES = 30;
+
     public function __construct(
         private readonly TypeParserInterface $delegate,
         /**
@@ -21,14 +31,13 @@ final class InMemoryTypeParser implements TypeParserInterface
          *
          * @var int<0, max>
          */
-        private readonly int $typesLimit = 100,
-
+        private readonly int $maxTypesLimit = self::DEFAULT_MAX_IN_MEMORY_TYPES,
         /**
          * Number of types cleared after GC triggering.
          *
          * @var int<0, max>
          */
-        private readonly int $typesCleanupCount = 30,
+        private readonly int $minTypesLimit = self::DEFAULT_MIN_IN_MEMORY_TYPES,
     ) {}
 
     /**
@@ -51,10 +60,10 @@ final class InMemoryTypeParser implements TypeParserInterface
 
     private function cleanup(): void
     {
-        if (\count($this->types) <= $this->typesLimit) {
+        if (\count($this->types) <= $this->maxTypesLimit) {
             return;
         }
 
-        $this->types = \array_slice($this->types, $this->typesCleanupCount);
+        $this->types = \array_slice($this->types, $this->minTypesLimit);
     }
 }

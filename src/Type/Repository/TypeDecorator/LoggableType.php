@@ -113,7 +113,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger = $context->config->findLogger();
 
-        if ($logger === null || !$context->config->shouldLogTypeMatch()) {
+        if ($logger === null) {
             return parent::match($value, $context);
         }
 
@@ -167,7 +167,7 @@ final class LoggableType extends TypeDecorator
     {
         $logger = $context->config->findLogger();
 
-        if ($logger === null || !$context->config->shouldLogTypeCast()) {
+        if ($logger === null) {
             return parent::cast($value, $context);
         }
 
