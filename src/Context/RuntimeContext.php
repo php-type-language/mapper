@@ -37,8 +37,11 @@ abstract class RuntimeContext extends MapperContext implements
          *
          * In this case, the `$value` in the {@see RuntimeContext} remains the original
          * value, without any mutations from type coercions.
+         *
+         * @readonly
+         * @phpstan-readonly-allow-private-mutation
          */
-        public readonly mixed $value,
+        public mixed $value,
         /**
          * Gets data transformation direction.
          */
@@ -48,14 +51,6 @@ abstract class RuntimeContext extends MapperContext implements
         TypeExtractorInterface $extractor,
         PlatformInterface $platform,
         Configuration $config,
-        /**
-         * Contains a reference to the original config created during this
-         * context initialization.
-         *
-         * If there is no reference ({@see null}), then the current config in
-         * the {@see $config} context's field is the original.
-         */
-        public readonly ?Configuration $original = null,
     ) {
         parent::__construct(
             parser: $parser,
@@ -72,19 +67,11 @@ abstract class RuntimeContext extends MapperContext implements
      */
     public function enter(mixed $value, EntryInterface $entry, ?Configuration $config = null): self
     {
-        // Original configuration
-        $original = $this->original ?? $this->config;
+        [$original, $override] = $config === null
+            ? [null, $this->config]
+            : [$this->config, $config];
 
-        // Configuration of the current context
-        $current = $config ?? $original;
-
-        // Do not set "previous" config in case of
-        // "current" config is original
-        if ($current === $original) {
-            $original = null;
-        }
-
-        return new ChildRuntimeContext(
+        return new ChildContext(
             parent: $this,
             entry: $entry,
             value: $value,
@@ -93,8 +80,8 @@ abstract class RuntimeContext extends MapperContext implements
             extractor: $this->extractor,
             parser: $this->parser,
             platform: $this->platform,
-            config: $current,
-            original: $current === $original ? null : $original,
+            config: $override,
+            original: $original,
         );
     }
 
@@ -149,39 +136,19 @@ abstract class RuntimeContext extends MapperContext implements
     /**
      * Sets the value of the "object as array" configuration settings using
      * the original configuration rules.
-     *
-     * Note that the {@see $config} property contains the **current** context
-     * configuration settings, which may differ from the original ones.
-     * Therefore, method {@see RuntimeContext::withObjectAsArray()} is not equivalent
-     * to calling {@see Configuration::withObjectAsArray()}.
      */
     public function withObjectAsArray(?bool $enabled): Configuration
     {
-        if ($enabled === null) {
-            return $this->original ?? $this->config;
-        }
-
-        return ($this->original ?? $this->config)
-            ->withObjectAsArray($enabled);
+        return $this->config->withObjectAsArray($enabled);
     }
 
     /**
      * Sets the value of the "strict types" configuration settings using
      * the original configuration rules.
-     *
-     * Note that the {@see $config} property contains the **current** context
-     * configuration settings, which may differ from the original ones.
-     * Therefore, method {@see RuntimeContext::withStrictTypes()} is not equivalent
-     * to calling {@see Configuration::withStrictTypes()}.
      */
     public function withStrictTypes(?bool $enabled): Configuration
     {
-        if ($enabled === null) {
-            return $this->original ?? $this->config;
-        }
-
-        return ($this->original ?? $this->config)
-            ->withStrictTypes($enabled);
+        return $this->config->withStrictTypes($enabled);
     }
 
     /**

@@ -9,7 +9,7 @@ use TypeLang\Mapper\Context\BootContext;
 use TypeLang\Mapper\Context\Direction;
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
-use TypeLang\Mapper\Context\RootRuntimeContext;
+use TypeLang\Mapper\Context\RootContext;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
@@ -85,7 +85,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createRuntimeContext(mixed $value, DirectionInterface $direction): RuntimeContext
     {
-        return RootRuntimeContext::createFromMapperContext(
+        return RootContext::createFromMapperContext(
             context: $this->context,
             value: $value,
             direction: $direction,
