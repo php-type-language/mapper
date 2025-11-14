@@ -32,11 +32,15 @@ final class JMSAttributesBench extends MapperBenchmark
 
     public function benchNormalization(): void
     {
-        $this->serializer->toArray($this->denormalized, type: ExampleRequestDTO::class);
+        $result = $this->serializer->toArray($this->denormalized, type: ExampleRequestDTO::class);
+
+        assert($this->isNormalized($result));
     }
 
     public function benchDenormalization(): void
     {
-        $this->serializer->fromArray(self::NORMALIZED, ExampleRequestDTO::class);
+        $result = $this->serializer->fromArray(self::NORMALIZED, ExampleRequestDTO::class);
+
+        assert($this->isDenormalized($result));
     }
 }

@@ -9,16 +9,13 @@ use PhpBench\Attributes\Iterations;
 use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
-use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 
 #[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
-final class SymfonyDocBlockWithSymfonyPsr6Bench extends MapperBenchmark
+final class SymfonyPhpDocExtractorBench extends MapperBenchmark
 {
     private readonly Serializer $serializer;
 
@@ -28,25 +25,21 @@ final class SymfonyDocBlockWithSymfonyPsr6Bench extends MapperBenchmark
 
         $this->serializer = (new Serializer([
             new ArrayDenormalizer(),
-            new ObjectNormalizer(
-                classMetadataFactory: new CacheClassMetadataFactory(
-                    decorated: new ClassMetadataFactory(
-                        loader: new AttributeLoader(),
-                    ),
-                    cacheItemPool: $this->createPsr6Cache('symfony'),
-                ),
-                propertyTypeExtractor: new PhpDocExtractor()
-            ),
+            new ObjectNormalizer(propertyTypeExtractor: new PhpDocExtractor()),
         ]));
     }
 
     public function benchNormalization(): void
     {
-        $this->serializer->normalize($this->denormalized);
+        $result = $this->serializer->normalize($this->denormalized);
+
+        assert($this->isNormalized($result));
     }
 
     public function benchDenormalization(): void
     {
-        $this->serializer->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+        $result = $this->serializer->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+
+        assert($this->isDenormalized($result));
     }
 }

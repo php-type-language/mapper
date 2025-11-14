@@ -33,11 +33,15 @@ final class ValinorBench extends MapperBenchmark
 
     public function benchNormalization(): void
     {
-        $this->normalizer->normalize($this->denormalized);
+        $result = $this->normalizer->normalize($this->denormalized);
+
+        assert($this->isNormalized($result));
     }
 
     public function benchDenormalization(): void
     {
-        $this->mapper->map(ExampleRequestDTO::class, Source::array(self::NORMALIZED));
+        $result = $this->mapper->map(ExampleRequestDTO::class, Source::array(self::NORMALIZED));
+
+        assert($this->isDenormalized($result));
     }
 }

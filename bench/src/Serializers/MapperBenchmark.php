@@ -19,17 +19,17 @@ abstract class MapperBenchmark
             [
                 'name' => 'Example2',
                 'items' => [
-                    ['name' => 'Example3'],
-                    ['name' => 'Example4'],
-                    ['name' => 'Example5'],
+                    ['name' => 'Example3', 'items' => []],
+                    ['name' => 'Example4', 'items' => []],
+                    ['name' => 'Example5', 'items' => []],
                 ],
             ],
             [
                 'name' => 'Example6',
                 'items' => [
-                    ['name' => 'Example7'],
-                    ['name' => 'Example8'],
-                    ['name' => 'Example9'],
+                    ['name' => 'Example7', 'items' => []],
+                    ['name' => 'Example8', 'items' => []],
+                    ['name' => 'Example9', 'items' => []],
                 ],
             ],
         ],
@@ -41,7 +41,7 @@ abstract class MapperBenchmark
 
     protected function prepare(): void
     {
-        $mapperFilename = new \ReflectionClass(Mapper::class)
+        $mapperFilename = (new \ReflectionClass(Mapper::class))
             ->getFileName();
         $mapperDirectory = \dirname($mapperFilename);
 
@@ -68,6 +68,30 @@ abstract class MapperBenchmark
                 ),
             ],
         );
+    }
+
+    protected function isNormalized(mixed $result): bool
+    {
+        if ($result === self::NORMALIZED) {
+            return true;
+        }
+
+        throw new \LogicException("Actual:\n"
+            . \var_export($result, true)
+            . "\nExpected:\n"
+            . \var_export(self::NORMALIZED, true));
+    }
+
+    protected function isDenormalized(mixed $result): bool
+    {
+        if ($result == $this->denormalized) {
+            return true;
+        }
+
+        throw new \LogicException("Actual:\n"
+            . \var_export($result, true)
+            . "\nExpected:\n"
+            . \var_export($this->denormalized, true));
     }
 
     protected function createPsr6Cache(string $namespace): CacheItemPoolInterface

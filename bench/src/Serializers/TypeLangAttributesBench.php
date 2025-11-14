@@ -10,7 +10,6 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Provider\Psr16CacheProvider;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
@@ -32,11 +31,15 @@ final class TypeLangAttributesBench extends MapperBenchmark
 
     public function benchNormalization(): void
     {
-        $this->mapper->normalize($this->denormalized, ExampleRequestDTO::class);
+        $result = $this->mapper->normalize($this->denormalized, ExampleRequestDTO::class);
+
+        assert($this->isNormalized($result));
     }
 
     public function benchDenormalization(): void
     {
-        $this->mapper->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+        $result = $this->mapper->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+
+        assert($this->isDenormalized($result));
     }
 }

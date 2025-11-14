@@ -10,12 +10,11 @@ use PhpBench\Attributes\Revs;
 use PhpBench\Attributes\Warmup;
 use TypeLang\Mapper\Bench\Stub\ExampleRequestDTO;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\Provider\Psr16CacheProvider;
 use TypeLang\Mapper\Mapping\Reader\PhpDocReader;
 use TypeLang\Mapper\Platform\StandardPlatform;
 
 #[Revs(100), Warmup(3), Iterations(5), BeforeMethods('prepare')]
-final class TypeLangDocBlockWithSymfonyPsr16Bench extends MapperBenchmark
+final class TypeLangPhpDocBench extends MapperBenchmark
 {
     private readonly Mapper $mapper;
 
@@ -25,21 +24,22 @@ final class TypeLangDocBlockWithSymfonyPsr16Bench extends MapperBenchmark
 
         $this->mapper = new Mapper(
             platform: new StandardPlatform(
-                meta: new Psr16CacheProvider(
-                    psr16: $this->createPsr16Cache('tl-doc-psr16'),
-                    delegate: new PhpDocReader(),
-                ),
+                meta: new PhpDocReader(),
             ),
         );
     }
 
     public function benchNormalization(): void
     {
-        $this->mapper->normalize($this->denormalized, ExampleRequestDTO::class);
+        $result = $this->mapper->normalize($this->denormalized, ExampleRequestDTO::class);
+
+        assert($this->isNormalized($result));
     }
 
     public function benchDenormalization(): void
     {
-        $this->mapper->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+        $result = $this->mapper->denormalize(self::NORMALIZED, ExampleRequestDTO::class);
+
+        assert($this->isDenormalized($result));
     }
 }
