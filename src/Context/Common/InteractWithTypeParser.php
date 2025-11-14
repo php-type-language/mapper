@@ -6,11 +6,10 @@ namespace TypeLang\Mapper\Context\Common;
 
 use JetBrains\PhpStorm\Language;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @phpstan-require-implements TypeRepositoryInterface
+ * @phpstan-require-implements TypeParserInterface
  */
 trait InteractWithTypeParser
 {

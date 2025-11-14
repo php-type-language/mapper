@@ -29,8 +29,8 @@ final class ChildRuntimeContext extends RuntimeContext
             value: $value,
             direction: $direction,
             types: $types,
-            extractor: $extractor,
             parser: $parser,
+            extractor: $extractor,
             config: $config,
             original: $original,
         );

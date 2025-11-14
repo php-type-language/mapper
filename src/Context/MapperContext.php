@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Context\Common\InteractWithTypeExtractor;
 use TypeLang\Mapper\Context\Common\InteractWithTypeParser;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
@@ -14,7 +13,6 @@ class MapperContext implements
     TypeExtractorInterface,
     TypeParserInterface
 {
-    use InteractWithTypeExtractor;
     use InteractWithTypeParser;
 
     protected function __construct(

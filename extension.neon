@@ -1,0 +1,7 @@
+rules:
+  # Checks parser calls for type's syntax errors in constant strings
+  - TypeLang\Mapper\Extension\PHPStan\ParserMethodCallSyntaxRule
+  # Checks mapper calls for type's syntax errors in constant strings
+  - TypeLang\Mapper\Extension\PHPStan\MapperMethodCallSyntaxRule
+  # Checks mapper attributes for type's syntax errors
+  - TypeLang\Mapper\Extension\PHPStan\MetadataAttributeSyntaxCheckRule

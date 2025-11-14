@@ -1,6 +1,7 @@
 includes:
   - phar://phpstan.phar/conf/bleedingEdge.neon
   - vendor/phpstan/phpstan-strict-rules/rules.neon
+  - extension.neon
 parameters:
   level: max
   strictRules:
@@ -14,3 +15,5 @@ parameters:
   ignoreErrors:
     # Symfony polyfill bug
     - '/^Access to property \$\w+ of internal class Symfony\\Polyfill\\Php80\\PhpToken from outside its root namespace Symfony/'
+    # PHPStan trait + class combination bug
+    - '/^Class TypeLang\\Mapper\\Context\\.+? has an uninitialized readonly property \$\w+\./'
