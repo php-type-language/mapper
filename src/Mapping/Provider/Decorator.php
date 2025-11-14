@@ -13,7 +13,7 @@ abstract class Decorator implements ProviderInterface
     private readonly ProviderInterface $delegate;
 
     public function __construct(
-        ProviderInterface|ReaderInterface $delegate = new NullProvider(),
+        ProviderInterface|ReaderInterface $delegate = new MetadataBuilder(),
     ) {
         $this->delegate = $this->createProvider($delegate);
     }

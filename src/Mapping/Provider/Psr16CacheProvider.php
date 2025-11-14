@@ -15,7 +15,7 @@ final class Psr16CacheProvider extends CacheProvider
         private readonly CacheInterface $psr16,
         string $prefix = self::DEFAULT_CACHE_PREFIX,
         \DateInterval|int|null $ttl = self::DEFAULT_CACHE_TTL,
-        ReaderInterface|ProviderInterface $delegate = new NullProvider(),
+        ReaderInterface|ProviderInterface $delegate = new MetadataBuilder(),
     ) {
         parent::__construct($prefix, $ttl, $delegate);
     }
