@@ -6,6 +6,12 @@ namespace TypeLang\Mapper;
 
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Tracing\TracerInterface;
+use TypeLang\Mapper\Type\Extractor\Factory\DefaultTypeExtractorFactory;
+use TypeLang\Mapper\Type\Extractor\Factory\TypeExtractorFactoryInterface;
+use TypeLang\Mapper\Type\Parser\Factory\DefaultTypeParserFactory;
+use TypeLang\Mapper\Type\Parser\Factory\TypeParserFactoryInterface;
+use TypeLang\Mapper\Type\Repository\Factory\DefaultTypeRepositoryFactory;
+use TypeLang\Mapper\Type\Repository\Factory\TypeRepositoryFactoryInterface;
 
 class Configuration
 {
@@ -24,13 +30,17 @@ class Configuration
          * If this option contains {@see true}, then objects are converted to
          * associative arrays, otherwise anonymous {@see object} will be
          * returned.
+         *
+         * @phpstan-readonly-allow-private-mutation
          */
-        private readonly ?bool $objectAsArray = null,
+        private ?bool $objectAsArray = null,
         /**
          * If this option contains {@see true}, then strict types will
          * be enabled.
+         *
+         * @phpstan-readonly-allow-private-mutation
          */
-        private readonly ?bool $strictTypes = null,
+        private ?bool $strictTypes = null,
         /**
          * Enable or disable type parsing logs
          */
@@ -78,6 +88,29 @@ class Configuration
          * contain {@see null}.
          */
         private readonly ?TracerInterface $tracer = null,
+        /**
+         * A type extractor is a class responsible for inferring
+         * a type from a value.
+         *
+         * Define this field explicitly to set a specific type extractor
+         *
+         * @link https://typelang.dev/type-extractors.html
+         */
+        private readonly TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
+        /**
+         * A type parser is a class responsible for parse type definitions
+         * to full-fledged AST nodes
+         *
+         * Define this field explicitly to set a specific type parser
+         */
+        private readonly TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
+        /**
+         * A type repository is a class responsible to return specific
+         * type instances
+         *
+         * Define this field explicitly to set a specific type repository
+         */
+        private readonly TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {}
 
     /**
@@ -89,20 +122,10 @@ class Configuration
      */
     public function withObjectAsArray(?bool $enabled = null): self
     {
-        return new self(
-            objectAsArray: $enabled,
-            strictTypes: $this->strictTypes,
-            logTypeParse: $this->logTypeParse,
-            logTypeFind: $this->logTypeFind,
-            logTypeMatch: $this->logTypeMatch,
-            logTypeCast: $this->logTypeCast,
-            logger: $this->logger,
-            traceTypeParse: $this->traceTypeParse,
-            traceTypeFind: $this->traceTypeFind,
-            traceTypeMatch: $this->traceTypeMatch,
-            traceTypeCast: $this->traceTypeCast,
-            tracer: $this->tracer,
-        );
+        $self = clone $this;
+        $self->objectAsArray = $enabled;
+
+        return $self;
     }
 
     /**
@@ -136,20 +159,10 @@ class Configuration
      */
     public function withStrictTypes(?bool $enabled = null): self
     {
-        return new self(
-            objectAsArray: $this->objectAsArray,
-            strictTypes: $enabled,
-            logTypeParse: $this->logTypeParse,
-            logTypeFind: $this->logTypeFind,
-            logTypeMatch: $this->logTypeMatch,
-            logTypeCast: $this->logTypeCast,
-            logger: $this->logger,
-            traceTypeParse: $this->traceTypeParse,
-            traceTypeFind: $this->traceTypeFind,
-            traceTypeMatch: $this->traceTypeMatch,
-            traceTypeCast: $this->traceTypeCast,
-            tracer: $this->tracer,
-        );
+        $self = clone $this;
+        $self->strictTypes = $enabled;
+
+        return $self;
     }
 
     /**
@@ -255,5 +268,29 @@ class Configuration
     public function shouldTraceTypeCast(): bool
     {
         return $this->traceTypeCast;
+    }
+
+    /**
+     * Gets mapper type repository factory
+     */
+    public function getTypeRepositoryFactory(): TypeRepositoryFactoryInterface
+    {
+        return $this->typeRepositoryFactory;
+    }
+
+    /**
+     * Gets mapper type parser factory
+     */
+    public function getTypeParserFactory(): TypeParserFactoryInterface
+    {
+        return $this->typeParserFactory;
+    }
+
+    /**
+     * Gets mapper type extractor factory
+     */
+    public function getTypeExtractorFactory(): TypeExtractorFactoryInterface
+    {
+        return $this->typeExtractorFactory;
     }
 }

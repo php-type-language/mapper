@@ -15,20 +15,14 @@ use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Extractor\Factory\DefaultTypeExtractorFactory;
 use TypeLang\Mapper\Type\Extractor\Factory\TypeExtractorFactoryInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\Factory\DefaultTypeParserFactory;
 use TypeLang\Mapper\Type\Parser\Factory\TypeParserFactoryInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\Factory\DefaultTypeRepositoryFactory;
-use TypeLang\Mapper\Type\Repository\Factory\TypeRepositoryFactoryInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
-final class Mapper implements
-    NormalizerInterface,
-    DenormalizerInterface
+final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
     /**
      * @var \WeakMap<DirectionInterface, TypeRepositoryInterface>
@@ -40,16 +34,13 @@ final class Mapper implements
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
-        TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
-        TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
-        private readonly TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
         $this->repository = new \WeakMap();
 
         $this->context = MapperContext::create(
             config: $this->config,
-            extractor: $this->createTypeExtractor($typeExtractorFactory),
-            parser: $this->createTypeParser($typeParserFactory),
+            extractor: $this->createTypeExtractor($this->config->getTypeExtractorFactory()),
+            parser: $this->createTypeParser($this->config->getTypeParserFactory()),
         );
     }
 
@@ -71,8 +62,10 @@ final class Mapper implements
 
     private function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
     {
+        $factory = $this->config->getTypeRepositoryFactory();
+
         return $this->repository[$direction]
-            ??= $this->typeRepositoryFactory->createTypeRepository(
+            ??= $factory->createTypeRepository(
                 context: $this->context,
                 platform: $this->platform,
                 direction: $direction,
