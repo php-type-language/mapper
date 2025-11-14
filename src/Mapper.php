@@ -35,35 +35,35 @@ final class Mapper implements
      */
     private readonly \WeakMap $repository;
 
-    private readonly MapperContext $context;
+    public readonly MapperContext $context;
 
     public function __construct(
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
-        private readonly TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
-        private readonly TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
+        TypeExtractorFactoryInterface $typeExtractorFactory = new DefaultTypeExtractorFactory(),
+        TypeParserFactoryInterface $typeParserFactory = new DefaultTypeParserFactory(),
         private readonly TypeRepositoryFactoryInterface $typeRepositoryFactory = new DefaultTypeRepositoryFactory(),
     ) {
         $this->repository = new \WeakMap();
 
         $this->context = MapperContext::create(
             config: $this->config,
-            extractor: $this->createTypeExtractor(),
-            parser: $this->createTypeParser(),
+            extractor: $this->createTypeExtractor($typeExtractorFactory),
+            parser: $this->createTypeParser($typeParserFactory),
         );
     }
 
-    private function createTypeExtractor(): TypeExtractorInterface
+    private function createTypeExtractor(TypeExtractorFactoryInterface $typeExtractorFactory): TypeExtractorInterface
     {
-        return $this->typeExtractorFactory->createTypeExtractor(
+        return $typeExtractorFactory->createTypeExtractor(
             config: $this->config,
             platform: $this->platform,
         );
     }
 
-    private function createTypeParser(): TypeParserInterface
+    private function createTypeParser(TypeParserFactoryInterface $typeParserFactory): TypeParserInterface
     {
-        return $this->typeParserFactory->createTypeParser(
+        return $typeParserFactory->createTypeParser(
             config: $this->config,
             platform: $this->platform,
         );
