@@ -14,13 +14,13 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class FloatLiteralTypeBuilder implements TypeBuilderInterface
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        return $statement instanceof FloatLiteralNode;
+        return $stmt instanceof FloatLiteralNode;
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): FloatLiteralType
+    public function build(TypeStatement $stmt, BuildingContext $context): FloatLiteralType
     {
-        return new FloatLiteralType($statement->value);
+        return new FloatLiteralType($stmt->value);
     }
 }

@@ -17,21 +17,21 @@ require __DIR__ . '/../../vendor/autoload.php';
 // Create custom type builder
 class MyNonEmptyTypeBuilder extends Builder
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
         // Expects type with name "non-empty"
-        return $statement instanceof NamedTypeNode
-            && $statement->name->toLowerString() === 'non-empty';
+        return $stmt instanceof NamedTypeNode
+            && $stmt->name->toLowerString() === 'non-empty';
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         // Shape fields not allowed (like: "non-empty{...}")
-        $this->expectNoShapeFields($statement);
+        $this->expectNoShapeFields($stmt);
         // Expects only template argument (like: "non-empty<T>", but NOT "non-empty<T, U>")
-        $this->expectTemplateArgumentsCount($statement, 1);
+        $this->expectTemplateArgumentsCount($stmt, 1);
 
-        $innerArgument = $statement->arguments->first();
+        $innerArgument = $stmt->arguments->first();
 
         // inner type of TypeInterface
         $type = $context->types->getTypeByStatement($innerArgument->value);

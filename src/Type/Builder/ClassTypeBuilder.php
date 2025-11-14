@@ -52,14 +52,14 @@ abstract class ClassTypeBuilder extends Builder
     /**
      * Returns {@see true} if the type contains a reference to an existing class.
      */
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        if (!$statement instanceof NamedTypeNode) {
+        if (!$stmt instanceof NamedTypeNode) {
             return false;
         }
 
         /** @var non-empty-string $name */
-        $name = $statement->name->toString();
+        $name = $stmt->name->toString();
 
         if (!\class_exists($name)) {
             return false;
@@ -74,13 +74,13 @@ abstract class ClassTypeBuilder extends Builder
             || $reflection->isInterface();
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
         /** @var class-string<TObject> $class */
-        $class = $statement->name->toString();
+        $class = $stmt->name->toString();
 
         return $this->create(
             metadata: $this->driver->getClassMetadata(

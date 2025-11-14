@@ -37,19 +37,19 @@ class CallableTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
         try {
             return ($this->factory)();
         } catch (\Throwable $e) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: 'An error occurred while trying to fetch {{type}} type from callback',
                 previous: $e,
             );

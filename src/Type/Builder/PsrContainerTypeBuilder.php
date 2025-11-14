@@ -41,19 +41,19 @@ class PsrContainerTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
         try {
             $service = $this->container->get($this->serviceId);
         } catch (\Throwable $e) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: 'An error occurred while trying to fetch {{type}} type from service container',
                 previous: $e,
             );
@@ -61,7 +61,7 @@ class PsrContainerTypeBuilder extends NamedTypeBuilder
 
         if (!$service instanceof TypeInterface) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: \sprintf(
                     'Received service from service container defined as {{type}} must be instanceof %s, but %s given',
                     TypeInterface::class,

@@ -43,24 +43,24 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
         parent::__construct($names);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
+        $this->expectNoShapeFields($stmt);
 
-        $arguments = $statement->arguments->items ?? [];
+        $arguments = $stmt->arguments->items ?? [];
 
         /** @phpstan-ignore-next-line : It's too difficult for PHPStan to calculate the specified type */
         return match (\count($arguments)) {
             0 => $this->buildWithNoKeyValue($context),
-            1 => $this->buildWithValue($statement, $context),
-            2 => $this->buildWithKeyValue($statement, $context),
+            1 => $this->buildWithValue($stmt, $context),
+            2 => $this->buildWithKeyValue($stmt, $context),
             default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
                 minArgumentsCount: 0,
                 maxArgumentsCount: 2,
-                type: $statement,
+                type: $stmt,
             ),
         };
     }

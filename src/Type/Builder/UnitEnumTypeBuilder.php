@@ -29,36 +29,36 @@ abstract class UnitEnumTypeBuilder extends Builder
         protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
     ) {}
 
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        if (!$statement instanceof NamedTypeNode) {
+        if (!$stmt instanceof NamedTypeNode) {
             return false;
         }
 
         /** @var non-empty-string $enum */
-        $enum = $statement->name->toString();
+        $enum = $stmt->name->toString();
 
-        return \enum_exists($statement->name->toString())
+        return \enum_exists($stmt->name->toString())
             && !\is_subclass_of($enum, \BackedEnum::class);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
-        $names = \iterator_to_array($this->getEnumCaseNames($statement), false);
+        $names = \iterator_to_array($this->getEnumCaseNames($stmt), false);
 
         if ($names === []) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: 'The "{{type}}" enum requires at least one case',
             );
         }
 
         return $this->create(
             // @phpstan-ignore-next-line
-            class: $statement->name->toString(),
+            class: $stmt->name->toString(),
             cases: $names,
             type: $context->getTypeByDefinition(
                 definition: $this->type,

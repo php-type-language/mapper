@@ -17,16 +17,16 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class BackedEnumTypeBuilder extends Builder
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        if (!$statement instanceof NamedTypeNode) {
+        if (!$stmt instanceof NamedTypeNode) {
             return false;
         }
 
         /** @var non-empty-string $enum */
-        $enum = $statement->name->toString();
+        $enum = $stmt->name->toString();
 
-        return \enum_exists($statement->name->toString())
+        return \enum_exists($stmt->name->toString())
             && \is_subclass_of($enum, \BackedEnum::class);
     }
 
@@ -51,18 +51,18 @@ abstract class BackedEnumTypeBuilder extends Builder
         return $type->getName();
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
-        $reflection = $this->createReflectionEnum($statement);
+        $reflection = $this->createReflectionEnum($stmt);
 
-        $definition = $this->getBackedEnumType($reflection, $statement);
+        $definition = $this->getBackedEnumType($reflection, $stmt);
 
         return $this->create(
             /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
-            class: $statement->name->toString(),
+            class: $stmt->name->toString(),
             definition: $definition,
             /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
             type: $context->getTypeByDefinition($definition),

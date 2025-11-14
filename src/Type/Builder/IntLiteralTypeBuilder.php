@@ -14,13 +14,13 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class IntLiteralTypeBuilder implements TypeBuilderInterface
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        return $statement instanceof IntLiteralNode;
+        return $stmt instanceof IntLiteralNode;
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): IntLiteralType
+    public function build(TypeStatement $stmt, BuildingContext $context): IntLiteralType
     {
-        return new IntLiteralType($statement->value);
+        return new IntLiteralType($stmt->value);
     }
 }

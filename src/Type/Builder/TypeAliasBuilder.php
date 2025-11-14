@@ -33,8 +33,8 @@ class TypeAliasBuilder extends NamedTypeBuilder
         parent::__construct($aliases);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
-        return $this->delegate->build($statement, $context);
+        return $this->delegate->build($stmt, $context);
     }
 }

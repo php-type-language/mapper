@@ -16,14 +16,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class NullableTypeBuilder implements TypeBuilderInterface
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        return $statement instanceof NullableTypeNode;
+        return $stmt instanceof NullableTypeNode;
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): NullableType
+    public function build(TypeStatement $stmt, BuildingContext $context): NullableType
     {
-        $type = $context->getTypeByStatement($statement->type);
+        $type = $context->getTypeByStatement($stmt->type);
 
         return new NullableType($type);
     }

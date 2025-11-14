@@ -17,17 +17,17 @@ use TypeLang\Parser\Node\Stmt\UnionTypeNode;
  */
 class UnionTypeBuilder implements TypeBuilderInterface
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        return $statement instanceof UnionTypeNode;
+        return $stmt instanceof UnionTypeNode;
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         $result = [];
         $nullable = false;
 
-        foreach ($statement->statements as $leaf) {
+        foreach ($stmt->statements as $leaf) {
             if ($leaf instanceof NullLiteralNode) {
                 $nullable = true;
             } else {

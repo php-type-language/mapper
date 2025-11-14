@@ -18,39 +18,39 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class DateTimeTypeBuilder extends Builder
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        return $statement instanceof NamedTypeNode
-            && \is_a($statement->name->toLowerString(), \DateTimeInterface::class, true);
+        return $stmt instanceof NamedTypeNode
+            && \is_a($stmt->name->toLowerString(), \DateTimeInterface::class, true);
     }
 
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
-        $this->expectNoShapeFields($statement);
-        $this->expectTemplateArgumentsLessOrEqualThan($statement, 1);
+        $this->expectNoShapeFields($stmt);
+        $this->expectTemplateArgumentsLessOrEqualThan($stmt, 1);
 
         /** @var class-string<\DateTimeInterface> $class */
-        $class = $statement->name->toString();
+        $class = $stmt->name->toString();
 
-        if ($statement->arguments === null) {
-            return $this->create($statement, $class);
+        if ($stmt->arguments === null) {
+            return $this->create($stmt, $class);
         }
 
         /** @var TemplateArgumentNode $formatArgument */
-        $formatArgument = $statement->arguments->first();
+        $formatArgument = $stmt->arguments->first();
 
-        $this->expectNoTemplateArgumentHint($statement, $formatArgument);
+        $this->expectNoTemplateArgumentHint($stmt, $formatArgument);
 
         if (!$formatArgument->value instanceof StringLiteralNode) {
             throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
                 argument: $formatArgument,
                 expected: new NamedTypeNode('string'),
-                type: $statement,
+                type: $stmt,
             );
         }
 
         return $this->create(
-            stmt: $statement,
+            stmt: $stmt,
             class: $class,
             format: $formatArgument->value->value,
         );

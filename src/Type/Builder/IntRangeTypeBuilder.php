@@ -31,24 +31,24 @@ class IntRangeTypeBuilder extends NamedTypeBuilder
      * @throws TooManyTemplateArgumentsInRangeException
      * @throws ShapeFieldsNotSupportedException
      */
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
+        $this->expectNoShapeFields($stmt);
 
-        $arguments = $statement->arguments->items ?? [];
+        $arguments = $stmt->arguments->items ?? [];
 
         return match (\count($arguments)) {
             0 => $this->createIntType(),
             2 => $this->createIntRangeType(
-                min: $this->fetchTemplateArgumentValue($statement, $arguments[0]),
-                max: $this->fetchTemplateArgumentValue($statement, $arguments[1]),
+                min: $this->fetchTemplateArgumentValue($stmt, $arguments[0]),
+                max: $this->fetchTemplateArgumentValue($stmt, $arguments[1]),
             ),
             default => throw OneOfTemplateArgumentsCountException::becauseArgumentsCountDoesNotMatch(
                 variants: [0, 2],
-                type: $statement,
+                type: $stmt,
             ),
         };
     }

@@ -32,13 +32,13 @@ class SimpleTypeBuilder extends NamedTypeBuilder
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentsNotSupportedException
      */
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
         return new ($this->type)();
     }

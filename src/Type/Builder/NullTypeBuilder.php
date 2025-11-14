@@ -17,31 +17,31 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class NullTypeBuilder extends Builder
 {
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        if ($statement instanceof NullLiteralNode) {
+        if ($stmt instanceof NullLiteralNode) {
             return true;
         }
 
-        return $statement instanceof NamedTypeNode
-            && $statement->name->toLowerString() === 'null';
+        return $stmt instanceof NamedTypeNode
+            && $stmt->name->toLowerString() === 'null';
     }
 
     /**
      * @throws ShapeFieldsNotSupportedException
      * @throws TemplateArgumentsNotSupportedException
      */
-    public function build(TypeStatement $statement, BuildingContext $context): NullType
+    public function build(TypeStatement $stmt, BuildingContext $context): NullType
     {
-        if ($statement instanceof NullLiteralNode) {
+        if ($stmt instanceof NullLiteralNode) {
             return new NullType();
         }
 
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
-        $this->expectNoTemplateArguments($statement);
+        $this->expectNoShapeFields($stmt);
+        $this->expectNoTemplateArguments($stmt);
 
         return new NullType();
     }

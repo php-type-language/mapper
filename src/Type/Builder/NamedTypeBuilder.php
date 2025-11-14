@@ -44,15 +44,15 @@ abstract class NamedTypeBuilder extends Builder
         return $result;
     }
 
-    public function isSupported(TypeStatement $statement): bool
+    public function isSupported(TypeStatement $stmt): bool
     {
-        if (!$statement instanceof NamedTypeNode) {
+        if (!$stmt instanceof NamedTypeNode) {
             return false;
         }
 
-        $lower = $statement->name->toLowerString();
+        $lower = $stmt->name->toLowerString();
 
-        if ($statement->name instanceof FullQualifiedName && $statement->name->isPrefixedByLeadingBackslash()) {
+        if ($stmt->name instanceof FullQualifiedName && $stmt->name->isPrefixedByLeadingBackslash()) {
             $lower = \ltrim($lower, '\\');
         }
 

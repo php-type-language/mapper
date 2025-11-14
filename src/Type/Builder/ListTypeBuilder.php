@@ -43,22 +43,22 @@ class ListTypeBuilder extends NamedTypeBuilder
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function build(TypeStatement $statement, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($statement instanceof NamedTypeNode);
+        assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($statement);
+        $this->expectNoShapeFields($stmt);
 
-        $arguments = $statement->arguments->items ?? [];
+        $arguments = $stmt->arguments->items ?? [];
 
         return match (\count($arguments)) {
             0 => $this->buildWithNoValue($context),
-            1 => $this->buildWithValue($statement, $context),
+            1 => $this->buildWithValue($stmt, $context),
             default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
                 minArgumentsCount: 0,
                 maxArgumentsCount: 1,
-                type: $statement,
+                type: $stmt,
             ),
         };
     }
