@@ -51,8 +51,8 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
 
     private function createMapperContext(BootContext $context): MapperContext
     {
-        return MapperContext::create(
-            config: $this->config,
+        return MapperContext::createFromBootContext(
+            context: $context,
             extractor: $this->createTypeExtractor($context),
             parser: $this->createTypeParser($context),
         );
@@ -79,7 +79,6 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $this->repository[$direction]
             ??= $factory->createTypeRepository(
                 context: $this->context,
-                platform: $this->platform,
                 direction: $direction,
             );
     }

@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Common\InteractWithTypeRepository;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
@@ -23,9 +24,15 @@ class BuildingContext extends MapperContext implements
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
         TypeExtractorInterface $extractor,
+        PlatformInterface $platform,
         Configuration $config,
     ) {
-        parent::__construct($parser, $extractor, $config);
+        parent::__construct(
+            parser: $parser,
+            extractor: $extractor,
+            platform: $platform,
+            config: $config,
+        );
 
         $this->types = $types;
     }
@@ -40,6 +47,7 @@ class BuildingContext extends MapperContext implements
             types: $types,
             parser: $context->parser,
             extractor: $context->extractor,
+            platform: $context->platform,
             config: $context->config,
         );
     }

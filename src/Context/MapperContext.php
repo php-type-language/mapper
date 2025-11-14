@@ -6,10 +6,14 @@ namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Common\InteractWithTypeParser;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 
-class MapperContext implements
+/**
+ * Contains information about a ready-to-use (initialized) mapper
+ */
+class MapperContext extends Context implements
     TypeExtractorInterface,
     TypeParserInterface
 {
@@ -18,30 +22,28 @@ class MapperContext implements
     protected function __construct(
         TypeParserInterface $parser,
         TypeExtractorInterface $extractor,
-        /**
-         * Gets current configuration.
-         *
-         * If you need to retrieve configuration's settings, it is recommended
-         * to use the following methods:
-         *
-         * - {@see RuntimeContext::isObjectAsArray()}
-         * - {@see RuntimeContext::isStrictTypesEnabled()}
-         */
-        public readonly Configuration $config,
+        PlatformInterface $platform,
+        Configuration $config,
     ) {
+        parent::__construct(
+            platform: $platform,
+            config: $config,
+        );
+
         $this->extractor = $extractor;
         $this->parser = $parser;
     }
 
-    public static function create(
-        Configuration $config,
+    public static function createFromBootContext(
+        BootContext $context,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
     ): self {
         return new self(
             parser: $parser,
             extractor: $extractor,
-            config: $config,
+            platform: $context->platform,
+            config: $context->config,
         );
     }
 

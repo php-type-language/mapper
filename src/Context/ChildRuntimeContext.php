@@ -8,6 +8,7 @@ use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Context\Path\Path;
 use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
@@ -22,6 +23,7 @@ final class ChildRuntimeContext extends RuntimeContext
         TypeRepositoryInterface $types,
         TypeExtractorInterface $extractor,
         TypeParserInterface $parser,
+        PlatformInterface $platform,
         Configuration $config,
         ?Configuration $original = null,
     ) {
@@ -31,6 +33,7 @@ final class ChildRuntimeContext extends RuntimeContext
             types: $types,
             parser: $parser,
             extractor: $extractor,
+            platform: $platform,
             config: $config,
             original: $original,
         );

@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Type\Repository\Factory;
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
-use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Repository\DecorateByCoercibleTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByLoggableTypeRepository;
 use TypeLang\Mapper\Type\Repository\DecorateByTraceableTypeRepository;
@@ -37,12 +36,13 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         private readonly bool $enableMemoization = self::DEFAULT_MEMOIZATION_OPTION,
     ) {}
 
-    public function createTypeRepository(
-        MapperContext $context,
-        PlatformInterface $platform,
-        DirectionInterface $direction,
-    ): TypeRepositoryInterface {
-        $types = $this->createDefaultRepository($context, $direction, $platform);
+    public function createTypeRepository(MapperContext $context, DirectionInterface $direction): TypeRepositoryInterface
+    {
+        $types = new TypeRepository(
+            context: $context,
+            direction: $direction,
+            builders: $context->platform->getTypes($direction),
+        );
 
         if ($this->enableTypeTracing) {
             $types = $this->withTypeTracing($types, $context->config);
@@ -60,36 +60,16 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             $types = $this->withLogging($types, $context->config);
         }
 
-        $types = $this->withCoercers($types, $platform, $direction);
+        $types = new DecorateByCoercibleTypeRepository(
+            delegate: $types,
+            coercers: $context->platform->getTypeCoercers($direction),
+        );
 
         if ($this->enableMemoization) {
             $types = $this->withMemoization($types);
         }
 
         return $types;
-    }
-
-    private function createDefaultRepository(
-        MapperContext $context,
-        DirectionInterface $direction,
-        PlatformInterface $platform,
-    ): TypeRepository {
-        return new TypeRepository(
-            context: $context,
-            direction: $direction,
-            builders: $platform->getTypes($direction),
-        );
-    }
-
-    private function withCoercers(
-        TypeRepositoryInterface $types,
-        PlatformInterface $platform,
-        DirectionInterface $direction,
-    ): TypeRepositoryInterface {
-        return new DecorateByCoercibleTypeRepository(
-            delegate: $types,
-            coercers: $platform->getTypeCoercers($direction),
-        );
     }
 
     private function withTypeTracing(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface

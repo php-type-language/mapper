@@ -12,6 +12,7 @@ use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
 use TypeLang\Mapper\Type\Parser\TypeParserInterface;
@@ -45,6 +46,7 @@ abstract class RuntimeContext extends MapperContext implements
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
         TypeExtractorInterface $extractor,
+        PlatformInterface $platform,
         Configuration $config,
         /**
          * Contains a reference to the original config created during this
@@ -55,7 +57,12 @@ abstract class RuntimeContext extends MapperContext implements
          */
         public readonly ?Configuration $original = null,
     ) {
-        parent::__construct($parser, $extractor, $config);
+        parent::__construct(
+            parser: $parser,
+            extractor: $extractor,
+            platform: $platform,
+            config: $config,
+        );
 
         $this->types = $types;
     }
@@ -85,6 +92,7 @@ abstract class RuntimeContext extends MapperContext implements
             types: $this->types,
             extractor: $this->extractor,
             parser: $this->parser,
+            platform: $this->platform,
             config: $current,
             original: $current === $original ? null : $original,
         );

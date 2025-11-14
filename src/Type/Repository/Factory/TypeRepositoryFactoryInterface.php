@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type\Repository\Factory;
 
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
-use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 /**
@@ -21,7 +20,6 @@ interface TypeRepositoryFactoryInterface
 {
     public function createTypeRepository(
         MapperContext $context,
-        PlatformInterface $platform,
         DirectionInterface $direction,
     ): TypeRepositoryInterface;
 }

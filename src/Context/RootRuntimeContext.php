@@ -32,6 +32,7 @@ final class RootRuntimeContext extends RuntimeContext
             types: $types,
             parser: $context->parser,
             extractor: $context->extractor,
+            platform: $context->platform,
             config: $config,
         );
     }

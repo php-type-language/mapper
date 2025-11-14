@@ -9,14 +9,16 @@ use TypeLang\Mapper\Context\MapperContext;
 
 trait InteractWithMapperContext
 {
+    use InteractWithBootContext;
     use InteractWithTypeParser;
     use InteractWithTypeExtractor;
-    use InteractWithConfiguration;
 
     protected static function createMapperContext(?Configuration $config = null): MapperContext
     {
-        return MapperContext::create(
-            config: $config ?? self::getConfiguration(),
+        $context = self::createBootContext($config);
+
+        return MapperContext::createFromBootContext(
+            context: $context,
             extractor: self::getTypeExtractor(),
             parser: self::getTypeParser(),
         );
