@@ -29,6 +29,7 @@
         "bench:extract": "@bench --filter=benchExtract",
         "bench:normalize": "@bench --filter=benchNormalization",
         "bench:denormalize": "@bench --filter=benchDenormalization",
+        "bench:map": ["@bench:denormalize", "@bench:normalize"],
         "bench": "phpbench run --report=default --tag=current"
     },
     "minimum-stability": "dev",
