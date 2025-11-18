@@ -130,7 +130,11 @@ class StandardPlatform extends Platform
             // Adds support for the "DateTimeInterface -> string" type
             yield new Builder\DateTimeToStringTypeBuilder();
             // Adds support for the "object(ClassName) -> array{ ... }" type
-            yield new Builder\ClassToArrayTypeBuilder($this->meta);
+            yield new Builder\ClassToArrayTypeBuilder(
+                driver: $this->getMetadataProvider(),
+                accessor: $this->getPropertyAccessor(),
+                instantiator: $this->getClassInstantiator(),
+            );
         } else {
             // Adds support for the "array{ ... } -> object" type
             yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
@@ -142,7 +146,11 @@ class StandardPlatform extends Platform
             // Adds support for the "string -> DateTime|DateTimeImmutable" type
             yield new Builder\DateTimeFromStringTypeBuilder();
             // Adds support for the "array{ ... } -> object(ClassName)" type
-            yield new Builder\ClassFromArrayTypeBuilder($this->meta);
+            yield new Builder\ClassFromArrayTypeBuilder(
+                driver: $this->getMetadataProvider(),
+                accessor: $this->getPropertyAccessor(),
+                instantiator: $this->getClassInstantiator(),
+            );
         }
     }
 

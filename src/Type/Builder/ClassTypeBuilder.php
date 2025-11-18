@@ -23,31 +23,11 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 abstract class ClassTypeBuilder extends Builder
 {
-    protected readonly ClassInstantiatorInterface $instantiator;
-    protected readonly PropertyAccessorInterface $accessor;
-
     public function __construct(
         protected readonly ProviderInterface $driver,
-        ?PropertyAccessorInterface $accessor = null,
-        ?ClassInstantiatorInterface $instantiator = null,
-    ) {
-        $this->instantiator = $instantiator ?? $this->createDefaultClassInstantiator();
-        $this->accessor = $accessor ?? $this->createDefaultPropertyAccessor();
-    }
-
-    private function createDefaultPropertyAccessor(): PropertyAccessorInterface
-    {
-        return new ReflectionPropertyAccessor();
-    }
-
-    private function createDefaultClassInstantiator(): ClassInstantiatorInterface
-    {
-        if (DoctrineClassInstantiator::isSupported()) {
-            return new DoctrineClassInstantiator();
-        }
-
-        return new ReflectionClassInstantiator();
-    }
+        protected readonly PropertyAccessorInterface $accessor,
+        protected readonly ClassInstantiatorInterface $instantiator,
+    ) {}
 
     /**
      * Returns {@see true} if the type contains a reference to an existing class.

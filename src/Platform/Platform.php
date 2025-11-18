@@ -6,12 +6,13 @@ namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Context\DirectionInterface;
-use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
-use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
+use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
-use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
-use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
+use TypeLang\Mapper\Platform\Common\SupportsClassInstantiator;
+use TypeLang\Mapper\Platform\Common\SupportsMetadata;
+use TypeLang\Mapper\Platform\Common\SupportsPropertyAccessor;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -19,7 +20,9 @@ use function TypeLang\Mapper\iterable_to_array;
 
 abstract class Platform implements PlatformInterface
 {
-    protected readonly ProviderInterface $meta;
+    use SupportsMetadata;
+    use SupportsClassInstantiator;
+    use SupportsPropertyAccessor;
 
     /**
      * @var list<TypeBuilderInterface>
@@ -39,35 +42,15 @@ abstract class Platform implements PlatformInterface
         ProviderInterface|ReaderInterface|null $meta = null,
         iterable $types = [],
         iterable $coercers = [],
+        ?ClassInstantiatorInterface $classInstantiator = null,
+        ?PropertyAccessorInterface $propertyAccessor = null,
     ) {
-        $this->meta = $this->formatMetadataProvider($meta);
+        $this->bootMetadataProviderIfNotBooted($meta);
+        $this->bootClassInstantiatorIfNotBooted($classInstantiator);
+        $this->bootPropertyAccessorIfNotBooted($propertyAccessor);
+
         $this->types = $this->formatTypes($types);
         $this->coercers = $this->formatCoercers($coercers);
-    }
-
-    protected function formatMetadataProvider(ProviderInterface|ReaderInterface|null $meta): ProviderInterface
-    {
-        return match (true) {
-            $meta instanceof ProviderInterface => $meta,
-            $meta instanceof ReaderInterface => $this->createDefaultMetadataProvider($meta),
-            default => $this->createDefaultMetadataProvider(),
-        };
-    }
-
-    protected function createDefaultMetadataProvider(?ReaderInterface $reader = null): ProviderInterface
-    {
-        return new InMemoryProvider(
-            delegate: new MetadataBuilder(
-                reader: $reader ?? $this->createDefaultMetadataReader(),
-            ),
-        );
-    }
-
-    protected function createDefaultMetadataReader(): ReaderInterface
-    {
-        return new AttributeReader(
-            delegate: new ReflectionReader(),
-        );
     }
 
     /**
