@@ -23,7 +23,7 @@ final class RootContext extends RuntimeContext
         $config = $context->config;
 
         if (!$config->isStrictTypesOptionDefined()) {
-            $config = $config->withStrictTypes($direction->isSafeTypes());
+            $config = $config->withStrictTypes($direction->isOutput());
         }
 
         return new self(

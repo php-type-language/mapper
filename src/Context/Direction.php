@@ -14,16 +14,6 @@ enum Direction: string implements DirectionInterface
         return $this->value;
     }
 
-    public function isSafeTypes(): bool
-    {
-        return $this === self::Normalize;
-    }
-
-    public function isPublicTypes(): bool
-    {
-        return $this === self::Normalize;
-    }
-
     public function isOutput(): bool
     {
         return $this === self::Normalize;
