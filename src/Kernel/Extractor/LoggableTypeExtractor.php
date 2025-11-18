@@ -8,32 +8,21 @@ use Psr\Log\LoggerInterface;
 
 final class LoggableTypeExtractor implements TypeExtractorInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_EXTRACTOR_GROUP_NAME = 'EXTRACT';
-
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly TypeExtractorInterface $delegate,
-        /**
-         * @var non-empty-string
-         */
-        private readonly string $group = self::DEFAULT_EXTRACTOR_GROUP_NAME,
     ) {}
 
     private function logBefore(mixed $value): void
     {
-        $this->logger->debug('[{group}] Type inference for "{{value}}" value', [
-            'group' => $this->group,
+        $this->logger->debug('[EXTRACT] Type inference for "{{value}}" value', [
             'value' => $value,
         ]);
     }
 
     private function logAfter(mixed $value, string $definition): void
     {
-        $this->logger->info('[{group}] Type inferred as "{{definition}}" for "{{value}}" value', [
-            'group' => $this->group,
+        $this->logger->info('[EXTRACT] Type inferred as "{{definition}}" for "{{value}}" value', [
             'definition' => $definition,
             'value' => $value,
         ]);
@@ -41,8 +30,7 @@ final class LoggableTypeExtractor implements TypeExtractorInterface
 
     private function logError(mixed $value, \Throwable $e): void
     {
-        $this->logger->error('[{group}] Type inferring error: {error}', [
-            'group' => $this->group,
+        $this->logger->error('[EXTRACT] Type inferring error: {error}', [
             'value' => $value,
             'error' => $e->getMessage(),
         ]);

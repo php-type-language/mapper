@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\UnitEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum

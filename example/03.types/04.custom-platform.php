@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Reader\AttributeReader;
+use TypeLang\Mapper\Platform\Common\SupportsClassInstantiator;
+use TypeLang\Mapper\Platform\Common\SupportsMetadata;
+use TypeLang\Mapper\Platform\Common\SupportsPropertyAccessor;
 use TypeLang\Mapper\Platform\GrammarFeature;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Builder\ClassFromArrayTypeBuilder;
-use TypeLang\Mapper\Type\Builder\ClassToArrayTypeBuilder;
+use TypeLang\Mapper\Type\Builder\ClassTypeBuilder;
 
 require __DIR__ . '/../../vendor/autoload.php';
 
@@ -21,22 +22,31 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 class SimplePlatform implements PlatformInterface
 {
+    use SupportsMetadata;
+    use SupportsPropertyAccessor;
+    use SupportsClassInstantiator;
+
     public function getName(): string
     {
         return 'simple';
     }
 
-    public function getTypes(DirectionInterface $direction): iterable
+    public function getTypes(): iterable
     {
         $driver = new MetadataBuilder(new AttributeReader());
 
         // The platform will only support objects, that is,
         // references to existing classes.
-        if ($direction->isOutput()) {
-            yield new ClassToArrayTypeBuilder($driver);
-        } else {
-            yield new ClassFromArrayTypeBuilder($driver);
-        }
+        yield new ClassTypeBuilder(
+            meta: $this->getMetadataProvider(),
+            accessor: $this->getPropertyAccessor(),
+            instantiator: $this->getClassInstantiator(),
+        );
+    }
+
+    public function getTypeCoercers(): iterable
+    {
+        return [];
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

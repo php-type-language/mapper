@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\ClassType;
 
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
@@ -15,10 +15,11 @@ use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Type\ClassType\DiscriminatorTypeSelector;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object
+ *
  * @template-implements TypeInterface<TObject>
  */
 class ClassFromArrayType implements TypeInterface

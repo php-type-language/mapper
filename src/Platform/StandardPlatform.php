@@ -29,9 +29,9 @@ class StandardPlatform extends Platform
     }
 
     #[\Override]
-    public function getTypes(DirectionInterface $direction): iterable
+    public function getTypes(): iterable
     {
-        yield from parent::getTypes($direction);
+        yield from parent::getTypes();
 
         // Adds support for the "mixed" type
         yield new Builder\SimpleTypeBuilder('mixed', Type\MixedType::class);
@@ -93,110 +93,48 @@ class StandardPlatform extends Platform
         yield new Builder\UnionTypeBuilder();
 
         // Temporary aliases
-        yield new Builder\TypeAliasBuilder('non-empty-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('lowercase-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-empty-lowercase-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('uppercase-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-empty-uppercase-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('numeric-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('literal-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-empty-literal-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('class-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('interface-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('trait-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('enum-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('callable-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('truthy-string', $string, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-falsy-string', $string, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('non-empty-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('lowercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-lowercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('uppercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-uppercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('numeric-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('literal-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-literal-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('class-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('interface-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('trait-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('enum-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('callable-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('truthy-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-falsy-string', $string, Reason::Temporary);
 
-        yield new Builder\TypeAliasBuilder('positive-int', $int, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-positive-int', $int, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('negative-int', $int, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-negative-int', $int, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('non-zero-int', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('positive-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-positive-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('negative-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-negative-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-zero-int', $int, Reason::Temporary);
 
-        yield new Builder\TypeAliasBuilder('number', $int, Reason::Deprecated);
-        yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Deprecated);
+        yield new Builder\TypeAliasBuilder('number', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Temporary);
 
         // Other
-        yield from $this->getObjectTypes($direction);
-        yield from $this->getEnumTypes($direction);
-        yield from $this->getDateTimeTypes($direction);
-        yield from $this->getClassTypes($direction);
-    }
-
-    /**
-     * @return iterable<array-key, Builder\TypeBuilderInterface>
-     */
-    private function getObjectTypes(DirectionInterface $direction): iterable
-    {
-        if ($direction->isOutput()) {
-            yield $object = new Builder\ObjectToArrayTypeBuilder('object');
-        } else {
-            yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
-        }
-
+        yield $object = new Builder\ObjectTypeBuilder('object');
         yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
-    }
-
-    /**
-     * @return iterable<array-key, Builder\TypeBuilderInterface>
-     */
-    private function getEnumTypes(DirectionInterface $direction): iterable
-    {
-        if ($direction->isOutput()) {
-            // Adds support for the "BackedEnum -> scalar" type
-            yield new Builder\BackedEnumToScalarTypeBuilder();
-            // Adds support for the "UnitEnum -> scalar" type
-            yield new Builder\UnitEnumToScalarTypeBuilder();
-        } else {
-            // Adds support for the "scalar -> BackedEnum" type
-            yield new Builder\BackedEnumFromScalarTypeBuilder();
-            // Adds support for the "scalar -> UnitEnum" type
-            yield new Builder\UnitEnumFromScalarTypeBuilder();
-        }
-    }
-
-    /**
-     * @return iterable<array-key, Builder\TypeBuilderInterface>
-     */
-    private function getDateTimeTypes(DirectionInterface $direction): iterable
-    {
-        if ($direction->isOutput()) {
-            // Adds support for the "DateTimeInterface -> string" type
-            yield new Builder\DateTimeToStringTypeBuilder();
-        } else {
-            // Adds support for the "string -> DateTime|DateTimeImmutable" type
-            yield new Builder\DateTimeFromStringTypeBuilder();
-        }
-    }
-
-    /**
-     * @return iterable<array-key, Builder\TypeBuilderInterface>
-     */
-    private function getClassTypes(DirectionInterface $direction): iterable
-    {
-        if ($direction->isOutput()) {
-            // Adds support for the "object(ClassName) -> array{ ... }" type
-            yield new Builder\ClassToArrayTypeBuilder(
-                driver: $this->getMetadataProvider(),
-                accessor: $this->getPropertyAccessor(),
-                instantiator: $this->getClassInstantiator(),
-            );
-        } else {
-            // Adds support for the "array{ ... } -> object(ClassName)" type
-            yield new Builder\ClassFromArrayTypeBuilder(
-                driver: $this->getMetadataProvider(),
-                accessor: $this->getPropertyAccessor(),
-                instantiator: $this->getClassInstantiator(),
-            );
-        }
+        yield new Builder\UnitEnumTypeBuilder();
+        yield new Builder\BackedEnumTypeBuilder();
+        yield new Builder\DateTimeTypeBuilder();
+        yield new Builder\ClassTypeBuilder(
+            meta: $this->getMetadataProvider(),
+            accessor: $this->getPropertyAccessor(),
+            instantiator: $this->getClassInstantiator(),
+        );
     }
 
     #[\Override]
-    public function getTypeCoercers(DirectionInterface $direction): iterable
+    public function getTypeCoercers(): iterable
     {
-        yield from parent::getTypeCoercers($direction);
+        yield from parent::getTypeCoercers();
 
         yield new Coercer\ArrayKeyTypeCoercer() => [
             Type\ArrayKeyType::class,

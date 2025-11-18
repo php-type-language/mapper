@@ -10,6 +10,14 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class DecorateByLoggableTypeRepository extends TypeRepositoryDecorator
 {
+    public function __construct(
+        private readonly bool $enableTypeMatchLogging,
+        private readonly bool $enableTypeCastLogging,
+        TypeRepositoryInterface $delegate,
+    ) {
+        parent::__construct($delegate);
+    }
+
     #[\Override]
     public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
@@ -19,6 +27,10 @@ final class DecorateByLoggableTypeRepository extends TypeRepositoryDecorator
             return $type;
         }
 
-        return new LoggableType($type);
+        return new LoggableType(
+            logTypeMatching: $this->enableTypeMatchLogging,
+            logTypeCasting: $this->enableTypeCastLogging,
+            delegate: $type,
+        );
     }
 }

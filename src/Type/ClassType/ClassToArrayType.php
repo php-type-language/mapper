@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\ClassType;
 
 use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
@@ -12,10 +12,13 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object
- * @template-implements TypeInterface<object|array<array-key, mixed>>
+ * @template-covariant TResult of object|array = object|array<array-key, mixed>
+ *
+ * @template-implements TypeInterface<TResult>
  */
 class ClassToArrayType implements TypeInterface
 {

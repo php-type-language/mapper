@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\UnitEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\StringType;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
@@ -13,20 +15,38 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class UnitEnumFromStringType implements TypeInterface
 {
+    /**
+     * @var list<non-empty-string>
+     */
+    private readonly array $cases;
+
     public function __construct(
         /**
          * @var class-string<TEnum>
          */
         protected readonly string $class,
         /**
-         * @var non-empty-list<non-empty-string>
-         */
-        protected readonly array $cases,
-        /**
          * @var TypeInterface<string>
          */
-        protected readonly TypeInterface $string = new StringType(),
-    ) {}
+        protected readonly TypeInterface $type,
+    ) {
+        $this->cases = $this->getEnumCases($class);
+    }
+
+    /**
+     * @param class-string<TEnum> $enum
+     * @return list<non-empty-string>
+     */
+    private function getEnumCases(string $enum): array
+    {
+        $result = [];
+
+        foreach ($enum::cases() as $case) {
+            $result[] = $case->name;
+        }
+
+        return $result;
+    }
 
     public function match(mixed $value, RuntimeContext $context): bool
     {
@@ -35,7 +55,7 @@ class UnitEnumFromStringType implements TypeInterface
 
     public function cast(mixed $value, RuntimeContext $context): \UnitEnum
     {
-        $string = $this->string->cast($value, $context);
+        $string = $this->type->cast($value, $context);
 
         if (!$this->match($string, $context)) {
             throw InvalidValueException::createFromContext($context);

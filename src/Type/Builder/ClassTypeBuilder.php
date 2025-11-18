@@ -6,12 +6,9 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Kernel\Instantiator\DoctrineClassInstantiator;
-use TypeLang\Mapper\Kernel\Instantiator\ReflectionClassInstantiator;
 use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
-use TypeLang\Mapper\Kernel\PropertyAccessor\ReflectionPropertyAccessor;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
+use TypeLang\Mapper\Type\ClassType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -19,12 +16,13 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TObject of object = object
  * @template TResult of object|array = object|array<array-key, mixed>
- * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
+ *
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TObject>>
  */
-abstract class ClassTypeBuilder extends Builder
+class ClassTypeBuilder extends Builder
 {
     public function __construct(
-        protected readonly ProviderInterface $driver,
+        protected readonly ProviderInterface $meta,
         protected readonly PropertyAccessorInterface $accessor,
         protected readonly ClassInstantiatorInterface $instantiator,
     ) {}
@@ -54,7 +52,7 @@ abstract class ClassTypeBuilder extends Builder
             || $reflection->isInterface();
     }
 
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): ClassType
     {
         $this->expectNoShapeFields($stmt);
         $this->expectNoTemplateArguments($stmt);
@@ -62,18 +60,14 @@ abstract class ClassTypeBuilder extends Builder
         /** @var class-string<TObject> $class */
         $class = $stmt->name->toString();
 
-        return $this->create(
-            metadata: $this->driver->getClassMetadata(
+        /** @var ClassType<TObject, TResult> */
+        return new ClassType(
+            metadata: $this->meta->getClassMetadata(
                 class: new \ReflectionClass($class),
                 context: $context,
             ),
+            accessor: $this->accessor,
+            instantiator: $this->instantiator,
         );
     }
-
-    /**
-     * @param ClassMetadata<TObject> $metadata
-     *
-     * @return TypeInterface<TResult>
-     */
-    abstract protected function create(ClassMetadata $metadata): TypeInterface;
 }

@@ -25,11 +25,11 @@ final class MixedTypeTest extends TypeTestCase
         parent::setUp();
 
         self::withPlatform(new class extends StandardPlatform {
-            public function getTypes(DirectionInterface $direction): iterable
+            public function getTypes(): iterable
             {
                 yield new SimpleTypeBuilder('resource', AnyTypeStub::class);
 
-                yield from parent::getTypes($direction);
+                yield from parent::getTypes();
             }
         });
     }

@@ -26,6 +26,8 @@ final class TraceableType extends TypeDecorator
      * @param TypeInterface<TResult> $delegate
      */
     public function __construct(
+        private readonly bool $traceTypeMatching,
+        private readonly bool $traceTypeCasting,
         private readonly string $definition,
         TypeInterface $delegate,
     ) {
@@ -59,7 +61,7 @@ final class TraceableType extends TypeDecorator
     {
         $tracer = $context->config->findTracer();
 
-        if ($tracer === null) {
+        if ($tracer === null || $this->traceTypeMatching === false) {
             return parent::match($value, $context);
         }
 
@@ -76,7 +78,7 @@ final class TraceableType extends TypeDecorator
     {
         $tracer = $context->config->findTracer();
 
-        if ($tracer === null) {
+        if ($tracer === null || $this->traceTypeCasting === false) {
             return parent::cast($value, $context);
         }
 

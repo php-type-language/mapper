@@ -17,17 +17,17 @@ final class EmptyPlatform implements PlatformInterface
     }
 
     /**
-     * @return array<class-string<TypeInterface>, TypeCoercerInterface>
+     * @return array<array-key, TypeBuilderInterface>
      */
-    public function getTypeCoercers(DirectionInterface $direction): array
+    public function getTypes(): array
     {
         return [];
     }
 
     /**
-     * @return array<array-key, TypeBuilderInterface>
+     * @return array<class-string<TypeInterface>, TypeCoercerInterface>
      */
-    public function getTypes(DirectionInterface $direction): array
+    public function getTypeCoercers(): array
     {
         return [];
     }

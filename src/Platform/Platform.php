@@ -63,7 +63,7 @@ abstract class Platform implements PlatformInterface
         return iterable_to_array($types, false);
     }
 
-    public function getTypes(DirectionInterface $direction): iterable
+    public function getTypes(): iterable
     {
         return $this->types;
     }
@@ -78,7 +78,7 @@ abstract class Platform implements PlatformInterface
         return iterable_to_array($coercers);
     }
 
-    public function getTypeCoercers(DirectionInterface $direction): iterable
+    public function getTypeCoercers(): iterable
     {
         return $this->coercers;
     }

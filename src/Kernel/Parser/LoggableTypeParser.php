@@ -10,18 +10,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class LoggableTypeParser implements TypeParserInterface
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_PARSER_GROUP_NAME = 'PARSE';
-
     public function __construct(
         private readonly LoggerInterface $logger,
         private readonly TypeParserInterface $delegate,
-        /**
-         * @var non-empty-string
-         */
-        private readonly string $group = self::DEFAULT_PARSER_GROUP_NAME,
     ) {}
 
     /**
@@ -29,8 +20,7 @@ final class LoggableTypeParser implements TypeParserInterface
      */
     private function logBefore(string $definition): void
     {
-        $this->logger->debug('[{group}] Parsing "{definition}" definition', [
-            'group' => $this->group,
+        $this->logger->debug('[PARSE] Parsing "{definition}" definition', [
             'definition' => $definition,
         ]);
     }
@@ -40,8 +30,7 @@ final class LoggableTypeParser implements TypeParserInterface
      */
     private function logAfter(string $definition, TypeStatement $statement): void
     {
-        $this->logger->info('[{group}] Parsed "{definition}" definition', [
-            'group' => $this->group,
+        $this->logger->info('[PARSE] Parsed "{definition}" definition', [
             'definition' => $definition,
             'statement' => $statement,
         ]);
@@ -49,8 +38,7 @@ final class LoggableTypeParser implements TypeParserInterface
 
     private function logError(string $definition, \Throwable $e): void
     {
-        $this->logger->error('[{group}] Parsing error: {error}', [
-            'group' => $this->group,
+        $this->logger->error('[PARSE] Parsing error: {error}', [
             'definition' => $definition,
             'error' => $e->getMessage(),
         ]);

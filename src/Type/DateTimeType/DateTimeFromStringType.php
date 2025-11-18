@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Type;
+namespace TypeLang\Mapper\Type\DateTimeType;
 
+use DateTimeImmutable as TDateTime;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\StringType;
+use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TDateTime of \DateTimeImmutable|\DateTime = \DateTimeImmutable
@@ -18,11 +21,14 @@ class DateTimeFromStringType implements TypeInterface
          * @var class-string<TDateTime>
          */
         protected readonly string $class,
+        /**
+         * @var non-empty-string|null
+         */
         protected readonly ?string $format = null,
         /**
          * @var TypeInterface<string>
          */
-        protected readonly TypeInterface $input = new StringType(),
+        protected readonly TypeInterface $input,
     ) {
         $this->assertDateTimeClassExists($class);
     }
@@ -53,7 +59,7 @@ class DateTimeFromStringType implements TypeInterface
 
         try {
             /** @var string $value */
-            return $this->tryParseDateTime($value) !== null;
+            return $this->tryParseDateTime($value, $context) !== null;
         } catch (\Throwable) {
             return false;
         }
@@ -63,6 +69,7 @@ class DateTimeFromStringType implements TypeInterface
     {
         $result = $this->tryParseDateTime(
             value: $this->input->cast($value, $context),
+            context: $context,
         );
 
         if ($result instanceof \DateTimeInterface) {
@@ -76,9 +83,10 @@ class DateTimeFromStringType implements TypeInterface
     /**
      * @return TDateTime|null
      */
-    private function tryParseDateTime(string $value): ?\DateTimeInterface
+    private function tryParseDateTime(string $value, RuntimeContext $context): ?\DateTimeInterface
     {
-        if ($this->format !== null) {
+        // In case of format and strict config types are enabled
+        if ($this->format !== null && $context->isStrictTypesEnabled()) {
             /** @var class-string<TDateTime> $class */
             $class = $this->class;
 

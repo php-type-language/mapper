@@ -11,18 +11,9 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 final class LoggableTypeRepository extends TypeRepositoryDecorator
 {
-    /**
-     * @var non-empty-string
-     */
-    public const DEFAULT_REPOSITORY_GROUP_NAME = 'REPOSITORY';
-
     public function __construct(
         private readonly LoggerInterface $logger,
         TypeRepositoryInterface $delegate,
-        /**
-         * @var non-empty-string
-         */
-        private readonly string $group = self::DEFAULT_REPOSITORY_GROUP_NAME,
     ) {
         parent::__construct($delegate);
     }
@@ -37,8 +28,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
 
     private function logBefore(TypeStatement $statement): void
     {
-        $this->logger->debug('[{group}] Fetching type by {statement_name} statement', [
-            'group' => $this->group,
+        $this->logger->debug('[REPOSITORY] Fetching type by {statement_name} statement', [
             'statement_name' => $this->getInstanceName($statement),
             'statement' => $statement,
         ]);
@@ -48,8 +38,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
     {
         $unwrapped = $this->unwrap($type);
 
-        $this->logger->info('[{group}] Fetched {type_name} type', [
-            'group' => $this->group,
+        $this->logger->info('[REPOSITORY] Fetched {type_name} type', [
             'statement_name' => $this->getInstanceName($statement),
             'type_name' => $this->getInstanceName($unwrapped),
             'statement' => $statement,
@@ -59,8 +48,7 @@ final class LoggableTypeRepository extends TypeRepositoryDecorator
 
     private function logError(TypeStatement $statement, \Throwable $e): void
     {
-        $this->logger->error('[{group}] Fetch error: {error}', [
-            'group' => $this->group,
+        $this->logger->error('[REPOSITORY] Fetch error: {error}', [
             'statement_name' => $this->getInstanceName($statement),
             'statement' => $statement,
             'error' => $e->getMessage(),

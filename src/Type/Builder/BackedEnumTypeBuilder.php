@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Exception\Definition\InternalTypeException;
+use TypeLang\Mapper\Type\BackedEnumType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -13,9 +14,10 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
  * @template TResult of mixed = mixed
+ *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
-abstract class BackedEnumTypeBuilder extends Builder
+class BackedEnumTypeBuilder extends Builder
 {
     public function isSupported(TypeStatement $stmt): bool
     {
@@ -60,23 +62,13 @@ abstract class BackedEnumTypeBuilder extends Builder
 
         $definition = $this->getBackedEnumType($reflection, $stmt);
 
-        return $this->create(
+        return new BackedEnumType(
             /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
             class: $stmt->name->toString(),
-            definition: $definition,
             /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
             type: $context->getTypeByDefinition($definition),
         );
     }
-
-    /**
-     * @param class-string<TEnum> $class
-     * @param non-empty-string $definition
-     * @param TypeInterface<value-of<TEnum>> $type
-     *
-     * @return TypeInterface<TResult>
-     */
-    abstract protected function create(string $class, string $definition, TypeInterface $type): TypeInterface;
 
     /**
      * @return \ReflectionEnum<\BackedEnum>

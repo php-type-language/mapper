@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Coercer\TypeCoercerInterface;
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -41,7 +40,7 @@ interface PlatformInterface
      *
      * @return iterable<array-key, TypeBuilderInterface>
      */
-    public function getTypes(DirectionInterface $direction): iterable;
+    public function getTypes(): iterable;
 
     /**
      * Returns a list of registered type coercers for the specific platform.
@@ -74,7 +73,7 @@ interface PlatformInterface
      *
      * @return iterable<TypeCoercerInterface, list<class-string<TypeInterface>>>
      */
-    public function getTypeCoercers(DirectionInterface $direction): iterable;
+    public function getTypeCoercers(): iterable;
 
     /**
      * Returns {@see true} in case of feature is supported.

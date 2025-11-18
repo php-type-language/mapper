@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\InternalTypeException;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Mapper\Type\UnitEnumType;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- * @template TResult of mixed = mixed
- * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
+ *
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|non-empty-string>>
  */
-abstract class UnitEnumTypeBuilder extends Builder
+class UnitEnumTypeBuilder extends Builder
 {
     /**
      * @var non-empty-lowercase-string
@@ -42,50 +42,16 @@ abstract class UnitEnumTypeBuilder extends Builder
             && !\is_subclass_of($enum, \BackedEnum::class);
     }
 
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): UnitEnumType
     {
         $this->expectNoShapeFields($stmt);
         $this->expectNoTemplateArguments($stmt);
 
-        $names = \iterator_to_array($this->getEnumCaseNames($stmt), false);
-
-        if ($names === []) {
-            throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $stmt,
-                message: 'The "{{type}}" enum requires at least one case',
-            );
-        }
-
-        return $this->create(
-            // @phpstan-ignore-next-line
+        return new UnitEnumType(
+            /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
             class: $stmt->name->toString(),
-            cases: $names,
-            type: $context->getTypeByDefinition(
-                definition: $this->type,
-            ),
+            /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
+            type: $context->getTypeByDefinition($this->type),
         );
-    }
-
-    /**
-     * @param class-string<TEnum> $class
-     * @param non-empty-list<non-empty-string> $cases
-     * @param TypeInterface<string> $type
-     *
-     * @return TypeInterface<TResult>
-     */
-    abstract protected function create(string $class, array $cases, TypeInterface $type): TypeInterface;
-
-    /**
-     * @return \Traversable<array-key, non-empty-string>
-     */
-    private function getEnumCaseNames(NamedTypeNode $statement): \Traversable
-    {
-        /** @var class-string<\UnitEnum> $enum */
-        $enum = $statement->name->toString();
-
-        foreach ($enum::cases() as $case) {
-            // @phpstan-ignore-next-line : Enum case name cannot be empty
-            yield $case->name;
-        }
     }
 }

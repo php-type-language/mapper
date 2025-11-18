@@ -15,6 +15,8 @@ use TypeLang\Mapper\Kernel\Repository\LoggableTypeRepository;
 use TypeLang\Mapper\Kernel\Repository\TraceableTypeRepository;
 use TypeLang\Mapper\Kernel\Repository\TypeRepository;
 use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
+use TypeLang\Printer\PrettyPrinter;
+use TypeLang\Printer\PrinterInterface;
 
 /**
  * Implements the basic (built-in) logic for initializing the
@@ -23,17 +25,25 @@ use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterface
 {
     public const DEFAULT_TRACING_OPTION = false;
-    public const DEFAULT_TYPE_TRACING_OPTION = true;
+    public const DEFAULT_TYPE_CAST_TRACING_OPTION = false;
+    public const DEFAULT_TYPE_MATCH_TRACING_OPTION = true;
     public const DEFAULT_LOGGING_OPTION = false;
-    public const DEFAULT_TYPE_LOGGING_OPTION = true;
+    public const DEFAULT_TYPE_CAST_LOGGING_OPTION = false;
+    public const DEFAULT_TYPE_MATCH_LOGGING_OPTION = true;
     public const DEFAULT_MEMOIZATION_OPTION = true;
 
     public function __construct(
         private readonly bool $enableLogging = self::DEFAULT_LOGGING_OPTION,
-        private readonly bool $enableTypeLogging = self::DEFAULT_TYPE_LOGGING_OPTION,
+        private readonly bool $enableTypeMatchLogging = self::DEFAULT_TYPE_MATCH_TRACING_OPTION,
+        private readonly bool $enableTypeCastLogging = self::DEFAULT_TYPE_CAST_TRACING_OPTION,
         private readonly bool $enableTracing = self::DEFAULT_TRACING_OPTION,
-        private readonly bool $enableTypeTracing = self::DEFAULT_TYPE_TRACING_OPTION,
+        private readonly bool $enableTypeMatchTracing = self::DEFAULT_TYPE_MATCH_LOGGING_OPTION,
+        private readonly bool $enableTypeCastTracing = self::DEFAULT_TYPE_CAST_LOGGING_OPTION,
         private readonly bool $enableMemoization = self::DEFAULT_MEMOIZATION_OPTION,
+        private readonly PrinterInterface $typeTracingPrinter = new PrettyPrinter(
+            wrapUnionType: false,
+            multilineShape: \PHP_INT_MAX,
+        ),
     ) {}
 
     public function createTypeRepository(MapperContext $context, DirectionInterface $direction): TypeRepositoryInterface
@@ -41,10 +51,10 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         $types = new TypeRepository(
             context: $context,
             direction: $direction,
-            builders: $context->platform->getTypes($direction),
+            builders: $context->platform->getTypes(),
         );
 
-        if ($this->enableTypeTracing) {
+        if ($this->enableTypeCastTracing || $this->enableTypeMatchTracing) {
             $types = $this->withTypeTracing($types, $context->config);
         }
 
@@ -52,7 +62,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             $types = $this->withTracing($types, $context->config);
         }
 
-        if ($this->enableTypeLogging) {
+        if ($this->enableTypeCastLogging || $this->enableTypeMatchLogging) {
             $types = $this->withTypeLogging($types, $context->config);
         }
 
@@ -62,7 +72,7 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
 
         $types = new DecorateByCoercibleTypeRepository(
             delegate: $types,
-            coercers: $context->platform->getTypeCoercers($direction),
+            coercers: $context->platform->getTypeCoercers(),
         );
 
         if ($this->enableMemoization) {
@@ -80,7 +90,12 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        return new DecorateByTraceableTypeRepository($types);
+        return new DecorateByTraceableTypeRepository(
+            enableTypeMatchTracing: $this->enableTypeMatchTracing,
+            enableTypeCastTracing: $this->enableTypeCastTracing,
+            printer: $this->typeTracingPrinter,
+            delegate: $types,
+        );
     }
 
     private function withTracing(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface
@@ -102,7 +117,11 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
             return $types;
         }
 
-        return new DecorateByLoggableTypeRepository($types);
+        return new DecorateByLoggableTypeRepository(
+            enableTypeMatchLogging: $this->enableTypeMatchLogging,
+            enableTypeCastLogging: $this->enableTypeCastLogging,
+            delegate: $types,
+        );
     }
 
     private function withLogging(TypeRepositoryInterface $types, Configuration $config): TypeRepositoryInterface

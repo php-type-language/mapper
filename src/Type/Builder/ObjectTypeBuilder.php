@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildingContext;
+use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
- * @template-extends NamedTypeBuilder<TypeInterface>
+ * @template-extends NamedTypeBuilder<TypeInterface<object|array<array-key, mixed>>>
  */
-abstract class ObjectTypeBuilder extends NamedTypeBuilder
+class ObjectTypeBuilder extends NamedTypeBuilder
 {
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): ObjectType
     {
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($stmt instanceof NamedTypeNode);
@@ -22,8 +23,6 @@ abstract class ObjectTypeBuilder extends NamedTypeBuilder
         $this->expectNoShapeFields($stmt);
         $this->expectNoTemplateArguments($stmt);
 
-        return $this->create();
+        return new ObjectType();
     }
-
-    abstract protected function create(): TypeInterface;
 }
