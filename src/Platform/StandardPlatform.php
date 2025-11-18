@@ -119,16 +119,64 @@ class StandardPlatform extends Platform
         yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Deprecated);
 
         // Other
+        yield from $this->getObjectTypes($direction);
+        yield from $this->getEnumTypes($direction);
+        yield from $this->getDateTimeTypes($direction);
+        yield from $this->getClassTypes($direction);
+    }
+
+    /**
+     * @return iterable<array-key, Builder\TypeBuilderInterface>
+     */
+    private function getObjectTypes(DirectionInterface $direction): iterable
+    {
         if ($direction->isOutput()) {
-            // Adds support for the "object -> array{ ... }" type
             yield $object = new Builder\ObjectToArrayTypeBuilder('object');
-            yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
+        } else {
+            yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
+        }
+
+        yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
+    }
+
+    /**
+     * @return iterable<array-key, Builder\TypeBuilderInterface>
+     */
+    private function getEnumTypes(DirectionInterface $direction): iterable
+    {
+        if ($direction->isOutput()) {
             // Adds support for the "BackedEnum -> scalar" type
             yield new Builder\BackedEnumToScalarTypeBuilder();
             // Adds support for the "UnitEnum -> scalar" type
             yield new Builder\UnitEnumToScalarTypeBuilder();
+        } else {
+            // Adds support for the "scalar -> BackedEnum" type
+            yield new Builder\BackedEnumFromScalarTypeBuilder();
+            // Adds support for the "scalar -> UnitEnum" type
+            yield new Builder\UnitEnumFromScalarTypeBuilder();
+        }
+    }
+
+    /**
+     * @return iterable<array-key, Builder\TypeBuilderInterface>
+     */
+    private function getDateTimeTypes(DirectionInterface $direction): iterable
+    {
+        if ($direction->isOutput()) {
             // Adds support for the "DateTimeInterface -> string" type
             yield new Builder\DateTimeToStringTypeBuilder();
+        } else {
+            // Adds support for the "string -> DateTime|DateTimeImmutable" type
+            yield new Builder\DateTimeFromStringTypeBuilder();
+        }
+    }
+
+    /**
+     * @return iterable<array-key, Builder\TypeBuilderInterface>
+     */
+    private function getClassTypes(DirectionInterface $direction): iterable
+    {
+        if ($direction->isOutput()) {
             // Adds support for the "object(ClassName) -> array{ ... }" type
             yield new Builder\ClassToArrayTypeBuilder(
                 driver: $this->getMetadataProvider(),
@@ -136,15 +184,6 @@ class StandardPlatform extends Platform
                 instantiator: $this->getClassInstantiator(),
             );
         } else {
-            // Adds support for the "array{ ... } -> object" type
-            yield $object = new Builder\ObjectFromArrayTypeBuilder('object');
-            yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
-            // Adds support for the "scalar -> BackedEnum" type
-            yield new Builder\BackedEnumFromScalarTypeBuilder();
-            // Adds support for the "scalar -> UnitEnum" type
-            yield new Builder\UnitEnumFromScalarTypeBuilder();
-            // Adds support for the "string -> DateTime|DateTimeImmutable" type
-            yield new Builder\DateTimeFromStringTypeBuilder();
             // Adds support for the "array{ ... } -> object(ClassName)" type
             yield new Builder\ClassFromArrayTypeBuilder(
                 driver: $this->getMetadataProvider(),
@@ -159,31 +198,38 @@ class StandardPlatform extends Platform
     {
         yield from parent::getTypeCoercers($direction);
 
-        // array-key
-        yield Type\ArrayKeyType::class => $arrayKey = new Coercer\ArrayKeyTypeCoercer();
+        yield new Coercer\ArrayKeyTypeCoercer() => [
+            Type\ArrayKeyType::class,
+        ];
 
-        // bool
-        yield Type\BoolType::class => $bool = new Coercer\BoolTypeCoercer();
-        yield Type\BoolLiteralType::class => $bool;
+        yield new Coercer\BoolTypeCoercer() => [
+            Type\BoolType::class,
+            Type\BoolLiteralType::class,
+        ];
 
-        // float
-        yield Type\FloatType::class => $float = new Coercer\FloatTypeCoercer();
-        yield Type\FloatLiteralType::class => $float;
+        yield new Coercer\FloatTypeCoercer() => [
+            Type\FloatType::class,
+            Type\FloatLiteralType::class,
+        ];
 
-        // int
-        yield Type\IntType::class => $int = new Coercer\IntTypeCoercer();
-        yield Type\IntRangeType::class => $int;
-        yield Type\IntLiteralType::class => $int;
+        yield new Coercer\IntTypeCoercer() => [
+            Type\IntType::class,
+            Type\IntRangeType::class,
+            Type\IntLiteralType::class,
+        ];
 
-        // string
-        yield Type\StringType::class => $string = new Coercer\StringTypeCoercer();
-        yield Type\StringLiteralType::class => $string;
+        yield new Coercer\StringTypeCoercer() => [
+            Type\StringType::class,
+            Type\StringLiteralType::class,
+        ];
 
-        // array
-        yield Type\ArrayType::class => $array = new Coercer\ArrayTypeCoercer();
+        yield new Coercer\ArrayTypeCoercer() => [
+            Type\ArrayType::class,
+        ];
 
-        // list
-        yield Type\ListType::class => $list = new Coercer\ListTypeCoercer();
+        yield new Coercer\ListTypeCoercer() => [
+            Type\ListType::class,
+        ];
     }
 
     #[\Override]

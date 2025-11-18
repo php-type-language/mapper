@@ -12,17 +12,6 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class ArrayKeyType implements TypeInterface
 {
-    public function __construct(
-        /**
-         * @var TypeInterface<string>
-         */
-        protected readonly TypeInterface $string = new StringType(),
-        /**
-         * @var TypeInterface<int>
-         */
-        protected readonly TypeInterface $int = new IntType(),
-    ) {}
-
     /**
      * @phpstan-assert-if-true array-key $value
      */
@@ -37,8 +26,7 @@ class ArrayKeyType implements TypeInterface
         //     return false;
         // }
 
-        return $this->int->match($value, $context)
-            || $this->string->match($value, $context);
+        return \is_int($value) || \is_string($value);
     }
 
     public function cast(mixed $value, RuntimeContext $context): string|int

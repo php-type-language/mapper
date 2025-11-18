@@ -72,7 +72,7 @@ interface PlatformInterface
      * In the example above, in case of {@see int} and {@see float} type
      * coercers are missing, then there will be a mapper type error.
      *
-     * @return iterable<class-string<TypeInterface>, TypeCoercerInterface>
+     * @return iterable<TypeCoercerInterface, list<class-string<TypeInterface>>>
      */
     public function getTypeCoercers(DirectionInterface $direction): iterable;
 

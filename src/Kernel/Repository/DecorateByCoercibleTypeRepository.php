@@ -9,8 +9,6 @@ use TypeLang\Mapper\Kernel\Repository\TypeDecorator\CoercibleType;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
-use function TypeLang\Mapper\iterable_to_array;
-
 final class DecorateByCoercibleTypeRepository extends TypeRepositoryDecorator
 {
     /**
@@ -19,7 +17,7 @@ final class DecorateByCoercibleTypeRepository extends TypeRepositoryDecorator
     private array $coercers = [];
 
     /**
-     * @param iterable<class-string<TypeInterface>, TypeCoercerInterface> $coercers
+     * @param iterable<TypeCoercerInterface, list<class-string<TypeInterface>>> $coercers
      */
     public function __construct(
         TypeRepositoryInterface $delegate,
@@ -27,7 +25,24 @@ final class DecorateByCoercibleTypeRepository extends TypeRepositoryDecorator
     ) {
         parent::__construct($delegate);
 
-        $this->coercers = iterable_to_array($coercers);
+        $this->coercers = $this->formatTypeCoercers($coercers);
+    }
+
+    /**
+     * @param iterable<TypeCoercerInterface, list<class-string<TypeInterface>>> $coercers
+     * @return array<class-string<TypeInterface>, TypeCoercerInterface>
+     */
+    private function formatTypeCoercers(iterable $coercers): array
+    {
+        $result = [];
+
+        foreach ($coercers as $coercer => $types) {
+            foreach ($types as $type) {
+                $result[$type] = $coercer;
+            }
+        }
+
+        return $result;
     }
 
     #[\Override]
