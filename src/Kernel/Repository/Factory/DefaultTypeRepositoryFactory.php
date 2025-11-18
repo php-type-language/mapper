@@ -25,8 +25,8 @@ use TypeLang\Printer\PrinterInterface;
 final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterface
 {
     public const DEFAULT_TRACING_OPTION = false;
-    public const DEFAULT_TYPE_CAST_TRACING_OPTION = false;
-    public const DEFAULT_TYPE_MATCH_TRACING_OPTION = true;
+    public const DEFAULT_TYPE_CAST_TRACING_OPTION = true;
+    public const DEFAULT_TYPE_MATCH_TRACING_OPTION = false;
     public const DEFAULT_LOGGING_OPTION = false;
     public const DEFAULT_TYPE_CAST_LOGGING_OPTION = false;
     public const DEFAULT_TYPE_MATCH_LOGGING_OPTION = true;
