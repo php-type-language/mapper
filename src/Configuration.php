@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use Psr\Log\LoggerInterface;
-use TypeLang\Mapper\Tracing\TracerInterface;
-use TypeLang\Mapper\Type\Extractor\Factory\DefaultTypeExtractorFactory;
-use TypeLang\Mapper\Type\Extractor\Factory\TypeExtractorFactoryInterface;
-use TypeLang\Mapper\Type\Parser\Factory\DefaultTypeParserFactory;
-use TypeLang\Mapper\Type\Parser\Factory\TypeParserFactoryInterface;
-use TypeLang\Mapper\Type\Repository\Factory\DefaultTypeRepositoryFactory;
-use TypeLang\Mapper\Type\Repository\Factory\TypeRepositoryFactoryInterface;
+use TypeLang\Mapper\Kernel\Extractor\Factory\DefaultTypeExtractorFactory;
+use TypeLang\Mapper\Kernel\Extractor\Factory\TypeExtractorFactoryInterface;
+use TypeLang\Mapper\Kernel\Parser\Factory\DefaultTypeParserFactory;
+use TypeLang\Mapper\Kernel\Parser\Factory\TypeParserFactoryInterface;
+use TypeLang\Mapper\Kernel\Repository\Factory\DefaultTypeRepositoryFactory;
+use TypeLang\Mapper\Kernel\Repository\Factory\TypeRepositoryFactoryInterface;
+use TypeLang\Mapper\Kernel\Tracing\TracerInterface;
 
 class Configuration
 {

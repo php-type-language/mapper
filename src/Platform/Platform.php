@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Mapping\Provider\InMemoryProvider;
 use TypeLang\Mapper\Mapping\Provider\MetadataBuilder;
@@ -12,7 +13,6 @@ use TypeLang\Mapper\Mapping\Reader\AttributeReader;
 use TypeLang\Mapper\Mapping\Reader\ReaderInterface;
 use TypeLang\Mapper\Mapping\Reader\ReflectionReader;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 use function TypeLang\Mapper\iterable_to_array;

@@ -10,8 +10,8 @@ use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
+use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
 
 /**
  * @template TObject of object = object

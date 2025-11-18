@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Extension\PHPStan;
 
-use TypeLang\Mapper\Extension\PHPStan\MethodCallSyntaxCheckRule\MethodCallTarget;
 use TypeLang\Mapper\Context\BuildingContext;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\DenormalizerInterface;
+use TypeLang\Mapper\Extension\PHPStan\MethodCallSyntaxCheckRule\MethodCallTarget;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\NormalizerInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 
 final class MapperMethodCallSyntaxRule extends MethodCallSyntaxCheckRule
 {

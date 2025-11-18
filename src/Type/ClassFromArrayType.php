@@ -12,9 +12,9 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Runtime\NonInstantiatableException;
 use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
-use TypeLang\Mapper\Instantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Type\ClassType\DiscriminatorTypeSelector;
 
 /**

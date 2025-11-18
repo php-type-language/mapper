@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Instantiator\ClassInstantiatorInterface;
-use TypeLang\Mapper\Instantiator\DoctrineClassInstantiator;
-use TypeLang\Mapper\Instantiator\ReflectionClassInstantiator;
+use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
+use TypeLang\Mapper\Kernel\Instantiator\DoctrineClassInstantiator;
+use TypeLang\Mapper\Kernel\Instantiator\ReflectionClassInstantiator;
+use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
+use TypeLang\Mapper\Kernel\PropertyAccessor\ReflectionPropertyAccessor;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\ProviderInterface;
-use TypeLang\Mapper\PropertyAccessor\PropertyAccessorInterface;
-use TypeLang\Mapper\PropertyAccessor\ReflectionPropertyAccessor;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;

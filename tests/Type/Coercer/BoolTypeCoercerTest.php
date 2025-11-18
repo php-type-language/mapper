@@ -6,8 +6,8 @@ namespace TypeLang\Mapper\Tests\Type\Coercer;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\Coercer\BoolTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
+use TypeLang\Mapper\Coercer\BoolTypeCoercer;
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 
 #[Group('coercer')]
 #[CoversClass(BoolTypeCoercer::class)]

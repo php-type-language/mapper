@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Context\Path\Path;
 use TypeLang\Mapper\Context\Path\PathInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 
 /**
  * @internal this is an internal library class, please do not use it in your code

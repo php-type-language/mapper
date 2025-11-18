@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Tests\Type\Coercer;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
+use TypeLang\Mapper\Coercer\FloatTypeCoercer;
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Tests\Type\Stub\IntBackedEnumStub;
-use TypeLang\Mapper\Type\Coercer\FloatTypeCoercer;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 #[Group('coercer')]
 #[CoversClass(FloatTypeCoercer::class)]

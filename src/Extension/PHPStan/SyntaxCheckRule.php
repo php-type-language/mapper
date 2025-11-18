@@ -16,7 +16,6 @@ use TypeLang\Parser\ParserInterface;
 
 /**
  * @template T of PhpNode
- *
  * @template-implements Rule<T>
  */
 abstract class SyntaxCheckRule implements Rule

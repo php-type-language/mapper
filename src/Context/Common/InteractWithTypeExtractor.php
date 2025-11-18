@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context\Common;
 
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
 
 /**
  * @phpstan-require-implements TypeExtractorInterface

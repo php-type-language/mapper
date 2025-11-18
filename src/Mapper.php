@@ -14,11 +14,11 @@ use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Definition\DefinitionException;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Exception\Runtime\RuntimeException;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
 use TypeLang\Mapper\Platform\StandardPlatform;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface

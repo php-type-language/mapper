@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context;
 
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Common\InteractWithTypeRepository;
 use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
@@ -12,11 +13,10 @@ use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 /**
  * @template-implements \IteratorAggregate<array-key, RuntimeContext>
@@ -39,6 +39,7 @@ abstract class RuntimeContext extends MapperContext implements
          * value, without any mutations from type coercions.
          *
          * @readonly
+         *
          * @phpstan-readonly-allow-private-mutation
          */
         public mixed $value,

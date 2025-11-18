@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Concerns;
 
 use PHPUnit\Framework\Attributes\Before;
-use TypeLang\Mapper\Type\Extractor\NativeTypeExtractor;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Extractor\NativeTypeExtractor;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
 
 trait InteractWithTypeExtractor
 {

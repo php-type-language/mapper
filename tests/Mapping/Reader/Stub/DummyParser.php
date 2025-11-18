@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Mapping\Reader\Stub;
 
 use JetBrains\PhpStorm\Language;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 

@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Type\Coercer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Tests\Concerns\InteractWithRuntimeContext;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Tests\Type\Stub\DataSamples;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 
 abstract class TypeCoercerTestCase extends TestCase
 {

@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Common\InteractWithTypeParser;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
 
 /**
  * Contains information about a ready-to-use (initialized) mapper

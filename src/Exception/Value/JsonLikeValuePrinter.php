@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Exception\Value;
 
-use TypeLang\Mapper\Type\Coercer\StringTypeCoercer;
+use TypeLang\Mapper\Coercer\StringTypeCoercer;
 
 final class JsonLikeValuePrinter implements ValuePrinterInterface
 {

@@ -8,21 +8,23 @@ use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Path\Entry\EntryInterface;
 use TypeLang\Mapper\Context\Path\Path;
 use TypeLang\Mapper\Context\Path\PathInterface;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 final class ChildContext extends RuntimeContext
 {
     protected function __construct(
         /**
          * @readonly
+         *
          * @phpstan-readonly-allow-private-mutation
          */
         public RuntimeContext $parent,
         /**
          * @readonly
+         *
          * @phpstan-readonly-allow-private-mutation
          */
         public EntryInterface $entry,
@@ -41,6 +43,7 @@ final class ChildContext extends RuntimeContext
          * the {@see $config} context's field is the original.
          *
          * @readonly
+         *
          * @phpstan-readonly-allow-private-mutation
          */
         public ?Configuration $original = null,

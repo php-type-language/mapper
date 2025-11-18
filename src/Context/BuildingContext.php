@@ -6,10 +6,10 @@ namespace TypeLang\Mapper\Context;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Common\InteractWithTypeRepository;
+use TypeLang\Mapper\Kernel\Extractor\TypeExtractorInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Platform\PlatformInterface;
-use TypeLang\Mapper\Type\Extractor\TypeExtractorInterface;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 
 class BuildingContext extends MapperContext implements
     TypeRepositoryInterface

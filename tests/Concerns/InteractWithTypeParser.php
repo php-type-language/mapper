@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Concerns;
 
 use PHPUnit\Framework\Attributes\Before;
-use TypeLang\Mapper\Type\Parser\TypeLangParser;
-use TypeLang\Mapper\Type\Parser\TypeParserInterface;
+use TypeLang\Mapper\Kernel\Parser\TypeLangParser;
+use TypeLang\Mapper\Kernel\Parser\TypeParserInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 use TypeLang\Parser\Parser;
 

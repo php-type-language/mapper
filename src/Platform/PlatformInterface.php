@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Platform;
 
+use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
-use TypeLang\Mapper\Type\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
 interface PlatformInterface

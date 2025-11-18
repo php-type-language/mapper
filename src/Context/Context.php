@@ -21,6 +21,7 @@ abstract class Context
          * - {@see RuntimeContext::isStrictTypesEnabled()}
          *
          * @readonly
+         *
          * @phpstan-readonly-allow-private-mutation
          */
         public Configuration $config,

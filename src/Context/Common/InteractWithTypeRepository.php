@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Context\Common;
 
 use JetBrains\PhpStorm\Language;
-use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
+use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
