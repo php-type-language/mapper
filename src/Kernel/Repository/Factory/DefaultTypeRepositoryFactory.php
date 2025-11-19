@@ -24,22 +24,73 @@ use TypeLang\Printer\PrinterInterface;
  */
 final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterface
 {
-    public const DEFAULT_TRACING_OPTION = false;
-    public const DEFAULT_TYPE_CAST_TRACING_OPTION = true;
-    public const DEFAULT_TYPE_MATCH_TRACING_OPTION = false;
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableLogging}
+     */
     public const DEFAULT_LOGGING_OPTION = false;
-    public const DEFAULT_TYPE_CAST_LOGGING_OPTION = false;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableTypeMatchLogging}
+     */
     public const DEFAULT_TYPE_MATCH_LOGGING_OPTION = true;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableTypeCastLogging}
+     */
+    public const DEFAULT_TYPE_CAST_LOGGING_OPTION = false;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableTracing}
+     */
+    public const DEFAULT_TRACING_OPTION = false;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableTypeMatchTracing}
+     */
+    public const DEFAULT_TYPE_MATCH_TRACING_OPTION = false;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableTypeCastTracing}
+     */
+    public const DEFAULT_TYPE_CAST_TRACING_OPTION = true;
+
+    /**
+     * Default value for {@see DefaultTypeRepositoryFactory::$enableMemoization}
+     */
     public const DEFAULT_MEMOIZATION_OPTION = true;
 
     public function __construct(
+        /**
+         * Enables or disables logging of type retrieval from the repository
+         */
         private readonly bool $enableLogging = self::DEFAULT_LOGGING_OPTION,
+        /**
+         * Enables or disables logging of type matching processes
+         */
         private readonly bool $enableTypeMatchLogging = self::DEFAULT_TYPE_MATCH_TRACING_OPTION,
+        /**
+         * Enables or disables logging of type casting processes
+         */
         private readonly bool $enableTypeCastLogging = self::DEFAULT_TYPE_CAST_TRACING_OPTION,
+        /**
+         * Enables or disables tracing of type retrieval from the repository
+         */
         private readonly bool $enableTracing = self::DEFAULT_TRACING_OPTION,
+        /**
+         * Enables or disables tracing of type matching processes
+         */
         private readonly bool $enableTypeMatchTracing = self::DEFAULT_TYPE_MATCH_LOGGING_OPTION,
+        /**
+         * Enables or disables tracing of type casting processes
+         */
         private readonly bool $enableTypeCastTracing = self::DEFAULT_TYPE_CAST_LOGGING_OPTION,
+        /**
+         * Enables or disables storing types in memory for quick retrieval
+         */
         private readonly bool $enableMemoization = self::DEFAULT_MEMOIZATION_OPTION,
+        /**
+         * Printer instance for displaying types in tracing
+         */
         private readonly PrinterInterface $typeTracingPrinter = new PrettyPrinter(
             wrapUnionType: false,
             multilineShape: \PHP_INT_MAX,
