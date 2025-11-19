@@ -9,7 +9,6 @@ use TypeLang\Mapper\Type\UnitEnumType\UnitEnumToStringType;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- *
  * @template-extends AsymmetricType<non-empty-string, TEnum>
  */
 class UnitEnumType extends AsymmetricType

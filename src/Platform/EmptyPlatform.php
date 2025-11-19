@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Platform;
 
 use TypeLang\Mapper\Coercer\TypeCoercerInterface;
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\TypeInterface;
 
@@ -17,7 +16,7 @@ final class EmptyPlatform implements PlatformInterface
     }
 
     /**
-     * @return array<array-key, TypeBuilderInterface>
+     * @return array{}
      */
     public function getTypes(): array
     {
@@ -25,7 +24,7 @@ final class EmptyPlatform implements PlatformInterface
     }
 
     /**
-     * @return array<class-string<TypeInterface>, TypeCoercerInterface>
+     * @return array{}
      */
     public function getTypeCoercers(): array
     {

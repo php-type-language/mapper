@@ -12,7 +12,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|non-empty-string>>
  */
 class UnitEnumTypeBuilder extends Builder

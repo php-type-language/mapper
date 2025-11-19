@@ -30,6 +30,7 @@ final class DecorateByCoercibleTypeRepository extends TypeRepositoryDecorator
 
     /**
      * @param iterable<TypeCoercerInterface, list<class-string<TypeInterface>>> $coercers
+     *
      * @return array<class-string<TypeInterface>, TypeCoercerInterface>
      */
     private function formatTypeCoercers(iterable $coercers): array

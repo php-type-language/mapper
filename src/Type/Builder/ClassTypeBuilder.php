@@ -16,7 +16,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TObject of object = object
  * @template TResult of object|array = object|array<array-key, mixed>
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TObject>>
  */
 class ClassTypeBuilder extends Builder

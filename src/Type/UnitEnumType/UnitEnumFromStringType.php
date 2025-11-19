@@ -6,7 +6,6 @@ namespace TypeLang\Mapper\Type\UnitEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -35,6 +34,7 @@ class UnitEnumFromStringType implements TypeInterface
 
     /**
      * @param class-string<TEnum> $enum
+     *
      * @return list<non-empty-string>
      */
     private function getEnumCases(string $enum): array

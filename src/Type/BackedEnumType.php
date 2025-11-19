@@ -9,7 +9,6 @@ use TypeLang\Mapper\Type\BackedEnumType\BackedEnumToScalarType;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
- *
  * @template-extends AsymmetricType<value-of<TEnum>, TEnum>
  */
 class BackedEnumType extends AsymmetricType

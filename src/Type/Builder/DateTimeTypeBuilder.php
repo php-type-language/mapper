@@ -16,7 +16,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TDate of \DateTimeImmutable|\DateTime = \DateTimeImmutable
  * @template TResult of string = string
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TDate>>
  */
 class DateTimeTypeBuilder extends Builder
@@ -39,6 +38,7 @@ class DateTimeTypeBuilder extends Builder
         protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
         /**
          * @var array<class-string<\DateTimeInterface>, class-string<\DateTimeInterface>>
+         *
          * @phpstan-var array<interface-string<\DateTimeInterface>, class-string<\DateTimeInterface>>
          */
         protected readonly array $dateInterfaceMapping = self::DEFAULT_DATE_INTERFACE_MAPPING,

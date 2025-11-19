@@ -14,7 +14,6 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
  * @template TResult of mixed = mixed
- *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
  */
 class BackedEnumTypeBuilder extends Builder

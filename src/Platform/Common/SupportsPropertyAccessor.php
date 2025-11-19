@@ -18,7 +18,7 @@ trait SupportsPropertyAccessor
         return $this->propertyAccessor ??= $this->createDefaultPropertyAccessor();
     }
 
-    final protected function bootPropertyAccessorIfNotBooted(PropertyAccessorInterface|null $accessor): void
+    final protected function bootPropertyAccessorIfNotBooted(?PropertyAccessorInterface $accessor): void
     {
         /** @phpstan-ignore-next-line : Allow instantiation outside constructor */
         $this->propertyAccessor ??= ($accessor ?? $this->createDefaultPropertyAccessor());

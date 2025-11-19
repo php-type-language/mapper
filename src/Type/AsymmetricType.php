@@ -9,7 +9,6 @@ use TypeLang\Mapper\Context\RuntimeContext;
 /**
  * @template TOutResult of mixed = mixed
  * @template TInResult of mixed = mixed
- *
  * @template-implements TypeInterface<TOutResult|TInResult>
  */
 abstract class AsymmetricType implements TypeInterface

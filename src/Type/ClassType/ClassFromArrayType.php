@@ -19,7 +19,6 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object
- *
  * @template-implements TypeInterface<TObject>
  */
 class ClassFromArrayType implements TypeInterface

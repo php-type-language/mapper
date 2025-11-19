@@ -9,7 +9,6 @@ use TypeLang\Mapper\Type\DateTimeType\DateTimeToStringType;
 
 /**
  * @template TDateTime of \DateTimeImmutable|\DateTime = \DateTimeImmutable
- *
  * @template-extends AsymmetricType<string, TDateTime|string>
  */
 class DateTimeType extends AsymmetricType

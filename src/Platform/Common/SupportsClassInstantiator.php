@@ -18,7 +18,7 @@ trait SupportsClassInstantiator
         return $this->classInstantiator ??= $this->createDefaultClassInstantiator();
     }
 
-    final protected function bootClassInstantiatorIfNotBooted(ClassInstantiatorInterface|null $instantiator): void
+    final protected function bootClassInstantiatorIfNotBooted(?ClassInstantiatorInterface $instantiator): void
     {
         /** @phpstan-ignore-next-line : Allow instantiation outside constructor */
         $this->classInstantiator ??= ($instantiator ?? $this->createDefaultClassInstantiator());

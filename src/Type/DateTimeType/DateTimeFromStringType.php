@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Type\DateTimeType;
 use DateTimeImmutable as TDateTime;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\StringType;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -24,7 +23,7 @@ class DateTimeFromStringType implements TypeInterface
         /**
          * @var non-empty-string|null
          */
-        protected readonly ?string $format = null,
+        protected readonly ?string $format,
         /**
          * @var TypeInterface<string>
          */

@@ -17,7 +17,6 @@ use TypeLang\Mapper\Type\TypeInterface;
 /**
  * @template TObject of object = object
  * @template-covariant TResult of object|array = object|array<array-key, mixed>
- *
  * @template-implements TypeInterface<TResult>
  */
 class ClassToArrayType implements TypeInterface

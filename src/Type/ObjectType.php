@@ -9,7 +9,6 @@ use TypeLang\Mapper\Type\ObjectType\ObjectToArrayType;
 
 /**
  * @template TResult of object|array = object|array<array-key, mixed>
- *
  * @template-extends AsymmetricType<TResult, object>
  */
 final class ObjectType extends AsymmetricType
