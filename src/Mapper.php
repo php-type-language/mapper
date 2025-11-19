@@ -23,10 +23,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 
 final class Mapper implements NormalizerInterface, DenormalizerInterface
 {
-    /**
-     * @var \WeakMap<DirectionInterface, TypeRepositoryInterface>
-     */
-    private readonly \WeakMap $repository;
+    private readonly TypeRepositoryInterface $types;
 
     public readonly MapperContext $context;
 
@@ -34,10 +31,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         private readonly PlatformInterface $platform = new StandardPlatform(),
         private readonly Configuration $config = new Configuration(),
     ) {
-        $this->repository = new \WeakMap();
-
         $this->context = $this->createMapperContext(
             context: $this->createBootContext(),
+        );
+
+        $this->types = $this->createTypeRepository(
+            context: $this->context,
         );
     }
 
@@ -72,15 +71,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
         return $factory->createTypeParser($context);
     }
 
-    private function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
+    private function createTypeRepository(MapperContext $context): TypeRepositoryInterface
     {
-        $factory = $this->config->getTypeRepositoryFactory();
+        $factory = $context->config->getTypeRepositoryFactory();
 
-        return $this->repository[$direction]
-            ??= $factory->createTypeRepository(
-                context: $this->context,
-                direction: $direction,
-            );
+        return $factory->createTypeRepository($context);
     }
 
     private function createRuntimeContext(mixed $value, DirectionInterface $direction): RuntimeContext
@@ -89,7 +84,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             context: $this->context,
             value: $value,
             direction: $direction,
-            types: $this->getTypeRepository($direction),
+            types: $this->types,
         );
     }
 
@@ -166,11 +161,9 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getType(DirectionInterface $direction, #[Language('PHP')] string $type): TypeInterface
+    public function getType(#[Language('PHP')] string $type): TypeInterface
     {
-        $repository = $this->getTypeRepository($direction);
-
-        return $repository->getTypeByStatement(
+        return $this->types->getTypeByStatement(
             statement: $this->context->getStatementByDefinition($type),
         );
     }
@@ -183,12 +176,11 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException in case of type not found
      * @throws \Throwable in case of internal error occurs
      */
-    public function getTypeByValue(DirectionInterface $direction, mixed $value): TypeInterface
+    public function getTypeByValue(mixed $value): TypeInterface
     {
-        return $this->getType(
-            direction: $direction,
-            type: $this->context->getDefinitionByValue($value),
-        );
+        $definition = $this->context->getDefinitionByValue($value);
+
+        return $this->getType($definition);
     }
 
     /**
@@ -204,12 +196,12 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
      * @throws TypeNotFoundException
      * @throws \Throwable
      */
-    public function warmup(DirectionInterface $direction, string|object $class): void
+    public function warmup(string|object $class): void
     {
         if (\is_object($class)) {
             $class = $class::class;
         }
 
-        $this->getType($direction, $class);
+        $this->getType($class);
     }
 }

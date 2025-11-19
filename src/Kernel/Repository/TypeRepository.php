@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Kernel\Repository;
 
 use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
@@ -25,12 +24,13 @@ final class TypeRepository implements
 
     private TypeRepositoryInterface $repository;
 
+    private ?BuildingContext $building = null;
+
     /**
      * @param iterable<mixed, TypeBuilderInterface> $builders
      */
     public function __construct(
         private readonly MapperContext $context,
-        private readonly DirectionInterface $direction,
         iterable $builders,
     ) {
         $this->repository = $this;
@@ -47,9 +47,8 @@ final class TypeRepository implements
 
     private function buildType(TypeStatement $statement): TypeInterface
     {
-        $context = BuildingContext::createFromMapperContext(
+        $context = $this->building ??= BuildingContext::createFromMapperContext(
             context: $this->context,
-            direction: $this->direction,
             types: $this->repository,
         );
 

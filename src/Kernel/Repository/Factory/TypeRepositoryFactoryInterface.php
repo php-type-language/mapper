@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Kernel\Repository\Factory;
 
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
 
@@ -18,8 +17,5 @@ use TypeLang\Mapper\Kernel\Repository\TypeRepositoryInterface;
  */
 interface TypeRepositoryFactoryInterface
 {
-    public function createTypeRepository(
-        MapperContext $context,
-        DirectionInterface $direction,
-    ): TypeRepositoryInterface;
+    public function createTypeRepository(MapperContext $context): TypeRepositoryInterface;
 }

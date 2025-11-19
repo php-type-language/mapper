@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Kernel\Repository\Factory;
 
 use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Context\DirectionInterface;
 use TypeLang\Mapper\Context\MapperContext;
 use TypeLang\Mapper\Kernel\Repository\DecorateByCoercibleTypeRepository;
 use TypeLang\Mapper\Kernel\Repository\DecorateByLoggableTypeRepository;
@@ -97,11 +96,10 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         ),
     ) {}
 
-    public function createTypeRepository(MapperContext $context, DirectionInterface $direction): TypeRepositoryInterface
+    public function createTypeRepository(MapperContext $context): TypeRepositoryInterface
     {
         $types = new TypeRepository(
             context: $context,
-            direction: $direction,
             builders: $context->platform->getTypes(),
         );
 

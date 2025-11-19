@@ -17,10 +17,6 @@ class BuildingContext extends MapperContext implements
     use InteractWithTypeRepository;
 
     protected function __construct(
-        /**
-         * Gets data transformation direction.
-         */
-        public readonly DirectionInterface $direction,
         TypeRepositoryInterface $types,
         TypeParserInterface $parser,
         TypeExtractorInterface $extractor,
@@ -39,11 +35,9 @@ class BuildingContext extends MapperContext implements
 
     public static function createFromMapperContext(
         MapperContext $context,
-        DirectionInterface $direction,
         TypeRepositoryInterface $types,
     ): self {
         return new self(
-            direction: $direction,
             types: $types,
             parser: $context->parser,
             extractor: $context->extractor,
