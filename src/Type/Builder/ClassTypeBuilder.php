@@ -15,8 +15,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TObject of object = object
- * @template TResult of object|array = object|array<array-key, mixed>
- * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TObject>>
+ * @template-extends Builder<NamedTypeNode, TypeInterface<object|array<array-key, mixed>|TObject>>
  */
 class ClassTypeBuilder extends Builder
 {
@@ -59,7 +58,7 @@ class ClassTypeBuilder extends Builder
         /** @var class-string<TObject> $class */
         $class = $stmt->name->toString();
 
-        /** @var ClassType<TObject, TResult> */
+        /** @var ClassType<TObject> */
         return new ClassType(
             metadata: $this->meta->getClassMetadata(
                 class: new \ReflectionClass($class),

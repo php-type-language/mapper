@@ -8,8 +8,7 @@ use TypeLang\Mapper\Type\ObjectType\ObjectFromArrayType;
 use TypeLang\Mapper\Type\ObjectType\ObjectToArrayType;
 
 /**
- * @template TResult of object|array = object|array<array-key, mixed>
- * @template-extends AsymmetricType<TResult, object>
+ * @template-extends AsymmetricType<object|array<array-key, mixed>, object>
  */
 final class ObjectType extends AsymmetricType
 {

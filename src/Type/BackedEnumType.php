@@ -9,7 +9,7 @@ use TypeLang\Mapper\Type\BackedEnumType\BackedEnumToScalarType;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
- * @template-extends AsymmetricType<value-of<TEnum>, TEnum>
+ * @template-extends AsymmetricType<int|string, TEnum>
  */
 class BackedEnumType extends AsymmetricType
 {

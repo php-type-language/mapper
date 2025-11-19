@@ -42,6 +42,10 @@ class UnitEnumFromStringType implements TypeInterface
         $result = [];
 
         foreach ($enum::cases() as $case) {
+            if ($case->name === '') {
+                continue;
+            }
+
             $result[] = $case->name;
         }
 

@@ -13,8 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
- * @template TResult of mixed = mixed
- * @template-extends Builder<NamedTypeNode, TypeInterface<TResult>>
+ * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|int|string>>
  */
 class BackedEnumTypeBuilder extends Builder
 {
@@ -32,7 +31,7 @@ class BackedEnumTypeBuilder extends Builder
     }
 
     /**
-     * @param \ReflectionEnum<\BackedEnum> $reflection
+     * @param \ReflectionEnum<TEnum> $reflection
      *
      * @return non-empty-string
      * @throws InternalTypeException
@@ -52,39 +51,36 @@ class BackedEnumTypeBuilder extends Builder
         return $type->getName();
     }
 
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
+    public function build(TypeStatement $stmt, BuildingContext $context): BackedEnumType
     {
         $this->expectNoShapeFields($stmt);
         $this->expectNoTemplateArguments($stmt);
 
-        $reflection = $this->createReflectionEnum($stmt);
+        /** @var class-string<TEnum> $class */
+        $class = $stmt->name->toString();
 
+        $reflection = $this->createReflectionEnum($class, $stmt);
         $definition = $this->getBackedEnumType($reflection, $stmt);
 
         return new BackedEnumType(
-            /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
-            class: $stmt->name->toString(),
+            class: $class,
             /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
             type: $context->getTypeByDefinition($definition),
         );
     }
 
     /**
-     * @return \ReflectionEnum<\BackedEnum>
+     * @param class-string<TEnum> $class
+     * @return \ReflectionEnum<TEnum>
      * @throws InternalTypeException
      */
-    protected function createReflectionEnum(NamedTypeNode $statement): \ReflectionEnum
+    protected function createReflectionEnum(string $class, NamedTypeNode $stmt): \ReflectionEnum
     {
         try {
-            /**
-             * @var \ReflectionEnum<\BackedEnum> $reflection
-             *
-             * @phpstan-ignore-next-line
-             */
-            $reflection = new \ReflectionEnum($statement->name->toString());
+            $reflection = new \ReflectionEnum($class);
         } catch (\ReflectionException $e) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: 'The "{{type}}" must be an existing enum',
                 previous: $e,
             );
@@ -92,7 +88,7 @@ class BackedEnumTypeBuilder extends Builder
 
         if ($reflection->getCases() === []) {
             throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
+                type: $stmt,
                 message: 'The "{{type}}" enum requires at least one case',
             );
         }

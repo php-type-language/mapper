@@ -79,8 +79,9 @@ abstract class Platform implements PlatformInterface
 
     public function getTypeCoercers(): iterable
     {
-        // TODO
-        return $this->coercers;
+        foreach ($this->coercers as $type => $coercer) {
+            yield $coercer => [$type];
+        }
     }
 
     public function isFeatureSupported(GrammarFeature $feature): bool

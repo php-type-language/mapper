@@ -12,8 +12,7 @@ use TypeLang\Mapper\Type\ClassType\ClassToArrayType;
 
 /**
  * @template TObject of object = object
- * @template TResult of object|array = object|array<array-key, mixed>
- * @template-extends AsymmetricType<TResult, TObject>
+ * @template-extends AsymmetricType<object|array<array-key, mixed>, TObject>
  */
 class ClassType extends AsymmetricType
 {
