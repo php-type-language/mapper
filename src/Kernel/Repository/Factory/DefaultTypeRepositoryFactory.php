@@ -67,11 +67,11 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         /**
          * Enables or disables logging of type matching processes
          */
-        private readonly bool $enableTypeMatchLogging = self::DEFAULT_TYPE_MATCH_TRACING_OPTION,
+        private readonly bool $enableTypeMatchLogging = self::DEFAULT_TYPE_MATCH_LOGGING_OPTION,
         /**
          * Enables or disables logging of type casting processes
          */
-        private readonly bool $enableTypeCastLogging = self::DEFAULT_TYPE_CAST_TRACING_OPTION,
+        private readonly bool $enableTypeCastLogging = self::DEFAULT_TYPE_CAST_LOGGING_OPTION,
         /**
          * Enables or disables tracing of type retrieval from the repository
          */
@@ -79,11 +79,11 @@ final class DefaultTypeRepositoryFactory implements TypeRepositoryFactoryInterfa
         /**
          * Enables or disables tracing of type matching processes
          */
-        private readonly bool $enableTypeMatchTracing = self::DEFAULT_TYPE_MATCH_LOGGING_OPTION,
+        private readonly bool $enableTypeMatchTracing = self::DEFAULT_TYPE_MATCH_TRACING_OPTION,
         /**
          * Enables or disables tracing of type casting processes
          */
-        private readonly bool $enableTypeCastTracing = self::DEFAULT_TYPE_CAST_LOGGING_OPTION,
+        private readonly bool $enableTypeCastTracing = self::DEFAULT_TYPE_CAST_TRACING_OPTION,
         /**
          * Enables or disables storing types in memory for quick retrieval
          */
