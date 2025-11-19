@@ -29,14 +29,24 @@ class IntRangeType implements TypeInterface
      */
     public function match(mixed $value, RuntimeContext $context): bool
     {
-        return $this->type->match($value, $context)
-            && $value >= $this->min
-            && $value <= $this->max;
+        if (\is_int($value)) {
+            return $value >= $this->min
+                && $value <= $this->max;
+        }
+
+        try {
+            $coerced = $this->type->cast($value, $context);
+
+            return $coerced >= $this->min
+                && $coerced <= $this->max;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function cast(mixed $value, RuntimeContext $context): int
     {
-        if ($this->match($value, $context)) {
+        if (\is_int($value) && $value >= $this->min && $value <= $this->max) {
             return $value;
         }
 

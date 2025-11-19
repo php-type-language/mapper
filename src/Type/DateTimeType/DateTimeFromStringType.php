@@ -52,13 +52,14 @@ class DateTimeFromStringType implements TypeInterface
      */
     public function match(mixed $value, RuntimeContext $context): bool
     {
-        if (!$this->input->match($value, $context)) {
+        try {
+            $coerced = $this->input->cast($value, $context);
+        } catch (\Throwable) {
             return false;
         }
 
         try {
-            /** @var string $value */
-            return $this->tryParseDateTime($value, $context) !== null;
+            return $this->tryParseDateTime($coerced, $context) !== null;
         } catch (\Throwable) {
             return false;
         }

@@ -14,6 +14,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class BoolLiteralTypeBuilder implements TypeBuilderInterface
 {
+    public const DEFAULT_PARENT_TYPE = 'bool';
+
+    public function __construct(
+        /**
+         * @var non-empty-string
+         */
+        protected readonly string $type = self::DEFAULT_PARENT_TYPE,
+    ) {}
+
     public function isSupported(TypeStatement $stmt): bool
     {
         return $stmt instanceof BoolLiteralNode;
@@ -21,6 +30,9 @@ class BoolLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $stmt, BuildingContext $context): BoolLiteralType
     {
-        return new BoolLiteralType($stmt->value);
+        return new BoolLiteralType(
+            value: $stmt->value,
+            type: $context->getTypeByDefinition($this->type),
+        );
     }
 }

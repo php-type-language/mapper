@@ -14,6 +14,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class StringLiteralTypeBuilder implements TypeBuilderInterface
 {
+    public const DEFAULT_PARENT_TYPE = 'string';
+
+    public function __construct(
+        /**
+         * @var non-empty-string
+         */
+        protected readonly string $type = self::DEFAULT_PARENT_TYPE,
+    ) {}
+
     public function isSupported(TypeStatement $stmt): bool
     {
         return $stmt instanceof StringLiteralNode;
@@ -21,6 +30,9 @@ class StringLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $stmt, BuildingContext $context): StringLiteralType
     {
-        return new StringLiteralType($stmt->value);
+        return new StringLiteralType(
+            value: $stmt->value,
+            type: $context->getTypeByDefinition($this->type),
+        );
     }
 }

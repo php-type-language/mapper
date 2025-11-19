@@ -17,6 +17,10 @@ abstract class LiteralType implements TypeInterface
          * @var TResult
          */
         protected readonly mixed $value,
+        /**
+         * @var TypeInterface<TResult>
+         */
+        protected readonly TypeInterface $type,
     ) {}
 
     /**
@@ -24,13 +28,23 @@ abstract class LiteralType implements TypeInterface
      */
     public function match(mixed $value, RuntimeContext $context): bool
     {
-        return $value === $this->value;
+        if ($value === $this->value) {
+            return true;
+        }
+
+        try {
+            return $this->type->cast($value, $context) === $this->value;
+        } catch (\Throwable) {
+            return false;
+        }
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed
     {
-        if ($value === $this->value) {
-            return $value;
+        $coerced = $this->type->cast($value, $context);
+
+        if ($coerced === $this->value) {
+            return $coerced;
         }
 
         throw InvalidValueException::createFromContext($context);

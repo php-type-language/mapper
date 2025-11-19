@@ -14,6 +14,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class IntLiteralTypeBuilder implements TypeBuilderInterface
 {
+    public const DEFAULT_PARENT_TYPE = 'int';
+
+    public function __construct(
+        /**
+         * @var non-empty-string
+         */
+        protected readonly string $type = self::DEFAULT_PARENT_TYPE,
+    ) {}
+
     public function isSupported(TypeStatement $stmt): bool
     {
         return $stmt instanceof IntLiteralNode;
@@ -21,6 +30,9 @@ class IntLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $stmt, BuildingContext $context): IntLiteralType
     {
-        return new IntLiteralType($stmt->value);
+        return new IntLiteralType(
+            value: $stmt->value,
+            type: $context->getTypeByDefinition($this->type),
+        );
     }
 }

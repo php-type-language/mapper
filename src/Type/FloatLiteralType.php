@@ -9,8 +9,11 @@ namespace TypeLang\Mapper\Type;
  */
 class FloatLiteralType extends LiteralType
 {
-    public function __construct(int|float $value)
+    /**
+     * @param TypeInterface<float> $type
+     */
+    public function __construct(int|float $value, TypeInterface $type)
     {
-        parent::__construct((float) $value);
+        parent::__construct((float) $value, $type);
     }
 }

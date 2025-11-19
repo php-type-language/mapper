@@ -141,23 +141,19 @@ class StandardPlatform extends Platform
 
         yield new Coercer\BoolTypeCoercer() => [
             Type\BoolType::class,
-            Type\BoolLiteralType::class,
         ];
 
         yield new Coercer\FloatTypeCoercer() => [
             Type\FloatType::class,
-            Type\FloatLiteralType::class,
         ];
 
         yield new Coercer\IntTypeCoercer() => [
             Type\IntType::class,
             Type\IntRangeType::class,
-            Type\IntLiteralType::class,
         ];
 
         yield new Coercer\StringTypeCoercer() => [
             Type\StringType::class,
-            Type\StringLiteralType::class,
         ];
 
         yield new Coercer\ArrayTypeCoercer() => [

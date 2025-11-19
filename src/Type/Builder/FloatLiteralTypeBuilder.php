@@ -14,6 +14,15 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  */
 class FloatLiteralTypeBuilder implements TypeBuilderInterface
 {
+    public const DEFAULT_PARENT_TYPE = 'float';
+
+    public function __construct(
+        /**
+         * @var non-empty-string
+         */
+        protected readonly string $type = self::DEFAULT_PARENT_TYPE,
+    ) {}
+
     public function isSupported(TypeStatement $stmt): bool
     {
         return $stmt instanceof FloatLiteralNode;
@@ -21,6 +30,9 @@ class FloatLiteralTypeBuilder implements TypeBuilderInterface
 
     public function build(TypeStatement $stmt, BuildingContext $context): FloatLiteralType
     {
-        return new FloatLiteralType($stmt->value);
+        return new FloatLiteralType(
+            value: $stmt->value,
+            type: $context->getTypeByDefinition($this->type),
+        );
     }
 }
