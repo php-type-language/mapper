@@ -9,13 +9,14 @@ use TypeLang\Mapper\Type\UnitEnumType\UnitEnumToStringType;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
+ *
  * @template-extends AsymmetricType<non-empty-string, TEnum>
  */
 class UnitEnumType extends AsymmetricType
 {
     /**
      * @param class-string<TEnum> $class
-     * @param TypeInterface<string> $type
+     * @param TypeInterface<string, string> $type
      */
     public function __construct(string $class, TypeInterface $type = new StringType())
     {

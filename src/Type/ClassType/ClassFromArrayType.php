@@ -8,18 +8,19 @@ use TypeLang\Mapper\Context\Path\Entry\ObjectEntry;
 use TypeLang\Mapper\Context\Path\Entry\ObjectPropertyEntry;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidObjectValueException;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\MissingRequiredObjectFieldException;
 use TypeLang\Mapper\Exception\Runtime\NonInstantiatableException;
 use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Kernel\Instantiator\ClassInstantiatorInterface;
 use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object
- * @template-implements TypeInterface<TObject>
+ *
+ * @template-implements TypeInterface<TObject, object|array<array-key, mixed>>
  */
 class ClassFromArrayType implements TypeInterface
 {
@@ -35,14 +36,21 @@ class ClassFromArrayType implements TypeInterface
         protected readonly ClassMetadata $metadata,
         protected readonly PropertyAccessorInterface $accessor,
         protected readonly ClassInstantiatorInterface $instantiator,
+        /**
+         * @var TypeInterface<array<array-key, mixed>, array<array-key, mixed>>
+         */
+        protected readonly TypeInterface $input,
     ) {
         $this->discriminator = new DiscriminatorTypeSelector($metadata);
     }
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return (\is_array($value) || \is_object($value))
-            && $this->matchRequiredProperties((array) $value, $context);
+        $result = \is_object($value)
+            ? MatchedResult::success($value)
+            : $this->input->match($value, $context);
+
+        return $result?->if($this->matchRequiredProperties((array) $result->value, $context));
     }
 
     /**
@@ -62,7 +70,7 @@ class ClassFromArrayType implements TypeInterface
             }
 
             // Assert valid type
-            if (!$meta->write->type->match($payload[$meta->alias], $context)) {
+            if ($meta->write->type->match($payload[$meta->alias], $context) === null) {
                 return false;
             }
         }
@@ -72,16 +80,9 @@ class ClassFromArrayType implements TypeInterface
 
     public function cast(mixed $value, RuntimeContext $context): mixed
     {
-        if (\is_object($value)) {
-            $value = (array) $value;
-        }
-
-        if (!\is_array($value)) {
-            throw InvalidValueOfTypeException::createFromContext(
-                expected: $this->metadata->getTypeStatement($context, read: false),
-                context: $context,
-            );
-        }
+        $value = \is_object($value)
+            ? (array) $value
+            : $this->input->cast($value, $context);
 
         $discriminator = $this->discriminator->select($value, $context);
 

@@ -6,11 +6,13 @@ namespace TypeLang\Mapper\Type\BackedEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
- * @template-implements TypeInterface<value-of<TEnum>>
+ *
+ * @template-implements TypeInterface<value-of<TEnum>, TEnum>
  */
 class BackedEnumToScalarType implements TypeInterface
 {
@@ -21,9 +23,10 @@ class BackedEnumToScalarType implements TypeInterface
         protected readonly string $class,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return $value instanceof $this->class;
+        /** @var MatchedResult<TEnum>|null */
+        return MatchedResult::successIf($value, $value instanceof $this->class);
     }
 
     public function cast(mixed $value, RuntimeContext $context): int|string

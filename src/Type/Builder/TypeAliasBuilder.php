@@ -15,6 +15,7 @@ use TypeLang\Printer\PrinterInterface;
 
 /**
  * @template-covariant TType of TypeInterface = TypeInterface<mixed>
+ *
  * @template-extends NamedTypeBuilder<TType>
  */
 class TypeAliasBuilder extends NamedTypeBuilder

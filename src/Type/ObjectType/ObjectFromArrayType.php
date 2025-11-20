@@ -5,30 +5,36 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\ObjectType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template-implements TypeInterface<object>
+ * @template-implements TypeInterface<object, object|array<array-key, mixed>>
  */
-final class ObjectFromArrayType implements TypeInterface
+class ObjectFromArrayType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function __construct(
+        /**
+         * @var TypeInterface<array<array-key, mixed>, array<array-key, mixed>>
+         */
+        protected readonly TypeInterface $input,
+    ) {}
+
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_object($value)
-            || \is_array($value);
+        if (\is_object($value)) {
+            return MatchedResult::success($value);
+        }
+
+        return $this->input->match($value, $context);
     }
 
     public function cast(mixed $value, RuntimeContext $context): object
     {
-        if (\is_array($value)) {
-            $value = (object) $value;
-        }
-
         if (\is_object($value)) {
             return $value;
         }
 
-        throw InvalidValueException::createFromContext($context);
+        return (object) $this->input->cast($value, $context);
     }
 }

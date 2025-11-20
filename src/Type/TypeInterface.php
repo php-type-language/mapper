@@ -9,13 +9,16 @@ use TypeLang\Mapper\Exception\Runtime\RuntimeException;
 
 /**
  * @template-covariant TResult of mixed = mixed
+ * @template-covariant TMatch of mixed = mixed
  */
 interface TypeInterface
 {
     /**
      * Checks that the value matches the selected type
+     *
+     * @return MatchedResult<TMatch>|null
      */
-    public function match(mixed $value, RuntimeContext $context): bool;
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult;
 
     /**
      * @return TResult

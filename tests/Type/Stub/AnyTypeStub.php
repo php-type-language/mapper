@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Type\Stub;
 
 use TypeLang\Mapper\Context\RuntimeContext;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
@@ -13,9 +14,9 @@ use TypeLang\Mapper\Type\TypeInterface;
  */
 final class AnyTypeStub implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): MatchedResult
     {
-        return true;
+        return MatchedResult::success($value);
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

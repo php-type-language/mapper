@@ -8,6 +8,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Builder\Builder;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -47,9 +48,9 @@ class MyNonEmptyType implements TypeInterface
         private readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return !empty($value);
+        return MatchedResult::successIf($value, !empty($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

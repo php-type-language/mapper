@@ -12,11 +12,16 @@ use TypeLang\Mapper\Type\ObjectType\ObjectToArrayType;
  */
 final class ObjectType extends AsymmetricType
 {
-    public function __construct()
+    /**
+     * @param TypeInterface<array<array-key, mixed>, array<array-key, mixed>> $input
+     */
+    public function __construct(TypeInterface $input = new ArrayType())
     {
         parent::__construct(
             normalize: new ObjectToArrayType(),
-            denormalize: new ObjectFromArrayType(),
+            denormalize: new ObjectFromArrayType(
+                input: $input,
+            ),
         );
     }
 }

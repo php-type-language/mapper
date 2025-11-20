@@ -12,6 +12,7 @@ use TypeLang\Mapper\Type\ClassType\ClassToArrayType;
 
 /**
  * @template TObject of object = object
+ *
  * @template-extends AsymmetricType<object|array<array-key, mixed>, TObject>
  */
 class ClassType extends AsymmetricType
@@ -23,6 +24,10 @@ class ClassType extends AsymmetricType
         ClassMetadata $metadata,
         PropertyAccessorInterface $accessor,
         ClassInstantiatorInterface $instantiator,
+        /**
+         * @var TypeInterface<array<array-key, mixed>, array<array-key, mixed>>
+         */
+        protected readonly TypeInterface $input = new ArrayType(),
     ) {
         parent::__construct(
             normalize: new ClassToArrayType(
@@ -33,6 +38,7 @@ class ClassType extends AsymmetricType
                 metadata: $metadata,
                 accessor: $accessor,
                 instantiator: $instantiator,
+                input: $input,
             ),
         );
     }

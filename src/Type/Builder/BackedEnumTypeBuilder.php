@@ -13,6 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
+ *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|int|string>>
  */
 class BackedEnumTypeBuilder extends Builder
@@ -71,6 +72,7 @@ class BackedEnumTypeBuilder extends Builder
 
     /**
      * @param class-string<TEnum> $class
+     *
      * @return \ReflectionEnum<TEnum>
      * @throws InternalTypeException
      */

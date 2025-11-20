@@ -15,9 +15,9 @@ class BoolType implements TypeInterface
     /**
      * @phpstan-assert-if-true bool $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_bool($value);
+        return MatchedResult::successIf($value, \is_bool($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): bool

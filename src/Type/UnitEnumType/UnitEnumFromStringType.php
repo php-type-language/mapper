@@ -6,11 +6,13 @@ namespace TypeLang\Mapper\Type\UnitEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TEnum of \UnitEnum = \UnitEnum
- * @template-implements TypeInterface<TEnum>
+ *
+ * @template-implements TypeInterface<TEnum, string>
  */
 class UnitEnumFromStringType implements TypeInterface
 {
@@ -25,7 +27,7 @@ class UnitEnumFromStringType implements TypeInterface
          */
         protected readonly string $class,
         /**
-         * @var TypeInterface<string>
+         * @var TypeInterface<string, string>
          */
         protected readonly TypeInterface $type,
     ) {
@@ -52,16 +54,18 @@ class UnitEnumFromStringType implements TypeInterface
         return $result;
     }
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \in_array($value, $this->cases, true);
+        $result = $this->type->match($value, $context);
+
+        return $result?->if(\in_array($result->value, $this->cases, true));
     }
 
     public function cast(mixed $value, RuntimeContext $context): \UnitEnum
     {
         $string = $this->type->cast($value, $context);
 
-        if (!$this->match($string, $context)) {
+        if (!\in_array($string, $this->cases, true)) {
             throw InvalidValueException::createFromContext($context);
         }
 

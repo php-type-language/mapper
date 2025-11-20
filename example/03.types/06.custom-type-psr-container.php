@@ -9,6 +9,7 @@ use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Platform\DelegatePlatform;
 use TypeLang\Mapper\Platform\StandardPlatform;
 use TypeLang\Mapper\Type\Builder\PsrContainerTypeBuilder;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 require __DIR__ . '/../../vendor/autoload.php';
@@ -43,9 +44,9 @@ class Container implements ContainerInterface
 // Add new type (must implement TypeInterface)
 class MyNonEmptyStringType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_string($value) && $value !== '';
+        return MatchedResult::successIf($value, \is_string($value) && $value !== '');
     }
 
     public function cast(mixed $value, RuntimeContext $context): string

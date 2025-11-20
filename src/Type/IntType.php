@@ -15,9 +15,9 @@ class IntType implements TypeInterface
     /**
      * @phpstan-assert-if-true int $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_int($value);
+        return MatchedResult::successIf($value, \is_int($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): int

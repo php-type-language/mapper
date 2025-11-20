@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Kernel\Repository\TypeDecorator;
 
 use TypeLang\Mapper\Context\RuntimeContext;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template-covariant TResult of mixed = mixed
- *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Type\Repository
  *
- * @template-extends TypeDecorator<TResult>
+ * @template-covariant TResult of mixed = mixed
+ * @template-covariant TMatch of mixed = mixed
+ *
+ * @template-extends TypeDecorator<TResult, TMatch>
  */
 final class TraceableType extends TypeDecorator
 {
@@ -23,7 +25,7 @@ final class TraceableType extends TypeDecorator
     private readonly string $name;
 
     /**
-     * @param TypeInterface<TResult> $delegate
+     * @param TypeInterface<TResult, TMatch> $delegate
      */
     public function __construct(
         private readonly bool $traceTypeMatching,
@@ -57,7 +59,7 @@ final class TraceableType extends TypeDecorator
         ]);
     }
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
         $tracer = $context->config->findTracer();
 

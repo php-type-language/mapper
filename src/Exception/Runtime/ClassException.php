@@ -9,6 +9,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TObject of object = object
+ *
  * @template-extends ValueOfTypeException<class-string<TObject>>
  */
 abstract class ClassException extends ValueOfTypeException implements

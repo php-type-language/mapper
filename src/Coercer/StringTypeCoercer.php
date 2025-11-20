@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Coercer;
 
 use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-implements TypeCoercerInterface<string>
@@ -67,10 +66,7 @@ class StringTypeCoercer implements TypeCoercerInterface
         return self::DEFAULT_FLOAT_PRECISION;
     }
 
-    /**
-     * @throws InvalidValueException
-     */
-    public function coerce(mixed $value, RuntimeContext $context): string
+    public function tryCoerce(mixed $value, RuntimeContext $context): mixed
     {
         return match (true) {
             // string
@@ -89,7 +85,7 @@ class StringTypeCoercer implements TypeCoercerInterface
                 $value === \INF => static::INF_TO_STRING,
                 $value === -\INF => '-' . static::INF_TO_STRING,
                 // Other floating point values
-                default => $this->floatToString($value, $context),
+                default => $this->floatToString($value),
             },
             // Int
             \is_int($value),
@@ -101,11 +97,11 @@ class StringTypeCoercer implements TypeCoercerInterface
             // Resource
             \is_resource($value) => \get_resource_type($value),
             \get_debug_type($value) === 'resource (closed)' => 'resource',
-            default => throw InvalidValueException::createFromContext($context),
+            default => $value,
         };
     }
 
-    private function floatToString(float $value, RuntimeContext $context): string
+    private function floatToString(float $value): string|float
     {
         $formatted = \sprintf($this->floatTemplate, $value);
         $formatted = \rtrim($formatted, '0');
@@ -118,6 +114,6 @@ class StringTypeCoercer implements TypeCoercerInterface
             return $formatted;
         }
 
-        throw InvalidValueException::createFromContext($context);
+        return $value;
     }
 }

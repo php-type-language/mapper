@@ -161,25 +161,103 @@ final class JsonLikeValuePrinter implements ValuePrinterInterface
      */
     private function printObject(object $object, int $depth): string
     {
+        $prefix = '';
+
+        if (!$object instanceof \stdClass) {
+            $prefix = \sprintf('object(%s)', $object::class);
+        }
+
         if ($object instanceof \Stringable) {
             $result = (string) $object;
 
             if ($result === '') {
-                return '{}';
+                return \sprintf('%s{}', $prefix);
             }
         }
 
         if ($depth >= $this->maxDepth) {
-            return '{...}';
+            return \sprintf('%s{...}', $prefix);
         }
 
-        $values = \get_object_vars($object);
+        $values = $this->getObjectProperties($object);
         $result = $this->computeKeyValValues($values, $depth + 1);
 
-        return \vsprintf('{%s%s}', [
+        return \vsprintf('%s{%s%s}', [
+            $prefix,
             \implode(', ', $result),
             $this->getArraySuffix(\count($values)),
         ]);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    private function getObjectProperties(object $object): array
+    {
+        return $this->tryGetObjectPublicProperties($object)
+            ?? $this->tryGetObjectPropertiesViaJson($object)
+            ?? $this->tryGetObjectPropertiesViaSerialize($object)
+            ?? [];
+    }
+
+    /**
+     * @return non-empty-array<array-key, mixed>|null
+     */
+    private function tryGetObjectPropertiesViaSerialize(object $object): ?array
+    {
+        if (!\method_exists($object, '__serialize')) {
+            return null;
+        }
+
+        try {
+            $result = $object->__serialize();
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (!\is_array($result) || $result === []) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return non-empty-array<array-key, mixed>|null
+     */
+    private function tryGetObjectPublicProperties(object $object): ?array
+    {
+        $result = \get_object_vars($object);
+
+        if ($result === []) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return non-empty-array<array-key, mixed>|null
+     */
+    private function tryGetObjectPropertiesViaJson(object $object): ?array
+    {
+        if (!\extension_loaded('json')) {
+            return null;
+        }
+
+        try {
+            $json = \json_encode($object, \JSON_THROW_ON_ERROR);
+
+            $result = \json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
+
+            if (!\is_array($result) || $result === []) {
+                return null;
+            }
+        } catch (\JsonException) {
+            return null;
+        }
+
+        return $result;
     }
 
     /**

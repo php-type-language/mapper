@@ -10,6 +10,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TValue of mixed = mixed
+ *
  * @template-extends ValueException<TValue>
  */
 abstract class ValueOfTypeException extends ValueException

@@ -6,16 +6,18 @@ namespace TypeLang\Mapper\Type\ObjectType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template-implements TypeInterface<object|array<array-key, mixed>>
+ * @template-implements TypeInterface<object|array<array-key, mixed>, object>
  */
-final class ObjectToArrayType implements TypeInterface
+class ObjectToArrayType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_object($value);
+        /** @var MatchedResult<object>|null */
+        return MatchedResult::successIf($value, \is_object($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): array|object

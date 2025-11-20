@@ -10,6 +10,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 /**
  * @template TKey of array-key = array-key
  * @template TValue of mixed = mixed
+ *
  * @template-extends IterableToArrayType<TKey, TValue>
  */
 class ArrayType extends IterableToArrayType
@@ -18,9 +19,9 @@ class ArrayType extends IterableToArrayType
      * @phpstan-assert-if-true array<array-key, mixed> $value
      */
     #[\Override]
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_array($value);
+        return MatchedResult::successIf($value, \is_array($value));
     }
 
     #[\Override]

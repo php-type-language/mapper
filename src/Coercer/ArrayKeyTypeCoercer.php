@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Coercer;
 
 use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-implements TypeCoercerInterface<array-key>
  */
 class ArrayKeyTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, RuntimeContext $context): int|string
+    public function tryCoerce(mixed $value, RuntimeContext $context): mixed
     {
         return match (true) {
             \is_string($value),
@@ -26,7 +25,7 @@ class ArrayKeyTypeCoercer implements TypeCoercerInterface
             // Enum
             $value instanceof \BackedEnum => $value->value,
             $value instanceof \UnitEnum => $value->name,
-            default => throw InvalidValueException::createFromContext($context),
+            default => $value,
         };
     }
 }

@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Coercer;
 
 use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-implements TypeCoercerInterface<int>
  */
 class IntTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, RuntimeContext $context): int
+    public function tryCoerce(mixed $value, RuntimeContext $context): mixed
     {
         if ($value instanceof \BackedEnum && \is_int($value->value)) {
             return $value->value;
@@ -30,7 +29,7 @@ class IntTypeCoercer implements TypeCoercerInterface
             $value === true => 1,
             // Resource to int type coercion is not obvious:
             // \is_resource($value) => \get_resource_id($value),
-            default => throw InvalidValueException::createFromContext($context),
+            default => $value,
         };
     }
 

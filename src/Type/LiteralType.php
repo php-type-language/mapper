@@ -8,7 +8,10 @@ use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
- * @template TResult of mixed = mixed
+ * @template-covariant TResult of mixed = mixed
+ * @template-covariant TMatch of mixed = mixed
+ *
+ * @template-implements TypeInterface<TResult, TMatch>
  */
 abstract class LiteralType implements TypeInterface
 {
@@ -18,25 +21,16 @@ abstract class LiteralType implements TypeInterface
          */
         protected readonly mixed $value,
         /**
-         * @var TypeInterface<TResult>
+         * @var TypeInterface<TResult, TMatch>
          */
         protected readonly TypeInterface $type,
     ) {}
 
-    /**
-     * @phpstan-assert-if-true TResult $value
-     */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        if ($value === $this->value) {
-            return true;
-        }
+        $result = $this->type->match($value, $context);
 
-        try {
-            return $this->type->cast($value, $context) === $this->value;
-        } catch (\Throwable) {
-            return false;
-        }
+        return $result?->if($result->value === $this->value);
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

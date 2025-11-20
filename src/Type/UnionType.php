@@ -7,16 +7,19 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\UnionType\UnionSelection;
 
 /**
  * @template-covariant TResult of mixed = mixed
- * @template-implements TypeInterface<TResult>
+ * @template-covariant TMatch of mixed= mixed
+ *
+ * @template-implements TypeInterface<TResult, TMatch>
  */
 class UnionType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var non-empty-list<TypeInterface<TResult>>
+         * @var non-empty-list<TypeInterface<TResult, TMatch>>
          */
         private readonly array $types,
     ) {}
@@ -24,9 +27,9 @@ class UnionType implements TypeInterface
     /**
      * Finds a child supported type from their {@see $types} list by value.
      *
-     * @return TypeInterface<TResult>|null
+     * @return UnionSelection<TResult, TMatch>|null
      */
-    protected function findType(mixed $value, RuntimeContext $context, bool $strict = true): ?TypeInterface
+    protected function select(mixed $value, RuntimeContext $context, bool $strict = true): ?UnionSelection
     {
         foreach ($this->types as $index => $type) {
             $entrance = $context->enter(
@@ -35,8 +38,10 @@ class UnionType implements TypeInterface
                 config: $context->withStrictTypes($strict),
             );
 
-            if ($type->match($value, $entrance)) {
-                return $type;
+            $result = $type->match($value, $entrance);
+
+            if ($result !== null) {
+                return new UnionSelection($type, $result);
             }
         }
 
@@ -51,29 +56,30 @@ class UnionType implements TypeInterface
      *    - in case of the primary search did not work
      *    - and if type coercions are enabled
      *
-     * @return TypeInterface<TResult>|null
+     * @return UnionSelection<TResult, TMatch>|null
      */
-    protected function findTypeWithFallback(mixed $value, RuntimeContext $context): ?TypeInterface
+    protected function selectWithFallback(mixed $value, RuntimeContext $context): ?UnionSelection
     {
         if ($context->isStrictTypesEnabled()) {
-            return $this->findType($value, $context);
+            return $this->select($value, $context);
         }
 
-        return $this->findType($value, $context)
-            ?? $this->findType($value, $context, false);
+        return $this->select($value, $context)
+            ?? $this->select($value, $context, false);
     }
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return $this->findTypeWithFallback($value, $context) !== null;
+        return $this->selectWithFallback($value, $context)
+            ?->result;
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed
     {
-        $type = $this->findTypeWithFallback($value, $context);
+        $selection = $this->selectWithFallback($value, $context);
 
-        if ($type !== null) {
-            return $type->cast($value, $context);
+        if ($selection !== null) {
+            return $selection->type->cast($value, $context);
         }
 
         throw InvalidValueException::createFromContext($context);

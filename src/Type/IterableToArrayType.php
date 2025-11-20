@@ -13,6 +13,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 /**
  * @template TKey of array-key = array-key
  * @template TValue of mixed = mixed
+ *
  * @template-implements TypeInterface<array<TKey, TValue>>
  */
 class IterableToArrayType implements TypeInterface
@@ -31,9 +32,9 @@ class IterableToArrayType implements TypeInterface
     /**
      * @phpstan-assert-if-true iterable<mixed, mixed> $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_iterable($value);
+        return MatchedResult::successIf($value, \is_iterable($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): array

@@ -6,22 +6,24 @@ namespace TypeLang\Mapper\Kernel\Repository\TypeDecorator;
 
 use Psr\Log\LoggerInterface;
 use TypeLang\Mapper\Context\RuntimeContext;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * Decorates calls of each type by adding logging functionality
  *
- * @template-covariant TResult of mixed = mixed
- *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Type\Repository
  *
- * @template-extends TypeDecorator<TResult>
+ * @template-covariant TResult of mixed = mixed
+ * @template-covariant TMatch of mixed = mixed
+ *
+ * @template-extends TypeDecorator<TResult, TMatch>
  */
 final class LoggableType extends TypeDecorator
 {
     /**
-     * @param TypeInterface<TResult> $delegate
+     * @param TypeInterface<TResult, TMatch> $delegate
      */
     public function __construct(
         private readonly bool $logTypeMatching,
@@ -75,11 +77,15 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    private function logAfterMatch(LoggerInterface $logger, mixed $value, RuntimeContext $context, bool $status): void
-    {
-        if ($status) {
+    private function logAfterMatch(
+        LoggerInterface $logger,
+        mixed $value,
+        RuntimeContext $context,
+        ?MatchedResult $result,
+    ): void {
+        if ($result !== null) {
             $logger->info('[MATCH] ✔ Matched {value} by {type_name} type', [
-                'isMatched' => true,
+                'matched' => $result->value,
                 ...$this->getLoggerArguments($value, $context),
             ]);
 
@@ -87,7 +93,7 @@ final class LoggableType extends TypeDecorator
         }
 
         $logger->notice('[MATCH] ✘ Not matched {value} by {type_name} type', [
-            'isMatched' => false,
+            'matched' => null,
             ...$this->getLoggerArguments($value, $context),
         ]);
     }
@@ -100,7 +106,7 @@ final class LoggableType extends TypeDecorator
         ]);
     }
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
         $logger = $context->config->findLogger();
 
@@ -112,9 +118,10 @@ final class LoggableType extends TypeDecorator
     }
 
     /**
+     * @return MatchedResult<TMatch>|null
      * @throws \Throwable in case of any internal error occurs
      */
-    private function matchThroughLogger(LoggerInterface $logger, mixed $value, RuntimeContext $context): bool
+    private function matchThroughLogger(LoggerInterface $logger, mixed $value, RuntimeContext $context): ?MatchedResult
     {
         $this->logBeforeMatch($logger, $value, $context);
 

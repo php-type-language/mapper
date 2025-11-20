@@ -9,6 +9,7 @@ use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>
+ *
  * @template-extends IterableValueException<TValue>
  */
 class InvalidIterableValueException extends IterableValueException

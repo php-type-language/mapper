@@ -22,6 +22,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
  * ```
  *
  * @template TValue of mixed = mixed
+ *
  * @template-extends NamedTypeBuilder<TypeInterface<TValue>>
  */
 class CallableTypeBuilder extends NamedTypeBuilder

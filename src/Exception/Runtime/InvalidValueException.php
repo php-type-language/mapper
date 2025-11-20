@@ -9,6 +9,7 @@ use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template TValue of mixed = mixed
+ *
  * @template-extends ValueException<TValue>
  */
 class InvalidValueException extends ValueException

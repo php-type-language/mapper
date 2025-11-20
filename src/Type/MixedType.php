@@ -11,9 +11,9 @@ use TypeLang\Mapper\Context\RuntimeContext;
  */
 class MixedType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): MatchedResult
     {
-        return true;
+        return MatchedResult::success($value);
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

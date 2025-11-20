@@ -16,6 +16,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TDate of \DateTimeImmutable|\DateTime = \DateTimeImmutable
  * @template TResult of string = string
+ *
  * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TDate>>
  */
 class DateTimeTypeBuilder extends Builder

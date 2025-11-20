@@ -9,6 +9,7 @@ use TypeLang\Mapper\Type\DateTimeType\DateTimeToStringType;
 
 /**
  * @template TDateTime of \DateTimeImmutable|\DateTime = \DateTimeImmutable
+ *
  * @template-extends AsymmetricType<string, TDateTime|string>
  */
 class DateTimeType extends AsymmetricType
@@ -16,7 +17,7 @@ class DateTimeType extends AsymmetricType
     /**
      * @param class-string<TDateTime> $class
      * @param non-empty-string|null $format
-     * @param TypeInterface<string> $input
+     * @param TypeInterface<string, string> $input
      */
     public function __construct(
         string $class,
@@ -25,6 +26,7 @@ class DateTimeType extends AsymmetricType
     ) {
         parent::__construct(
             normalize: new DateTimeToStringType(
+                class: $class,
                 format: $format,
             ),
             denormalize: new DateTimeFromStringType(

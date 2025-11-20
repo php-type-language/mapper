@@ -11,7 +11,7 @@ use TypeLang\Mapper\Context\RuntimeContext;
  */
 class BoolTypeCoercer implements TypeCoercerInterface
 {
-    public function coerce(mixed $value, RuntimeContext $context): bool
+    public function tryCoerce(mixed $value, RuntimeContext $context): mixed
     {
         //
         // Each value should be checked EXPLICITLY, instead

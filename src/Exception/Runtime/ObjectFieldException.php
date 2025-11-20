@@ -10,6 +10,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TField of mixed = mixed
  * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
  * @template-extends ObjectException<TValue>
  */
 abstract class ObjectFieldException extends ObjectException

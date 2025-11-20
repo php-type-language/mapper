@@ -8,6 +8,7 @@ use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
  * @template-covariant TResult of mixed = mixed
+ *
  * @template-implements TypeInterface<TResult|null>
  */
 class NullableType implements TypeInterface
@@ -19,9 +20,13 @@ class NullableType implements TypeInterface
         private readonly TypeInterface $parent,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return $value === null || $this->parent->match($value, $context);
+        if ($value === null) {
+            return MatchedResult::success($value);
+        }
+
+        return $this->parent->match($value, $context);
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

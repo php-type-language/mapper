@@ -10,6 +10,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TObject of object = object
+ *
  * @template-extends ClassException<TObject>
  */
 class NonInstantiatableException extends ClassException

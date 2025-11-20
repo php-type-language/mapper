@@ -9,6 +9,7 @@ use TypeLang\Mapper\Context\RuntimeContext;
 /**
  * @template TOutResult of mixed = mixed
  * @template TInResult of mixed = mixed
+ *
  * @template-implements TypeInterface<TOutResult|TInResult>
  */
 abstract class AsymmetricType implements TypeInterface
@@ -24,7 +25,7 @@ abstract class AsymmetricType implements TypeInterface
         private readonly TypeInterface $denormalize,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
         if ($context->direction->isOutput()) {
             return $this->normalize->match($value, $context);

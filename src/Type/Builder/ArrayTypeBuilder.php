@@ -10,6 +10,7 @@ use TypeLang\Mapper\Type\TypeInterface;
 /**
  * @template TKey of array-key = array-key
  * @template TValue of mixed = mixed
+ *
  * @template-extends MapTypeBuilder<TKey, TValue>
  */
 class ArrayTypeBuilder extends MapTypeBuilder

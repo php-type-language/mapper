@@ -15,7 +15,7 @@ interface TypeCoercerInterface
     /**
      * @param TValue $value
      *
-     * @return TResult
+     * @return TResult|mixed
      */
-    public function coerce(mixed $value, RuntimeContext $context): mixed;
+    public function tryCoerce(mixed $value, RuntimeContext $context): mixed;
 }

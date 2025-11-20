@@ -27,27 +27,19 @@ class IntRangeType implements TypeInterface
     /**
      * @phpstan-assert-if-true int $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        if (\is_int($value)) {
-            return $value >= $this->min
-                && $value <= $this->max;
-        }
+        $result = $this->type->match($value, $context);
 
-        try {
-            $coerced = $this->type->cast($value, $context);
-
-            return $coerced >= $this->min
-                && $coerced <= $this->max;
-        } catch (\Throwable) {
-            return false;
-        }
+        return $result?->if($result->value >= $this->min && $result->value <= $this->max);
     }
 
     public function cast(mixed $value, RuntimeContext $context): int
     {
-        if (\is_int($value) && $value >= $this->min && $value <= $this->max) {
-            return $value;
+        $casted = $this->type->cast($value, $context);
+
+        if ($casted >= $this->min && $casted <= $this->max) {
+            return $casted;
         }
 
         throw InvalidValueException::createFromContext($context);

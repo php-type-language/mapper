@@ -12,9 +12,9 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class StringType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_string($value);
+        return MatchedResult::successIf($value, \is_string($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): string

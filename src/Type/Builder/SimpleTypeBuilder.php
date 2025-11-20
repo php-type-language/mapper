@@ -13,6 +13,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TResult of mixed = mixed
+ *
  * @template-extends NamedTypeBuilder<TypeInterface<TResult>>
  */
 class SimpleTypeBuilder extends NamedTypeBuilder

@@ -9,13 +9,14 @@ use TypeLang\Mapper\Type\BackedEnumType\BackedEnumToScalarType;
 
 /**
  * @template TEnum of \BackedEnum = \BackedEnum
+ *
  * @template-extends AsymmetricType<int|string, TEnum>
  */
 class BackedEnumType extends AsymmetricType
 {
     /**
      * @param class-string<TEnum> $class
-     * @param TypeInterface<value-of<TEnum>> $type
+     * @param TypeInterface<int, int>|TypeInterface<string, string> $type
      */
     public function __construct(string $class, TypeInterface $type)
     {
@@ -25,7 +26,7 @@ class BackedEnumType extends AsymmetricType
             ),
             denormalize: new BackedEnumFromScalarType(
                 class: $class,
-                type: $type
+                input: $type
             ),
         );
     }

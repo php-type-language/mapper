@@ -148,7 +148,7 @@ final class Mapper implements NormalizerInterface, DenormalizerInterface
             statement: $this->context->getStatementByDefinition($type),
         );
 
-        return $instance->match($value, $context);
+        return $instance->match($value, $context) !== null;
     }
 
     /**

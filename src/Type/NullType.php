@@ -15,9 +15,9 @@ class NullType implements TypeInterface
     /**
      * @phpstan-assert-if-true null $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return $value === null;
+        return MatchedResult::successIf($value, $value === null);
     }
 
     public function cast(mixed $value, RuntimeContext $context): mixed

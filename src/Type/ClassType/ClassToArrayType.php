@@ -12,11 +12,13 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueOfTypeException;
 use TypeLang\Mapper\Exception\Runtime\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Kernel\PropertyAccessor\PropertyAccessorInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TObject of object = object
- * @template-implements TypeInterface<object|array<array-key, mixed>>
+ *
+ * @template-implements TypeInterface<object|array<array-key, mixed>, TObject>
  */
 class ClassToArrayType implements TypeInterface
 {
@@ -28,11 +30,10 @@ class ClassToArrayType implements TypeInterface
         protected readonly PropertyAccessorInterface $accessor,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        $class = $this->metadata->name;
-
-        return $value instanceof $class;
+        /** @var MatchedResult<TObject>|null */
+        return MatchedResult::successIf($value, $value instanceof $this->metadata->name);
     }
 
     public function cast(mixed $value, RuntimeContext $context): object|array

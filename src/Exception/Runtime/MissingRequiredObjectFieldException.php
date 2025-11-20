@@ -10,6 +10,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
  * @template-extends ObjectFieldException<non-empty-string, TValue>
  */
 class MissingRequiredObjectFieldException extends ObjectFieldException

@@ -15,7 +15,7 @@ class ArrayKeyType implements TypeInterface
     /**
      * @phpstan-assert-if-true array-key $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
         // TBD (?)
         // It is not entirely clear whether a zero ("0") string
@@ -26,7 +26,7 @@ class ArrayKeyType implements TypeInterface
         //     return false;
         // }
 
-        return \is_int($value) || \is_string($value);
+        return MatchedResult::successIf($value, \is_int($value) || \is_string($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): string|int

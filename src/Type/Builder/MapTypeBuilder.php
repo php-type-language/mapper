@@ -16,6 +16,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 /**
  * @template TKey of mixed = mixed
  * @template TValue of mixed = mixed
+ *
  * @template-extends NamedTypeBuilder<TypeInterface<iterable<TKey, TValue>>>
  */
 abstract class MapTypeBuilder extends NamedTypeBuilder

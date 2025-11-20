@@ -11,6 +11,7 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
 
 /**
  * @template-covariant TItem of mixed = mixed
+ *
  * @template-implements TypeInterface<list<TItem>>
  */
 class ListType implements TypeInterface
@@ -25,9 +26,9 @@ class ListType implements TypeInterface
     /**
      * @phpstan-assert-if-true iterable<mixed, mixed> $value
      */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_array($value) && \array_is_list($value);
+        return MatchedResult::successIf($value, \is_array($value) && \array_is_list($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): array

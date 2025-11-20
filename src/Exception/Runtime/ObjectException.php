@@ -9,6 +9,7 @@ use TypeLang\Parser\Node\Stmt\TypeStatement;
 
 /**
  * @template TValue of array<array-key, mixed>|object = array<array-key, mixed>|object
+ *
  * @template-extends ValueOfTypeException<TValue>
  */
 abstract class ObjectException extends ValueOfTypeException implements

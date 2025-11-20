@@ -7,11 +7,13 @@ namespace TypeLang\Mapper\Type\DateTimeType;
 use DateTimeImmutable as TDateTime;
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
  * @template TDateTime of \DateTimeImmutable|\DateTime = \DateTimeImmutable
- * @template-implements TypeInterface<TDateTime>
+ *
+ * @template-implements TypeInterface<TDateTime, string>
  */
 class DateTimeFromStringType implements TypeInterface
 {
@@ -25,7 +27,7 @@ class DateTimeFromStringType implements TypeInterface
          */
         protected readonly ?string $format,
         /**
-         * @var TypeInterface<string>
+         * @var TypeInterface<string, string>
          */
         protected readonly TypeInterface $input,
     ) {
@@ -47,22 +49,15 @@ class DateTimeFromStringType implements TypeInterface
         ));
     }
 
-    /**
-     * @phpstan-assert-if-true string $value
-     */
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        try {
-            $coerced = $this->input->cast($value, $context);
-        } catch (\Throwable) {
-            return false;
+        $result = $this->input->match($value, $context);
+
+        if ($context->isStrictTypesEnabled()) {
+            return $result?->if($this->tryParseDateTime($result->value, $context) !== null);
         }
 
-        try {
-            return $this->tryParseDateTime($coerced, $context) !== null;
-        } catch (\Throwable) {
-            return false;
-        }
+        return $result;
     }
 
     public function cast(mixed $value, RuntimeContext $context): \DateTimeInterface
@@ -87,22 +82,32 @@ class DateTimeFromStringType implements TypeInterface
     {
         // In case of format and strict config types are enabled
         if ($this->format !== null && $context->isStrictTypesEnabled()) {
-            /** @var class-string<TDateTime> $class */
-            $class = $this->class;
-
-            try {
-                $result = $class::createFromFormat($this->format, $value);
-            } catch (\Throwable) {
-                return null;
-            }
-
-            return \is_bool($result) ? null : $result;
+            return $this->tryParseDateTimeStrict($value);
         }
 
         try {
-            return new $this->class($value);
+            return new ($this->class)($value);
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    /**
+     * @return TDateTime|null
+     */
+    private function tryParseDateTimeStrict(string $value): ?\DateTimeInterface
+    {
+        assert($this->format !== null);
+
+        /** @var class-string<TDateTime> $class */
+        $class = $this->class;
+
+        try {
+            $result = $class::createFromFormat($this->format, $value);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        return \is_bool($result) ? null : $result;
     }
 }

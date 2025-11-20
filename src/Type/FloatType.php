@@ -12,9 +12,9 @@ use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
  */
 class FloatType implements TypeInterface
 {
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return \is_float($value);
+        return MatchedResult::successIf($value, \is_float($value));
     }
 
     public function cast(mixed $value, RuntimeContext $context): float

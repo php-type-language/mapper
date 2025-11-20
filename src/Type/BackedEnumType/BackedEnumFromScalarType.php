@@ -6,11 +6,13 @@ namespace TypeLang\Mapper\Type\BackedEnumType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template TEnum of \BackedEnum = \BackedEnum
- * @template-implements TypeInterface<TEnum>
+ * @template-covariant TEnum of \BackedEnum = \BackedEnum
+ *
+ * @template-implements TypeInterface<TEnum, int|string>
  */
 class BackedEnumFromScalarType implements TypeInterface
 {
@@ -20,32 +22,26 @@ class BackedEnumFromScalarType implements TypeInterface
          */
         protected readonly string $class,
         /**
-         * @var TypeInterface<string|int>
+         * @var TypeInterface<int, int>|TypeInterface<string, string>
          */
-        protected readonly TypeInterface $type,
+        protected readonly TypeInterface $input,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        $isSupportsType = $this->type->match($value, $context);
-
-        if (!$isSupportsType) {
-            return false;
-        }
-
-        /** @var int|string $denormalized */
-        $denormalized = $this->type->cast($value, $context);
+        /** @var MatchedResult<int>|MatchedResult<string>|null $result */
+        $result = $this->input->match($value, $context);
 
         try {
-            return ($this->class)::tryFrom($denormalized) !== null;
+            return $result?->if(($this->class)::tryFrom($result->value) !== null);
         } catch (\Throwable) {
-            return false;
+            return null;
         }
     }
 
     public function cast(mixed $value, RuntimeContext $context): \BackedEnum
     {
-        $denormalized = $this->type->cast($value, $context);
+        $denormalized = $this->input->cast($value, $context);
 
         try {
             $case = $this->class::tryFrom($denormalized);

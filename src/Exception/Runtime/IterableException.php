@@ -8,6 +8,7 @@ use TypeLang\Mapper\Context\Path\PathInterface;
 
 /**
  * @template TValue of iterable = iterable<mixed, mixed>
+ *
  * @template-extends ValueException<TValue>
  */
 abstract class IterableException extends ValueException implements

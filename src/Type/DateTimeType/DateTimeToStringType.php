@@ -6,10 +6,13 @@ namespace TypeLang\Mapper\Type\DateTimeType;
 
 use TypeLang\Mapper\Context\RuntimeContext;
 use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Type\MatchedResult;
 use TypeLang\Mapper\Type\TypeInterface;
 
 /**
- * @template-implements TypeInterface<string>
+ * @template TDateTime of \DateTimeInterface = \DateTimeInterface
+ *
+ * @template-implements TypeInterface<string, TDateTime>
  */
 class DateTimeToStringType implements TypeInterface
 {
@@ -20,19 +23,36 @@ class DateTimeToStringType implements TypeInterface
 
     public function __construct(
         /**
+         * @var class-string<TDateTime>
+         */
+        protected readonly string $class,
+        /**
          * @var non-empty-string|null
          */
         protected readonly ?string $format = null,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): bool
+    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        return $value instanceof \DateTimeInterface;
+        $expected = \DateTimeInterface::class;
+
+        if ($context->isStrictTypesEnabled()) {
+            $expected = $this->class;
+        }
+
+        /** @var MatchedResult<TDateTime>|null */
+        return MatchedResult::successIf($value, $value instanceof $expected);
     }
 
     public function cast(mixed $value, RuntimeContext $context): string
     {
-        if ($value instanceof \DateTimeInterface) {
+        $expected = \DateTimeInterface::class;
+
+        if ($context->isStrictTypesEnabled()) {
+            $expected = $this->class;
+        }
+
+        if ($value instanceof $expected) {
             return $value->format($this->format ?? self::DEFAULT_DATETIME_FORMAT);
         }
 
