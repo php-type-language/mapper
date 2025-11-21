@@ -42,10 +42,32 @@ class StandardPlatform extends Platform
         // Adds support for the "string" type
         yield $string = new Builder\SimpleTypeBuilder('string', Type\StringType::class);
         yield new Builder\TypeAliasBuilder(\Stringable::class, $string);
+        yield new Builder\TypeAliasBuilder('non-empty-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('lowercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-lowercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('uppercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-uppercase-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('numeric-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('literal-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-empty-literal-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('class-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('interface-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('trait-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('enum-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('callable-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('truthy-string', $string, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-falsy-string', $string, Reason::Temporary);
 
         // Adds support for the "int" type
         yield $int = new Builder\IntRangeTypeBuilder('int');
         yield new Builder\TypeAliasBuilder('integer', $int, Reason::NonCanonical);
+        yield new Builder\TypeAliasBuilder('positive-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-positive-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('negative-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-negative-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('non-zero-int', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('number', $int, Reason::Temporary);
+        yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Temporary);
 
         // Adds support for the "float" type
         yield $float = new Builder\SimpleTypeBuilder('float', Type\FloatType::class);
@@ -70,19 +92,11 @@ class StandardPlatform extends Platform
         // Adds support for the "?T" statement
         yield new Builder\NullableTypeBuilder();
 
-        // Adds support for the "null" literal and/or named type statement
+        // Adds support for the literal types
         yield new Builder\NullTypeBuilder();
-
-        // Adds support for the "true" and "false" literals
         yield new Builder\BoolLiteralTypeBuilder();
-
-        // Adds support for the integer literal types
         yield new Builder\IntLiteralTypeBuilder();
-
-        // Adds support for the float literal types
         yield new Builder\FloatLiteralTypeBuilder();
-
-        // Adds support for the string literal types
         yield new Builder\StringLiteralTypeBuilder();
 
         // Adds support for the "T[]" statement
@@ -91,33 +105,12 @@ class StandardPlatform extends Platform
         // Adds support for the "T|U" union types
         yield new Builder\UnionTypeBuilder();
 
-        // Temporary aliases
-        yield new Builder\TypeAliasBuilder('non-empty-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('lowercase-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-empty-lowercase-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('uppercase-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-empty-uppercase-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('numeric-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('literal-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-empty-literal-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('class-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('interface-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('trait-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('enum-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('callable-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('truthy-string', $string, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-falsy-string', $string, Reason::Temporary);
+        // Adds support for constants (and masks)
+        yield new Builder\ConstMaskTypeBuilder();
+        yield new Builder\ClassConstTypeBuilder();
+        yield new Builder\ClassConstMaskTypeBuilder();
 
-        yield new Builder\TypeAliasBuilder('positive-int', $int, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-positive-int', $int, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('negative-int', $int, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-negative-int', $int, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('non-zero-int', $int, Reason::Temporary);
-
-        yield new Builder\TypeAliasBuilder('number', $int, Reason::Temporary);
-        yield new Builder\TypeAliasBuilder('numeric', $int, Reason::Temporary);
-
-        // Other
+        // Other (asymmetric)
         yield $object = new Builder\ObjectTypeBuilder('object');
         yield new Builder\TypeAliasBuilder(\stdClass::class, $object);
         yield new Builder\UnitEnumTypeBuilder();

@@ -54,6 +54,10 @@ final class ReferencesResolver
         return $this->typeResolver->resolve(
             type: $statement,
             transform: static function (Name $name) use ($class): ?Name {
+                if ($name->isFullQualified() || $name->isBuiltin()) {
+                    return $name;
+                }
+
                 $namespace = $class->getNamespaceName();
 
                 // Replace "namespace\ClassName" sequences to current
@@ -72,19 +76,13 @@ final class ReferencesResolver
                     }
                 }
 
-                if ($namespace !== '' && self::entryExists($namespace . '\\' . $name->toString())) {
-                    return (new Name($namespace))
-                        ->withAdded($name);
+                if ($namespace === '') {
+                    return null;
                 }
 
-                return null;
+                return (new Name($namespace))
+                    ->withAdded($name);
             },
         );
-    }
-
-    private static function entryExists(string $fqn): bool
-    {
-        return \class_exists($fqn)
-            || \interface_exists($fqn, false);
     }
 }

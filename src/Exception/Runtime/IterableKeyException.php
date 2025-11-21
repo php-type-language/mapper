@@ -7,7 +7,7 @@ namespace TypeLang\Mapper\Exception\Runtime;
 use TypeLang\Mapper\Context\Path\PathInterface;
 
 /**
- * @template TValue of iterable = iterable<mixed, mixed>
+ * @template TValue of mixed = mixed
  *
  * @template-extends IterableException<TValue>
  */
@@ -30,7 +30,7 @@ abstract class IterableKeyException extends IterableException
          * be compatible with PHP array keys ({@see int} or {@see string}).
          */
         public readonly mixed $key,
-        iterable $value,
+        mixed $value,
         PathInterface $path,
         string $template,
         int $code = 0,

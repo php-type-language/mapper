@@ -8,14 +8,14 @@ use TypeLang\Mapper\Context\Path\PathInterface;
 use TypeLang\Mapper\Context\RuntimeContext;
 
 /**
- * @template TValue of iterable = iterable<mixed, mixed>
+ * @template TValue of mixed = mixed
  *
  * @template-extends IterableKeyException<TValue>
  */
 class InvalidIterableKeyException extends IterableKeyException
 {
     /**
-     * @template TArgValue of iterable
+     * @template TArgValue of mixed
      *
      * @param int<0, max> $index
      * @param TArgValue $value
@@ -25,11 +25,11 @@ class InvalidIterableKeyException extends IterableKeyException
     public static function createFromPath(
         int $index,
         mixed $key,
-        iterable $value,
+        mixed $value,
         PathInterface $path,
         ?\Throwable $previous = null,
     ): self {
-        $template = 'The key {{key}} on index {{index}} in {{value}} is invalid';
+        $template = 'The key {{key}} in {{value}} is invalid';
 
         /** @var self<TArgValue> */
         return new self(

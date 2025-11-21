@@ -7,19 +7,15 @@ namespace TypeLang\Mapper\Exception\Runtime;
 use TypeLang\Mapper\Context\Path\PathInterface;
 
 /**
- * @template TValue of iterable = iterable<mixed, mixed>
+ * @template TValue of mixed = mixed
  *
  * @template-extends ValueException<TValue>
  */
 abstract class IterableException extends ValueException implements
     NotInterceptableExceptionInterface
 {
-    /**
-     * @param TValue $value unlike {@see ValueException::$value}, this exception
-     *        value can only be {@see iterable}
-     */
     public function __construct(
-        iterable $value,
+        mixed $value,
         PathInterface $path,
         string $template,
         int $code = 0,

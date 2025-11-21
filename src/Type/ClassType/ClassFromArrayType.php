@@ -46,9 +46,11 @@ class ClassFromArrayType implements TypeInterface
 
     public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
-        $result = \is_object($value)
-            ? MatchedResult::success($value)
-            : $this->input->match($value, $context);
+        $result = match (true) {
+            \is_array($value) => MatchedResult::success($value),
+            \is_iterable($value) => MatchedResult::success(\iterator_to_array($value)),
+            default => $this->input->match($value, $context),
+        };
 
         return $result?->if($this->matchRequiredProperties((array) $result->value, $context));
     }
@@ -80,9 +82,11 @@ class ClassFromArrayType implements TypeInterface
 
     public function cast(mixed $value, RuntimeContext $context): mixed
     {
-        $value = \is_object($value)
-            ? (array) $value
-            : $this->input->cast($value, $context);
+        $value = match (true) {
+            \is_array($value) => $value,
+            \is_iterable($value) => \iterator_to_array($value),
+            default => $this->input->cast($value, $context),
+        };
 
         $discriminator = $this->discriminator->select($value, $context);
 
