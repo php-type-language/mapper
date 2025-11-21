@@ -49,7 +49,7 @@ abstract class MapTypeBuilder extends NamedTypeBuilder
         /** @phpstan-ignore-next-line : Additional DbC assertion */
         assert($stmt instanceof NamedTypeNode);
 
-        $this->expectNoShapeFields($stmt);
+        //$this->expectNoShapeFields($stmt);
 
         $arguments = $stmt->arguments->items ?? [];
 
