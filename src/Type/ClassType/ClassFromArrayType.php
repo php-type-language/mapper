@@ -52,6 +52,7 @@ class ClassFromArrayType implements TypeInterface
             default => $this->input->match($value, $context),
         };
 
+        /** @var MatchedResult<array<array-key, mixed>>|null */
         return $result?->if($this->matchRequiredProperties((array) $result->value, $context));
     }
 

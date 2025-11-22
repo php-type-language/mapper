@@ -100,7 +100,7 @@ final class ReferencesResolver
     /**
      * @param \ReflectionClass<object> $class
      */
-    private function fromCurrentNamespace(Name $name, \ReflectionClass $class): ?Name
+    private function fromCurrentNamespace(Name $name, \ReflectionClass $class): Name
     {
         // Replace "namespace\ClassName" sequences to current namespace of the class.
         $first = $name->getFirstPart();
