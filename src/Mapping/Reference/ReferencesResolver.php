@@ -71,6 +71,7 @@ final class ReferencesResolver
 
     /**
      * @param array<int|non-empty-string, non-empty-string> $uses
+     *
      * @return array<non-empty-string, non-empty-string>
      */
     private function formatUseStatements(array $uses): array
