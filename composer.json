@@ -26,7 +26,7 @@
     },
     "require-dev": {
         "doctrine/instantiator": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.89",
+        "friendsofphp/php-cs-fixer": "^3.90",
         "jetbrains/phpstorm-attributes": "^1.2",
         "justinrainbow/json-schema": "^6.6",
         "marc-mabe/php-enum": "^4.7",
