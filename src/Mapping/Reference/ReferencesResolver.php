@@ -18,6 +18,11 @@ use TypeLang\Parser\TypeResolver;
  */
 final class ReferencesResolver
 {
+    /**
+     * @var non-empty-lowercase-string
+     */
+    private const CURRENT_NAMESPACE = 'namespace';
+
     private readonly TypeResolver $typeResolver;
 
     public function __construct(
@@ -35,54 +40,81 @@ final class ReferencesResolver
      */
     public function resolve(TypeStatement $statement, \ReflectionClass $context): TypeStatement
     {
-        // Performs Name conversions if the required type is found
-        // in the same namespace as the declared dependency.
-        $statement = $this->resolveFromCurrentNamespace($statement, $context);
+        // Fetch all "use" statements from the class
+        $uses = $this->formatUseStatements(
+            uses: $this->references->getUseStatements($context),
+        );
 
-        $uses = $this->references->getUseStatements($context);
+        return $this->typeResolver->resolve($statement, function (Name $name) use ($context, $uses): ?Name {
+            if ($name->isFullQualified() || $name->isBuiltin()) {
+                return null;
+            }
 
-        // Additionally performs Name conversions if the required
-        // type was specified in "use" statement.
-        return $this->typeResolver->resolveWith($statement, $uses);
+            return $this->tryFromUseStatements($name, $uses)
+                ?? $this->fromCurrentNamespace($name, $context);
+        });
+    }
+
+    /**
+     * @param array<int|non-empty-string, non-empty-string> $uses
+     */
+    private function tryFromUseStatements(Name $name, array $uses): ?Name
+    {
+        $suffix = (string) $name->getLastPart();
+
+        if (isset($uses[$suffix])) {
+            return new Name($uses[$suffix]);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<int|non-empty-string, non-empty-string> $uses
+     * @return array<non-empty-string, non-empty-string>
+     */
+    private function formatUseStatements(array $uses): array
+    {
+        $result = [];
+
+        foreach ($uses as $alias => $fqn) {
+            if (\is_string($alias)) {
+                $result[$alias] = $fqn;
+                continue;
+            }
+
+            $nameOffset = \strrpos($fqn, '\\');
+
+            if ($nameOffset === false) {
+                $result[$fqn] = $fqn;
+                continue;
+            }
+
+            dd($nameOffset);
+        }
+
+        return $result;
     }
 
     /**
      * @param \ReflectionClass<object> $class
      */
-    private function resolveFromCurrentNamespace(TypeStatement $statement, \ReflectionClass $class): TypeStatement
+    private function fromCurrentNamespace(Name $name, \ReflectionClass $class): ?Name
     {
-        return $this->typeResolver->resolve(
-            type: $statement,
-            transform: static function (Name $name) use ($class): ?Name {
-                if ($name->isFullQualified() || $name->isBuiltin()) {
-                    return $name;
-                }
+        // Replace "namespace\ClassName" sequences to current namespace of the class.
+        $first = $name->getFirstPart();
 
-                $namespace = $class->getNamespaceName();
+        if ($first->toLowerString() === self::CURRENT_NAMESPACE) {
+            $name = $name->slice(1);
+        }
 
-                // Replace "namespace\ClassName" sequences to current
-                // namespace of the class.
-                if (!$name->isSimple()) {
-                    $first = $name->getFirstPart();
+        $namespace = $class->getNamespaceName();
 
-                    if ($first->toLowerString() === 'namespace') {
-                        // Return name AS IS in case of namespace is global
-                        if ($namespace === '') {
-                            return $name->slice(1);
-                        }
+        if ($namespace === '') {
+            return $name;
+        }
 
-                        return (new Name($namespace))
-                            ->withAdded($name->slice(1));
-                    }
-                }
-
-                if ($namespace === '') {
-                    return null;
-                }
-
-                return (new Name($namespace))
-                    ->withAdded($name);
-            },
-        );
+        return (new Name($namespace))
+            ->withAdded($name);
     }
 }
