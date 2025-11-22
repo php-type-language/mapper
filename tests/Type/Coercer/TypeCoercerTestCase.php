@@ -22,12 +22,12 @@ abstract class TypeCoercerTestCase extends TestCase
     abstract protected static function createCoercer(): TypeCoercerInterface;
 
     /**
-     * @return iterable<mixed, \ValueError>
+     * @return iterable<mixed, mixed>
      */
     final protected static function defaultCoercionSamples(): iterable
     {
         return (new DataSamples())
-            ->getCastsIterator();
+            ->getCoercionIterator();
     }
 
     /**
@@ -44,8 +44,6 @@ abstract class TypeCoercerTestCase extends TestCase
     #[DataProvider('castNormalizationDataProvider')]
     public function testCoerceForNormalization(mixed $value, mixed $expected): void
     {
-        $this->expectTypeErrorIfException($expected);
-
         $coercer = static::createCoercer();
 
         $actual = $coercer->tryCoerce($value, self::createNormalizationContext(
@@ -69,8 +67,6 @@ abstract class TypeCoercerTestCase extends TestCase
     #[DataProvider('castDenormalizationDataProvider')]
     public function testCoerceForDenormalization(mixed $value, mixed $expected): void
     {
-        $this->expectTypeErrorIfException($expected);
-
         $coercer = static::createCoercer();
 
         $actual = $coercer->tryCoerce($value, self::createNormalizationContext(

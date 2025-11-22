@@ -67,7 +67,7 @@ abstract class TypeTestCase extends TestCase
             value: $value,
         ));
 
-        self::assertSame($expected, $actual !== null);
+        self::assertSame($actual !== null, $expected);
     }
 
     /**
@@ -90,7 +90,7 @@ abstract class TypeTestCase extends TestCase
             value: $value,
         ));
 
-        self::assertSame($expected, $actual !== null);
+        self::assertSame($actual !== null, $expected);
     }
 
     /**

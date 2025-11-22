@@ -36,8 +36,18 @@ final class DataSamples implements \IteratorAggregate
         foreach ($this as $value) {
             yield $value => new \ValueError(\sprintf(
                 'Passed value %s is invalid',
-                $printer->print($value)
+                $printer->print($value),
             ));
+        }
+    }
+
+    /**
+     * @return \Traversable<mixed, mixed>
+     */
+    public function getCoercionIterator(): \Traversable
+    {
+        foreach ($this as $value) {
+            yield $value => $value;
         }
     }
 

@@ -285,7 +285,7 @@ abstract class PlatformTestCase extends TestCase
 
     abstract protected function createTypePlatform(): PlatformInterface;
 
-    private function testTypeIsAvailable(string $definition, bool $supports, DirectionInterface $direction): void
+    private function assertTypeIsAvailable(string $definition, bool $supports): void
     {
         if (!$supports) {
             $this->expectException(ParseException::class);
@@ -302,19 +302,13 @@ abstract class PlatformTestCase extends TestCase
             $this->expectNotToPerformAssertions();
         }
 
-        $repository = self::createTypeRepository($direction);
+        $repository = self::createTypeRepository();
         $repository->getTypeByStatement($statement);
     }
 
     #[DataProvider('typesDataProvider')]
-    public function testNormalizationTypeIsAvailable(string $definition, bool $supports): void
+    public function testTypeIsAvailable(string $definition, bool $supports): void
     {
-        $this->testTypeIsAvailable($definition, $supports, Direction::Normalize);
-    }
-
-    #[DataProvider('typesDataProvider')]
-    public function testDenormalizationTypeIsAvailable(string $definition, bool $supports): void
-    {
-        $this->testTypeIsAvailable($definition, $supports, Direction::Denormalize);
+        $this->assertTypeIsAvailable($definition, $supports);
     }
 }

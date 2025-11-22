@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Mapping\Reference;
 
+use PHPUnit\Framework\Attributes\TestDox;
 use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Mapper\Mapping\Reference\ReferencesResolver;
 use TypeLang\Mapper\Tests\Mapping\Reference\Stub\SimpleClassStub;
@@ -12,34 +13,39 @@ use TypeLang\Parser\Node\Stmt\NamedTypeNode;
 
 final class ReferencesResolverTest extends ReferenceTestCase
 {
-    public function testResolveWithSimpleNameInSameNamespace(): void
+    private function getResolver(array $useStatements = []): ReferencesResolver
     {
         $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('TestClass');
-        $context = new \ReflectionClass(SimpleClassStub::class);
+        $reader->method('getUseStatements')
+            ->willReturn($useStatements);
 
-        $result = $resolver->resolve($statement, $context);
+        return new ReferencesResolver($reader);
+    }
+
+    #[TestDox('if no "use" stmt, then the namespace must be same as the class')]
+    public function testResolveWithSimpleNameInSameNamespace(): void
+    {
+        $needle = new NamedTypeNode('TestClass');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
+
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TestClass', $result->name->toString());
+        self::assertSame('TypeLang\Mapper\Tests\Mapping\Reference\Stub\TestClass', $result->name->toString());
     }
 
     public function testResolveWithUseStatement(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([
+        $needle = new NamedTypeNode('Any');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
+
+        $result = $this->getResolver([
             'Any' => 'Some\\Any',
             'Example' => 'Some\\Any\\Test',
-        ]);
-
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('Any');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        ])
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('Some\\Any', $result->name->toString());
@@ -47,16 +53,13 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithAliasedUseStatement(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([
+        $needle = new NamedTypeNode('Example');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
+
+        $result = $this->getResolver([
             'Example' => 'Some\\Any\\Test',
-        ]);
-
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('Example');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        ])
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('Some\\Any\\Test', $result->name->toString());
@@ -64,14 +67,11 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithNamespaceKeyword(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
+        $needle = new NamedTypeNode('namespace\\TestClass');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('namespace\\TestClass');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\TestClass', $result->name->toString());
@@ -79,14 +79,11 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithNamespaceKeywordInGlobalNamespace(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
+        $needle = new NamedTypeNode('namespace\\TestClass');
+        $haystack = new \ReflectionClass(\stdClass::class); // stdClass is in global namespace
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('namespace\\TestClass');
-        $context = new \ReflectionClass(\stdClass::class); // stdClass is in global namespace
-
-        $result = $resolver->resolve($statement, $context);
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('TestClass', $result->name->toString());
@@ -94,45 +91,23 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithFullyQualifiedName(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
+        $needle = new NamedTypeNode(new FullQualifiedName('\\Some\\Fully\\Qualified\\Class'));
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode(new FullQualifiedName('\\Some\\Fully\\Qualified\\Class'));
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('\\Some\\Fully\\Qualified\\Class', $result->name->toString());
     }
 
-    public function testResolveWithNonExistentClassInNamespace(): void
-    {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
-
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('NonExistentClass');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
-
-        // Should return original statement if class doesn't exist in namespace
-        self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('NonExistentClass', $result->name->toString());
-    }
-
     public function testResolveWithComplexNamespaceKeyword(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
+        $needle = new NamedTypeNode('namespace\\Sub\\Namespace\\TestClass');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('namespace\\Sub\\Namespace\\TestClass');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
         self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\Sub\\Namespace\\TestClass', $result->name->toString());
@@ -140,34 +115,28 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithMixedUseStatements(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([
+        $needle = new NamedTypeNode('GlobalClass');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
+
+        $result = $this->getResolver([
             'Any' => 'Some\\Any',
             'Example' => 'Some\\Any\\Test',
             'GlobalClass', // No alias, just the class name
-        ]);
-
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('Example');
-        $context = new \ReflectionClass(SimpleClassStub::class);
-
-        $result = $resolver->resolve($statement, $context);
+        ])
+            ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('Some\\Any\\Test', $result->name->toString());
+        self::assertSame('GlobalClass', $result->name->toString());
     }
 
     public function testResolvePreservesOriginalStatementWhenNoResolutionNeeded(): void
     {
-        $reader = $this->createMock(ReferencesReaderInterface::class);
-        $reader->method('getUseStatements')->willReturn([]);
+        $needle = new NamedTypeNode('\\Fully\\Qualified\\Class');
+        $haystack = new \ReflectionClass(SimpleClassStub::class);
 
-        $resolver = new ReferencesResolver($reader);
-        $statement = new NamedTypeNode('\\Fully\\Qualified\\Class');
-        $context = new \ReflectionClass(SimpleClassStub::class);
+        $result = $this->getResolver()
+            ->resolve($needle, $haystack);
 
-        $result = $resolver->resolve($statement, $context);
-
-        self::assertSame($statement, $result);
+        self::assertSame($needle, $result);
     }
 }

@@ -19,7 +19,7 @@ trait InteractWithRuntimeContext
             context: self::createMapperContext($config),
             value: $value,
             direction: Direction::Normalize,
-            types: self::getTypeRepository(Direction::Normalize),
+            types: self::getTypeRepository(),
         );
     }
 
@@ -29,7 +29,7 @@ trait InteractWithRuntimeContext
             context: self::createMapperContext($config),
             value: $value,
             direction: Direction::Denormalize,
-            types: self::getTypeRepository(Direction::Denormalize),
+            types: self::getTypeRepository(),
         );
     }
 }

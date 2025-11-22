@@ -27,20 +27,19 @@ trait InteractWithTypeRepository
         self::$currentTypeRepository = $repository;
     }
 
-    private static function createTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
+    private static function createTypeRepository(): TypeRepositoryInterface
     {
         $platform = self::getPlatform();
 
         return new TypeRepository(
             context: self::createMapperContext(),
-            direction: $direction,
             builders: $platform->getTypes()
         );
     }
 
-    protected static function getTypeRepository(DirectionInterface $direction): TypeRepositoryInterface
+    protected static function getTypeRepository(): TypeRepositoryInterface
     {
         return self::$currentTypeRepository
-            ??= self::createTypeRepository($direction);
+            ??= self::createTypeRepository();
     }
 }
