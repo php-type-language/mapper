@@ -39,6 +39,7 @@ class DateTimeTypeBuilder extends Builder
         protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
         /**
          * @var array<class-string<\DateTimeInterface>, class-string<\DateTimeInterface>>
+         *
          * @phpstan-ignore-next-line : PHPStan false-positive (?)
          */
         protected readonly array $dateInterfaceMapping = self::DEFAULT_DATE_INTERFACE_MAPPING,
