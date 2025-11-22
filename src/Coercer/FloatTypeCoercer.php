@@ -24,7 +24,7 @@ class FloatTypeCoercer implements TypeCoercerInterface
             $value === false,
             $value === null => 0.0,
             $value === true => 1.0,
-            default => null,
+            default => $value,
         };
     }
 }

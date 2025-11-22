@@ -13,6 +13,8 @@ class IntTypeCoercer implements TypeCoercerInterface
 {
     public function tryCoerce(mixed $value, RuntimeContext $context): mixed
     {
+        $input = $value;
+
         if ($value instanceof \BackedEnum && \is_int($value->value)) {
             return $value->value;
         }
@@ -29,7 +31,7 @@ class IntTypeCoercer implements TypeCoercerInterface
             $value === true => 1,
             // Resource to int type coercion is not obvious:
             // \is_resource($value) => \get_resource_id($value),
-            default => $value,
+            default => $input,
         };
     }
 
