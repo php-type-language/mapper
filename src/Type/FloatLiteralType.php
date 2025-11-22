@@ -12,7 +12,7 @@ class FloatLiteralType extends LiteralType
     /**
      * @param TypeInterface<float> $type
      */
-    public function __construct(int|float $value, TypeInterface $type)
+    public function __construct(int|float $value, TypeInterface $type = new FloatType())
     {
         parent::__construct((float) $value, $type);
     }
