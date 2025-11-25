@@ -19,8 +19,15 @@ final class SymfonyStopwatchTracer implements TracerInterface
 
     public function start(string $name): SpanInterface
     {
+        /**
+         * Fixes a Symfony Profiler bug that cuts off all FQN classes.
+         *
+         * @var string $formatted
+         */
+        $formatted = \preg_replace('/\\\\?(?:\w+\\\\)+(\w+)/isum', '$1', $name);
+
         return new SymfonyStopwatchSpan(
-            event: $this->stopwatch->start($name, $this->category),
+            event: $this->stopwatch->start($formatted, $this->category),
         );
     }
 }
