@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reference;
 
-use phpDocumentor\Reflection\Types\True_;
 use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -90,6 +89,10 @@ final class ReferencesResolver
             $className = ($nameOffset = \strrpos($fqn, '\\')) !== false
                 ? \substr($fqn, $nameOffset + 1)
                 : $fqn;
+
+            if ($className === '') {
+                continue;
+            }
 
             $result[$className] = $fqn;
         }
