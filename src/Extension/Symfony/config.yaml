@@ -1,0 +1,132 @@
+type_lang:
+#
+# ----------------------------------------------------------------------------
+#   Common Config
+# ----------------------------------------------------------------------------
+#
+object_as_array: ~
+strict_types: ~
+
+#
+# ----------------------------------------------------------------------------
+#   Types List
+# ----------------------------------------------------------------------------
+#
+# List of additional type builders. Each builder should
+# be registered as service builder class:
+#
+types:
+# - App\Mapper\Builder\ExampleTypeBuilder
+# - ...
+
+#
+# ----------------------------------------------------------------------------
+#   Types Coercers
+# ----------------------------------------------------------------------------
+#
+# List of additional type coercers. Each key should be valid type
+# class; each value should be registered as service coercer class:
+#
+coercions:
+# App\Mapper\ExampleType: App\Mapper\Coercer\ExampleCoercer
+# ...: ...
+
+#
+# ----------------------------------------------------------------------------
+#   Metadata Configuration
+# ----------------------------------------------------------------------------
+#
+meta:
+# Enable/disable attributes metadata, defaults to "true"
+attributes:
+enabled: ~
+
+# Enable/disable phpdoc metadata, by default depends on the availability
+# of the "type-lang/phpdoc-standard-tags" package
+phpdoc:
+enabled: ~
+param_tag_name:  "param"
+var_tag_name:    "var"
+return_tag_name: "return"
+
+# Enable/disable yaml config metadata, defaults to "true"
+yaml:
+enabled: ~
+# List of configuration file directories
+directories:
+- '%kernel.project_dir%/config/mapper'
+# List of file extensions
+extensions:
+- '.yml'
+- '.yaml'
+
+#
+# ----------------------------------------------------------------------------
+#   Logger Configuration
+# ----------------------------------------------------------------------------
+#
+logger:
+# Defaults to "%kernel.debug%"
+enabled:             ~
+# service:             Psr\Log\LoggerInterface
+# log_type_extraction: false
+# log_type_parse:      false
+# log_type_fetch:      false
+# log_type_cast:       false
+# log_type_match:      true
+
+#
+# ----------------------------------------------------------------------------
+#   Tracing Configuration
+# ----------------------------------------------------------------------------
+#
+tracing:
+# Defaults to "%kernel.debug%"
+enabled:               ~
+# service:               TypeLang\Mapper\Kernel\Tracing\TracerInterface
+# printer:               TypeLang\Printer\PrinterInterface
+# trace_type_extraction: false
+# trace_type_parse:      false
+# trace_type_fetch:      false
+# trace_type_cast:       true
+# trace_type_match:      false
+
+#
+# ----------------------------------------------------------------------------
+#   Cache Configuration
+# ----------------------------------------------------------------------------
+#
+cache:
+# Defaults to "!%kernel.debug%"
+enabled: ~
+# Cache service name, defaults to "cache.app"
+# service: cache.app
+#
+# One of "psr6"; "psr16", defaults to "psr6"
+# driver: psr6
+#
+# Optional cache prefix, defaults to "tlm_"
+# prefix: "tlm_"
+#
+# Cache TTL
+# ttl: 0
+
+#
+# ----------------------------------------------------------------------------
+#   Second-Level Cache Configuration
+# ----------------------------------------------------------------------------
+#
+memoization:
+# AST in-memory cache, defaults to "true"
+# parser:
+#   enabled:   ~
+#   min_types: 30
+#   max_types: 100
+
+# Types in-memory cache, defaults to "true"
+# types:
+#   enabled: ~
+
+# Metadata in-memory cache, defaults to "true"
+# meta:
+#   enabled: ~
