@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reference;
 
+use phpDocumentor\Reflection\Types\True_;
 use TypeLang\Mapper\Mapping\Reference\Reader\ReferencesReaderInterface;
 use TypeLang\Parser\Node\Name;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
@@ -79,19 +80,18 @@ final class ReferencesResolver
         $result = [];
 
         foreach ($uses as $alias => $fqn) {
+            // In case of "use Some as Alias;" stmt found
             if (\is_string($alias)) {
                 $result[$alias] = $fqn;
                 continue;
             }
 
-            $nameOffset = \strrpos($fqn, '\\');
+            // In case of "use Some;" or "use Some\Any;" stmts found
+            $className = ($nameOffset = \strrpos($fqn, '\\')) !== false
+                ? \substr($fqn, $nameOffset + 1)
+                : $fqn;
 
-            if ($nameOffset === false) {
-                $result[$fqn] = $fqn;
-                continue;
-            }
-
-            dd($nameOffset);
+            $result[$className] = $fqn;
         }
 
         return $result;
@@ -115,7 +115,22 @@ final class ReferencesResolver
             return $name;
         }
 
-        return (new Name($namespace))
+        $result = (new Name($namespace))
             ->withAdded($name);
+
+        if ($this->isClassExists($result)) {
+            return $result;
+        }
+
+        return $name;
+    }
+
+    private function isClassExists(Name $name): bool
+    {
+        $fqn = $name->toString();
+
+        return \class_exists($fqn)
+            || \interface_exists($fqn, false)
+            || \trait_exists($fqn, false);
     }
 }

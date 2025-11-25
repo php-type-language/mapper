@@ -81,7 +81,7 @@ final class NativeReferencesReader implements ReferencesReaderInterface
         while ($tokens->valid()) {
             $current = $tokens->current();
 
-            if ($current->id === \T_NAME_QUALIFIED) {
+            if ($current->id === \T_NAME_QUALIFIED || $current->id === \T_STRING) {
                 $result = $current->text;
             } elseif ($current->text === ';') {
                 $tokens->next();

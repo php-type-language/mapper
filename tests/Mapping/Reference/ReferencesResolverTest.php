@@ -26,14 +26,14 @@ final class ReferencesResolverTest extends ReferenceTestCase
     #[TestDox('if no "use" stmt, then the namespace must be same as the class')]
     public function testResolveWithSimpleNameInSameNamespace(): void
     {
-        $needle = new NamedTypeNode('TestClass');
+        $needle = new NamedTypeNode('ClassWithGroupUsesStub');
         $haystack = new \ReflectionClass(SimpleClassStub::class);
 
         $result = $this->getResolver()
             ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TypeLang\Mapper\Tests\Mapping\Reference\Stub\TestClass', $result->name->toString());
+        self::assertSame('TypeLang\Mapper\Tests\Mapping\Reference\Stub\ClassWithGroupUsesStub', $result->name->toString());
     }
 
     public function testResolveWithUseStatement(): void
@@ -67,14 +67,14 @@ final class ReferencesResolverTest extends ReferenceTestCase
 
     public function testResolveWithNamespaceKeyword(): void
     {
-        $needle = new NamedTypeNode('namespace\\TestClass');
+        $needle = new NamedTypeNode('namespace\\Attribute');
         $haystack = new \ReflectionClass(SimpleClassStub::class);
 
         $result = $this->getResolver()
             ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\TestClass', $result->name->toString());
+        self::assertSame('Attribute', $result->name->toString());
     }
 
     public function testResolveWithNamespaceKeywordInGlobalNamespace(): void
@@ -110,7 +110,7 @@ final class ReferencesResolverTest extends ReferenceTestCase
             ->resolve($needle, $haystack);
 
         self::assertInstanceOf(NamedTypeNode::class, $result);
-        self::assertSame('TypeLang\\Mapper\\Tests\\Mapping\\Reference\\Stub\\Sub\\Namespace\\TestClass', $result->name->toString());
+        self::assertSame('Sub\\Namespace\\TestClass', $result->name->toString());
     }
 
     public function testResolveWithMixedUseStatements(): void
