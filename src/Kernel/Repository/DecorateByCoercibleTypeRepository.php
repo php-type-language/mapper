@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Kernel\Repository;
 
 use TypeLang\Mapper\Coercer\TypeCoercerInterface;
 use TypeLang\Mapper\Kernel\Repository\TypeDecorator\CoercibleType;
+use TypeLang\Mapper\Kernel\Repository\TypeDecorator\TypeDecorator;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Parser\Node\Stmt\TypeStatement;
 
@@ -49,13 +50,17 @@ final class DecorateByCoercibleTypeRepository extends TypeRepositoryDecorator
     #[\Override]
     public function getTypeByStatement(TypeStatement $statement): TypeInterface
     {
-        $type = parent::getTypeByStatement($statement);
+        $concrete = $type = parent::getTypeByStatement($statement);
 
         if ($type instanceof CoercibleType) {
             return $type;
         }
 
-        $coercer = $this->coercers[$type::class] ?? null;
+        if ($concrete instanceof TypeDecorator) {
+            $concrete = $concrete->getDecoratedType();
+        }
+
+        $coercer = $this->coercers[$concrete::class] ?? null;
 
         if ($coercer === null) {
             return $type;
