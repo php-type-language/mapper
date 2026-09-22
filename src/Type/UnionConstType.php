@@ -23,6 +23,9 @@ final class UnionConstType implements TypeInterface
         private readonly array $groups,
     ) {}
 
+    /**
+     * @return MatchedResult<TResult & TMatch>|null
+     */
     public function match(mixed $value, RuntimeContext $context): ?MatchedResult
     {
         foreach ($this->groups as $group) {

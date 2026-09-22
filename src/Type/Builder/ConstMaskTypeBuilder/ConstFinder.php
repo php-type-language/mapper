@@ -25,7 +25,7 @@ final class ConstFinder
             ? $this->getSimpleConstantValues($constants, $mask->getLastPart(), $mode)
             : $this->getNamespacedConstantValues($constants, $mask, $mode);
 
-        return \array_values(\array_unique($result));
+        return \array_values(\array_unique($result, \SORT_REGULAR));
     }
 
     /**
@@ -49,7 +49,7 @@ final class ConstFinder
 
             // Skip in case of constant name is not in namespace,
             // for example, "FOO" instead of "Bar\FOO"
-            if ($delimiterOffset === false || $constant === '') {
+            if ($delimiterOffset === false) {
                 continue;
             }
 

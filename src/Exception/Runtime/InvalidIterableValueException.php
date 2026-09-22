@@ -43,6 +43,7 @@ class InvalidIterableValueException extends IterableValueException
             element: $element,
             index: $index,
             key: $key,
+            /** @phpstan-ignore-next-line : PHPStan false-positive */
             value: $value,
             path: $path,
             template: $template,
