@@ -36,8 +36,10 @@ final class TypeLangParser implements TypeParserInterface
         ));
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement {
         // Fast-built optimization: if the definition is "null", return a null literal.
         if ($definition === 'null') {
             return new NullLiteralNode();

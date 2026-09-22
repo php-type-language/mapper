@@ -60,10 +60,13 @@ trait InteractWithTypeParser
         );
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement {
         return $this->parser->getStatementByDefinition(
             definition: $definition,
+            context: $context,
         );
     }
 }

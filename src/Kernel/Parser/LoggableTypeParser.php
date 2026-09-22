@@ -44,12 +44,14 @@ final class LoggableTypeParser implements TypeParserInterface
         ]);
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement {
         $this->logBefore($definition);
 
         try {
-            $statement = $this->delegate->getStatementByDefinition($definition);
+            $statement = $this->delegate->getStatementByDefinition($definition, $context);
         } catch (\Throwable $e) {
             $this->logError($definition, $e);
 

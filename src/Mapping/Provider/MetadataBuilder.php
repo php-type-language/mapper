@@ -340,6 +340,7 @@ final class MetadataBuilder implements ProviderInterface
         $statement = match (true) {
             $info instanceof RawTypeInfo => $context->parser->getStatementByDefinition(
                 definition: $info->definition,
+                context: $class,
             ),
             $info instanceof ParsedTypeInfo => $info->statement,
             default => throw new \InvalidArgumentException(\sprintf(

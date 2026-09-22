@@ -42,20 +42,27 @@ final class InMemoryTypeParser implements TypeParserInterface
 
     /**
      * @param non-empty-string $definition
+     * @param \ReflectionClass<object>|null $context
      *
      * @return non-empty-string
      */
-    private function keyOf(string $definition): string
+    private function keyOf(string $definition, ?\ReflectionClass $context): string
     {
-        return $definition;
+        if ($context === null) {
+            return $definition;
+        }
+
+        return $context->getName() . '::' . $definition;
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement {
         $this->cleanup();
 
-        return $this->types[$this->keyOf($definition)]
-            ??= $this->delegate->getStatementByDefinition($definition);
+        return $this->types[$this->keyOf($definition, $context)]
+            ??= $this->delegate->getStatementByDefinition($definition, $context);
     }
 
     private function cleanup(): void

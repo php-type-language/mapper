@@ -21,12 +21,14 @@ final class TraceableTypeParser implements TypeParserInterface
         return $this->tracer->start(\sprintf('Parse "%s"', $definition));
     }
 
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement
-    {
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement {
         $span = $this->start($definition);
 
         try {
-            return $this->delegate->getStatementByDefinition($definition);
+            return $this->delegate->getStatementByDefinition($definition, $context);
         } finally {
             $span->stop();
         }

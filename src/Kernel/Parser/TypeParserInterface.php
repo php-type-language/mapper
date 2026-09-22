@@ -11,8 +11,14 @@ interface TypeParserInterface
 {
     /**
      * @param non-empty-string $definition
+     * @param \ReflectionClass<object>|null $context Class in which the
+     *        definition is declared. Relative names are resolved in relation
+     *        to this class, so statements of different contexts can not be shared.
      *
      * @throws \Throwable in case of any internal error occurs
      */
-    public function getStatementByDefinition(#[Language('PHP')] string $definition): TypeStatement;
+    public function getStatementByDefinition(
+        #[Language('PHP')] string $definition,
+        ?\ReflectionClass $context = null,
+    ): TypeStatement;
 }
