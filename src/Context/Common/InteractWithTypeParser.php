@@ -61,7 +61,8 @@ trait InteractWithTypeParser
     }
 
     public function getStatementByDefinition(
-        #[Language('PHP')] string $definition,
+        #[Language('PHP')]
+        string $definition,
         ?\ReflectionClass $context = null,
     ): TypeStatement {
         return $this->parser->getStatementByDefinition(

@@ -18,7 +18,8 @@ interface TypeParserInterface
      * @throws \Throwable in case of any internal error occurs
      */
     public function getStatementByDefinition(
-        #[Language('PHP')] string $definition,
+        #[Language('PHP')]
+        string $definition,
         ?\ReflectionClass $context = null,
     ): TypeStatement;
 }

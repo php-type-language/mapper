@@ -56,7 +56,8 @@ final class InMemoryTypeParser implements TypeParserInterface
     }
 
     public function getStatementByDefinition(
-        #[Language('PHP')] string $definition,
+        #[Language('PHP')]
+        string $definition,
         ?\ReflectionClass $context = null,
     ): TypeStatement {
         $this->cleanup();
