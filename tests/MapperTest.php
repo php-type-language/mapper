@@ -17,6 +17,7 @@ use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\DecimalCommaCoercerStub;
 use TypeLang\Mapper\Tests\Stub\DuplicateNameStub;
 use TypeLang\Mapper\Tests\Stub\JsonArrayCoercerStub;
+use TypeLang\Mapper\Tests\Stub\NativeUnionStub;
 use TypeLang\Mapper\Tests\Stub\Shape\CircleStub;
 use TypeLang\Mapper\Tests\Stub\Shape\ShapeStub;
 use TypeLang\Mapper\Tests\Stub\StatusStub;
@@ -225,6 +226,21 @@ final class MapperTest extends TestCase
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame(['$[0][0]', '$[0][1]', '$[1][0]'], self::printPaths($error));
+    }
+
+    public function testNativeUnionWithNullAndFalseIsMapped(): void
+    {
+        $mapper = new Mapper();
+
+        $object = $mapper->denormalize(['value' => null, 'limit' => false], NativeUnionStub::class);
+
+        self::assertInstanceOf(NativeUnionStub::class, $object);
+        self::assertNull($object->value);
+        self::assertFalse($object->limit);
+        self::assertSame(1.5, $mapper->denormalize(['value' => 1.5], NativeUnionStub::class)->value);
+        self::assertSame(['value' => null, 'limit' => 10], $mapper->normalize(
+            $mapper->denormalize(['limit' => 10], NativeUnionStub::class),
+        ));
     }
 
     public function testDropsExtraFieldsByDefault(): void
