@@ -4,104 +4,96 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
-use TypeLang\Mapper\Exception\Definition\Template\OneOfTemplateArgumentsCountException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
-use TypeLang\Mapper\Type\IntRangeType;
+use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Type\Check\IntRangeCheck;
 use TypeLang\Mapper\Type\IntType;
+use TypeLang\Mapper\Type\RefinedType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Literal\IntLiteralNode;
-use TypeLang\Parser\Node\Literal\StringLiteralNode;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode as ArgNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
-use TypeLang\Parser\Node\Stmt\UnionTypeNode;
+use TypeLang\Mapper\TypeMatcher\Exception\InvalidPatternException;
+use TypeLang\Mapper\TypeMatcher\NamedTypePattern;
+use TypeLang\Type\Literal\IntLiteralNode;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template-extends NamedTypeBuilder<TypeInterface<int>>
+ * Creates the type of `int<min, max>`: each bound is an integer or the name
+ * `min` or `max` of an open bound. A range open on both sides is `int`.
+ *
+ * @template-implements TypeBuilderInterface<int>
  */
-class IntRangeTypeBuilder extends NamedTypeBuilder
+final class IntRangeTypeBuilder implements TypeBuilderInterface
 {
+    private readonly NamedTypePattern $pattern;
+
     /**
-     * @throws InvalidTemplateArgumentException
-     * @throws TemplateArgumentHintNotSupportedException
-     * @throws TooManyTemplateArgumentsInRangeException
-     * @throws ShapeFieldsNotSupportedException
+     * @throws InvalidPatternException in case of the pattern is written wrong
      */
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
-    {
-        /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($stmt instanceof NamedTypeNode);
-
-        $this->expectNoShapeFields($stmt);
-
-        $arguments = $stmt->arguments->items ?? [];
-
-        return match (\count($arguments)) {
-            0 => $this->createIntType(),
-            2 => $this->createIntRangeType(
-                min: $this->fetchTemplateArgumentValue($stmt, $arguments[0]),
-                max: $this->fetchTemplateArgumentValue($stmt, $arguments[1]),
-            ),
-            default => throw OneOfTemplateArgumentsCountException::becauseArgumentsCountDoesNotMatch(
-                variants: [0, 2],
-                type: $stmt,
-            ),
-        };
+    public function __construct(
+        ?NamedTypePattern $pattern = null,
+        /**
+         * Type the range refines
+         *
+         * @var TypeInterface<int>
+         */
+        private readonly TypeInterface $type = new IntType(),
+    ) {
+        $this->pattern = $pattern ?? new NamedTypePattern(['int<min, max>']);
     }
 
     /**
-     * @return TypeInterface<int>
+     * @return TypeInterface<int>|null
+     * @throws TypeDefinitionException in case of a bound is not an integer,
+     *         `min` or `max`, or the lower bound is greater than the upper one
      */
-    protected function createIntType(): TypeInterface
+    public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {
-        return new IntType();
-    }
+        $arguments = $this->pattern->findArguments($node);
 
-    /**
-     * @return TypeInterface<int>
-     * @throws InvalidTemplateArgumentException
-     * @throws TemplateArgumentHintNotSupportedException
-     */
-    protected function createIntRangeType(int $min, int $max): TypeInterface
-    {
-        return new IntRangeType($min, $max, $this->createIntType());
-    }
-
-    /**
-     * @throws InvalidTemplateArgumentException
-     * @throws TemplateArgumentHintNotSupportedException
-     */
-    private function fetchTemplateArgumentValue(NamedTypeNode $statement, ArgNode $argument): int
-    {
-        $this->expectNoTemplateArgumentHint($statement, $argument);
-
-        $value = $argument->value;
-
-        if ($value instanceof IntLiteralNode) {
-            return $value->value;
+        if ($arguments === null) {
+            return null;
         }
 
-        if ($value instanceof NamedTypeNode) {
-            switch ($value->name->toLowerString()) {
-                case 'min':
-                    return IntRangeType::DEFAULT_INT_MIN;
-                case 'max':
-                    return IntRangeType::DEFAULT_INT_MAX;
-            }
+        $name = $context->printer->print($node);
+
+        $min = self::readBound($name, 1, $arguments['min'], 'min');
+        $max = self::readBound($name, 2, $arguments['max'], 'max');
+
+        if ($min === null && $max === null) {
+            return $this->type;
         }
 
-        throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
-            argument: $argument,
-            expected: new UnionTypeNode(
-                new NamedTypeNode('int'),
-                StringLiteralNode::createFromValue('min'),
-                StringLiteralNode::createFromValue('max'),
-            ),
-            type: $statement,
-        );
+        if ($min !== null && $max !== null && $min > $max) {
+            throw TypeDefinitionException::becauseRangeIsEmpty($name);
+        }
+
+        return new RefinedType($this->type, [new IntRangeCheck($min, $max)], $name);
+    }
+
+    /**
+     * Returns {@see null} in case of the bound is open.
+     *
+     * @param non-empty-string $type
+     * @param int<1, 2> $position
+     * @param 'min'|'max' $open name of the open bound at the position
+     * @throws TypeDefinitionException in case of the bound is not an integer
+     *         or the name of the open bound
+     */
+    private static function readBound(string $type, int $position, TypeNode $bound, string $open): ?int
+    {
+        if ($bound instanceof IntLiteralNode) {
+            return $bound->value;
+        }
+
+        if (
+            $bound instanceof NamedTypeNode
+            && $bound->arguments === null
+            && $bound->fields === null
+            && $bound->name->toLowerString() === $open
+        ) {
+            return null;
+        }
+
+        throw TypeDefinitionException::becauseRangeBoundIsInvalid($type, $position, $open);
     }
 }

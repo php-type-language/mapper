@@ -4,83 +4,64 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\StringType;
-use TypeLang\Mapper\Type\TypeInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Tests\TestCase;
 
-#[Group('type')]
-#[CoversClass(StringType::class)]
-final class StringTypeTest extends TypeTestCase
+final class StringTypeTest extends TestCase
 {
-    protected static function createType(): TypeInterface
+    /**
+     * @return iterable<non-empty-string, array{mixed, string}>
+     */
+    public static function denormalizableDataProvider(): iterable
     {
-        return new StringType();
+        yield 'string' => ['x', 'x'];
+        yield 'empty string' => ['', ''];
+        yield 'integer' => [42, '42'];
+        yield 'float' => [4.5, '4.5'];
     }
 
-    protected static function matchValues(bool $normalize): iterable
+    /**
+     * @return iterable<non-empty-string, array{mixed, non-empty-string}>
+     */
+    public static function nonDenormalizableDataProvider(): iterable
     {
-        foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === '9223372036854775808',
-                $value === '9223372036854775807',
-                $value === '42',
-                $value === '1',
-                $value === '0',
-                $value === '-1',
-                $value === '-42',
-                $value === '-9223372036854775808',
-                $value === '-9223372036854775809',
-                $value === '9223372036854775808.0',
-                $value === '9223372036854775807.0',
-                $value === '42.5',
-                $value === '42.0',
-                $value === '1.0',
-                $value === '0.0',
-                $value === '-1.0',
-                $value === '-42.0',
-                $value === '-42.5',
-                $value === '-9223372036854775808.0',
-                $value === '-9223372036854775809.0',
-                $value === 'true',
-                $value === 'false',
-                $value === 'non empty',
-                $value === '' => true,
-                default => $default,
-            };
-        }
+        yield 'boolean' => [true, '$: Value must be of type "string", but true given'];
+        yield 'null' => [null, '$: Value must be of type "string", but null given'];
+        yield 'array' => [[], '$: Value must be of type "string", but array(0) given'];
     }
 
-    protected static function castValues(bool $normalize): iterable
+    #[DataProvider('denormalizableDataProvider')]
+    public function testDenormalizesStringAndNumbers(mixed $input, string $expected): void
     {
-        foreach (self::defaultCastDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === '9223372036854775808' => '9223372036854775808',
-                $value === '9223372036854775807' => '9223372036854775807',
-                $value === '42' => '42',
-                $value === '1' => '1',
-                $value === '0' => '0',
-                $value === '-1' => '-1',
-                $value === '-42' => '-42',
-                $value === '-9223372036854775808' => '-9223372036854775808',
-                $value === '-9223372036854775809' => '-9223372036854775809',
-                $value === '9223372036854775808.0' => '9223372036854775808.0',
-                $value === '9223372036854775807.0' => '9223372036854775807.0',
-                $value === '42.5' => '42.5',
-                $value === '42.0' => '42.0',
-                $value === '1.0' => '1.0',
-                $value === '0.0' => '0.0',
-                $value === '-1.0' => '-1.0',
-                $value === '-42.0' => '-42.0',
-                $value === '-42.5' => '-42.5',
-                $value === '-9223372036854775808.0' => '-9223372036854775808.0',
-                $value === '-9223372036854775809.0' => '-9223372036854775809.0',
-                $value === 'true' => 'true',
-                $value === 'false' => 'false',
-                $value === 'non empty' => 'non empty',
-                $value === '' => '',
-                default => $default,
-            };
-        }
+        self::assertDenormalizes('string', $input, $expected);
+    }
+
+    /**
+     * @param non-empty-string $message
+     */
+    #[DataProvider('nonDenormalizableDataProvider')]
+    public function testRejectsValueThatIsNotStringForm(mixed $input, string $message): void
+    {
+        self::assertDenormalizationFails('string', $input, $message);
+    }
+
+    public function testStrictContextRejectsNumber(): void
+    {
+        self::assertDenormalizationFails(
+            'string',
+            42,
+            '$: Value must be of type "string", but 42 given',
+            self::createRepository(isStrict: true),
+        );
+    }
+
+    public function testNormalizesStringAsIs(): void
+    {
+        self::assertNormalizes('string', 'x', 'x');
+    }
+
+    public function testNormalizationDoesNotCoerce(): void
+    {
+        self::assertNormalizationFails('string', 42, '$: Value must be of type "string", but 42 given');
     }
 }

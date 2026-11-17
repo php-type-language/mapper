@@ -4,97 +4,45 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\InternalTypeException;
+use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Type\BackedEnumType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template TEnum of \BackedEnum = \BackedEnum
+ * Creates the type of a backed enum, its backing values are denormalized by
+ * the type of `int` or `string` from the repository, the aliases of the
+ * values are taken from the metadata of the enum.
  *
- * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|int|string>>
+ * @template-implements TypeBuilderInterface<\BackedEnum>
  */
-class BackedEnumTypeBuilder extends Builder
+final class BackedEnumTypeBuilder implements TypeBuilderInterface
 {
-    public function isSupported(TypeStatement $stmt): bool
-    {
-        if (!$stmt instanceof NamedTypeNode) {
-            return false;
-        }
-
-        /** @var non-empty-string $enum */
-        $enum = $stmt->name->toString();
-
-        return \enum_exists($stmt->name->toString())
-            && \is_subclass_of($enum, \BackedEnum::class);
-    }
-
     /**
-     * @param \ReflectionEnum<TEnum> $reflection
-     *
-     * @return non-empty-string
-     * @throws InternalTypeException
+     * @return BackedEnumType<\BackedEnum>|null
      */
-    private function getBackedEnumType(\ReflectionEnum $reflection, NamedTypeNode $statement): string
+    public function tryBuild(TypeNode $node, BuildContext $context): ?BackedEnumType
     {
-        $type = $reflection->getBackingType();
-
-        if (!$type instanceof \ReflectionNamedType) {
-            throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $statement,
-                message: 'The "{{type}}" must provide type (a subtype of BackedEnum)',
-            );
+        if (!$node instanceof NamedTypeNode || $node->arguments !== null || $node->fields !== null) {
+            return null;
         }
 
-        /** @var non-empty-string */
-        return $type->getName();
-    }
+        $name = \ltrim($node->name->toString(), '\\');
 
-    public function build(TypeStatement $stmt, BuildingContext $context): BackedEnumType
-    {
-        $this->expectNoShapeFields($stmt);
-        $this->expectNoTemplateArguments($stmt);
-
-        /** @var class-string<TEnum> $class */
-        $class = $stmt->name->toString();
-
-        $reflection = $this->createReflectionEnum($class, $stmt);
-        $definition = $this->getBackedEnumType($reflection, $stmt);
-
-        return new BackedEnumType(
-            class: $class,
-            /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
-            type: $context->getTypeByDefinition($definition),
-        );
-    }
-
-    /**
-     * @param class-string<TEnum> $class
-     *
-     * @return \ReflectionEnum<TEnum>
-     * @throws InternalTypeException
-     */
-    protected function createReflectionEnum(string $class, NamedTypeNode $stmt): \ReflectionEnum
-    {
-        try {
-            $reflection = new \ReflectionEnum($class);
-        } catch (\ReflectionException $e) {
-            throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $stmt,
-                message: 'The "{{type}}" must be an existing enum',
-                previous: $e,
-            );
+        if (!\is_a($name, \BackedEnum::class, true)) {
+            return null;
         }
 
-        if ($reflection->getCases() === []) {
-            throw InternalTypeException::becauseInternalTypeErrorOccurs(
-                type: $stmt,
-                message: 'The "{{type}}" enum requires at least one case',
-            );
-        }
+        /** @var 'int'|'string' */
+        $backing = (string) (new \ReflectionEnum($name))->getBackingType();
 
-        return $reflection;
+        /** @var TypeInterface<int|string> */
+        $type = $context->types->getType(new NamedTypeNode(new Name($backing)));
+
+        $aliases = $context->metadata->read(new \ReflectionClass($name))->aliases;
+
+        return new BackedEnumType($name, $type, $aliases);
     }
 }

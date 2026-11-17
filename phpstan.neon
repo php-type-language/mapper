@@ -1,19 +1,21 @@
 includes:
-  - phar://phpstan.phar/conf/bleedingEdge.neon
-  - vendor/phpstan/phpstan-strict-rules/rules.neon
-  - extension.neon
+  - libs/bridge/phpstan/phpstan.neon
+  - libs/bridge/symfony/phpstan.neon
+  - libs/component/coercer/phpstan.neon
+  - libs/component/diagnostics/phpstan.neon
+  - libs/component/instantiator/phpstan.neon
+  - libs/component/mapping/phpstan.neon
+  - libs/component/naming/phpstan.neon
+  - libs/component/property-accessor/phpstan.neon
+  - libs/component/type-matcher/phpstan.neon
+
 parameters:
   level: max
-  strictRules:
-    allRules: true
+  phpVersion:
+    min: 80100
+    max: 80599
+  treatPhpDocTypesAsCertain: false
   fileExtensions:
     - php
   paths:
     - src
-  tmpDir: vendor/.cache.phpstan
-  reportUnmatchedIgnoredErrors: false
-  ignoreErrors:
-    # Symfony polyfill bug
-    - '/^Access to property \$\w+ of internal class Symfony\\Polyfill\\Php80\\PhpToken from outside its root namespace Symfony/'
-    # PHPStan trait + class combination bug
-    - '/^Class TypeLang\\Mapper\\Context\\.+? has an uninitialized readonly property \$\w+\./'

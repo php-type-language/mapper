@@ -4,39 +4,70 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\BoolType;
-use TypeLang\Mapper\Type\TypeInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Tests\TestCase;
 
-#[Group('type')]
-#[CoversClass(BoolType::class)]
-final class BoolTypeTest extends TypeTestCase
+final class BoolTypeTest extends TestCase
 {
-    protected static function createType(): TypeInterface
+    /**
+     * @return iterable<non-empty-string, array{mixed, bool}>
+     */
+    public static function denormalizableDataProvider(): iterable
     {
-        return new BoolType();
+        yield 'true' => [true, true];
+        yield 'false' => [false, false];
+        yield 'one' => [1, true];
+        yield 'zero' => [0, false];
+        yield 'one string' => ['1', true];
+        yield 'word true in upper case' => ['TRUE', true];
+        yield 'word off' => ['off', false];
     }
 
-    protected static function matchValues(bool $normalize): iterable
+    /**
+     * @return iterable<non-empty-string, array{mixed, non-empty-string}>
+     */
+    public static function nonDenormalizableDataProvider(): iterable
     {
-        foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === true,
-                $value === false => true,
-                default => $default,
-            };
-        }
+        yield 'two' => [2, '$: Value must be of type "bool", but 2 given'];
+        yield 'float one' => [1.0, '$: Value must be of type "bool", but 1.0 given'];
+        yield 'empty string' => ['', '$: Value must be of type "bool", but "" given'];
+        yield 'ambiguous word' => ['y', '$: Value must be of type "bool", but "y" given'];
+        yield 'null' => [null, '$: Value must be of type "bool", but null given'];
     }
 
-    protected static function castValues(bool $normalize): iterable
+    #[DataProvider('denormalizableDataProvider')]
+    public function testDenormalizesBooleanAndItsForms(mixed $input, bool $expected): void
     {
-        foreach (self::defaultCastDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === true => true,
-                $value === false => false,
-                default => $default,
-            };
-        }
+        self::assertDenormalizes('bool', $input, $expected);
+    }
+
+    /**
+     * @param non-empty-string $message
+     */
+    #[DataProvider('nonDenormalizableDataProvider')]
+    public function testRejectsValueThatIsNotBooleanForm(mixed $input, string $message): void
+    {
+        self::assertDenormalizationFails('bool', $input, $message);
+    }
+
+    public function testStrictContextRejectsOtherForm(): void
+    {
+        self::assertDenormalizationFails(
+            'bool',
+            1,
+            '$: Value must be of type "bool", but 1 given',
+            self::createRepository(isStrict: true),
+        );
+    }
+
+    public function testBooleanIsAliasOfBool(): void
+    {
+        self::assertDenormalizes('boolean', 'yes', true);
+    }
+
+    public function testNormalizesBooleanAsIs(): void
+    {
+        self::assertNormalizes('bool', false, false);
+        self::assertNormalizationFails('bool', 1, '$: Value must be of type "bool", but 1 given');
     }
 }

@@ -4,121 +4,112 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\Template\InvalidTemplateArgumentException;
+use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Type\DateTimeType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Literal\StringLiteralNode;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Type\Literal\StringLiteralNode;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\Template\TypedTemplateArgumentNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template TDate of \DateTimeImmutable|\DateTime = \DateTimeImmutable
- * @template TResult of string = string
+ * Creates the type of {@see \DateTimeInterface} and its implementations
+ * with an optional format: `DateTimeImmutable<'Y-m-d'>`. An interface is
+ * created as {@see \DateTimeImmutable}, the strings are denormalized by the
+ * type of `string` from the repository.
  *
- * @template-extends Builder<NamedTypeNode, TypeInterface<TResult|TDate>>
+ * @template-implements TypeBuilderInterface<\DateTimeInterface>
  */
-class DateTimeTypeBuilder extends Builder
+final class DateTimeTypeBuilder implements TypeBuilderInterface
 {
-    private const DEFAULT_DATE_INTERFACE_MAPPING = [
-        \DateTimeInterface::class => \DateTimeImmutable::class,
-        /** @phpstan-ignore-next-line : Classes and interfaces may be missing */
-        \Carbon\CarbonInterface::class => \Carbon\CarbonImmutable::class,
-    ];
-
     /**
-     * @var non-empty-lowercase-string
+     * @return DateTimeType<\DateTimeInterface>|null
+     * @throws TypeDefinitionException in case of the format is not a single
+     *         non-empty string literal
      */
-    public const DEFAULT_INNER_SCALAR_TYPE = 'string';
-
-    public function __construct(
-        /**
-         * @var non-empty-string
-         */
-        protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
-        /**
-         * @var array<class-string<\DateTimeInterface>, class-string<\DateTimeInterface>>
-         *
-         * @phpstan-ignore-next-line : PHPStan false-positive (?)
-         */
-        protected readonly array $dateInterfaceMapping = self::DEFAULT_DATE_INTERFACE_MAPPING,
-    ) {}
-
-    public function isSupported(TypeStatement $stmt): bool
+    public function tryBuild(TypeNode $node, BuildContext $context): ?DateTimeType
     {
-        return $stmt instanceof NamedTypeNode
-            && \is_a($stmt->name->toLowerString(), \DateTimeInterface::class, true);
-    }
+        if (!$node instanceof NamedTypeNode || $node->fields !== null) {
+            return null;
+        }
 
-    public function build(TypeStatement $stmt, BuildingContext $context): DateTimeType
-    {
-        $this->expectNoShapeFields($stmt);
-        $this->expectTemplateArgumentsLessOrEqualThan($stmt, 1);
+        $name = \ltrim($node->name->toString(), '\\');
 
-        /** @var DateTimeType<TDate> */
+        if (
+            !(\class_exists($name) || \interface_exists($name))
+            || !\is_a($name, \DateTimeInterface::class, true)
+        ) {
+            return null;
+        }
+
+        $type = (new \ReflectionClass($name))->name;
+
+        $printed = $context->printer->print($node);
+
+        /** @var TypeInterface<string> */
+        $string = $context->types->getType(new NamedTypeNode(new Name('string')));
+
         return new DateTimeType(
-            class: $this->getDateTimeClass($stmt),
-            format: $this->findDateTimeFormat($stmt),
-            input: $context->getTypeByDefinition($this->type),
+            class: $type,
+            implementation: self::findClass($type)
+                ?? throw TypeDefinitionException::becauseTypeIsNotSupported($printed),
+            string: $string,
+            format: self::readFormat($node, $printed),
+            name: $printed,
         );
     }
 
     /**
-     * @return non-empty-string|null
+     * Returns the class a date of the type is created by, {@see null} in case
+     * of the type is neither {@see \DateTime} nor {@see \DateTimeImmutable}
+     * nor an interface both implement.
+     *
+     * @param class-string<\DateTimeInterface> $type
+     * @return class-string<\DateTime|\DateTimeImmutable>|null
      */
-    private function findDateTimeFormat(NamedTypeNode $stmt): ?string
+    private static function findClass(string $type): ?string
     {
-        if ($stmt->arguments === null) {
-            return null;
+        $isDate = \is_a($type, \DateTimeImmutable::class, true) || \is_a($type, \DateTime::class, true);
+
+        if ($isDate && (new \ReflectionClass($type))->isInstantiable()) {
+            return $type;
         }
 
-        /** @var TemplateArgumentNode $formatArgument */
-        $formatArgument = $stmt->arguments->first();
-
-        $this->expectNoTemplateArgumentHint($stmt, $formatArgument);
-
-        if (!$formatArgument->value instanceof StringLiteralNode) {
-            throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
-                argument: $formatArgument,
-                expected: new NamedTypeNode('string'),
-                type: $stmt,
-            );
+        if (!$isDate && \is_a(\DateTimeImmutable::class, $type, true)) {
+            return \DateTimeImmutable::class;
         }
 
-        $formatValue = $formatArgument->value->value;
-
-        if ($formatValue === '') {
-            throw InvalidTemplateArgumentException::becauseTemplateArgumentMustBe(
-                argument: $formatArgument,
-                expected: new NamedTypeNode('non-empty-string'),
-                type: $stmt,
-            );
-        }
-
-        return $formatValue;
+        return null;
     }
 
     /**
-     * @return class-string<TDate>
+     * @param non-empty-string $printed
+     * @return non-empty-string|null
+     * @throws TypeDefinitionException in case of the format is not a single
+     *         non-empty string literal
      */
-    private function getDateTimeClass(NamedTypeNode $stmt): string
+    private static function readFormat(NamedTypeNode $node, string $printed): ?string
     {
-        /** @var class-string<TDate> $class */
-        $class = $stmt->name->toString();
+        $arguments = $node->arguments->children ?? [];
 
-        if (!\interface_exists($class)) {
-            return $class;
+        if ($arguments === []) {
+            return null;
         }
 
-        foreach ($this->dateInterfaceMapping as $interface => $impl) {
-            if (\is_a($interface, $class, true)) {
-                $class = $impl;
-                break;
-            }
+        $format = $arguments[0];
+
+        if (
+            \count($arguments) === 1
+            && $format instanceof TypedTemplateArgumentNode
+            && $format->variance === null
+            && $format->value instanceof StringLiteralNode
+            && $format->value->value !== ''
+        ) {
+            return $format->value->value;
         }
 
-        /** @var class-string<TDate> */
-        return $class;
+        throw TypeDefinitionException::becauseDateFormatIsInvalid($printed);
     }
 }

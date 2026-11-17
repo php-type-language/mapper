@@ -4,84 +4,114 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Path\Entry\UnionLeafEntry;
-use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
-use TypeLang\Mapper\Type\UnionType\UnionSelection;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Exception\InvalidValueException;
 
 /**
- * @template-covariant TResult of mixed = mixed
- * @template-covariant TMatch of mixed= mixed
+ * `A|B|...`: the value by the first type accepting it.
  *
- * @template-implements TypeInterface<TResult, TMatch>
+ * On denormalization a type accepting the value exactly wins over a type
+ * accepting it by coercion: the types are checked in the strict context
+ * first, then in the given one in the coercion order.
+ *
+ * ```
+ * // int|string
+ * $union->denormalize('42', $context); // '42'
+ * $union->denormalize(42.0, $context); // 42
+ * ```
+ *
+ * @template T
+ *
+ * @template-implements TypeInterface<T>
  */
-class UnionType implements TypeInterface
+final class UnionType implements TypeInterface
 {
-    public function __construct(
-        /**
-         * @var non-empty-list<TypeInterface<TResult, TMatch>>
-         */
-        private readonly array $types,
-    ) {}
+    /**
+     * @var non-empty-list<TypeInterface<T>>
+     */
+    private readonly array $coercionOrder;
 
     /**
-     * Finds a child supported type from their {@see $types} list by value.
-     *
-     * @return UnionSelection<TResult, TMatch>|null
+     * @param non-empty-list<TypeInterface<T>>|null $coercionOrder the same
+     *        types in the order they are tried with coercion, the declared
+     *        order in case of {@see null}
      */
-    protected function select(mixed $value, RuntimeContext $context, bool $strict = true): ?UnionSelection
+    public function __construct(
+        /**
+         * Types in the declared order, checked in it for an exact match and
+         * on normalization
+         *
+         * @var non-empty-list<TypeInterface<T>>
+         */
+        public readonly array $types,
+        /**
+         * Canonical description of the union, for messages
+         *
+         * @var non-empty-string
+         */
+        public readonly string $name,
+        ?array $coercionOrder = null,
+    ) {
+        $this->coercionOrder = $coercionOrder ?? $types;
+    }
+
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        foreach ($this->types as $index => $type) {
-            $entrance = $context->enter(
-                value: $value,
-                entry: new UnionLeafEntry($index),
-                config: $context->withStrictTypes($strict),
-            );
-
-            $result = $type->match($value, $entrance);
-
-            if ($result !== null) {
-                return new UnionSelection($type, $result);
+        foreach ($this->types as $type) {
+            if ($type->isDenormalizable($value, $context)) {
+                return true;
             }
         }
 
-        return null;
+        return false;
     }
 
     /**
-     * Performs a cascading search of types based on value.
-     *
-     * 1. Perform a primary search using strict checks
-     * 2. Perform a secondary search using type coercions:
-     *    - in case of the primary search did not work
-     *    - and if type coercions are enabled
-     *
-     * @return UnionSelection<TResult, TMatch>|null
+     * @throws InvalidValueException in case of no type accepts the value
      */
-    protected function selectWithFallback(mixed $value, RuntimeContext $context): ?UnionSelection
+    public function denormalize(mixed $value, Context $context): mixed
     {
-        if ($context->isStrictTypesEnabled()) {
-            return $this->select($value, $context);
+        $strict = $context->withStrictTypes(true);
+
+        foreach ($this->types as $type) {
+            if ($type->isDenormalizable($value, $strict)) {
+                return $type->denormalize($value, $strict);
+            }
         }
 
-        return $this->select($value, $context)
-            ?? $this->select($value, $context, false);
-    }
-
-    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
-    {
-        return $this->selectWithFallback($value, $context)
-            ?->result;
-    }
-
-    public function cast(mixed $value, RuntimeContext $context): mixed
-    {
-        $selection = $this->selectWithFallback($value, $context);
-
-        if ($selection !== null) {
-            return $selection->type->cast($value, $context);
+        if ($strict !== $context) {
+            foreach ($this->coercionOrder as $type) {
+                if ($type->isDenormalizable($value, $context)) {
+                    return $type->denormalize($value, $context);
+                }
+            }
         }
 
-        throw InvalidValueException::createFromContext($context);
+        throw InvalidValueException::becauseInvalidType($this->name, $value);
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        foreach ($this->types as $type) {
+            if ($type->isNormalizable($value, $context)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @throws InvalidValueException in case of no type accepts the value
+     */
+    public function normalize(mixed $value, Context $context): mixed
+    {
+        foreach ($this->types as $type) {
+            if ($type->isNormalizable($value, $context)) {
+                return $type->normalize($value, $context);
+            }
+        }
+
+        throw InvalidValueException::becauseInvalidType($this->name, $value);
     }
 }

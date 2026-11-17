@@ -4,52 +4,54 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context;
 
-use TypeLang\Mapper\Configuration;
-use TypeLang\Mapper\Platform\PlatformInterface;
-
-abstract class Context
+/**
+ * State of the conversion, created once per mapper and passed to every
+ * type.
+ */
+final class Context
 {
-    protected function __construct(
-        public readonly PlatformInterface $platform,
+    /**
+     * The same context with the other strictness, created on the first
+     * request
+     */
+    private ?self $sibling = null;
+
+    public function __construct(
         /**
-         * Gets current configuration.
-         *
-         * If you need to retrieve configuration's settings, it is recommended
-         * to use the following methods:
-         *
-         * - {@see RuntimeContext::isObjectAsArray()}
-         * - {@see RuntimeContext::isStrictTypesEnabled()}
-         *
-         * @readonly
-         *
-         * @phpstan-readonly-allow-private-mutation
+         * Types resolved by the class of the value at runtime, such as the
+         * type of an object in `mixed`. A type known on building is given
+         * to its composite type by the builder.
          */
-        public Configuration $config,
+        public readonly ClassTypes $types,
+        public readonly Configuration $config = new Configuration(),
+        /**
+         * Runtime side of the classes: their instantiators and the readers
+         * and writers of their properties
+         */
+        public readonly ClassAccessors $accessors = new ClassAccessors(),
+        public readonly Coercers $coercers = new Coercers(),
     ) {}
 
     /**
-     * A more convenient and correct way to get current "object as array"
-     * configuration value.
-     *
-     * @see Configuration::isObjectAsArray()
-     *
-     * @link https://en.wikipedia.org/wiki/Law_of_Demeter
+     * Returns the context with the strictness overridden, such as for a
+     * property with its own strictness.
      */
-    public function isObjectAsArray(): bool
+    public function withStrictTypes(bool $isStrict): self
     {
-        return $this->config->isObjectAsArray();
-    }
+        if ($this->config->isStrict === $isStrict) {
+            return $this;
+        }
 
-    /**
-     * A more convenient and correct way to get current "strict types"
-     * configuration value.
-     *
-     * @see Configuration::isStrictTypesEnabled()
-     *
-     * @link https://en.wikipedia.org/wiki/Law_of_Demeter
-     */
-    public function isStrictTypesEnabled(): bool
-    {
-        return $this->config->isStrictTypesEnabled();
+        if ($this->sibling === null) {
+            $this->sibling = new self(
+                types: $this->types,
+                config: $this->config->withStrictTypes($isStrict),
+                accessors: $this->accessors,
+                coercers: $this->coercers,
+            );
+            $this->sibling->sibling = $this;
+        }
+
+        return $this->sibling;
     }
 }

@@ -4,54 +4,39 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
+use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Mapper\Type\UnitEnumType;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template TEnum of \UnitEnum = \UnitEnum
+ * Creates the type of an enum without values, its names are denormalized by
+ * the type of `string` from the repository.
  *
- * @template-extends Builder<NamedTypeNode, TypeInterface<TEnum|non-empty-string>>
+ * @template-implements TypeBuilderInterface<\UnitEnum>
  */
-class UnitEnumTypeBuilder extends Builder
+final class UnitEnumTypeBuilder implements TypeBuilderInterface
 {
     /**
-     * @var non-empty-lowercase-string
+     * @return UnitEnumType<\UnitEnum>|null
      */
-    public const DEFAULT_INNER_SCALAR_TYPE = 'string';
-
-    public function __construct(
-        /**
-         * @var non-empty-string
-         */
-        protected readonly string $type = self::DEFAULT_INNER_SCALAR_TYPE,
-    ) {}
-
-    public function isSupported(TypeStatement $stmt): bool
+    public function tryBuild(TypeNode $node, BuildContext $context): ?UnitEnumType
     {
-        if (!$stmt instanceof NamedTypeNode) {
-            return false;
+        if (!$node instanceof NamedTypeNode || $node->arguments !== null || $node->fields !== null) {
+            return null;
         }
 
-        /** @var non-empty-string $enum */
-        $enum = $stmt->name->toString();
+        $name = \ltrim($node->name->toString(), '\\');
 
-        return \enum_exists($stmt->name->toString())
-            && !\is_subclass_of($enum, \BackedEnum::class);
-    }
+        if (!\enum_exists($name) || \is_a($name, \BackedEnum::class, true)) {
+            return null;
+        }
 
-    public function build(TypeStatement $stmt, BuildingContext $context): UnitEnumType
-    {
-        $this->expectNoShapeFields($stmt);
-        $this->expectNoTemplateArguments($stmt);
+        /** @var TypeInterface<string> */
+        $string = $context->types->getType(new NamedTypeNode(new Name('string')));
 
-        return new UnitEnumType(
-            /** @phpstan-ignore-next-line : The stmt name contains class-string<TEnum> */
-            class: $stmt->name->toString(),
-            /** @phpstan-ignore-next-line : The "getTypeByStatement" returns TypeInterface<value-of<TEnum>> */
-            type: $context->getTypeByDefinition($this->type),
-        );
+        return new UnitEnumType($name, $string);
     }
 }

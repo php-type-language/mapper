@@ -4,59 +4,82 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\FloatType;
-use TypeLang\Mapper\Type\TypeInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Tests\TestCase;
 
-#[Group('type')]
-#[CoversClass(FloatType::class)]
-final class FloatTypeTest extends TypeTestCase
+final class FloatTypeTest extends TestCase
 {
-    protected static function createType(): TypeInterface
+    /**
+     * @return iterable<non-empty-string, array{mixed, float}>
+     */
+    public static function denormalizableDataProvider(): iterable
     {
-        return new FloatType();
+        yield 'float' => [4.5, 4.5];
+        yield 'infinity' => [\INF, \INF];
+        yield 'integer' => [42, 42.0];
+        yield 'numeric string' => ['4.5', 4.5];
+        yield 'exponent string' => ['1e3', 1000.0];
     }
 
-    protected static function matchValues(bool $normalize): iterable
+    /**
+     * @return iterable<non-empty-string, array{mixed, non-empty-string}>
+     */
+    public static function nonDenormalizableDataProvider(): iterable
     {
-        foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === \INF,
-                $value === -\INF,
-                \is_float($value) && \is_nan($value),
-                $value === \PHP_INT_MAX + 1,
-                $value === 42.5,
-                $value === 42.0,
-                $value === 1.0,
-                $value === 0.0,
-                $value === -1.0,
-                $value === -42.0,
-                $value === -42.5,
-                $value === \PHP_INT_MIN - 1 => true,
-                default => $default,
-            };
-        }
+        yield 'integer losing precision' => [
+            9_007_199_254_740_993,
+            '$: Value must be of type "float", but 9007199254740993 given',
+        ];
+        yield 'padded string' => [' 4.5', '$: Value must be of type "float", but " 4.5" given'];
+        yield 'boolean' => [true, '$: Value must be of type "float", but true given'];
+        yield 'null' => [null, '$: Value must be of type "float", but null given'];
     }
 
-    protected static function castValues(bool $normalize): iterable
+    #[DataProvider('denormalizableDataProvider')]
+    public function testDenormalizesFloatAndItsForms(mixed $input, float $expected): void
     {
-        foreach (self::defaultCastDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === \INF => \INF,
-                $value === -\INF => -\INF,
-                \is_float($value) && \is_nan($value) => \NAN,
-                $value === \PHP_INT_MAX + 1 => \PHP_INT_MAX + 1,
-                $value === 42.5 => 42.5,
-                $value === 42.0 => 42.0,
-                $value === 1.0 => 1.0,
-                $value === 0.0 => 0.0,
-                $value === -1.0 => -1.0,
-                $value === -42.0 => -42.0,
-                $value === -42.5 => -42.5,
-                $value === \PHP_INT_MIN - 1 => \PHP_INT_MIN - 1,
-                default => $default,
-            };
-        }
+        self::assertDenormalizes('float', $input, $expected);
+    }
+
+    /**
+     * @param non-empty-string $message
+     */
+    #[DataProvider('nonDenormalizableDataProvider')]
+    public function testRejectsValueThatIsNotFloatForm(mixed $input, string $message): void
+    {
+        self::assertDenormalizationFails('float', $input, $message);
+    }
+
+    public function testStrictContextAcceptsExactInteger(): void
+    {
+        self::assertDenormalizes('float', 42, 42.0, self::createRepository(isStrict: true));
+    }
+
+    public function testStrictContextRejectsNumericString(): void
+    {
+        self::assertDenormalizationFails(
+            'float',
+            '4.5',
+            '$: Value must be of type "float", but "4.5" given',
+            self::createRepository(isStrict: true),
+        );
+    }
+
+    public function testDenormalizesNotNumber(): void
+    {
+        $result = self::getType('float')->denormalize(\NAN, self::getContext(self::createRepository()));
+
+        self::assertNan($result);
+    }
+
+    public function testDoubleIsAliasOfFloat(): void
+    {
+        self::assertDenormalizes('double', '4.5', 4.5);
+    }
+
+    public function testNormalizesFloatAsIs(): void
+    {
+        self::assertNormalizes('float', 4.5, 4.5);
+        self::assertNormalizationFails('float', 4, '$: Value must be of type "float", but 4 given');
     }
 }

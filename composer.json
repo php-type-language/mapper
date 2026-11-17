@@ -10,58 +10,79 @@
     },
     "require": {
         "php": "^8.1",
-        "psr/clock": "^1.0",
-        "psr/log": "^1.0|^2.0|^3.0",
-        "psr/simple-cache": "^1.0|^2.0|^3.0",
-        "type-lang/parser": "^1.6",
-        "type-lang/printer": "^1.4"
+        "type-lang/parser": "^2.0",
+        "type-lang/printer": "^2.0",
+        "type-lang/reader": "^2.0",
+        "type-lang/types": "^2.0"
     },
     "autoload": {
         "psr-4": {
-            "TypeLang\\Mapper\\": "src"
-        },
-        "files": [
-            "src/helpers.php"
-        ]
+            "TypeLang\\Mapper\\": "src",
+            "TypeLang\\Mapper\\Bridge\\PHPStan\\": "libs/bridge/phpstan/src",
+            "TypeLang\\Mapper\\Bridge\\Symfony\\": "libs/bridge/symfony/src",
+            "TypeLang\\Mapper\\Coercer\\": "libs/component/coercer/src",
+            "TypeLang\\Mapper\\Diagnostics\\": "libs/component/diagnostics/src",
+            "TypeLang\\Mapper\\Instantiator\\": "libs/component/instantiator/src",
+            "TypeLang\\Mapper\\Mapping\\": "libs/component/mapping/src",
+            "TypeLang\\Mapper\\Naming\\": "libs/component/naming/src",
+            "TypeLang\\Mapper\\PropertyAccessor\\": "libs/component/property-accessor/src",
+            "TypeLang\\Mapper\\TypeMatcher\\": "libs/component/type-matcher/src"
+        }
     },
     "require-dev": {
-        "doctrine/instantiator": "^2.0",
-        "friendsofphp/php-cs-fixer": "^3.90",
-        "jetbrains/phpstorm-attributes": "^1.2",
-        "justinrainbow/json-schema": "^6.6",
-        "marc-mabe/php-enum": "^4.7",
-        "monolog/monolog": "^3.9",
+        "jetbrains/phpstorm-attributes": "^1.3",
         "nette/neon": "^3.4",
-        "nikic/php-parser": "^5.6",
-        "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-strict-rules": "^2.0",
-        "phpunit/phpunit": "^10.5|^11.0|^12.0",
-        "symfony/cache": "^6.4|^7.0",
-        "symfony/expression-language": "^6.4|^7.0",
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/stopwatch": "^6.4|^7.0",
-        "symfony/var-dumper": "^6.4|^7.0",
-        "symfony/yaml": "^6.4|^7.0",
-        "type-lang/phpdoc": "^1.0",
-        "type-lang/phpdoc-standard-tags": "^1.0"
+        "phpstan/phpstan": "^2.3",
+        "phpunit/phpunit": "^10.5|^11.0|^12.0|^13.0",
+        "psr/cache": "^2.0|^3.0",
+        "psr/simple-cache": "^2.0|^3.0",
+        "symfony/config": "^6.4|^7.0|^8.0",
+        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
+        "symfony/expression-language": "^6.4|^7.0|^8.0",
+        "symfony/http-foundation": "^6.4|^7.0|^8.0",
+        "symfony/http-kernel": "^6.4|^7.0|^8.0",
+        "symfony/stopwatch": "^6.4|^7.0|^8.0",
+        "symfony/validator": "^6.4|^7.0|^8.0",
+        "symfony/var-dumper": "^6.4|^7.0|^8.0",
+        "symfony/yaml": "^6.4|^7.0|^8.0",
+        "twig/twig": "^3.0",
+        "type-lang/phpdoc": "^2.0"
+    },
+    "suggest": {
+        "ext-json": "(*) Allows reading mapping configuration from JSON files",
+        "nette/neon": "(^3.4) Allows reading mapping configuration from NEON files",
+        "phpstan/phpstan": "(^2.0) Allows checking the syntax of the types in mapper calls and attributes",
+        "psr/cache": "(^2.0|^3.0) Allows caching metadata in a PSR-6 pool",
+        "psr/simple-cache": "(^2.0|^3.0) Allows caching metadata in a PSR-16 cache",
+        "symfony/expression-language": "(^6.4|^7.0|^8.0) Allows skipping properties by an expression",
+        "symfony/http-kernel": "(^6.4|^7.0|^8.0) Allows using the mapper as a Symfony bundle",
+        "symfony/validator": "(^6.4|^7.0|^8.0) Allows validating the mapped controller arguments",
+        "symfony/yaml": "(^6.4|^7.0|^8.0) Allows reading mapping configuration from YAML files",
+        "type-lang/phpdoc": "(^2.0) Allows reading property types from PHPDoc"
     },
     "autoload-dev": {
         "psr-4": {
-            "TypeLang\\Mapper\\Tests\\": "tests"
+            "TypeLang\\Mapper\\Tests\\": "tests",
+            "TypeLang\\Mapper\\Bridge\\PHPStan\\Tests\\": "libs/bridge/phpstan/tests",
+            "TypeLang\\Mapper\\Bridge\\Symfony\\Tests\\": "libs/bridge/symfony/tests",
+            "TypeLang\\Mapper\\Coercer\\Tests\\": "libs/component/coercer/tests",
+            "TypeLang\\Mapper\\Diagnostics\\Tests\\": "libs/component/diagnostics/tests",
+            "TypeLang\\Mapper\\Instantiator\\Tests\\": "libs/component/instantiator/tests",
+            "TypeLang\\Mapper\\Mapping\\Tests\\": "libs/component/mapping/tests",
+            "TypeLang\\Mapper\\Naming\\Tests\\": "libs/component/naming/tests",
+            "TypeLang\\Mapper\\PropertyAccessor\\Tests\\": "libs/component/property-accessor/tests",
+            "TypeLang\\Mapper\\TypeMatcher\\Tests\\": "libs/component/type-matcher/tests"
         }
-    },
-    "suggest": {
-        "ext-json": "Required for JSON mapping configuration files",
-        "doctrine/instantiator": "(^2.0) A faster way to create class instances",
-        "nette/neon": "(^3.0) Required for NEON mapping configuration files",
-        "symfony/yaml": "(^6.4|^7.0) Required for YAML mapping configuration files",
-        "type-lang/phpdoc-standard-tags": "(^1.0) Required for PhpDoc mapping configuration",
-        "justinrainbow/json-schema": "(^6.0) Required for file-based configuration validation"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.x-dev",
-            "dev-main": "1.x-dev"
+            "dev-master": "2.x-dev",
+            "dev-main": "2.x-dev"
+        },
+        "phpstan": {
+            "includes": [
+                "libs/bridge/phpstan/extension.neon"
+            ]
         }
     },
     "config": {
@@ -74,17 +95,10 @@
         }
     },
     "scripts-aliases": {
-        "phpcs:fix": ["phpcs", "cs"],
-        "linter:check": ["linter", "stan"]
+        "test:unit": ["test", "phpunit", "unit"]
     },
     "scripts": {
-        "build": "@php bin/build",
-        "test": ["@test:unit"],
-        "test:unit": "phpunit --testdox --testsuite=unit",
-        "linter:check": "phpstan analyse --configuration phpstan.neon --memory-limit 512M",
-        "linter:baseline": "@linter:check --generate-baseline",
-        "phpcs:check": "@phpcs:fix --dry-run",
-        "phpcs:fix": "php-cs-fixer fix --config=.php-cs-fixer.php --allow-risky=yes --verbose --diff"
+        "test:unit": "phpunit --testdox"
     },
     "minimum-stability": "dev",
     "prefer-stable": true

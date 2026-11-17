@@ -4,30 +4,80 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Type\UnitEnumType\UnitEnumFromStringType;
-use TypeLang\Mapper\Type\UnitEnumType\UnitEnumToStringType;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Exception\InvalidValueException;
 
 /**
- * @template TEnum of \UnitEnum = \UnitEnum
+ * Case of an enum without values by its name. The name is denormalized by
+ * the type of `string` first, a case is normalized to its name.
  *
- * @template-extends AsymmetricType<non-empty-string, TEnum>
+ * @template T of \UnitEnum
+ *
+ * @template-implements TypeInterface<T>
  */
-class UnitEnumType extends AsymmetricType
+final class UnitEnumType implements TypeInterface
 {
     /**
-     * @param class-string<TEnum> $class
-     * @param TypeInterface<string, string> $type
+     * Cases by their names
+     *
+     * @var array<non-empty-string, T>
      */
-    public function __construct(string $class, TypeInterface $type = new StringType())
+    private readonly array $cases;
+
+    public function __construct(
+        /**
+         * @var class-string<T>
+         */
+        public readonly string $class,
+        /**
+         * Type of the names
+         *
+         * @var TypeInterface<string>
+         */
+        public readonly TypeInterface $string,
+    ) {
+        $cases = [];
+
+        foreach ($class::cases() as $case) {
+            $cases[$case->name] = $case;
+        }
+
+        $this->cases = $cases;
+    }
+
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        parent::__construct(
-            normalize: new UnitEnumToStringType(
-                class: $class,
-            ),
-            denormalize: new UnitEnumFromStringType(
-                class: $class,
-                type: $type,
-            ),
-        );
+        return $this->string->isDenormalizable($value, $context)
+            && isset($this->cases[$this->string->denormalize($value, $context)]);
+    }
+
+    /**
+     * @return T
+     * @throws InvalidValueException in case of the value is not a name of a
+     *         case
+     * @throws \Throwable in case of the value is not a string
+     */
+    public function denormalize(mixed $value, Context $context): \UnitEnum
+    {
+        return $this->cases[$this->string->denormalize($value, $context)]
+            ?? throw InvalidValueException::becauseInvalidType($this->class, $value);
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        return $value instanceof $this->class;
+    }
+
+    /**
+     * @throws InvalidValueException in case of the value is not a case of
+     *         the enum
+     */
+    public function normalize(mixed $value, Context $context): string
+    {
+        if (!$value instanceof $this->class) {
+            throw InvalidValueException::becauseInvalidType($this->class, $value);
+        }
+
+        return $value->name;
     }
 }

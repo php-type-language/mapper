@@ -1,0 +1,4 @@
+TypeLang\Mapper\Mapping\Tests\Stub\PromotedStub:
+    properties:
+        id:
+            default: !php/const PHP_VERSION

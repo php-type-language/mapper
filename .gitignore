@@ -4,7 +4,6 @@
 # Composer
 /composer.lock
 /vendor/
-/var/
 
 # Testing
 test.php

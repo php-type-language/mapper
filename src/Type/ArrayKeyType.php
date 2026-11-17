@@ -4,37 +4,45 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Exception\InvalidValueException;
 
 /**
- * @template-implements TypeInterface<array-key>
+ * `array-key`: an integer or a string, the keys a PHP array may have.
+ *
+ * @template-implements TypeInterface<int|string>
  */
-class ArrayKeyType implements TypeInterface
+final class ArrayKeyType implements TypeInterface
 {
-    /**
-     * @phpstan-assert-if-true array-key $value
-     */
-    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        // TBD (?)
-        // It is not entirely clear whether a zero ("0") string
-        // key should be allowed, since it is technically
-        // impossible to put it in associative array.
-        //
-        // if ($value === '0') {
-        //     return false;
-        // }
-
-        return MatchedResult::successIf($value, \is_int($value) || \is_string($value));
+        return \is_int($value) || \is_string($value);
     }
 
-    public function cast(mixed $value, RuntimeContext $context): string|int
+    /**
+     * @throws InvalidValueException in case of the value is neither an
+     *         integer nor a string
+     */
+    public function denormalize(mixed $value, Context $context): int|string
     {
-        return match (true) {
-            \is_string($value),
-            \is_int($value) => $value,
-            default => throw InvalidValueException::createFromContext($context),
-        };
+        if (\is_int($value) || \is_string($value)) {
+            return $value;
+        }
+
+        throw InvalidValueException::becauseInvalidType('array-key', $value);
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        return \is_int($value) || \is_string($value);
+    }
+
+    /**
+     * @throws InvalidValueException in case of the value is neither an
+     *         integer nor a string
+     */
+    public function normalize(mixed $value, Context $context): int|string
+    {
+        return $this->denormalize($value, $context);
     }
 }

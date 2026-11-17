@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TypeLang\Mapper\Mapping\Tests\Fixture;
+
+use TypeLang\Mapper\Mapping\Tests\Stub\UserStub;
+
+return [
+    UserStub::class => [
+        'properties' => [
+            'id' => 'positive-int',
+            'email' => [
+                'name' => 'e_mail',
+                'read_type' => 'string',
+                'write_type' => 'non-empty-string',
+                'strict' => true,
+                'default' => 'unknown',
+            ],
+            'friend' => [
+                'type' => 'self|null',
+                'default' => null,
+            ],
+        ],
+    ],
+];

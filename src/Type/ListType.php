@@ -4,73 +4,128 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\Path\Entry\ArrayIndexEntry;
-use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidIterableValueException;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
+use TypeLang\Mapper\Exception\InvalidValueException;
+use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
 
 /**
- * @template-covariant TItem of mixed = mixed
+ * `list<T>`: an array with keys `0, 1, 2, ...` in order, each element of the
+ * type. An array with other keys is rejected.
  *
- * @template-implements TypeInterface<list<TItem>>
+ * @template T
+ *
+ * @template-implements TypeInterface<list<T>>
  */
-class ListType implements TypeInterface
+final class ListType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var TypeInterface<TItem>
+         * @var TypeInterface<T>
          */
-        protected readonly TypeInterface $value = new MixedType(),
+        public readonly TypeInterface $type,
+        /**
+         * Canonical description of the list, for messages
+         *
+         * @var non-empty-string
+         */
+        public readonly string $name,
     ) {}
 
-    /**
-     * @phpstan-assert-if-true iterable<mixed, mixed> $value
-     */
-    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        return MatchedResult::successIf($value, \is_array($value) && \array_is_list($value));
-    }
+        $value = $context->coercers->array->coerce($value);
 
-    public function cast(mixed $value, RuntimeContext $context): array
-    {
-        if (!\is_array($value) || !\array_is_list($value)) {
-            throw InvalidValueException::createFromContext($context);
+        if ($value === null || !\array_is_list($value)) {
+            return false;
         }
 
-        return $this->process($value, $context);
+        foreach ($value as $item) {
+            if (!$this->type->isDenormalizable($item, $context)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
-     * @param iterable<mixed, mixed> $value
-     *
-     * @return list<TItem>
-     * @throws \Throwable
+     * @return list<T>
+     * @throws InvalidValueException in case of the value is not a list or
+     *         an element cannot be denormalized
      */
-    protected function process(iterable $value, RuntimeContext $context): array
+    public function denormalize(mixed $value, Context $context): array
     {
+        $input = $context->coercers->array->coerce($value);
+
+        if ($input === null || !\array_is_list($input)) {
+            throw InvalidValueException::becauseInvalidType($this->name, $value);
+        }
+
+        $limit = $context->config->maxViolations;
+        $type = $this->type;
         $result = [];
-        $index = 0;
+        $violations = [];
 
-        /** @var iterable<mixed, mixed> $value */
-        foreach ($value as $key => $item) {
-            $entrance = $context->enter(
-                value: $item,
-                entry: new ArrayIndexEntry($index),
-            );
-
+        foreach ($input as $index => $item) {
             try {
-                $result[] = $this->value->cast($item, $entrance);
-            } catch (InvalidValueException $e) {
-                throw InvalidIterableValueException::createFromContext(
-                    element: $item,
-                    index: $index,
-                    key: $key,
-                    context: $entrance,
-                    previous: $e,
+                $result[] = $type->denormalize($item, $context);
+            } catch (NotInterceptableExceptionInterface $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                InvalidValueException::collect(
+                    $violations,
+                    InvalidValueException::wrapWithPath($e, new KeySegment($index), $item),
+                    $limit,
                 );
             }
+        }
 
-            ++$index;
+        if ($violations !== []) {
+            throw InvalidValueException::becauseViolationsAreCollected($violations);
+        }
+
+        return $result;
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        if (!\is_array($value) || !\array_is_list($value)) {
+            return false;
+        }
+
+        foreach ($value as $item) {
+            if (!$this->type->isNormalizable($item, $context)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return list<mixed>
+     * @throws InvalidValueException in case of the value is not a list or
+     *         an element cannot be normalized
+     */
+    public function normalize(mixed $value, Context $context): array
+    {
+        if (!\is_array($value) || !\array_is_list($value)) {
+            throw InvalidValueException::becauseInvalidType($this->name, $value);
+        }
+
+        $type = $this->type;
+
+        $result = [];
+
+        foreach ($value as $index => $item) {
+            try {
+                $result[] = $type->normalize($item, $context);
+            } catch (NotInterceptableExceptionInterface $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                throw InvalidValueException::wrapWithPath($e, new KeySegment($index), $item);
+            }
         }
 
         return $result;

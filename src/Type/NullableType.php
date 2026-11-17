@@ -4,37 +4,49 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\RuntimeContext;
+use TypeLang\Mapper\Context\Context;
 
 /**
- * @template-covariant TResult of mixed = mixed
+ * `?T` and `T|null`: {@see null} as is, any other value by the type.
  *
- * @template-implements TypeInterface<TResult|null>
+ * @template T
+ *
+ * @template-implements TypeInterface<T|null>
  */
-class NullableType implements TypeInterface
+final class NullableType implements TypeInterface
 {
     public function __construct(
         /**
-         * @var TypeInterface<TResult>
+         * @var TypeInterface<T>
          */
-        private readonly TypeInterface $parent,
+        public readonly TypeInterface $type,
     ) {}
 
-    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        if ($value === null) {
-            return MatchedResult::success($value);
-        }
-
-        return $this->parent->match($value, $context);
+        return $value === null || $this->type->isDenormalizable($value, $context);
     }
 
-    public function cast(mixed $value, RuntimeContext $context): mixed
+    public function denormalize(mixed $value, Context $context): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        return $this->parent->cast($value, $context);
+        return $this->type->denormalize($value, $context);
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        return $value === null || $this->type->isNormalizable($value, $context);
+    }
+
+    public function normalize(mixed $value, Context $context): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return $this->type->normalize($value, $context);
     }
 }

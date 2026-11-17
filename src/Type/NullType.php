@@ -4,28 +4,43 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type;
 
-use TypeLang\Mapper\Context\RuntimeContext;
-use TypeLang\Mapper\Exception\Runtime\InvalidValueException;
+use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Exception\InvalidValueException;
 
 /**
+ * `null` in both directions.
+ *
  * @template-implements TypeInterface<null>
  */
-class NullType implements TypeInterface
+final class NullType implements TypeInterface
 {
-    /**
-     * @phpstan-assert-if-true null $value
-     */
-    public function match(mixed $value, RuntimeContext $context): ?MatchedResult
+    public function isDenormalizable(mixed $value, Context $context): bool
     {
-        return MatchedResult::successIf($value, $value === null);
+        return $value === null;
     }
 
-    public function cast(mixed $value, RuntimeContext $context): mixed
+    /**
+     * @throws InvalidValueException in case of the value is not null
+     */
+    public function denormalize(mixed $value, Context $context): mixed
     {
         if ($value === null) {
             return null;
         }
 
-        throw InvalidValueException::createFromContext($context);
+        throw InvalidValueException::becauseInvalidType('null', $value);
+    }
+
+    public function isNormalizable(mixed $value, Context $context): bool
+    {
+        return $value === null;
+    }
+
+    /**
+     * @throws InvalidValueException in case of the value is not null
+     */
+    public function normalize(mixed $value, Context $context): mixed
+    {
+        return $this->denormalize($value, $context);
     }
 }

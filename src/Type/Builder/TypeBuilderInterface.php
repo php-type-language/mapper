@@ -4,35 +4,38 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\DefinitionException;
+use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Type\TypeNode;
 
 /**
- * Responsible for creating types based on their declaration
+ * Creates the type of a node, called once per type.
  *
- * @template TStmt of TypeStatement = TypeStatement
- * @template-covariant TType of TypeInterface = TypeInterface
+ * ```
+ * public function tryBuild(TypeNode $node, BuildContext $context): ?UuidType
+ * {
+ *     if ($this->pattern->findArguments($node) === null) {
+ *         return null;
+ *     }
+ *
+ *     $string = new NamedTypeNode(new Name('string'));
+ *
+ *     return new UuidType($context->types->getType($string));
+ * }
+ * ```
+ *
+ * @template-covariant T
  */
 interface TypeBuilderInterface
 {
     /**
-     * Returns {@see true} if the specified builder can create an instance
-     * of the specified type by the given {@see TypeStatement}
+     * Returns {@see null} in case of the node is not supported by the
+     * builder. Nested types are taken from {@see BuildContext::$types}.
      *
-     * @phpstan-assert-if-true TStmt $stmt
+     * @return TypeInterface<T>|null
+     * @throws TypeDefinitionException in case of the node is supported, but
+     *         declared wrong
      */
-    public function isSupported(TypeStatement $stmt): bool;
-
-    /**
-     * Creates an instance of the desired type
-     *
-     * @param TStmt $stmt
-     *
-     * @return TType
-     * @throws DefinitionException in case of building error
-     * @throws \Throwable in case of any internal error
-     */
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface;
+    public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface;
 }

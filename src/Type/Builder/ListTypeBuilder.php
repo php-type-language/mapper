@@ -4,98 +4,67 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
-use TypeLang\Mapper\Exception\Definition\Shape\ShapeFieldsNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\Hint\TemplateArgumentHintNotSupportedException;
-use TypeLang\Mapper\Exception\Definition\Template\TooManyTemplateArgumentsInRangeException;
-use TypeLang\Mapper\Exception\Definition\TypeNotFoundException;
+use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Type\Check\CheckInterface;
 use TypeLang\Mapper\Type\ListType;
+use TypeLang\Mapper\Type\RefinedType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\Template\TemplateArgumentNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Mapper\TypeMatcher\Exception\InvalidPatternException;
+use TypeLang\Mapper\TypeMatcher\NamedTypePattern;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template-extends NamedTypeBuilder<TypeInterface>
+ * Creates the type of `list` and `list<T>`, the element type of `list` is
+ * `mixed`. With checks the list is refined by them, such as
+ * `non-empty-list<T>`.
+ *
+ * ```
+ * new ListTypeBuilder(
+ *     new NamedTypePattern(['non-empty-list', 'non-empty-list<T>']),
+ *     [new NonEmptyCheck()],
+ * );
+ * ```
+ *
+ * @template-implements TypeBuilderInterface<list<mixed>>
  */
-class ListTypeBuilder extends NamedTypeBuilder
+final class ListTypeBuilder implements TypeBuilderInterface
 {
-    /**
-     * @var non-empty-lowercase-string
-     */
-    public const DEFAULT_INNER_VALUE_TYPE = 'mixed';
+    private readonly NamedTypePattern $pattern;
 
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
-     * @param non-empty-string $defaultValueType
+     * @param list<CheckInterface> $checks
+     * @throws InvalidPatternException in case of the pattern is written wrong
      */
     public function __construct(
-        array|string $names,
-        protected readonly string $defaultValueType = self::DEFAULT_INNER_VALUE_TYPE,
+        ?NamedTypePattern $pattern = null,
+        private readonly array $checks = [],
     ) {
-        parent::__construct($names);
+        $this->pattern = $pattern ?? new NamedTypePattern(['list', 'list<T>']);
     }
 
     /**
-     * @throws ShapeFieldsNotSupportedException
-     * @throws TemplateArgumentHintNotSupportedException
-     * @throws TooManyTemplateArgumentsInRangeException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
+     * @return TypeInterface<list<mixed>>|null
      */
-    public function build(TypeStatement $stmt, BuildingContext $context): TypeInterface
+    public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {
-        /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($stmt instanceof NamedTypeNode);
+        $arguments = $this->pattern->findArguments($node);
 
-        $this->expectNoShapeFields($stmt);
+        if ($arguments === null) {
+            return null;
+        }
 
-        $arguments = $stmt->arguments->items ?? [];
+        $item = $arguments['T'] ?? new NamedTypeNode(new Name('mixed'));
 
-        return match (\count($arguments)) {
-            0 => $this->buildWithNoValue($context),
-            1 => $this->buildWithValue($stmt, $context),
-            default => throw TooManyTemplateArgumentsInRangeException::becauseArgumentsCountRequired(
-                minArgumentsCount: 0,
-                maxArgumentsCount: 1,
-                type: $stmt,
-            ),
-        };
-    }
+        $name = $context->printer->print($node);
 
-    /**
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
-    private function buildWithNoValue(BuildingContext $context): TypeInterface
-    {
-        return new ListType(
-            value: $context->getTypeByDefinition(
-                definition: $this->defaultValueType,
-            ),
-        );
-    }
+        $type = new ListType($context->types->getType($item), $name);
 
-    /**
-     * @throws TemplateArgumentHintNotSupportedException
-     * @throws TypeNotFoundException
-     * @throws \Throwable
-     */
-    private function buildWithValue(NamedTypeNode $statement, BuildingContext $context): TypeInterface
-    {
-        $arguments = $statement->arguments->items ?? [];
+        if ($this->checks === []) {
+            return $type;
+        }
 
-        assert(\array_key_exists(0, $arguments));
-
-        /** @var TemplateArgumentNode $value */
-        $value = $arguments[0];
-
-        $this->expectNoTemplateArgumentHint($statement, $value);
-
-        return new ListType(
-            value: $context->getTypeByStatement(
-                statement: $value->value,
-            ),
-        );
+        return new RefinedType($type, $this->checks, $name);
     }
 }

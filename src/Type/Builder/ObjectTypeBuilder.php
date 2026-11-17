@@ -4,25 +4,47 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
-use TypeLang\Mapper\Context\BuildingContext;
+use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Type\ObjectType;
+use TypeLang\Mapper\Type\ShapeType;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template-extends NamedTypeBuilder<TypeInterface<object|array<array-key, mixed>>>
+ * Creates the types of `object` and `\stdClass`. A {@see \stdClass} is an
+ * object shape with no declared fields, its properties are `mixed`.
+ *
+ * @template-implements TypeBuilderInterface<object|array<array-key, mixed>>
  */
-class ObjectTypeBuilder extends NamedTypeBuilder
+final class ObjectTypeBuilder implements TypeBuilderInterface
 {
-    public function build(TypeStatement $stmt, BuildingContext $context): ObjectType
+    /**
+     * @return TypeInterface<object|array<array-key, mixed>>|null
+     */
+    public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {
-        /** @phpstan-ignore-next-line : Additional DbC assertion */
-        assert($stmt instanceof NamedTypeNode);
+        if (
+            !$node instanceof NamedTypeNode
+            || $node->arguments !== null
+            || $node->fields !== null
+        ) {
+            return null;
+        }
 
-        $this->expectNoShapeFields($stmt);
-        $this->expectNoTemplateArguments($stmt);
+        $name = \strtolower(\ltrim($node->name->toString(), '\\'));
 
-        return new ObjectType();
+        if ($name !== 'object' && $name !== 'stdclass') {
+            return null;
+        }
+
+        $mixed = $context->types->getType(new NamedTypeNode(new Name('mixed')));
+
+        if ($name === 'stdclass') {
+            return new ShapeType([], \stdClass::class, rest: $mixed, isObject: true);
+        }
+
+        return new ObjectType(new ShapeType([], 'object', rest: $mixed, isObject: true), $mixed);
     }
 }

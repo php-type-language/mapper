@@ -1,0 +1,17 @@
+{
+    "TypeLang\\Mapper\\Mapping\\Tests\\Stub\\UserStub": {
+        "colour": "red",
+        "properties": {
+            "missing": "int",
+            "counter": "int",
+            "id": {
+                "name": "",
+                "size": 1
+            },
+            "email": 42,
+            "friend": {
+                "type": "array<"
+            }
+        }
+    }
+}

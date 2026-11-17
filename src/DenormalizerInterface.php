@@ -5,39 +5,33 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
-use TypeLang\Mapper\Exception\Definition\DefinitionException;
-use TypeLang\Mapper\Exception\Runtime\RuntimeException;
+use TypeLang\Mapper\Exception\InvalidValueException;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 
+/**
+ * Converts data, such as decoded JSON, to a PHP value of the type.
+ *
+ * ```
+ * $user = $denormalizer->denormalize(\json_decode($json, true), User::class);
+ * ```
+ */
 interface DenormalizerInterface
 {
     /**
-     * Denormalizes a specific type from generic data.
-     *
-     * Can be used to convert to PHP values from an external data source
-     * such as JSON, MessagePack, BSON, etc.
-     *
-     * ```
-     * $denormalizer->denormalize(\json_decode('{
-     *     "id": 42,
-     *     "name": "Kirill"
-     * }'), ExampleClass::class);
-     * ```
-     *
-     * @param non-empty-string $type
-     *
-     * @throws RuntimeException in case of runtime mapping exception occurs
-     * @throws DefinitionException in case of type building exception occurs
-     * @throws \Throwable in case of any internal error occurs
+     * @template TArgObject of object
+     * @param class-string<TArgObject>|non-empty-string $type
+     * @return ($type is class-string<TArgObject> ? TArgObject : mixed)
+     * @throws InvalidValueException in case of the data does not match the
+     *         type, the message has the path of the wrong value
+     * @throws TypeDefinitionException in case of the type is not supported,
+     *         written or declared wrong
      */
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed;
 
     /**
-     * Returns {@see true} if the value can be denormalized for the given type.
-     *
      * @param non-empty-string $type
-     *
-     * @throws DefinitionException in case of type building exception occurs
-     * @throws \Throwable in case of any internal error occurs
+     * @throws TypeDefinitionException in case of the type is not supported,
+     *         written or declared wrong
      */
     public function isDenormalizable(mixed $value, #[Language('PHP')] string $type): bool;
 }

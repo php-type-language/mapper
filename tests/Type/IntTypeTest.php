@@ -4,49 +4,73 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Group;
-use TypeLang\Mapper\Type\IntType;
-use TypeLang\Mapper\Type\TypeInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Tests\TestCase;
 
-#[Group('type')]
-#[CoversClass(IntType::class)]
-final class IntTypeTest extends TypeTestCase
+final class IntTypeTest extends TestCase
 {
-    protected static function createType(): TypeInterface
+    /**
+     * @return iterable<non-empty-string, array{mixed, int}>
+     */
+    public static function denormalizableDataProvider(): iterable
     {
-        return new IntType();
+        yield 'integer' => [42, 42];
+        yield 'integer string' => ['42', 42];
+        yield 'negative integer string' => ['-7', -7];
+        yield 'decimal string with zero fraction' => ['42.0', 42];
+        yield 'integral float' => [42.0, 42];
     }
 
-    protected static function matchValues(bool $normalize): iterable
+    /**
+     * @return iterable<non-empty-string, array{mixed, non-empty-string}>
+     */
+    public static function nonDenormalizableDataProvider(): iterable
     {
-        foreach (self::defaultMatchDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === 42,
-                $value === 1,
-                $value === 0,
-                $value === -1,
-                $value === -42,
-                $value === \PHP_INT_MAX,
-                $value === \PHP_INT_MIN => true,
-                default => $default,
-            };
-        }
+        yield 'padded string' => [' 42', '$: Value must be of type "int", but " 42" given'];
+        yield 'word' => ['x', '$: Value must be of type "int", but "x" given'];
+        yield 'fractional float' => [42.5, '$: Value must be of type "int", but 42.5 given'];
+        yield 'boolean' => [true, '$: Value must be of type "int", but true given'];
+        yield 'null' => [null, '$: Value must be of type "int", but null given'];
+        yield 'array' => [[], '$: Value must be of type "int", but array(0) given'];
     }
 
-    protected static function castValues(bool $normalize): iterable
+    #[DataProvider('denormalizableDataProvider')]
+    public function testDenormalizesIntegerAndItsForms(mixed $input, int $expected): void
     {
-        foreach (self::defaultCastDataProviderSamples() as $value => $default) {
-            yield $value => match (true) {
-                $value === 42 => 42,
-                $value === 1 => 1,
-                $value === 0 => 0,
-                $value === -1 => -1,
-                $value === -42 => -42,
-                $value === \PHP_INT_MAX => \PHP_INT_MAX,
-                $value === \PHP_INT_MIN => \PHP_INT_MIN,
-                default => $default,
-            };
-        }
+        self::assertDenormalizes('int', $input, $expected);
+    }
+
+    /**
+     * @param non-empty-string $message
+     */
+    #[DataProvider('nonDenormalizableDataProvider')]
+    public function testRejectsValueThatIsNotIntegerForm(mixed $input, string $message): void
+    {
+        self::assertDenormalizationFails('int', $input, $message);
+    }
+
+    public function testStrictContextRejectsIntegerString(): void
+    {
+        self::assertDenormalizationFails(
+            'int',
+            '42',
+            '$: Value must be of type "int", but "42" given',
+            self::createRepository(isStrict: true),
+        );
+    }
+
+    public function testIntegerIsAliasOfInt(): void
+    {
+        self::assertDenormalizes('integer', '42', 42);
+    }
+
+    public function testNormalizesIntegerAsIs(): void
+    {
+        self::assertNormalizes('int', 42, 42);
+    }
+
+    public function testNormalizationDoesNotCoerce(): void
+    {
+        self::assertNormalizationFails('int', '42', '$: Value must be of type "int", but "42" given');
     }
 }

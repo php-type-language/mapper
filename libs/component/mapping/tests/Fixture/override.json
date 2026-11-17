@@ -1,0 +1,10 @@
+{
+    "TypeLang\\Mapper\\Mapping\\Tests\\Stub\\UserStub": {
+        "properties": {
+            "id": "int",
+            "email": {
+                "name": "mail"
+            }
+        }
+    }
+}

@@ -1,0 +1,219 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block icon %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.41.21A.5.5,0,0,0,17,0H12a.5.5,0,0,0-.47.34l-8,23A.5.5,0,0,0,4,24H9a.5.5,0,0,0,.47-.34l8-23A.5.5,0,0,0,17.41.21Z"/>
+        <circle cx="17.5" cy="21" r="3"/>
+    </svg>
+{% endblock %}
+
+{% block toolbar %}
+    {% set calls = collector.calls %}
+
+    {% if calls is not empty %}
+        {% set icon %}
+            {{ block('icon') }}
+            <span class="sf-toolbar-value">{{ calls|length }}</span>
+            <span class="sf-toolbar-info-piece-additional-detail">
+                <span class="sf-toolbar-label">in</span>
+                <span class="sf-toolbar-value">{{ '%0.2f'|format(collector.totalDuration) }}</span>
+                <span class="sf-toolbar-label">ms</span>
+            </span>
+        {% endset %}
+
+        {% set text %}
+            <div class="sf-toolbar-info-piece">
+                <b>Mapper calls</b>
+                <span class="sf-toolbar-status">{{ calls|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Failed calls</b>
+                <span class="sf-toolbar-status {{ collector.errorCount ? 'sf-toolbar-status-red' }}">
+                    {{ collector.errorCount }}
+                </span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Total time</b>
+                <span>{{ '%0.2f'|format(collector.totalDuration) }} ms</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Types built</b>
+                <span class="sf-toolbar-status">{{ collector.types|length }}</span>
+            </div>
+            <div class="sf-toolbar-info-piece">
+                <b>Metadata reads</b>
+                <span class="sf-toolbar-status">{{ collector.metadata|length }}</span>
+            </div>
+        {% endset %}
+
+        {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {
+            link: profiler_url,
+            status: collector.errorCount ? 'red' : '',
+        }) }}
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    <span class="label {{ collector.calls is empty ? 'disabled' }} {{ collector.errorCount ? 'label-status-error' }}">
+        <span class="icon">{{ block('icon') }}</span>
+        <strong>Mapper</strong>
+        {% if collector.errorCount %}
+            <span class="count">
+                <span>{{ collector.errorCount }}</span>
+            </span>
+        {% endif %}
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>TypeLang Mapper</h2>
+
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">{{ collector.calls|length }}</span>
+            <span class="label">Calls</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.errorCount }}</span>
+            <span class="label">Failed calls</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ '%0.2f'|format(collector.totalDuration) }} <span class="unit">ms</span></span>
+            <span class="label">Total time</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.types|length }}</span>
+            <span class="label">Types built</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.metadata|length }}</span>
+            <span class="label">Metadata reads</span>
+        </div>
+    </div>
+
+    <div class="sf-tabs">
+        <div class="tab {{ collector.calls is empty ? 'disabled' }}">
+            <h3 class="tab-title">Calls <span class="badge">{{ collector.calls|length }}</span></h3>
+
+            <div class="tab-content">
+                {% if collector.calls is empty %}
+                    <div class="empty"><p>No mapper was called.</p></div>
+                {% else %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Mapper</th>
+                                <th>Call</th>
+                                <th>Time</th>
+                                <th>Input</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for call in collector.calls %}
+                                <tr class="{{ call.error ? 'status-error' }}">
+                                    <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
+                                    <td class="nowrap">{{ call.mapper }}</td>
+                                    <td>
+                                        <code>{{ call.method }}({{ call.type ?? 'mixed' }})</code>
+                                        {% if call.file %}
+                                            <div class="text-small text-muted">
+                                                <a href="{{ call.file|file_link(call.line) }}">{{ call.file|file_relative|default(call.file) }}:{{ call.line }}</a>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td class="nowrap">{{ '%0.2f'|format(call.duration) }} ms</td>
+                                    <td>{{ profiler_dump(call.input, maxDepth=1) }}</td>
+                                    <td>
+                                        {% if call.error %}
+                                            <strong>{{ call.error.class|abbr_class }}</strong>
+                                            {% if call.violations is empty %}
+                                                <div>{{ call.error.message }}</div>
+                                            {% else %}
+                                                <ul>
+                                                    {% for violation in call.violations %}
+                                                        <li><code>{{ violation.path }}</code>: {{ violation.message }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        {% else %}
+                                            {{ profiler_dump(call.output, maxDepth=1) }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.types is empty ? 'disabled' }}">
+            <h3 class="tab-title">Types <span class="badge">{{ collector.types|length }}</span></h3>
+
+            <div class="tab-content">
+                <p class="text-muted">Types built during the request, each one once per mapper.</p>
+
+                {% if collector.types is empty %}
+                    <div class="empty"><p>No type was built.</p></div>
+                {% else %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mapper</th>
+                                <th>Type</th>
+                                <th>Implementation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for type in collector.types %}
+                                <tr>
+                                    <td class="nowrap">{{ type.mapper }}</td>
+                                    <td><code>{{ type.type }}</code></td>
+                                    <td>{{ type.class|abbr_class }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="tab {{ collector.metadata is empty ? 'disabled' }}">
+            <h3 class="tab-title">Metadata <span class="badge">{{ collector.metadata|length }}</span></h3>
+
+            <div class="tab-content">
+                <p class="text-muted">
+                    Class metadata read during the request. A class is read by several builders,
+                    the repeated reads come from the in-memory cache.
+                </p>
+
+                {% if collector.metadata is empty %}
+                    <div class="empty"><p>No metadata was read.</p></div>
+                {% else %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mapper</th>
+                                <th>Class</th>
+                                <th>Reads</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for read in collector.metadata %}
+                                <tr>
+                                    <td class="nowrap">{{ read.mapper }}</td>
+                                    <td>{{ read.class|abbr_class }}</td>
+                                    <td class="nowrap">{{ read.reads }}</td>
+                                    <td class="nowrap">{{ '%0.2f'|format(read.duration) }} ms</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+rules:
+  # Checks the syntax of the types in constant strings given to a mapper
+  - TypeLang\Mapper\Bridge\PHPStan\MethodCallTypeSyntaxRule
+  # Checks the syntax of the types in mapping attributes
+  - TypeLang\Mapper\Bridge\PHPStan\AttributeTypeSyntaxRule

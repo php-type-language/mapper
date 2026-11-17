@@ -4,59 +4,46 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Builder;
 
+use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\Node\FullQualifiedName;
-use TypeLang\Parser\Node\Stmt\NamedTypeNode;
-use TypeLang\Parser\Node\Stmt\TypeStatement;
+use TypeLang\Mapper\TypeMatcher\NamedTypePattern;
+use TypeLang\Type\TypeNode;
 
 /**
- * @template-covariant TType of TypeInterface = TypeInterface<mixed>
+ * Returns the same type for any node matching the pattern, such as `int`.
+ * Meant for forms without arguments: a form with arguments gets the same
+ * type for any of them, a type depending on its arguments needs its own
+ * builder over the pattern.
  *
- * @template-extends Builder<NamedTypeNode, TType>
+ * ```
+ * $pattern = new NamedTypePattern(['int', 'integer']);
+ *
+ * new NamedTypeBuilder($pattern, new IntType());
+ * ```
+ *
+ * @template T
+ *
+ * @template-implements TypeBuilderInterface<T>
  */
-abstract class NamedTypeBuilder extends Builder
+final class NamedTypeBuilder implements TypeBuilderInterface
 {
-    /**
-     * @var non-empty-list<non-empty-lowercase-string>
-     */
-    protected readonly array $lower;
+    public function __construct(
+        private readonly NamedTypePattern $pattern,
+        /**
+         * @var TypeInterface<T>
+         */
+        private readonly TypeInterface $type,
+    ) {}
 
     /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
+     * @return TypeInterface<T>|null
      */
-    public function __construct(array|string $names)
+    public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {
-        $this->lower = $this->formatNames($names);
-    }
-
-    /**
-     * @param non-empty-array<non-empty-string>|non-empty-string $names
-     *
-     * @return non-empty-list<non-empty-lowercase-string>
-     */
-    private function formatNames(array|string $names): array
-    {
-        $result = [];
-
-        foreach (\is_string($names) ? [$names] : $names as $name) {
-            $result[] = \strtolower($name);
+        if ($this->pattern->findArguments($node) === null) {
+            return null;
         }
 
-        return $result;
-    }
-
-    public function isSupported(TypeStatement $stmt): bool
-    {
-        if (!$stmt instanceof NamedTypeNode) {
-            return false;
-        }
-
-        $lower = $stmt->name->toLowerString();
-
-        if ($stmt->name instanceof FullQualifiedName && $stmt->name->isPrefixedByLeadingBackslash()) {
-            $lower = \ltrim($lower, '\\');
-        }
-
-        return \in_array($lower, $this->lower, true);
+        return $this->type;
     }
 }
