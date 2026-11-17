@@ -43,7 +43,6 @@
         "symfony/http-foundation": "^6.4|^7.0|^8.0",
         "symfony/http-kernel": "^6.4|^7.0|^8.0",
         "symfony/stopwatch": "^6.4|^7.0|^8.0",
-        "symfony/validator": "^6.4|^7.0|^8.0",
         "symfony/var-dumper": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
         "twig/twig": "^3.0",
@@ -57,7 +56,6 @@
         "psr/simple-cache": "(^2.0|^3.0) Allows caching metadata in a PSR-16 cache",
         "symfony/expression-language": "(^6.4|^7.0|^8.0) Allows skipping properties by an expression",
         "symfony/http-kernel": "(^6.4|^7.0|^8.0) Allows using the mapper as a Symfony bundle",
-        "symfony/validator": "(^6.4|^7.0|^8.0) Allows validating the mapped controller arguments",
         "symfony/yaml": "(^6.4|^7.0|^8.0) Allows reading mapping configuration from YAML files",
         "type-lang/phpdoc": "(^2.0) Allows reading property types from PHPDoc"
     },

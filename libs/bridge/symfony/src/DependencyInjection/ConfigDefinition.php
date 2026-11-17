@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 /**
  * Config tree of the bundle: the settings of the default mapper, the named
- * mappers with the same settings and the controller arguments. A setting
+ * mappers with the same settings and the web profiler. A setting
  * left {@see null} is inherited, from the default mapper by a named one and
  * from the mapper itself by the default one.
  *
@@ -44,16 +44,6 @@ final class ConfigDefinition
             });
 
         self::defineSettings($mappers->arrayPrototype()->children());
-
-        $request = $children->arrayNode('request');
-        $request->info('Controller arguments marked with #[MapBody] and #[MapQuery]');
-        $request->addDefaultsIfNotSet();
-
-        $requestChildren = $request->children();
-        $requestChildren->booleanNode('enabled')->defaultTrue();
-        $requestChildren->booleanNode('problem_response')
-            ->info('Whether invalid request data is answered with RFC 9457 JSON')
-            ->defaultTrue();
 
         $profiler = $children->arrayNode('profiler');
         $profiler->info('Web profiler panel of the mappers, enabled in debug mode unless disabled');

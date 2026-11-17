@@ -402,14 +402,6 @@ final class TypeLangMapperBundleTest extends TestCase
         self::createContainer(config: ['metadata' => ['paths' => [__DIR__ . '/missing']]]);
     }
 
-    public function testRequestServicesCanBeDisabled(): void
-    {
-        $container = self::createContainer(config: ['request' => ['enabled' => false]], isCompiled: false);
-
-        self::assertFalse($container->hasDefinition('type_lang_mapper.request.value_resolver'));
-        self::assertFalse($container->hasDefinition('type_lang_mapper.request.problem_response'));
-    }
-
     private static function createUser(): UserStub
     {
         $user = new UserStub();

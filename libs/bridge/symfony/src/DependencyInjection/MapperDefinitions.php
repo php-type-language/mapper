@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Bridge\Symfony\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
@@ -14,8 +13,6 @@ use TypeLang\Mapper\Bridge\Symfony\Profiler\MapperDataCollector;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TraceableMapper;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TraceableMetadataProvider;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TypeBuildRecorder;
-use TypeLang\Mapper\Bridge\Symfony\Request\ProblemResponseListener;
-use TypeLang\Mapper\Bridge\Symfony\Request\RequestValueResolver;
 use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\Context\Configuration;
 use TypeLang\Mapper\DenormalizerInterface;
@@ -87,10 +84,6 @@ use TypeLang\Parser\TypeParser;
  *         },
  *     },
  *     mappers: array<non-empty-string, MapperSettingsType>,
- *     request: array{
- *         enabled: bool,
- *         problem_response: bool,
- *     },
  *     profiler: array{
  *         enabled: bool|null,
  *     },
@@ -224,11 +217,9 @@ final class MapperDefinitions
         $defaults = $config;
         $extensions = [];
         $coercers = [];
-        $locator = [];
 
         $extensions[self::DEFAULT_NAME] = $this->registerMapper(self::DEFAULT_NAME, $defaults);
         $coercers[self::DEFAULT_NAME] = self::getConfiguredCoercers($defaults);
-        $locator[self::DEFAULT_NAME] = new Reference(self::MAPPER_ID);
 
         foreach (self::MAPPER_INTERFACES as $type) {
             $this->container->setAlias($type, self::MAPPER_ID);
@@ -237,7 +228,6 @@ final class MapperDefinitions
         foreach ($config['mappers'] as $name => $settings) {
             $extensions[$name] = $this->registerMapper($name, $settings, $defaults);
             $coercers[$name] = self::getConfiguredCoercers($settings);
-            $locator[$name] = new Reference(self::getMapperId($name));
 
             foreach (self::MAPPER_INTERFACES as $type) {
                 $this->container->registerAliasForArgument(self::getMapperId($name), $type, $name . '.mapper');
@@ -247,12 +237,8 @@ final class MapperDefinitions
         $this->container->setParameter(self::EXTENSIONS_PARAMETER, $extensions);
         $this->container->setParameter(self::COERCERS_PARAMETER, $coercers);
 
-        if ($config['request']['enabled']) {
-            $this->registerRequestServices($locator, $config['request']['problem_response']);
-        }
-
         if ($config['profiler']['enabled'] ?? $this->isDebug()) {
-            $this->registerProfilerServices(\array_keys($locator));
+            $this->registerProfilerServices(\array_keys($extensions));
         }
     }
 
@@ -561,26 +547,6 @@ final class MapperDefinitions
     {
         return $this->container->hasParameter('kernel.debug')
             && $this->container->getParameter('kernel.debug') === true;
-    }
-
-    /**
-     * @param array<non-empty-string, Reference> $mappers
-     */
-    private function registerRequestServices(array $mappers, bool $isProblemResponse): void
-    {
-        $this->container->register('type_lang_mapper.request.value_resolver', RequestValueResolver::class)
-            ->setArguments([
-                '$mappers' => new ServiceLocatorArgument($mappers),
-                '$validator' => new Reference('validator', ContainerInterface::IGNORE_ON_INVALID_REFERENCE),
-            ])
-            ->addTag('controller.argument_value_resolver', ['priority' => 110]);
-
-        if (!$isProblemResponse) {
-            return;
-        }
-
-        $this->container->register('type_lang_mapper.request.problem_response', ProblemResponseListener::class)
-            ->addTag('kernel.event_listener', ['event' => 'kernel.exception', 'method' => 'onKernelException']);
     }
 
     /**
