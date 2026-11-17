@@ -68,13 +68,11 @@ final class MixedTypeTest extends TestCase
 
     public function testObjectOfUnsupportedClassIsErrorOfTypeInCheckAndConversion(): void
     {
-        $repository = self::createRepository();
-        $type = self::getType('mixed', $repository);
+        $mapper = self::createMapper();
         $value = ['items' => [static fn(): int => 1]];
 
-        $context = self::getContext($repository);
-        $check = self::captureThrowable(static fn(): bool => $type->isNormalizable($value, $context));
-        $conversion = self::captureThrowable(static fn(): mixed => $type->normalize($value, $context));
+        $check = self::captureThrowable(static fn(): bool => $mapper->isNormalizable($value, 'mixed'));
+        $conversion = self::captureThrowable(static fn(): mixed => $mapper->normalize($value, 'mixed'));
 
         self::assertInstanceOf(TypeDefinitionException::class, $check);
         self::assertInstanceOf(TypeDefinitionException::class, $conversion);
@@ -85,12 +83,11 @@ final class MixedTypeTest extends TestCase
 
     public function testDynamicObjectStaysObjectInCaseOfObjectsAreNotArrays(): void
     {
-        $repository = self::createRepository(config: new Configuration(isObjectAsArray: false));
+        $mapper = self::createMapper(config: new Configuration(isObjectAsArray: false));
 
         self::assertEquals(
             (object) ['a' => (object) []],
-            self::getType('mixed', $repository)
-                ->normalize((object) ['a' => new \stdClass()], self::getContext($repository)),
+            $mapper->normalize((object) ['a' => new \stdClass()], 'mixed'),
         );
     }
 }

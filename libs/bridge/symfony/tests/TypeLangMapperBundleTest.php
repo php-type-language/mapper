@@ -183,8 +183,8 @@ final class TypeLangMapperBundleTest extends TestCase
     {
         yield 'decorator' => [DecoratorStub::class, 'type_lang_mapper.mapper', '$decorators'];
         yield 'hook' => [HookStub::class, 'type_lang_mapper.mapper.api', '$hooks'];
-        yield 'instantiator' => [InstantiatorStub::class, '.type_lang_mapper.default.instantiators', '$strategies'];
-        yield 'accessor' => [AccessorStub::class, '.type_lang_mapper.default.accessors', '$strategies'];
+        yield 'instantiator' => [InstantiatorStub::class, 'type_lang_mapper.mapper', '$instantiators'];
+        yield 'accessor' => [AccessorStub::class, 'type_lang_mapper.mapper', '$accessors'];
         yield 'metadata reader' => [MetadataReaderStub::class, '.type_lang_mapper.default.metadata', '$readers'];
     }
 
@@ -263,8 +263,8 @@ final class TypeLangMapperBundleTest extends TestCase
         );
 
         self::assertEquals(
-            ['$float' => new Reference('app.coercer')],
-            $container->getDefinition('.type_lang_mapper.api.coercers')->getArguments(),
+            ['float' => new Reference('app.coercer')],
+            $container->getDefinition('type_lang_mapper.mapper.api')->getArgument('$coercers'),
         );
     }
 

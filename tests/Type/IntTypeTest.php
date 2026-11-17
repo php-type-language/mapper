@@ -55,7 +55,7 @@ final class IntTypeTest extends TestCase
             'int',
             '42',
             '$: Value must be of type "int", but "42" given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

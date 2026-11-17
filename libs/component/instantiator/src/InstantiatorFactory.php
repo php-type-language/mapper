@@ -12,29 +12,34 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 /**
  * Creates the instantiator of a class once by the first strategy that takes
- * the class: the strategies of the user, then creating the objects without
- * the constructor. A class no strategy takes is rejected.
+ * the class, a class no strategy takes is rejected. The default strategy,
+ * after the ones of the user, creates the objects without the constructor.
  *
  * ```
- * $factory = new InstantiatorFactory([new EntityStrategy($entities)]);
+ * $factory = InstantiatorFactory::createDefault([new EntityStrategy($entities)]);
  *
  * $user = $factory->createInstantiator($class, $metadata)->instantiate(['id' => 42]);
  * ```
  */
 final class InstantiatorFactory
 {
-    /**
-     * @var non-empty-list<InstantiationStrategyInterface>
-     */
-    private readonly array $strategies;
+    public function __construct(
+        /**
+         * @var non-empty-list<InstantiationStrategyInterface>
+         */
+        private readonly array $strategies,
+    ) {}
 
     /**
      * @param list<InstantiationStrategyInterface> $strategies strategies of
      *        the user, tried before the default one in the order of the list
      */
-    public function __construct(array $strategies = [])
+    public static function createDefault(array $strategies = []): self
     {
-        $this->strategies = [...$strategies, new WithoutConstructorStrategy()];
+        return new self([
+            ...$strategies,
+            new WithoutConstructorStrategy(),
+        ]);
     }
 
     /**

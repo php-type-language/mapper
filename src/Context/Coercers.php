@@ -18,7 +18,7 @@ use TypeLang\Mapper\Coercer\StringCoercer;
  * {@see self::$array} in any mode.
  *
  * ```
- * new Mapper(coercers: new Coercers(float: new DecimalCommaCoercer()));
+ * new Mapper(coercers: ['float' => new DecimalCommaCoercer()]);
  * ```
  */
 final class Coercers
@@ -27,24 +27,47 @@ final class Coercers
         /**
          * @var CoercerInterface<int>
          */
-        public readonly CoercerInterface $int = new IntCoercer(),
+        public readonly CoercerInterface $int,
         /**
          * @var CoercerInterface<float>
          */
-        public readonly CoercerInterface $float = new FloatCoercer(),
+        public readonly CoercerInterface $float,
         /**
          * @var CoercerInterface<string>
          */
-        public readonly CoercerInterface $string = new StringCoercer(),
+        public readonly CoercerInterface $string,
         /**
          * @var CoercerInterface<bool>
          */
-        public readonly CoercerInterface $bool = new BoolCoercer(),
+        public readonly CoercerInterface $bool,
         /**
          * Input of the arrays, the lists and the objects
          *
          * @var CoercerInterface<array<array-key, mixed>>
          */
-        public readonly CoercerInterface $array = new ArrayCoercer(),
+        public readonly CoercerInterface $array,
     ) {}
+
+    /**
+     * @param CoercerInterface<int>|null $int
+     * @param CoercerInterface<float>|null $float
+     * @param CoercerInterface<string>|null $string
+     * @param CoercerInterface<bool>|null $bool
+     * @param CoercerInterface<array<array-key, mixed>>|null $array
+     */
+    public static function createDefault(
+        ?CoercerInterface $int = null,
+        ?CoercerInterface $float = null,
+        ?CoercerInterface $string = null,
+        ?CoercerInterface $bool = null,
+        ?CoercerInterface $array = null,
+    ): self {
+        return new self(
+            int: $int ?? new IntCoercer(),
+            float: $float ?? new FloatCoercer(),
+            string: $string ?? new StringCoercer(),
+            bool: $bool ?? new BoolCoercer(),
+            array: $array ?? new ArrayCoercer(),
+        );
+    }
 }

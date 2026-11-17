@@ -7,26 +7,15 @@ namespace TypeLang\Mapper\Tests\Type\Builder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\ShapeType;
 
 final class ShapeTypeBuilderTest extends TestCase
 {
     public function testFieldsAreReadWithKeysOfPhpArray(): void
     {
-        $type = self::getType("array{a: int, b?: string, '7': int, int, ...}");
+        $type = "array{a: int, b?: string, '7': int, int, ...}";
 
-        self::assertInstanceOf(ShapeType::class, $type);
-        $keys = $optional = [];
-
-        foreach ($type->fields as $field) {
-            $keys[] = $field->key;
-            $optional[] = $field->isOptional;
-        }
-
-        self::assertSame(['a', 'b', 7, 8], $keys);
-        self::assertSame([false, true, false, false], $optional);
-        self::assertNotNull($type->rest);
-        self::assertFalse($type->isObject);
+        self::assertDenormalizes($type, ['a' => 1, 7 => 2, 8 => 3, 'x' => 4], ['a' => 1, 7 => 2, 8 => 3, 'x' => 4]);
+        self::assertDenormalizationFails($type, ['a' => 1, 7 => 2], '$[8]: Required field "8" is missing');
     }
 
     /**
@@ -62,7 +51,7 @@ final class ShapeTypeBuilderTest extends TestCase
     #[DataProvider('invalidDataProvider')]
     public function testInvalidShapeIsRejected(string $type, string $message): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($type));
+        $error = self::captureBuildError($type);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame($message, $error->getMessage());

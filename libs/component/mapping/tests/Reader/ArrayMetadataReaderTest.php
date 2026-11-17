@@ -11,6 +11,7 @@ use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownKeyException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
+use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\ExpressionSkipCondition;
@@ -292,6 +293,49 @@ final class ArrayMetadataReaderTest extends TestCase
                 new ArrayMetadataReader([$class => ['aliases' => ['on' => [], 'off' => 'deleted']]]),
                 $class,
             )),
+        );
+    }
+
+    public function testAliasesOfPropertyAreRead(): void
+    {
+        $reader = new ArrayMetadataReader([
+            UserStub::class => [
+                'properties' => [
+                    'email' => ['aliases' => ['mail', 'e_mail'], 'alias_conflict' => 'first'],
+                ],
+            ],
+        ]);
+
+        $email = self::getProperty(self::readOverReflection($reader, UserStub::class), 'email');
+
+        self::assertSame(['mail', 'e_mail'], $email->aliases);
+        self::assertSame(AliasConflict::UseFirst, $email->aliasConflict);
+    }
+
+    public function testWrongAliasesOfPropertyAreThrown(): void
+    {
+        $class = UserStub::class;
+        $path = " in \$['{$class}'].properties.email";
+        $read = static fn(array $config) => self::getErrors(static fn() => self::readOverReflection(
+            new ArrayMetadataReader([$class => ['properties' => ['email' => $config]]]),
+            $class,
+        ));
+
+        self::assertSame(
+            ["{$class}::\$email: value of \"aliases\" must be a list{$path}.aliases"],
+            $read(['aliases' => 'mail']),
+        );
+        self::assertSame(
+            ["{$class}::\$email: value of \"aliases\" must be a non-empty string{$path}.aliases"],
+            $read(['aliases' => ['mail', 42]]),
+        );
+        self::assertSame(
+            [
+                "{$class}::\$email: value of \"alias_conflict\" must be one of \"fail\", \"first\", \"last\","
+                    . " \"name_or_first\", \"name_or_last\""
+                    . "{$path}.alias_conflict",
+            ],
+            $read(['alias_conflict' => 'latest']),
         );
     }
 

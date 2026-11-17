@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\MapAlias;
 
 enum AliasStatusStub: string
 {
-    #[MapAlias('on', 'active')]
+    #[MapAlias(['on', 'active'])]
     case Enabled = 'enabled';
 
     case Disabled = 'disabled';

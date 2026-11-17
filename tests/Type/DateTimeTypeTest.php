@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Tests\Type;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\DateTimeType;
 
 final class DateTimeTypeTest extends TestCase
 {
@@ -98,16 +97,15 @@ final class DateTimeTypeTest extends TestCase
 
     public function testInterfaceIsCreatedAsImmutable(): void
     {
-        $type = self::getType('DateTimeInterface');
+        $date = self::createMapper()->denormalize('2020-01-02T03:04:05+00:00', 'DateTimeInterface');
 
-        self::assertInstanceOf(DateTimeType::class, $type);
-        self::assertSame(\DateTimeImmutable::class, $type->implementation);
+        self::assertInstanceOf(\DateTimeImmutable::class, $date);
     }
 
     public function testFormatMustBeSingleNonEmptyString(): void
     {
         foreach (["DateTime<'Y', 'm'>", 'DateTime<int>', "DateTime<''>"] as $type) {
-            $error = self::captureThrowable(static fn(): mixed => self::getType($type));
+            $error = self::captureBuildError($type);
 
             self::assertInstanceOf(TypeDefinitionException::class, $error);
             self::assertSame(

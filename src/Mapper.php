@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
+use TypeLang\Mapper\Coercer\CoercerInterface;
 use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\ClassTypes;
 use TypeLang\Mapper\Context\Coercers;
@@ -13,9 +14,11 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Hook\ClassHookInterface;
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
+use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
 use TypeLang\Mapper\Mapping\MetadataProviderFactory;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
+use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Type\ArrayKeyType;
 use TypeLang\Mapper\Type\BoolType;
 use TypeLang\Mapper\Type\Builder\ArrayTypeBuilder;
@@ -63,6 +66,7 @@ use TypeLang\Mapper\TypeMatcher\NamedTypePattern;
 use TypeLang\Parser\Exception\ParserExceptionInterface;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Printer\TypePrinterInterface;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -81,46 +85,67 @@ final class Mapper implements MapperInterface
     private array $types = [];
 
     /**
-     * @param list<TypeBuilderInterface<mixed>> $builders builders of the
-     *        user, tried before the default ones
-     * @param list<TypeDecoratorInterface> $decorators wrap the built types
-     *        in the order of the list, such as all enums
-     * @param list<ClassHookInterface> $hooks run around the conversion of
-     *        the objects of the classes they support, in the order of the
-     *        list
-     * @param Coercers $coercers how values written in another form become
-     *        values of the types
+     * @param list<TypeBuilderInterface<mixed>> $builders builders of the user,
+     *        tried before the default ones
+     * @param list<ClassHookInterface> $hooks run around the conversion of the
+     *        objects of the classes they support, in the order of the list
+     * @param list<TypeDecoratorInterface> $decorators wrap the built types in
+     *        the order of the list, such as all enums
+     * @param list<AccessStrategyInterface> $accessors
+     * @param list<InstantiationStrategyInterface> $instantiators
+     * @param array{
+     *    int?: ?CoercerInterface<int>,
+     *    float?: ?CoercerInterface<float>,
+     *    string?: ?CoercerInterface<string>,
+     *    bool?: ?CoercerInterface<bool>,
+     *    array?: ?CoercerInterface<array<array-key, mixed>>,
+     * } $coercers how values written in another form become values of the types
+     * @param TypePrinterInterface|null $printer prints the key of a type and
+     *        the type in errors of its definition, a single line with all
+     *        fields of shapes in case of {@see null}
      * @throws InvalidPatternException in case of a pattern of a default type
      *         is written wrong
      */
     public function __construct(
         Configuration $config = new Configuration(),
-        ?MetadataProviderInterface $metadata = null,
         array $builders = [],
-        array $decorators = [],
-        private readonly TypeParser $parser = new TypeParser(),
-        PropertyAccessorFactory $accessors = new PropertyAccessorFactory(),
-        InstantiatorFactory $instantiators = new InstantiatorFactory(),
         array $hooks = [],
-        Coercers $coercers = new Coercers(),
+        array $decorators = [],
+        array $accessors = [],
+        array $instantiators = [],
+        array $coercers = [],
+        ?MetadataProviderInterface $metadata = null,
+        ?TypePrinterInterface $printer = null,
+        private readonly TypeParser $parser = new TypeParser(),
     ) {
-        $classes = new ClassAccessors($accessors, $instantiators, $hooks);
+        $classes = new ClassAccessors(
+            properties: PropertyAccessorFactory::createDefault($accessors),
+            instantiators: InstantiatorFactory::createDefault($instantiators),
+            hooks: $hooks,
+        );
 
         $this->repository = new TypeRepository(
-            builders: [...$builders, ...self::createDefaultBuilders($this->parser)],
+            builders: self::createDefaultTypes($this->parser, $builders),
             metadata: $metadata ?? MetadataProviderFactory::create(),
             decorators: $decorators,
             accessors: $classes,
+            printer: $printer,
         );
 
-        $this->context = new Context(new ClassTypes($this->repository), $config, $classes, $coercers);
+        $this->context = new Context(
+            types: new ClassTypes($this->repository),
+            config: $config,
+            accessors: $classes,
+            coercers: Coercers::createDefault(...$coercers),
+        );
     }
 
     /**
+     * @param list<TypeBuilderInterface<mixed>> $builders
      * @return list<TypeBuilderInterface<mixed>>
      * @throws InvalidPatternException in case of a pattern is written wrong
      */
-    public static function createDefaultBuilders(TypeParserInterface $parser = new TypeParser()): array
+    private static function createDefaultTypes(TypeParserInterface $parser, array $builders = []): array
     {
         $string = new StringType();
         $int = new IntType();
@@ -132,6 +157,7 @@ final class Mapper implements MapperInterface
         $mixed = new MixedType();
 
         return [
+            ...$builders,
             new NamedTypeBuilder(new NamedTypePattern(['int', 'integer', 'literal-int'], $parser), $int),
             new NamedTypeBuilder(new NamedTypePattern(['scalar'], $parser), $scalar),
             new NamedTypeBuilder(

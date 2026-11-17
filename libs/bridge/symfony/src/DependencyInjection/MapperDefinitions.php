@@ -19,7 +19,6 @@ use TypeLang\Mapper\Bridge\Symfony\Request\RequestValueResolver;
 use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\Context\Configuration;
 use TypeLang\Mapper\DenormalizerInterface;
-use TypeLang\Mapper\Instantiator\InstantiatorFactory;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\MapperInterface;
 use TypeLang\Mapper\Mapping\MetadataProviderFactory;
@@ -36,7 +35,6 @@ use TypeLang\Mapper\Naming\PascalCaseNamingStrategy;
 use TypeLang\Mapper\Naming\ScreamingSnakeCaseNamingStrategy;
 use TypeLang\Mapper\Naming\SnakeCaseNamingStrategy;
 use TypeLang\Mapper\NormalizerInterface;
-use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Parser\TypeParser;
 
 /**
@@ -145,7 +143,7 @@ final class MapperDefinitions
     public const COERCER_TAG = 'type_lang_mapper.coercer';
 
     /**
-     * Types of the coercers of a mapper, the arguments of {@see Coercers}
+     * Types of the coercers of a mapper, the arguments of {@see Coercers::createDefault()}
      */
     public const COERCED_TYPES = ['int', 'float', 'string', 'bool', 'array'];
 
@@ -206,20 +204,11 @@ final class MapperDefinitions
         return match ($kind) {
             ExtensionKind::TypeBuilder,
             ExtensionKind::TypeDecorator,
-            ExtensionKind::ClassHook => self::getMapperId($name),
-            ExtensionKind::InstantiationStrategy => self::getInternalId($name, 'instantiators'),
-            ExtensionKind::AccessStrategy => self::getInternalId($name, 'accessors'),
+            ExtensionKind::ClassHook,
+            ExtensionKind::InstantiationStrategy,
+            ExtensionKind::AccessStrategy => self::getMapperId($name),
             ExtensionKind::MetadataReader => self::getInternalId($name, 'metadata'),
         };
-    }
-
-    /**
-     * @param non-empty-string $name
-     * @return non-empty-string
-     */
-    public static function getCoercersId(string $name): string
-    {
-        return self::getInternalId($name, 'coercers');
     }
 
     /**
@@ -364,8 +353,6 @@ final class MapperDefinitions
                     ?? null,
             ]));
 
-        $this->container->register(self::getCoercersId($name), Coercers::class);
-
         $selector = $settings['metadata']['selector'] ?? $defaults['metadata']['selector'] ?? null;
 
         $this->container->register(self::getInternalId($name, 'metadata'), MetadataProviderInterface::class)
@@ -379,12 +366,6 @@ final class MapperDefinitions
                 '$selector' => $selector === null ? null : new Reference($selector),
             ]));
 
-        $this->container->register(self::getInternalId($name, 'instantiators'), InstantiatorFactory::class)
-            ->setArguments(['$strategies' => []]);
-
-        $this->container->register(self::getInternalId($name, 'accessors'), PropertyAccessorFactory::class)
-            ->setArguments(['$strategies' => []]);
-
         $this->container->register(self::getMapperId($name), Mapper::class)
             ->setArguments([
                 '$config' => new Reference(self::getInternalId($name, 'configuration')),
@@ -392,10 +373,10 @@ final class MapperDefinitions
                 '$builders' => [],
                 '$decorators' => [],
                 '$parser' => new Reference(self::PARSER_ID),
-                '$accessors' => new Reference(self::getInternalId($name, 'accessors')),
-                '$instantiators' => new Reference(self::getInternalId($name, 'instantiators')),
+                '$accessors' => [],
+                '$instantiators' => [],
                 '$hooks' => [],
-                '$coercers' => new Reference(self::getCoercersId($name)),
+                '$coercers' => [],
             ]);
 
         $extensions = [];

@@ -15,7 +15,8 @@ use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 
 /**
  * Checks the final metadata provided by the delegate: types left with a
- * failure and properties sharing an external name are errors. Errors of
+ * failure and properties sharing a name of a field, an external name or an
+ * alias, are errors. Errors of
  * the delegate and of the checks are thrown together.
  */
 final class ValidatingMetadataProvider implements MetadataProviderInterface
@@ -126,7 +127,9 @@ final class ValidatingMetadataProvider implements MetadataProviderInterface
         $properties = [];
 
         foreach ($metadata->properties as $property) {
-            $properties[$property->externalName][] = $property->name;
+            foreach ([$property->externalName, ...$property->aliases] as $name) {
+                $properties[$name][] = $property->name;
+            }
         }
 
         $source = SourceInfo::createFromReflection($class);
@@ -137,8 +140,21 @@ final class ValidatingMetadataProvider implements MetadataProviderInterface
                 continue;
             }
 
+            $unique = \array_values(\array_unique($names));
+
+            if (\count($unique) === 1) {
+                $errors[] = DuplicateExternalNameException::becausePropertyHasNameTwice(
+                    property: $unique[0],
+                    class: $class->name,
+                    name: (string) $name,
+                    source: $source,
+                );
+
+                continue;
+            }
+
             $errors[] = DuplicateExternalNameException::becausePropertiesHaveSameExternalName(
-                properties: $names,
+                properties: $unique,
                 class: $class->name,
                 name: (string) $name,
                 source: $source,

@@ -8,9 +8,9 @@ use TypeLang\Mapper\Mapping\MapAlias;
 
 enum BrokenAliasStub: string
 {
-    #[MapAlias('b', 'x')]
+    #[MapAlias(['b', 'x'])]
     case A = 'a';
 
-    #[MapAlias(1, 'x')]
+    #[MapAlias([1, 'x'])]
     case B = 'b';
 }

@@ -19,13 +19,15 @@ use TypeLang\Mapper\Tests\Stub\Shape\MessageShapeStub;
 use TypeLang\Mapper\Tests\Stub\Shape\ShapeStub;
 use TypeLang\Mapper\Tests\Stub\Shape\SquareStub;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\DiscriminatorType;
 
 final class DiscriminatorTypeTest extends TestCase
 {
     public function testAbstractBaseIsBuiltAsDiscriminatorType(): void
     {
-        self::assertInstanceOf(DiscriminatorType::class, self::getType(ShapeStub::class));
+        self::assertInstanceOf(
+            CircleStub::class,
+            self::createMapper()->denormalize(['type' => 'circle', 'radius' => 1], ShapeStub::class),
+        );
     }
 
     public function testTagSelectsClassOfData(): void
@@ -112,12 +114,11 @@ final class DiscriminatorTypeTest extends TestCase
 
     public function testTagIsAddedToObjectNormalizedAsStdClass(): void
     {
-        $repository = self::createRepository(config: new Configuration(isObjectAsArray: false));
+        $mapper = self::createMapper(config: new Configuration(isObjectAsArray: false));
 
         self::assertEquals(
             (object) ['type' => 'circle', 'radius' => 1],
-            self::getType(ShapeStub::class, $repository)
-                ->normalize(self::createCircle(1), self::getContext($repository)),
+            $mapper->normalize(self::createCircle(1), ShapeStub::class),
         );
     }
 
@@ -135,14 +136,13 @@ final class DiscriminatorTypeTest extends TestCase
 
     public function testObjectOfClassOutsideMapIsRejected(): void
     {
-        $repository = self::createRepository();
-        $type = self::getType(ShapeStub::class, $repository);
+        $mapper = self::createMapper();
         $object = new class extends ShapeStub {};
 
-        self::assertFalse($type->isNormalizable($object, self::getContext($repository)));
+        self::assertFalse($mapper->isNormalizable($object, ShapeStub::class));
         self::assertInstanceOf(
             InvalidValueException::class,
-            self::captureThrowable(static fn(): mixed => $type->normalize($object, self::getContext($repository))),
+            self::captureThrowable(static fn(): mixed => $mapper->normalize($object, ShapeStub::class)),
         );
     }
 
@@ -186,7 +186,7 @@ final class DiscriminatorTypeTest extends TestCase
 
     public function testClassOfMapOutsideHierarchyIsErrorOfType(): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType(ForeignMapStub::class));
+        $error = self::captureBuildError(ForeignMapStub::class);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame(

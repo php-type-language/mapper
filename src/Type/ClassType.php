@@ -10,7 +10,9 @@ use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Type\ClassType\Property;
 
 /**
@@ -24,6 +26,10 @@ use TypeLang\Mapper\Type\ClassType\Property;
  * and writers of the properties and the hooks of the class are taken from
  * {@see Context::$accessors} by the metadata. The hooks before a conversion
  * run in its check too.
+ *
+ * On denormalization a property takes its field by the external name or
+ * by an alias, several of them present are resolved by the conflict of the
+ * property.
  *
  * A property that cannot be read on normalization, such as an uninitialized
  * one, is a fault of the object: its {@see \Error} becomes a violation with
@@ -76,6 +82,10 @@ final class ClassType implements TypeInterface
 
         foreach ($writable as $property) {
             $keys[$property->metadata->externalName] = true;
+
+            foreach ($property->metadata->aliases as $alias) {
+                $keys[$alias] = true;
+            }
         }
 
         $this->keys = $keys;
@@ -101,6 +111,16 @@ final class ClassType implements TypeInterface
 
         foreach ($this->writable as $property) {
             $key = $property->metadata->externalName;
+
+            $present = self::getPresentNames($property->metadata, $value);
+
+            if ($present !== []) {
+                $key = self::selectName($property->metadata, $present, $value);
+            }
+
+            if ($key === null) {
+                return false;
+            }
 
             if (!\array_key_exists($key, $value)) {
                 if ($property->metadata->default !== null) {
@@ -157,6 +177,29 @@ final class ClassType implements TypeInterface
         foreach ($this->writable as $property) {
             $name = $property->metadata->name;
             $key = $property->metadata->externalName;
+
+            $present = self::getPresentNames($property->metadata, $value);
+
+            if ($present !== []) {
+                $key = self::selectName($property->metadata, $present, $value);
+            }
+
+            if ($key === null) {
+                foreach (\array_slice($present, 1) as $duplicate) {
+                    InvalidValueException::collect(
+                        $violations,
+                        InvalidValueException::becauseFieldIsDuplicated(
+                            $duplicate,
+                            $present[0],
+                            new PropertySegment($duplicate),
+                            $value[$duplicate],
+                        ),
+                        $limit,
+                    );
+                }
+
+                continue;
+            }
 
             if (!\array_key_exists($key, $value)) {
                 $default = $property->metadata->default;
@@ -347,6 +390,80 @@ final class ClassType implements TypeInterface
         }
 
         return (object) $result;
+    }
+
+    /**
+     * Returns the names of the property present in the data, in the order
+     * of priority: the external name, then the aliases. A property without
+     * aliases has none, its external name is taken as is.
+     *
+     * @param array<array-key, mixed> $value
+     * @return list<non-empty-string>
+     */
+    private static function getPresentNames(PropertyMetadata $metadata, array $value): array
+    {
+        if ($metadata->aliases === []) {
+            return [];
+        }
+
+        $present = [];
+
+        foreach ([$metadata->externalName, ...$metadata->aliases] as $name) {
+            if (\array_key_exists($name, $value)) {
+                $present[] = $name;
+            }
+        }
+
+        return $present;
+    }
+
+    /**
+     * Returns the name the value of the property is taken from by its alias
+     * conflict, {@see null} in case of the present names conflict.
+     *
+     * @param non-empty-list<non-empty-string> $present names of the property
+     *        present in the data
+     * @param array<array-key, mixed> $value
+     * @return non-empty-string|null
+     */
+    private static function selectName(PropertyMetadata $metadata, array $present, array $value): ?string
+    {
+        if (\count($present) === 1) {
+            return $present[0];
+        }
+
+        $conflict = $metadata->aliasConflict;
+        $isNameFirst = $conflict === AliasConflict::UseNameOrFirst || $conflict === AliasConflict::UseNameOrLast;
+
+        if ($isNameFirst && \in_array($metadata->externalName, $present, true)) {
+            return $metadata->externalName;
+        }
+
+        return match ($conflict) {
+            AliasConflict::Fail => null,
+            AliasConflict::UseFirst, AliasConflict::UseNameOrFirst => self::sortByData($present, $value)[0],
+            AliasConflict::UseLast, AliasConflict::UseNameOrLast => \array_reverse(self::sortByData($present, $value))[0],
+        };
+    }
+
+    /**
+     * Returns the names in the order of their keys in the data.
+     *
+     * @param non-empty-list<non-empty-string> $names
+     * @param array<array-key, mixed> $value
+     * @return non-empty-list<non-empty-string>
+     */
+    private static function sortByData(array $names, array $value): array
+    {
+        $positions = [];
+
+        foreach (\array_keys($value) as $position => $key) {
+            $positions[(string) $key] = $position;
+        }
+
+        \usort($names, static fn(string $a, string $b): int => $positions[$a] <=> $positions[$b]);
+
+        return $names;
     }
 
     /**

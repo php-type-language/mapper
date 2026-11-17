@@ -49,7 +49,7 @@ final class InstantiatorFactoryTest extends TestCase
             }
         };
 
-        $instantiator = (new InstantiatorFactory([$strategy]))
+        $instantiator = InstantiatorFactory::createDefault([$strategy])
             ->createInstantiator(new \ReflectionClass(AbstractStub::class), new ClassMetadata(AbstractStub::class));
 
         self::assertSame($object, $instantiator->instantiate([]));
@@ -66,7 +66,7 @@ final class InstantiatorFactoryTest extends TestCase
             }
         };
 
-        $object = (new InstantiatorFactory([$strategy]))
+        $object = InstantiatorFactory::createDefault([$strategy])
             ->createInstantiator(new \ReflectionClass(EmptyStub::class), new ClassMetadata(EmptyStub::class))
             ->instantiate([]);
 
@@ -136,7 +136,7 @@ final class InstantiatorFactoryTest extends TestCase
      */
     private static function createInstantiator(string $class): InstantiatorInterface
     {
-        return (new InstantiatorFactory())
+        return InstantiatorFactory::createDefault()
             ->createInstantiator(new \ReflectionClass($class), new ClassMetadata($class));
     }
 }

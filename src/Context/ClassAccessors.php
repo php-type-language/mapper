@@ -38,14 +38,14 @@ final class ClassAccessors
     private readonly \WeakMap $accessors;
 
     public function __construct(
-        private readonly PropertyAccessorFactory $properties = new PropertyAccessorFactory(),
-        private readonly InstantiatorFactory $instantiators = new InstantiatorFactory(),
+        private readonly PropertyAccessorFactory $properties,
+        private readonly InstantiatorFactory $instantiators,
         /**
          * Hooks of all classes, in the order they run
          *
          * @var list<ClassHookInterface>
          */
-        private readonly array $hooks = [],
+        private readonly array $hooks,
     ) {
         $this->accessors = new \WeakMap();
     }

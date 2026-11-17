@@ -36,10 +36,12 @@ final class Options
     {
         $types = new TypeOption($parser);
         $messages = new MessageOption();
+        $aliases = new AliasOption();
 
         return new self(
             properties: [
                 new NameOption(),
+                $aliases,
                 $types,
                 new DefaultOption(),
                 new SkipOption($expressions),
@@ -51,7 +53,7 @@ final class Options
                 $messages,
                 new NormalizeAsArrayOption(),
                 new NamingStrategyOption(),
-                new AliasOption(),
+                $aliases,
             ],
         );
     }

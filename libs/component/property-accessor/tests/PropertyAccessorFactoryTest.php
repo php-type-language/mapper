@@ -33,7 +33,7 @@ final class PropertyAccessorFactoryTest extends TestCase
     public function testStrategyOfUserIsTriedBeforeDefaultOnes(): void
     {
         $reader = new DirectPropertyReader('publicProperty');
-        $factory = new PropertyAccessorFactory([self::createStrategy($reader)]);
+        $factory = PropertyAccessorFactory::createDefault([self::createStrategy($reader)]);
 
         $property = new \ReflectionProperty(VisibilityStub::class, 'privateProperty');
 
@@ -42,7 +42,7 @@ final class PropertyAccessorFactoryTest extends TestCase
 
     public function testPropertyNotTakenByStrategyOfUserIsAccessedByDefaultOnes(): void
     {
-        $factory = new PropertyAccessorFactory([self::createStrategy(null)]);
+        $factory = PropertyAccessorFactory::createDefault([self::createStrategy(null)]);
 
         $property = new \ReflectionProperty(VisibilityStub::class, 'privateProperty');
 
@@ -56,7 +56,7 @@ final class PropertyAccessorFactoryTest extends TestCase
     public function testStrategyOfUserReadsVirtualPropertyWithoutGetHook(): void
     {
         $reader = new DirectPropertyReader('virtualWriteOnly');
-        $factory = new PropertyAccessorFactory([self::createStrategy($reader)]);
+        $factory = PropertyAccessorFactory::createDefault([self::createStrategy($reader)]);
 
         $property = new \ReflectionProperty(HookStub::class, 'virtualWriteOnly');
 
@@ -224,7 +224,7 @@ final class PropertyAccessorFactoryTest extends TestCase
     {
         $object = new HookStub();
         $property = new \ReflectionProperty(HookStub::class, 'hooked');
-        $writer = (new PropertyAccessorFactory())->createWriter($property, new PropertyMetadata($property->name));
+        $writer = PropertyAccessorFactory::createDefault()->createWriter($property, new PropertyMetadata($property->name));
 
         $writer->write($object, 'written');
 
@@ -295,7 +295,7 @@ final class PropertyAccessorFactoryTest extends TestCase
      */
     private static function createWriter(string $class, string $name): PropertyWriterInterface
     {
-        return (new PropertyAccessorFactory())
+        return PropertyAccessorFactory::createDefault()
             ->createWriter(new \ReflectionProperty($class, $name), new PropertyMetadata($name));
     }
 
@@ -306,7 +306,7 @@ final class PropertyAccessorFactoryTest extends TestCase
      */
     private static function createReader(string $class, string $name): PropertyReaderInterface
     {
-        return (new PropertyAccessorFactory())
+        return PropertyAccessorFactory::createDefault()
             ->createReader(new \ReflectionProperty($class, $name), new PropertyMetadata($name));
     }
 

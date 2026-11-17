@@ -6,121 +6,64 @@ namespace TypeLang\Mapper\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use TypeLang\Mapper\Context\ClassAccessors;
-use TypeLang\Mapper\Context\ClassTypes;
 use TypeLang\Mapper\Context\Configuration;
-use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Hook\ClassHookInterface;
+use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
 use TypeLang\Mapper\Mapper;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
+use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
-use TypeLang\Mapper\Type\Repository\TypeRepository;
-use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Parser\TypeParser;
-use TypeLang\Type\TypeNode;
 
 /**
  * Every assertion of a conversion checks the predicate too: `isX()` must
- * agree with `X()` on the same value. It checks the built type and its copy
- * restored from the serialization.
+ * agree with `X()` on the same value.
  */
 #[Group('unit'), Group('type-lang/mapper')]
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Contexts of the repositories created by {@see createRepository()}
-     *
-     * @var \WeakMap<TypeRepository, Context>|null
-     */
-    private static ?\WeakMap $contexts = null;
-
-    /**
-     * @param list<TypeBuilderInterface<mixed>> $builders builders preceding
-     *        the default ones
+     * @param list<TypeBuilderInterface<mixed>> $builders
      * @param list<TypeDecoratorInterface> $decorators
      * @param list<ClassHookInterface> $hooks
+     * @param list<AccessStrategyInterface> $accessors
+     * @param list<InstantiationStrategyInterface> $instantiators
      * @param Configuration|null $config configuration of the strictness in
      *        case of {@see null}
-     * @param ClassAccessors|null $accessors accessors of the hooks in case
-     *        of {@see null}
      */
-    protected static function createRepository(
+    protected static function createMapper(
         bool $isStrict = false,
         array $builders = [],
         array $decorators = [],
         array $hooks = [],
         ?Configuration $config = null,
-        ?ClassAccessors $accessors = null,
+        array $accessors = [],
+        array $instantiators = [],
         ?MetadataProviderInterface $metadata = null,
-    ): TypeRepository {
-        $accessors ??= new ClassAccessors(hooks: $hooks);
-
-        $repository = new TypeRepository(
-            builders: [...$builders, ...Mapper::createDefaultBuilders()],
-            metadata: $metadata ?? MetadataProviderFactory::create(),
+    ): Mapper {
+        return new Mapper(
+            config: $config ?? new Configuration(isStrict: $isStrict),
+            builders: $builders,
+            hooks: $hooks,
             decorators: $decorators,
             accessors: $accessors,
+            instantiators: $instantiators,
+            metadata: $metadata,
         );
-
-        self::$contexts ??= new \WeakMap();
-        self::$contexts[$repository] = new Context(
-            types: new ClassTypes($repository),
-            config: $config ?? new Configuration(isStrict: $isStrict),
-            accessors: $accessors,
-        );
-
-        return $repository;
     }
 
     /**
-     * Returns the context of the conversion sharing the accessors with the
-     * repository.
-     */
-    protected static function getContext(TypeRepository $repository): Context
-    {
-        return self::$contexts[$repository]
-            ?? throw new \LogicException('The repository is not created by createRepository()');
-    }
-
-    /**
-     * @param non-empty-string $type
-     */
-    protected static function parse(string $type): TypeNode
-    {
-        $node = (new TypeParser())->forType()->parse($type);
-
-        self::assertInstanceOf(TypeNode::class, $node);
-
-        return $node;
-    }
-
-    /**
-     * @param non-empty-string $type
-     * @return TypeInterface<mixed>
-     */
-    protected static function getType(string $type, ?TypeRepository $repository = null): TypeInterface
-    {
-        return ($repository ?? self::createRepository())->getType(self::parse($type));
-    }
-
-    /**
-     * Returns the built type and its copy restored from the serialization,
-     * every assertion of a conversion checks both.
+     * Returns the error of building the type, the type is built by a check
+     * of a value.
      *
      * @param non-empty-string $type
-     * @return array{TypeInterface<mixed>, TypeInterface<mixed>}
      */
-    protected static function getTypeAndCopy(string $type, TypeRepository $repository): array
+    protected static function captureBuildError(string $type, ?Mapper $mapper = null): \Throwable
     {
-        $instance = self::getType($type, $repository);
-        $copy = \unserialize(\serialize($instance));
+        $mapper ??= self::createMapper();
 
-        self::assertInstanceOf(TypeInterface::class, $copy);
-
-        return [$instance, $copy];
+        return self::captureThrowable(static fn(): bool => $mapper->isNormalizable(null, $type));
     }
 
     /**
@@ -130,17 +73,15 @@ abstract class TestCase extends BaseTestCase
         string $type,
         mixed $input,
         mixed $expected,
-        ?TypeRepository $repository = null,
+        ?Mapper $mapper = null,
     ): void {
-        $repository ??= self::createRepository();
+        $mapper ??= self::createMapper();
 
-        foreach (self::getTypeAndCopy($type, $repository) as $instance) {
-            self::assertTrue(
-                $instance->isDenormalizable($input, self::getContext($repository)),
-                'isDenormalizable() rejects the value denormalize() accepts',
-            );
-            self::assertResult($expected, $instance->denormalize($input, self::getContext($repository)));
-        }
+        self::assertTrue(
+            $mapper->isDenormalizable($input, $type),
+            'isDenormalizable() rejects the value denormalize() accepts',
+        );
+        self::assertResult($expected, $mapper->denormalize($input, $type));
     }
 
     /**
@@ -151,23 +92,19 @@ abstract class TestCase extends BaseTestCase
         string $type,
         mixed $input,
         string $message,
-        ?TypeRepository $repository = null,
+        ?Mapper $mapper = null,
     ): void {
-        $repository ??= self::createRepository();
+        $mapper ??= self::createMapper();
 
-        foreach (self::getTypeAndCopy($type, $repository) as $instance) {
-            self::assertFalse(
-                $instance->isDenormalizable($input, self::getContext($repository)),
-                'isDenormalizable() accepts the value denormalize() rejects',
-            );
+        self::assertFalse(
+            $mapper->isDenormalizable($input, $type),
+            'isDenormalizable() accepts the value denormalize() rejects',
+        );
 
-            $error = self::captureThrowable(
-                static fn(): mixed => $instance->denormalize($input, self::getContext($repository)),
-            );
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize($input, $type));
 
-            self::assertInstanceOf(InvalidValueException::class, $error);
-            self::assertSame($message, $error->getMessage());
-        }
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame($message, $error->getMessage());
     }
 
     /**
@@ -177,17 +114,15 @@ abstract class TestCase extends BaseTestCase
         string $type,
         mixed $value,
         mixed $expected,
-        ?TypeRepository $repository = null,
+        ?Mapper $mapper = null,
     ): void {
-        $repository ??= self::createRepository();
+        $mapper ??= self::createMapper();
 
-        foreach (self::getTypeAndCopy($type, $repository) as $instance) {
-            self::assertTrue(
-                $instance->isNormalizable($value, self::getContext($repository)),
-                'isNormalizable() rejects the value normalize() accepts',
-            );
-            self::assertSame($expected, $instance->normalize($value, self::getContext($repository)));
-        }
+        self::assertTrue(
+            $mapper->isNormalizable($value, $type),
+            'isNormalizable() rejects the value normalize() accepts',
+        );
+        self::assertSame($expected, $mapper->normalize($value, $type));
     }
 
     /**
@@ -198,23 +133,19 @@ abstract class TestCase extends BaseTestCase
         string $type,
         mixed $value,
         string $message,
-        ?TypeRepository $repository = null,
+        ?Mapper $mapper = null,
     ): void {
-        $repository ??= self::createRepository();
+        $mapper ??= self::createMapper();
 
-        foreach (self::getTypeAndCopy($type, $repository) as $instance) {
-            self::assertFalse(
-                $instance->isNormalizable($value, self::getContext($repository)),
-                'isNormalizable() accepts the value normalize() rejects',
-            );
+        self::assertFalse(
+            $mapper->isNormalizable($value, $type),
+            'isNormalizable() accepts the value normalize() rejects',
+        );
 
-            $error = self::captureThrowable(
-                static fn(): mixed => $instance->normalize($value, self::getContext($repository)),
-            );
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($value, $type));
 
-            self::assertInstanceOf(InvalidValueException::class, $error);
-            self::assertSame($message, $error->getMessage());
-        }
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame($message, $error->getMessage());
     }
 
     /**

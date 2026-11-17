@@ -47,7 +47,7 @@ final class UnionTypeTest extends TestCase
             'int|string',
             42.0,
             '$: Value must be of type "int|string", but 42.0 given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

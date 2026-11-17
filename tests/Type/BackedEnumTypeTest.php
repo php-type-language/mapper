@@ -37,7 +37,7 @@ final class BackedEnumTypeTest extends TestCase
             LevelStub::class,
             '2',
             '$: Value must be of type "int", but "2" given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 
@@ -56,7 +56,7 @@ final class BackedEnumTypeTest extends TestCase
             AliasStatusStub::class,
             'on',
             AliasStatusStub::Enabled,
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 
@@ -67,7 +67,7 @@ final class BackedEnumTypeTest extends TestCase
             AliasPriorityStub::class,
             '10',
             '$: Value must be of type "int", but "10" given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

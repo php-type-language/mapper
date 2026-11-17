@@ -22,14 +22,11 @@ final class IterableTypeTest extends TestCase
 
     public function testNormalizesGeneratorOnce(): void
     {
-        $repository = self::createRepository();
         $generator = (static function (): \Generator {
             yield 5 => 1;
         })();
 
-        $type = self::getType('iterable<int>', $repository);
-
-        self::assertSame([5 => 1], $type->normalize($generator, self::getContext($repository)));
+        self::assertSame([5 => 1], self::createMapper()->normalize($generator, 'iterable<int>'));
     }
 
     public function testRejectsElementAtItsKey(): void

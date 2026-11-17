@@ -10,11 +10,13 @@ use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
 use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
+use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\ExpressionSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\NullSkipCondition;
 use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
+use TypeLang\Mapper\Mapping\Tests\Stub\AliasConflictCaseStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\AliasConstantStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\AliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\AttributeStub;
@@ -22,11 +24,13 @@ use TypeLang\Mapper\Mapping\Tests\Stub\BrokenAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenDiscriminatorStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenNamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\BrokenPropertyAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenSkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Concern\OwnerTrait;
 use TypeLang\Mapper\Mapping\Tests\Stub\MessageStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\MethodAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\NamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PropertyAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ShapeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\SkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StatusStub;
@@ -255,6 +259,36 @@ final class AttributeMetadataReaderTest extends TestCase
                     . ' in AliasConstantStub.php',
             ],
             self::getErrors(static fn() => self::readAttributes(AliasConstantStub::class)),
+        );
+    }
+
+    public function testAliasesOfPropertyAreJoinedWithLastConflict(): void
+    {
+        $metadata = self::readAttributes(PropertyAliasStub::class);
+        $email = self::getProperty($metadata, 'email');
+        $name = self::getProperty($metadata, 'name');
+
+        self::assertSame(['mail', 'e_mail'], $email->aliases);
+        self::assertSame(AliasConflict::UseFirst, $email->aliasConflict);
+        self::assertSame([], $name->aliases);
+        self::assertSame(AliasConflict::Fail, $name->aliasConflict);
+    }
+
+    public function testWrongAliasesOfPropertyAreThrown(): void
+    {
+        self::assertSame(
+            [
+                BrokenPropertyAliasStub::class . '::$email: value of "aliases" must be a non-empty string'
+                    . ' in BrokenPropertyAliasStub.php',
+            ],
+            self::getErrors(static fn() => self::readAttributes(BrokenPropertyAliasStub::class)),
+        );
+        self::assertSame(
+            [
+                AliasConflictCaseStub::class . '::Enabled: alias conflict is allowed only for the aliases'
+                    . ' of a property in AliasConflictCaseStub.php',
+            ],
+            self::getErrors(static fn() => self::readAttributes(AliasConflictCaseStub::class)),
         );
     }
 

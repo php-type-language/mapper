@@ -9,7 +9,7 @@ default ones.
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 
 $property = new \ReflectionProperty(User::class, 'email');
-$factory = new PropertyAccessorFactory([new GetterSetterStrategy()]);
+$factory = PropertyAccessorFactory::createDefault([new GetterSetterStrategy()]);
 
 $factory->createWriter($property, $metadata)->write($user, 'user@example.com');
 

@@ -19,17 +19,17 @@ final class Context
     public function __construct(
         /**
          * Types resolved by the class of the value at runtime, such as the
-         * type of an object in `mixed`. A type known on building is given
+         * type of object in `mixed`. A type known on building is given
          * to its composite type by the builder.
          */
         public readonly ClassTypes $types,
-        public readonly Configuration $config = new Configuration(),
+        public readonly Configuration $config,
         /**
          * Runtime side of the classes: their instantiators and the readers
          * and writers of their properties
          */
-        public readonly ClassAccessors $accessors = new ClassAccessors(),
-        public readonly Coercers $coercers = new Coercers(),
+        public readonly ClassAccessors $accessors,
+        public readonly Coercers $coercers,
     ) {}
 
     /**

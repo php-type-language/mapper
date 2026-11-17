@@ -184,7 +184,7 @@ final class RefinedTypeTest extends TestCase
             $type,
             $input,
             '$: Value must be of type ' . $expected,
-            self::createRepository(true),
+            self::createMapper(true),
         );
     }
 
@@ -194,7 +194,7 @@ final class RefinedTypeTest extends TestCase
             'positive-int',
             '5',
             '$: Value must be of type "int", but "5" given',
-            self::createRepository(true),
+            self::createMapper(true),
         );
     }
 

@@ -97,7 +97,8 @@ enum ExtensionKind: string
             self::TypeBuilder => '$builders',
             self::TypeDecorator => '$decorators',
             self::ClassHook => '$hooks',
-            self::InstantiationStrategy, self::AccessStrategy => '$strategies',
+            self::InstantiationStrategy => '$instantiators',
+            self::AccessStrategy => '$accessors',
             self::MetadataReader => '$readers',
         };
     }

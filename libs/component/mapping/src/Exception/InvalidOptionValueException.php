@@ -55,6 +55,29 @@ final class InvalidOptionValueException extends MetadataException
     /**
      * @param string $target property or class: `App\User::$id`, `App\User`
      */
+    public static function becauseValueIsNotList(string $key, string $target, SourceInfo $source): self
+    {
+        return new self($target, $source, self::formatValue($key, 'a list'));
+    }
+
+    /**
+     * @param non-empty-list<string> $values
+     * @param string $target property or class: `App\User::$id`, `App\User`
+     */
+    public static function becauseValueIsNotOneOf(
+        string $key,
+        array $values,
+        string $target,
+        SourceInfo $source,
+    ): self {
+        $quoted = \array_map(static fn(string $value): string => '"' . \addcslashes($value, '"') . '"', $values);
+
+        return new self($target, $source, self::formatValue($key, 'one of ' . \implode(', ', $quoted)));
+    }
+
+    /**
+     * @param string $target property or class: `App\User::$id`, `App\User`
+     */
     public static function becauseExpressionIsInvalid(
         string $expression,
         string $target,

@@ -45,6 +45,15 @@ final class TypeRepository implements TypeRepositoryInterface
      */
     private array $built = [];
 
+    /**
+     * Prints the canonical description of a type, the key of the type
+     */
+    private readonly TypePrinterInterface $printer;
+
+    /**
+     * @param TypePrinterInterface|null $printer prints the key of a type, a
+     *        single line with all fields of shapes in case of {@see null}
+     */
     public function __construct(
         /**
          * @var list<TypeBuilderInterface<mixed>>
@@ -56,20 +65,28 @@ final class TypeRepository implements TypeRepositoryInterface
          *
          * @var list<TypeDecoratorInterface>
          */
-        private readonly array $decorators = [],
+        private readonly array $decorators,
         /**
          * Runtime side of the classes, the same object as the one of the
          * context of the conversion
          */
-        ClassAccessors $accessors = new ClassAccessors(),
-        /**
-         * Prints the canonical description of a type, the key of the type
-         */
-        private readonly TypePrinterInterface $printer = new PrettyTypePrinter(
-            new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX),
-        ),
+        ClassAccessors $accessors,
+        ?TypePrinterInterface $printer = null,
     ) {
-        $this->build = new BuildContext($this, $metadata, $accessors, $this->printer);
+        $this->printer = $printer ?? self::createDefaultTypePrinter();
+        $this->build = new BuildContext(
+            types: $this,
+            metadata: $metadata,
+            accessors: $accessors,
+            printer: $this->printer
+        );
+    }
+
+    private static function createDefaultTypePrinter(): TypePrinterInterface
+    {
+        return new PrettyTypePrinter(
+            new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX),
+        );
     }
 
     public function getType(TypeNode $node): TypeInterface

@@ -6,14 +6,10 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
-use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\Configuration;
-use TypeLang\Mapper\Context\ClassTypes;
-use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Instantiator\Exception\ClassNotInstantiableException;
-use TypeLang\Mapper\Instantiator\InstantiatorFactory;
 use TypeLang\Mapper\Instantiator\InstantiatorInterface;
 use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
@@ -22,17 +18,21 @@ use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
-use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\PropertyAccessor\PropertyReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Tests\Stub\AbstractShapeStub;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
+use TypeLang\Mapper\Tests\Stub\AliasedStub;
 use TypeLang\Mapper\Tests\Stub\ComputedStub;
+use TypeLang\Mapper\Tests\Stub\FirstInDataAliasStub;
 use TypeLang\Mapper\Tests\Stub\HookStub;
+use TypeLang\Mapper\Tests\Stub\LastInDataAliasStub;
 use TypeLang\Mapper\Tests\Stub\MessageOwnerStub;
 use TypeLang\Mapper\Tests\Stub\MessageStub;
 use TypeLang\Mapper\Tests\Stub\MismatchedTypeStub;
+use TypeLang\Mapper\Tests\Stub\NameOrFirstAliasStub;
+use TypeLang\Mapper\Tests\Stub\NameOrLastAliasStub;
 use TypeLang\Mapper\Tests\Stub\NodeStub;
 use TypeLang\Mapper\Tests\Stub\ObjectFormStub;
 use TypeLang\Mapper\Tests\Stub\ReadonlyChildStub;
@@ -45,7 +45,6 @@ use TypeLang\Mapper\Tests\Stub\StrictnessStub;
 use TypeLang\Mapper\Tests\Stub\UntypedStub;
 use TypeLang\Mapper\Tests\Stub\UserStub;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Type\Name;
 use TypeLang\Type\NamedTypeNode;
 
@@ -75,7 +74,7 @@ final class ClassTypeTest extends TestCase
             UserStub::class,
             (object) ['id' => 7, 'name' => 'John', 'address' => (object) ['city' => 'Paris'], 'code' => 5],
             self::createUser(id: 7, name: 'John', address: self::createAddress('Paris'), code: 5),
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 
@@ -107,7 +106,7 @@ final class ClassTypeTest extends TestCase
     #[DataProvider('internalClassDataProvider')]
     public function testInternalClassIsNotSupported(string $class): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($class));
+        $error = self::captureBuildError($class);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame(\sprintf('Type "%s" is not supported', $class), $error->getMessage());
@@ -128,7 +127,7 @@ final class ClassTypeTest extends TestCase
     #[DataProvider('notInstantiableClassDataProvider')]
     public function testClassRejectedByInstantiatorIsErrorOfType(string $class, string $reason): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($class));
+        $error = self::captureBuildError($class);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertInstanceOf(ClassNotInstantiableException::class, $error->getPrevious());
@@ -158,18 +157,14 @@ final class ClassTypeTest extends TestCase
             }
         };
 
-        $repository = self::createRepository(
-            accessors: new ClassAccessors(instantiators: new InstantiatorFactory([$strategy])),
-        );
-
-        $shape = self::getType(AbstractShapeStub::class, $repository)
-            ->denormalize(['name' => 'circle'], self::getContext($repository));
+        $shape = self::createMapper(instantiators: [$strategy])
+            ->denormalize(['name' => 'circle'], AbstractShapeStub::class);
 
         self::assertInstanceOf(AbstractShapeStub::class, $shape);
         self::assertSame('circle', $shape->name);
     }
 
-    public function testStrategyRejectingClassOfRestoredTypeIsErrorOfType(): void
+    public function testStrategyRejectingNestedClassIsErrorOfType(): void
     {
         $strategy = new class implements InstantiationStrategyInterface {
             public function tryCreateInstantiator(
@@ -183,19 +178,11 @@ final class ClassTypeTest extends TestCase
                 return null;
             }
         };
-        $instantiators = new InstantiatorFactory([$strategy]);
+        $mapper = self::createMapper(instantiators: [$strategy]);
 
-        $type = \unserialize(\serialize(self::getType(UserStub::class)));
-        $context = new Context(
-            types: new ClassTypes(self::createRepository()),
-            accessors: new ClassAccessors(instantiators: $instantiators),
-        );
-
-        self::assertInstanceOf(TypeInterface::class, $type);
-
-        $error = self::captureThrowable(static fn(): mixed => $type->denormalize(
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(
             ['id' => 7, 'name' => 'John', 'address' => ['city' => 'Paris'], 'code' => 5],
-            $context,
+            UserStub::class,
         ));
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
@@ -212,9 +199,9 @@ final class ClassTypeTest extends TestCase
 
     public function testTakesDefaultValueOfMissingField(): void
     {
-        $user = self::getType(UserStub::class)->denormalize(
+        $user = self::createMapper()->denormalize(
             ['id' => 7, 'name' => 'John', 'address' => null, 'code' => 5],
-            self::getContext(self::createRepository()),
+            UserStub::class,
         );
 
         self::assertInstanceOf(UserStub::class, $user);
@@ -302,6 +289,75 @@ final class ClassTypeTest extends TestCase
         self::assertNormalizes(RenamedStub::class, $expected, ['e-mail' => 'a@b.c', 'name' => 'John']);
     }
 
+    public function testAliasIsAcceptedOnDenormalizationOnly(): void
+    {
+        $expected = new AliasedStub();
+        $expected->email = 'a@b.c';
+        $expected->name = 'John';
+        $expected->age = 42;
+
+        self::assertDenormalizes(
+            AliasedStub::class,
+            ['mail' => 'a@b.c', 'login' => 'John', 'years' => 42],
+            $expected,
+        );
+        self::assertNormalizes(AliasedStub::class, $expected, ['e-mail' => 'a@b.c', 'name' => 'John', 'age' => 42]);
+    }
+
+    public function testNameFirstOrLastInDataIsTakenByUseFirstOrUseLast(): void
+    {
+        $first = new FirstInDataAliasStub();
+        $first->email = 'x@y.z';
+        $last = new LastInDataAliasStub();
+        $last->email = 'a@b.c';
+
+        self::assertDenormalizes(FirstInDataAliasStub::class, ['mail' => 'x@y.z', 'email' => 'a@b.c'], $first);
+        self::assertDenormalizes(LastInDataAliasStub::class, ['mail' => 'x@y.z', 'email' => 'a@b.c'], $last);
+        self::assertDenormalizes(LastInDataAliasStub::class, ['email' => 'x@y.z', 'mail' => 'a@b.c'], $last);
+    }
+
+    public function testNameIsTakenBeforeAliasesByUseNameOrFirstOrLast(): void
+    {
+        $data = ['mail' => 'x@y.z', 'email' => 'a@b.c', 'e_mail' => 'm@n.o'];
+        $first = new NameOrFirstAliasStub();
+        $first->email = 'a@b.c';
+        $last = new NameOrLastAliasStub();
+        $last->email = 'a@b.c';
+
+        self::assertDenormalizes(NameOrFirstAliasStub::class, $data, $first);
+        self::assertDenormalizes(NameOrLastAliasStub::class, $data, $last);
+
+        unset($data['email']);
+        $first->email = 'x@y.z';
+        $last->email = 'm@n.o';
+
+        self::assertDenormalizes(NameOrFirstAliasStub::class, $data, $first);
+        self::assertDenormalizes(NameOrLastAliasStub::class, $data, $last);
+    }
+
+    public function testSeveralNamesAreViolationByFail(): void
+    {
+        self::assertDenormalizationFails(
+            AliasedStub::class,
+            ['mail' => 'a@b.c', 'email' => 'x@y.z', 'name' => 'John'],
+            '$.email: Field "email" duplicates the field "mail"',
+        );
+    }
+
+    public function testErrorOfAliasedFieldHasPathOfAlias(): void
+    {
+        self::assertDenormalizationFails(
+            AliasedStub::class,
+            ['mail' => 'a@b.c', 'name' => 'John', 'years' => 'old'],
+            '$.years: Value must be of type "int", but "old" given',
+        );
+        self::assertDenormalizationFails(
+            AliasedStub::class,
+            ['name' => 'John'],
+            '$[\'e-mail\']: Required field "e-mail" is missing',
+        );
+    }
+
     #[RequiresPhp('>= 8.4.0')]
     public function testNormalizesObjectWithComputedProperty(): void
     {
@@ -314,11 +370,10 @@ final class ClassTypeTest extends TestCase
     #[RequiresPhp('>= 8.4.0')]
     public function testComputedPropertyIsIgnoredOnDenormalization(): void
     {
-        $repository = self::createRepository();
+        $mapper = self::createMapper();
 
         foreach ([['name' => 'John'], ['name' => 'John', 'greeting' => 'Hi']] as $input) {
-            $object = self::getType(ComputedStub::class, $repository)
-                ->denormalize($input, self::getContext($repository));
+            $object = $mapper->denormalize($input, ComputedStub::class);
 
             self::assertInstanceOf(ComputedStub::class, $object);
             self::assertSame('Hello John', $object->greeting);
@@ -338,9 +393,9 @@ final class ClassTypeTest extends TestCase
             }
         };
 
-        $repository = self::createRepository(metadata: $metadata);
+        $mapper = self::createMapper(metadata: $metadata);
 
-        $error = self::captureThrowable(static fn(): mixed => self::getType(ComputedStub::class, $repository));
+        $error = self::captureBuildError(ComputedStub::class, $mapper);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertInstanceOf(PropertyNotWritableException::class, $error->getPrevious());
@@ -366,12 +421,9 @@ final class ClassTypeTest extends TestCase
     public function testNormalizationRejectsUninitializedPropertyWithItsPath(): void
     {
         $user = (new \ReflectionClass(UserStub::class))->newInstanceWithoutConstructor();
-        $repository = self::createRepository();
+        $mapper = self::createMapper();
 
-        $error = self::captureThrowable(
-            static fn(): mixed => self::getType(UserStub::class, $repository)
-                ->normalize($user, self::getContext($repository)),
-        );
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($user, UserStub::class));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertStringStartsWith('$.id: ', $error->getMessage());
@@ -389,7 +441,7 @@ final class ClassTypeTest extends TestCase
             StrictnessStub::class,
             ['strict' => 1, 'loose' => '2'],
             $expected,
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
         self::assertDenormalizationFails(
             StrictnessStub::class,
@@ -400,7 +452,7 @@ final class ClassTypeTest extends TestCase
 
     public function testPropertyWithoutTypeIsErrorOfType(): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType(UntypedStub::class));
+        $error = self::captureBuildError(UntypedStub::class);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame(
@@ -480,28 +532,24 @@ final class ClassTypeTest extends TestCase
 
     public function testClassNormalizedAsObjectGivesStdClass(): void
     {
-        $repository = self::createRepository();
-        $type = self::getType(ObjectFormStub::class, $repository);
+        $mapper = self::createMapper();
 
-        self::assertTrue($type->isNormalizable(new ObjectFormStub(), self::getContext($repository)));
+        self::assertTrue($mapper->isNormalizable(new ObjectFormStub(), ObjectFormStub::class));
         self::assertEquals(
             (object) ['theme' => 'dark'],
-            $type->normalize(new ObjectFormStub(), self::getContext($repository)),
+            $mapper->normalize(new ObjectFormStub(), ObjectFormStub::class),
         );
     }
 
     public function testConfigurationNormalizesObjectsAsStdClass(): void
     {
-        $repository = self::createRepository(config: new Configuration(isObjectAsArray: false));
-
-        $type = self::getType(AddressStub::class, $repository);
         $address = self::createAddress('Paris');
 
-        self::assertEquals((object) ['city' => 'Paris'], $type->normalize($address, self::getContext($repository)));
-        self::assertEquals(
-            (object) ['city' => 'Paris'],
-            $type->normalize($address, self::getContext($repository)->withStrictTypes(true)),
-        );
+        foreach ([false, true] as $isStrict) {
+            $mapper = self::createMapper(config: new Configuration(isStrict: $isStrict, isObjectAsArray: false));
+
+            self::assertEquals((object) ['city' => 'Paris'], $mapper->normalize($address, AddressStub::class));
+        }
     }
 
     public function testAccessorStrategyReceivesMetadataOfProperty(): void
@@ -531,12 +579,8 @@ final class ClassTypeTest extends TestCase
             }
         };
 
-        $repository = self::createRepository(
-            accessors: new ClassAccessors(properties: new PropertyAccessorFactory([$strategy])),
-        );
-
-        $object = self::getType(RenamedStub::class, $repository)
-            ->denormalize(['e-mail' => 'a@b.c', 'name' => 'John'], self::getContext($repository));
+        $object = self::createMapper(accessors: [$strategy])
+            ->denormalize(['e-mail' => 'a@b.c', 'name' => 'John'], RenamedStub::class);
 
         self::assertSame(['e-mail', 'e-mail', 'name', 'name'], $strategy->names);
         self::assertInstanceOf(RenamedStub::class, $object);
@@ -573,12 +617,8 @@ final class ClassTypeTest extends TestCase
             }
         };
 
-        $repository = self::createRepository(
-            accessors: new ClassAccessors(instantiators: new InstantiatorFactory([$strategy])),
-        );
-
-        $address = self::getType(AddressStub::class, $repository)
-            ->denormalize(['id' => 1, 'city' => 'Paris'], self::getContext($repository));
+        $address = self::createMapper(instantiators: [$strategy])
+            ->denormalize(['id' => 1, 'city' => 'Paris'], AddressStub::class);
 
         self::assertSame($existing, $address);
         self::assertSame('Paris', $existing->city);
@@ -598,7 +638,7 @@ final class ClassTypeTest extends TestCase
             AddressStub::class,
             ['town' => 'Paris'],
             self::createAddress('Paris'),
-            self::createRepository(hooks: [$hook]),
+            self::createMapper(hooks: [$hook]),
         );
     }
 
@@ -612,13 +652,12 @@ final class ClassTypeTest extends TestCase
             },
         );
 
-        $repository = self::createRepository(hooks: [$hook]);
-        $type = self::getType(AddressStub::class, $repository);
+        $mapper = self::createMapper(hooks: [$hook]);
 
-        self::assertTrue($type->isDenormalizable(['city' => 'Paris'], self::getContext($repository)));
+        self::assertTrue($mapper->isDenormalizable(['city' => 'Paris'], AddressStub::class));
         self::assertSame(['beforeDenormalize'], $hook->calls);
 
-        $address = $type->denormalize(['city' => 'Paris'], self::getContext($repository));
+        $address = $mapper->denormalize(['city' => 'Paris'], AddressStub::class);
 
         self::assertSame($address, $received);
         self::assertSame(['beforeDenormalize', 'beforeDenormalize', 'afterDenormalize'], $hook->calls);
@@ -636,7 +675,7 @@ final class ClassTypeTest extends TestCase
             AddressStub::class,
             self::createAddress('Paris'),
             ['city' => 'PARIS'],
-            self::createRepository(hooks: [$hook]),
+            self::createMapper(hooks: [$hook]),
         );
     }
 
@@ -651,18 +690,18 @@ final class ClassTypeTest extends TestCase
             AddressStub::class,
             self::createAddress('Paris'),
             ['city' => 'Paris', '_links' => ['self' => '/addresses/1']],
-            self::createRepository(hooks: [$hook]),
+            self::createMapper(hooks: [$hook]),
         );
     }
 
     public function testHookRunsForObjectsOfItsClassOnly(): void
     {
         $hook = new HookStub(AddressStub::class);
-        $repository = self::createRepository(hooks: [$hook]);
+        $mapper = self::createMapper(hooks: [$hook]);
 
-        self::getType(UserStub::class, $repository)->denormalize(
+        $mapper->denormalize(
             ['id' => 7, 'name' => 'John', 'address' => ['city' => 'Paris'], 'code' => 5],
-            self::getContext($repository),
+            UserStub::class,
         );
 
         self::assertSame(['beforeDenormalize', 'afterDenormalize'], $hook->calls);
@@ -674,15 +713,12 @@ final class ClassTypeTest extends TestCase
             throw new \InvalidArgumentException('City is not served');
         });
 
-        $repository = self::createRepository(hooks: [$hook]);
-        $type = self::getType(UserStub::class, $repository);
+        $mapper = self::createMapper(hooks: [$hook]);
         $value = ['id' => 7, 'name' => 'John', 'address' => ['city' => 'Paris'], 'code' => 5];
 
-        self::assertTrue($type->isDenormalizable($value, self::getContext($repository)));
+        self::assertTrue($mapper->isDenormalizable($value, UserStub::class));
 
-        $error = self::captureThrowable(
-            static fn(): mixed => $type->denormalize($value, self::getContext($repository)),
-        );
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize($value, UserStub::class));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame('$.address: City is not served', $error->getMessage());
@@ -690,11 +726,10 @@ final class ClassTypeTest extends TestCase
 
     public function testErrorOfProgramPassesThroughCompositeAsIs(): void
     {
-        $repository = self::createRepository();
-        $type = self::getType('list<' . MismatchedTypeStub::class . '>', $repository);
+        $mapper = self::createMapper();
 
         $error = self::captureThrowable(
-            static fn(): mixed => $type->denormalize([['value' => 'x']], self::getContext($repository)),
+            static fn(): mixed => $mapper->denormalize([['value' => 'x']], 'list<' . MismatchedTypeStub::class . '>'),
         );
 
         self::assertInstanceOf(\TypeError::class, $error);
@@ -734,8 +769,7 @@ final class ClassTypeTest extends TestCase
 
     public function testWritesReadonlyPropertyDeclaredByParent(): void
     {
-        $child = self::getType(ReadonlyChildStub::class)
-            ->denormalize(['id' => 1, 'name' => 'a'], self::getContext(self::createRepository()));
+        $child = self::createMapper()->denormalize(['id' => 1, 'name' => 'a'], ReadonlyChildStub::class);
 
         self::assertInstanceOf(ReadonlyChildStub::class, $child);
         self::assertSame(1, $child->id);
@@ -751,21 +785,19 @@ final class ClassTypeTest extends TestCase
                 throw new \DomainException('b');
             }),
         ];
-        $repository = self::createRepository(hooks: $hooks);
-        $context = self::getContext($repository);
-        $address = self::getType(AddressStub::class, $repository);
+        $mapper = self::createMapper(hooks: $hooks);
 
-        self::assertFalse($address->isDenormalizable(['city' => 'Paris'], $context));
+        self::assertFalse($mapper->isDenormalizable(['city' => 'Paris'], AddressStub::class));
 
-        $error = self::captureThrowable(static fn(): mixed => $address->denormalize(['city' => 'Paris'], $context));
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(['city' => 'Paris'], AddressStub::class));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame('$: a', $error->getMessage());
         self::assertInstanceOf(\DomainException::class, $error->getPrevious());
 
-        $error = self::captureThrowable(static fn(): mixed => self::getType(UserStub::class, $repository)->denormalize(
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(
             ['id' => 7, 'name' => 'John', 'address' => null, 'code' => 5],
-            $context,
+            UserStub::class,
         ));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
@@ -774,11 +806,10 @@ final class ClassTypeTest extends TestCase
 
     public function testMessageOfPropertyReplacesMessagesOfItsValueOnly(): void
     {
-        $repository = self::createRepository(config: new Configuration(maxViolations: 10));
-        $context = self::getContext($repository);
-        $type = self::getType(MessageOwnerStub::class, $repository);
+        $mapper = self::createMapper(config: new Configuration(maxViolations: 10));
+        $type = MessageOwnerStub::class;
 
-        $error = self::captureThrowable(static fn(): mixed => $type->denormalize(['person' => ['age' => 'x']], $context));
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(['person' => ['age' => 'x']], $type));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame(
@@ -786,7 +817,7 @@ final class ClassTypeTest extends TestCase
             $error->getMessage(),
         );
 
-        $error = self::captureThrowable(static fn(): mixed => $type->denormalize(['person' => 5], $context));
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(['person' => 5], $type));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame('$.person: Person is invalid', $error->getMessage());

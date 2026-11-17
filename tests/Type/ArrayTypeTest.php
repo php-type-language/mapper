@@ -20,7 +20,7 @@ final class ArrayTypeTest extends TestCase
 
     public function testStringKeyTypeAcceptsKeyTurnedIntoIntegerByPhp(): void
     {
-        self::assertDenormalizes('array<string, int>', ['1' => 2], [1 => 2], self::createRepository(isStrict: true));
+        self::assertDenormalizes('array<string, int>', ['1' => 2], [1 => 2], self::createMapper(isStrict: true));
     }
 
     public function testRejectsInvalidKeyWithItsPath(): void

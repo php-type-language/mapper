@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests;
 
-use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\Context\Configuration;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\ViolationFormatter;
@@ -14,6 +13,7 @@ use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
+use TypeLang\Mapper\Tests\Stub\AliasedStub;
 use TypeLang\Mapper\Tests\Stub\DecimalCommaCoercerStub;
 use TypeLang\Mapper\Tests\Stub\DuplicateNameStub;
 use TypeLang\Mapper\Tests\Stub\JsonArrayCoercerStub;
@@ -77,10 +77,10 @@ final class MapperTest extends TestCase
 
     public function testCoercersOfUserReplaceDefaultOnes(): void
     {
-        $mapper = new Mapper(coercers: new Coercers(
-            float: new DecimalCommaCoercerStub(),
-            array: new JsonArrayCoercerStub(),
-        ));
+        $mapper = new Mapper(coercers: [
+            'float' => new DecimalCommaCoercerStub(),
+            'array' => new JsonArrayCoercerStub(),
+        ]);
 
         self::assertSame(1.5, $mapper->denormalize('1,5', 'float'));
         self::assertSame([1, 2], $mapper->denormalize('[1, 2]', 'list<int>'));
@@ -95,7 +95,7 @@ final class MapperTest extends TestCase
     {
         $mapper = new Mapper(
             config: new Configuration(isStrict: true),
-            coercers: new Coercers(float: new DecimalCommaCoercerStub()),
+            coercers: ['float' => new DecimalCommaCoercerStub()],
         );
 
         $this->expectException(InvalidValueException::class);
@@ -228,6 +228,15 @@ final class MapperTest extends TestCase
         self::assertSame(['$[0][0]', '$[0][1]', '$[1][0]'], self::printPaths($error));
     }
 
+    public function testAliasIsNotExtraField(): void
+    {
+        $mapper = new Mapper(new Configuration(shouldRejectExtraFields: true));
+
+        $object = $mapper->denormalize(['mail' => 'a@b.c', 'login' => 'John'], AliasedStub::class);
+
+        self::assertInstanceOf(AliasedStub::class, $object);
+        self::assertSame('John', $object->name);
+    }
     public function testNativeUnionWithNullAndFalseIsMapped(): void
     {
         $mapper = new Mapper();

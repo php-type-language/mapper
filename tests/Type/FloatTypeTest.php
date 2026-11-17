@@ -52,7 +52,7 @@ final class FloatTypeTest extends TestCase
 
     public function testStrictContextAcceptsExactInteger(): void
     {
-        self::assertDenormalizes('float', 42, 42.0, self::createRepository(isStrict: true));
+        self::assertDenormalizes('float', 42, 42.0, self::createMapper(isStrict: true));
     }
 
     public function testStrictContextRejectsNumericString(): void
@@ -61,13 +61,13 @@ final class FloatTypeTest extends TestCase
             'float',
             '4.5',
             '$: Value must be of type "float", but "4.5" given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 
     public function testDenormalizesNotNumber(): void
     {
-        $result = self::getType('float')->denormalize(\NAN, self::getContext(self::createRepository()));
+        $result = self::createMapper()->denormalize(\NAN, 'float');
 
         self::assertNan($result);
     }

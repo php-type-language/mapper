@@ -56,7 +56,7 @@ final class BoolTypeTest extends TestCase
             'bool',
             1,
             '$: Value must be of type "bool", but 1 given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

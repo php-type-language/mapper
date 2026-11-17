@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type\Repository;
 
-use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\BrokenOwnerStub;
@@ -13,42 +12,49 @@ use TypeLang\Mapper\Tests\Stub\MissingClassStub;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Tests\Type\Repository\Stub\CountingDecoratorStub;
 use TypeLang\Mapper\Tests\Type\Repository\Stub\FixedTypeBuilderStub;
+use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\StringType;
 
 final class TypeRepositoryTest extends TestCase
 {
     public function testBuildsTypeOnce(): void
     {
-        $repository = self::createRepository();
+        $decorator = new CountingDecoratorStub();
+        $mapper = self::createMapper(decorators: [$decorator]);
 
-        self::assertSame(self::getType('int', $repository), self::getType('int', $repository));
+        $mapper->denormalize(1, 'int');
+        $mapper->denormalize(2, 'int');
+        $mapper->denormalize('a', 'string');
+
+        self::assertSame(['int', 'string'], $decorator->decorated);
     }
 
     public function testFullyQualifiedAndQualifiedNamesAreOneType(): void
     {
-        $repository = self::createRepository();
+        $decorator = new CountingDecoratorStub();
+        $mapper = self::createMapper(decorators: [$decorator]);
 
-        self::assertSame(
-            self::getType(AddressStub::class, $repository),
-            self::getType('\\' . AddressStub::class, $repository),
-        );
+        $mapper->isDenormalizable([], AddressStub::class);
+        $mapper->isDenormalizable([], '\\' . AddressStub::class);
+
+        self::assertCount(1, \array_keys($decorator->decorated, AddressStub::class, true));
     }
 
     public function testStringLiteralWithLeadingBackslashIsOtherType(): void
     {
-        $repository = self::createRepository();
+        $mapper = self::createMapper();
 
-        self::assertNotSame(self::getType("'\\Foo'", $repository), self::getType("'Foo'", $repository));
-        self::assertDenormalizes("'Foo'", 'Foo', 'Foo', $repository);
+        self::assertFalse($mapper->isDenormalizable('Foo', "'\\Foo'"));
+        self::assertDenormalizes("'Foo'", 'Foo', 'Foo', $mapper);
     }
 
     public function testFailedTypeLeavesNoBuiltTypesReferringToIt(): void
     {
-        $repository = self::createRepository();
+        $mapper = self::createMapper();
         $message = \sprintf('Type "\\%s" is not supported', MissingClassStub::class);
 
-        $owner = self::captureThrowable(static fn(): mixed => self::getType(BrokenOwnerStub::class, $repository));
-        $child = self::captureThrowable(static fn(): mixed => self::getType(CyclicChildStub::class, $repository));
+        $owner = self::captureBuildError(BrokenOwnerStub::class, $mapper);
+        $child = self::captureBuildError(CyclicChildStub::class, $mapper);
 
         self::assertInstanceOf(TypeDefinitionException::class, $owner);
         self::assertSame($message, $owner->getMessage());
@@ -58,44 +64,26 @@ final class TypeRepositoryTest extends TestCase
 
     public function testFailedTypeKeepsTypesBuiltBeforeIt(): void
     {
-        $repository = self::createRepository();
-        $int = self::getType('int', $repository);
+        $decorator = new CountingDecoratorStub();
+        $mapper = self::createMapper(decorators: [$decorator]);
 
-        self::captureThrowable(static fn(): mixed => self::getType(BrokenOwnerStub::class, $repository));
+        $mapper->denormalize(1, 'int');
+        self::captureBuildError(BrokenOwnerStub::class, $mapper);
+        $mapper->denormalize(2, 'int');
 
-        self::assertSame($int, self::getType('int', $repository));
+        self::assertCount(1, \array_keys($decorator->decorated, 'int', true));
     }
 
     public function testBuilderOfUserPrecedesDefaultOnes(): void
     {
-        $string = new StringType();
-        $repository = self::createRepository(builders: [new FixedTypeBuilderStub('int', $string)]);
+        $mapper = self::createMapper(builders: [new FixedTypeBuilderStub('int', new StringType())]);
 
-        self::assertSame($string, self::getType('int', $repository));
-    }
-
-    public function testDecoratorWrapsEachTypeOnce(): void
-    {
-        $decorator = new CountingDecoratorStub();
-        $repository = self::createRepository(decorators: [$decorator]);
-
-        self::getType('int', $repository);
-        self::getType('int', $repository);
-        self::getType('string', $repository);
-
-        self::assertSame(['int', 'string'], $decorator->decorated);
-    }
-
-    public function testDecoratedTypeIsKept(): void
-    {
-        $repository = self::createRepository(decorators: [new CountingDecoratorStub()]);
-
-        self::assertSame(self::getType('int', $repository), self::getType('int', $repository));
+        self::assertSame('abc', $mapper->denormalize('abc', 'int'));
     }
 
     public function testRejectsTypeNoBuilderSupports(): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType('unknown-type'));
+        $error = self::captureBuildError('unknown-type');
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame('Type "unknown-type" is not supported', $error->getMessage());
@@ -104,11 +92,9 @@ final class TypeRepositoryTest extends TestCase
     public function testBuildContextGivesRepositoryToBuilders(): void
     {
         $builder = new FixedTypeBuilderStub('custom', new StringType());
-        $repository = self::createRepository(builders: [$builder]);
 
-        self::getType('custom', $repository);
+        self::createMapper(builders: [$builder])->denormalize('a', 'custom');
 
-        self::assertInstanceOf(BuildContext::class, $builder->context);
-        self::assertSame($repository, $builder->context->types);
+        self::assertInstanceOf(TypeRepositoryInterface::class, $builder->context?->types);
     }
 }

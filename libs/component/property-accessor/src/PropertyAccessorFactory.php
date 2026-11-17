@@ -16,36 +16,39 @@ use TypeLang\Mapper\PropertyAccessor\Strategy\ReflectionAccessStrategy;
 
 /**
  * Creates the reader and the writer of a property once by the first
- * strategy that takes the property: the strategies of the user, then
- * bypassing the hook of a property with a backing store, `$object->name`,
- * the reflection. A static property is rejected, so is a property no
- * strategy takes, such as a virtual one without the hook of the direction.
+ * strategy that takes the property. A static property is rejected, so is a
+ * property no strategy takes, such as a virtual one without the hook of the
+ * direction. The default strategies, after the ones of the user, bypass the
+ * hook of a property with a backing store, then use `$object->name`, then
+ * the reflection.
  *
  * ```
- * $factory = new PropertyAccessorFactory([new GetterSetterStrategy()]);
+ * $factory = PropertyAccessorFactory::createDefault([new GetterSetterStrategy()]);
  *
  * $factory->createWriter($property, $metadata)->write($user, 'user@example.com');
  * ```
  */
 final class PropertyAccessorFactory
 {
-    /**
-     * @var non-empty-list<AccessStrategyInterface>
-     */
-    private readonly array $strategies;
+    public function __construct(
+        /**
+         * @var non-empty-list<AccessStrategyInterface>
+         */
+        private readonly array $strategies,
+    ) {}
 
     /**
      * @param list<AccessStrategyInterface> $strategies strategies of the
      *        user, tried before the default ones in the order of the list
      */
-    public function __construct(array $strategies = [])
+    public static function createDefault(array $strategies = []): self
     {
-        $this->strategies = [
+        return new self([
             ...$strategies,
             new RawAccessStrategy(),
             new DirectAccessStrategy(),
             new ReflectionAccessStrategy(),
-        ];
+        ]);
     }
 
     /**

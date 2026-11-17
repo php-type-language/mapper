@@ -4,15 +4,38 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Context;
 
+use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\ClassTypes;
+use TypeLang\Mapper\Context\Coercers;
+use TypeLang\Mapper\Context\Configuration;
 use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Instantiator\InstantiatorFactory;
+use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\Tests\TestCase;
+use TypeLang\Mapper\Type\Repository\TypeRepository;
 
 final class ContextTest extends TestCase
 {
     public function testContextOfOtherStrictnessSharesEverythingElse(): void
     {
-        $context = new Context(new ClassTypes(self::createRepository()));
+        $accessors = new ClassAccessors(
+            properties: PropertyAccessorFactory::createDefault(),
+            instantiators: InstantiatorFactory::createDefault(),
+            hooks: [],
+        );
+        $repository = new TypeRepository(
+            builders: [],
+            metadata: MetadataProviderFactory::create(),
+            decorators: [],
+            accessors: $accessors,
+        );
+        $context = new Context(
+            types: new ClassTypes($repository),
+            config: new Configuration(),
+            accessors: $accessors,
+            coercers: Coercers::createDefault(),
+        );
         $strict = $context->withStrictTypes(true);
 
         self::assertTrue($strict->config->isStrict);

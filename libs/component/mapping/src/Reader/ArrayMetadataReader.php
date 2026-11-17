@@ -47,6 +47,8 @@ use TypeLang\Type\TypeNode;
  *     id: int
  *     email:
  *       name: e_mail
+ *       aliases: [mail, email_address]
+ *       alias_conflict: first
  *       type: non-empty-string
  *       read_type: string
  *       write_type: non-empty-string

@@ -56,6 +56,26 @@ final class InvalidValueException extends ViolationException implements MapperEx
     }
 
     /**
+     * The path of the error points to the place of the duplicate field.
+     *
+     * @param non-empty-string $field
+     * @param non-empty-string $other the field given before
+     */
+    public static function becauseFieldIsDuplicated(
+        string $field,
+        string $other,
+        SegmentInterface $segment,
+        mixed $value,
+    ): self {
+        return self::fromViolation(new Violation(
+            ViolationCode::DuplicateField,
+            ['field' => $field, 'other' => $other],
+            new Path([$segment]),
+            $value,
+        ));
+    }
+
+    /**
      * The path of the error points to the place of the field. The name of
      * the field comes from the data, its control characters, quotes and
      * backslashes are escaped.

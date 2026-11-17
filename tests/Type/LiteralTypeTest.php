@@ -70,7 +70,7 @@ final class LiteralTypeTest extends TestCase
             '42',
             '42',
             '$: Value must be of type "42", but "42" given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

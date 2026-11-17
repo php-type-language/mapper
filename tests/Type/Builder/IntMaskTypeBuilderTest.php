@@ -67,7 +67,7 @@ final class IntMaskTypeBuilderTest extends TestCase
     #[DataProvider('invalidMaskDataProvider')]
     public function testMaskOfOtherValuesIsErrorOfType(string $type): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($type));
+        $error = self::captureBuildError($type);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertStringContainsString('must be made of non-negative integers', $error->getMessage());
@@ -75,7 +75,7 @@ final class IntMaskTypeBuilderTest extends TestCase
 
     public function testMaskOfSeveralArgumentsIsNotSupported(): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType('int-mask-of<1, 2>'));
+        $error = self::captureBuildError('int-mask-of<1, 2>');
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame('Type "int-mask-of<1, 2>" is not supported', $error->getMessage());

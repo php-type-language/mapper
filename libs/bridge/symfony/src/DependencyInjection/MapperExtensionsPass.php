@@ -125,11 +125,11 @@ final class MapperExtensionsPass implements CompilerPassInterface
             $arguments = [];
 
             foreach ([...$defaults, ...$coercers[$name] ?? []] as $type => $id) {
-                $arguments['$' . $type] = new Reference($id);
+                $arguments[$type] = new Reference($id);
             }
 
-            $container->getDefinition(MapperDefinitions::getCoercersId($name))
-                ->setArguments($arguments);
+            $container->getDefinition(MapperDefinitions::getMapperId($name))
+                ->setArgument('$coercers', $arguments);
         }
     }
 

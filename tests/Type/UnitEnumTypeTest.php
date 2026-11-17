@@ -29,7 +29,7 @@ final class UnitEnumTypeTest extends TestCase
             SuitStub::class,
             42,
             '$: Value must be of type "string", but 42 given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

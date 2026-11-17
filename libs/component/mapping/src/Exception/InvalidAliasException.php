@@ -12,6 +12,14 @@ use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 final class InvalidAliasException extends MetadataException
 {
     /**
+     * @param string $target case: `App\Status::Enabled`
+     */
+    public static function becauseConflictIsNotAllowed(string $target, SourceInfo $source): self
+    {
+        return new self($target, $source, 'alias conflict is allowed only for the aliases of a property');
+    }
+
+    /**
      * @param string $target class or case: `App\Status`, `App\Status::Enabled`
      */
     public static function becauseClassIsNotBackedEnum(string $target, SourceInfo $source): self

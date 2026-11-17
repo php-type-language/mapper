@@ -94,15 +94,15 @@ final class ShapeTypeTest extends TestCase
 
     public function testConfigurationNormalizesObjectShapeAsStdClass(): void
     {
-        $repository = self::createRepository(config: new Configuration(isObjectAsArray: false));
+        $mapper = self::createMapper(config: new Configuration(isObjectAsArray: false));
 
         self::assertEquals(
             (object) ['a' => 1],
-            self::getType('object{a: int}', $repository)->normalize((object) ['a' => 1], self::getContext($repository)),
+            $mapper->normalize((object) ['a' => 1], 'object{a: int}'),
         );
         self::assertSame(
             ['a' => 1],
-            self::getType('array{a: int}', $repository)->normalize(['a' => 1], self::getContext($repository)),
+            $mapper->normalize(['a' => 1], 'array{a: int}'),
         );
     }
 

@@ -7,7 +7,7 @@ the user are tried before the default one.
 ```php
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
 
-$instantiator = (new InstantiatorFactory([new EntityStrategy($entities)]))
+$instantiator = InstantiatorFactory::createDefault([new EntityStrategy($entities)])
     ->createInstantiator(new \ReflectionClass(User::class), $metadata);
 
 $user = $instantiator->instantiate(['id' => 42]);

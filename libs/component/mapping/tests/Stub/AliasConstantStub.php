@@ -8,6 +8,6 @@ use TypeLang\Mapper\Mapping\MapAlias;
 
 final class AliasConstantStub
 {
-    #[MapAlias('x')]
+    #[MapAlias(['x'])]
     public const A = 'a';
 }

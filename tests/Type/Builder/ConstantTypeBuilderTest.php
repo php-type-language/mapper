@@ -102,7 +102,7 @@ final class ConstantTypeBuilderTest extends TestCase
     #[DataProvider('invalidDataProvider')]
     public function testInvalidConstantIsRejected(string $type, string $message): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($type));
+        $error = self::captureBuildError($type);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame(\sprintf($message, $type), $error->getMessage());

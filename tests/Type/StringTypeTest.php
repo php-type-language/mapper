@@ -51,7 +51,7 @@ final class StringTypeTest extends TestCase
             'string',
             42,
             '$: Value must be of type "string", but 42 given',
-            self::createRepository(isStrict: true),
+            self::createMapper(isStrict: true),
         );
     }
 

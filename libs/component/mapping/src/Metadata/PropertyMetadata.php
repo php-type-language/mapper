@@ -34,6 +34,27 @@ final class PropertyMetadata
     public bool $isExternalNameExplicit;
 
     /**
+     * Other names of the field accepted on denormalization, in the order of
+     * priority
+     *
+     * @var list<non-empty-string>
+     *
+     * @readonly
+     *
+     * @phpstan-readonly-allow-private-mutation
+     */
+    public array $aliases = [];
+
+    /**
+     * What the property takes when the data has several of its names
+     *
+     * @readonly
+     *
+     * @phpstan-readonly-allow-private-mutation
+     */
+    public AliasConflict $aliasConflict = AliasConflict::Fail;
+
+    /**
      * Type of the value read from the property on normalization
      *
      * @readonly
@@ -206,6 +227,27 @@ final class PropertyMetadata
         $self = clone $this;
         $self->externalName = $name;
         $self->isExternalNameExplicit = true;
+
+        return $self;
+    }
+
+    /**
+     * Returns a copy with the aliases replacing the given ones.
+     *
+     * @param list<non-empty-string> $aliases
+     */
+    public function withAliases(array $aliases): self
+    {
+        $self = clone $this;
+        $self->aliases = $aliases;
+
+        return $self;
+    }
+
+    public function withAliasConflict(AliasConflict $conflict): self
+    {
+        $self = clone $this;
+        $self->aliasConflict = $conflict;
 
         return $self;
     }

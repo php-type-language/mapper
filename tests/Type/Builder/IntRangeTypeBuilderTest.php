@@ -7,24 +7,19 @@ namespace TypeLang\Mapper\Tests\Type\Builder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\TestCase;
-use TypeLang\Mapper\Type\Check\IntRangeCheck;
-use TypeLang\Mapper\Type\IntType;
-use TypeLang\Mapper\Type\RefinedType;
 
 final class IntRangeTypeBuilderTest extends TestCase
 {
     public function testRangeOpenOnBothSidesIsInt(): void
     {
-        self::assertInstanceOf(IntType::class, self::getType('int<min, max>'));
+        self::assertDenormalizes('int<min, max>', \PHP_INT_MIN, \PHP_INT_MIN);
+        self::assertDenormalizes('int<min, max>', \PHP_INT_MAX, \PHP_INT_MAX);
     }
 
-    public function testBoundsAreReadIntoCheck(): void
+    public function testBoundsAreChecked(): void
     {
-        $type = self::getType('int<-5, max>');
-
-        self::assertInstanceOf(RefinedType::class, $type);
-        self::assertEquals([new IntRangeCheck(min: -5)], $type->checks);
-        self::assertSame('int<-5, max>', $type->name);
+        self::assertDenormalizes('int<-5, max>', -5, -5);
+        self::assertDenormalizationFails('int<-5, max>', -6, '$: Value must be of type "int<-5, max>" (>= -5)');
     }
 
     /**
@@ -60,7 +55,7 @@ final class IntRangeTypeBuilderTest extends TestCase
     #[DataProvider('invalidDataProvider')]
     public function testInvalidRangeIsRejected(string $type, string $message): void
     {
-        $error = self::captureThrowable(static fn(): mixed => self::getType($type));
+        $error = self::captureBuildError($type);
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame($message, $error->getMessage());

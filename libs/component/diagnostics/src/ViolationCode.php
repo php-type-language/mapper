@@ -31,6 +31,12 @@ enum ViolationCode: string implements ViolationCodeInterface
     case UnexpectedField = 'unexpected_field';
 
     /**
+     * Field holds the value of a target already given by another field, such
+     * as an alias of a property next to its name.
+     */
+    case DuplicateField = 'duplicate_field';
+
+    /**
      * Value of the expected type fails a check of its refinement, such as
      * `positive-int`.
      */
@@ -53,6 +59,7 @@ enum ViolationCode: string implements ViolationCodeInterface
             self::InvalidKey => 'Key must be of type "{{expected}}", but {{value}} given',
             self::MissingField => 'Required field "{{field}}" is missing',
             self::UnexpectedField => 'Unexpected field "{{field}}"',
+            self::DuplicateField => 'Field "{{field}}" duplicates the field "{{other}}"',
             self::FailedCheck => 'Value must be of type "{{expected}}" ({{check}})',
             self::InvalidValue => '{{message}}',
         };

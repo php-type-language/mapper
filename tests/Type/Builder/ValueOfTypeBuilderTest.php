@@ -34,7 +34,7 @@ final class ValueOfTypeBuilderTest extends TestCase
     public function testValueOfOtherTypesIsNotSupported(): void
     {
         foreach ([SuitStub::class, ConstantsStub::class . '::LIST', 'int', 'array{a: int}'] as $argument) {
-            $error = self::captureThrowable(static fn(): mixed => self::getType(\sprintf('value-of<%s>', $argument)));
+            $error = self::captureBuildError(\sprintf('value-of<%s>', $argument));
 
             self::assertInstanceOf(TypeDefinitionException::class, $error);
             self::assertStringEndsWith('is not supported', $error->getMessage());
