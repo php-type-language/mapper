@@ -6,8 +6,6 @@ namespace TypeLang\Mapper\Diagnostics;
 
 use TypeLang\Mapper\Diagnostics\Printer\Value\ValuePrinterInterface;
 use TypeLang\Printer\TypePrinterInterface;
-use TypeLang\Type\Name;
-use TypeLang\Type\NamedTypeNode;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -60,23 +58,28 @@ final class ViolationFormatter implements ViolationFormatterInterface
             $replacements['{{' . $name . '}}'] = (string) $parameter;
         }
 
-        $type = $this->getType($violation);
+        $type = $this->selectType($violation);
 
-        $replacements['{{expected}}'] = $this->typePrinter->print($type);
+        if ($type !== null) {
+            $replacements['{{expected}}'] = $this->typePrinter->print($type);
+        }
+
         $replacements['{{value}}'] = $this->valuePrinter->print($violation->value);
 
         return \strtr(self::getTemplate($violation, $type), $replacements);
     }
 
-    private function getType(Violation $violation): TypeNode
+    /**
+     * Returns the type printed in place of `{{expected}}`, {@see null} in
+     * case of the violation has no such type.
+     */
+    private function selectType(Violation $violation): ?TypeNode
     {
         if ($this->shouldPrintDeclaredType) {
-            return $violation->declared
-                ?? new NamedTypeNode(new Name('mixed'));
+            return $violation->declared;
         }
 
-        return $violation->expected
-            ?? new NamedTypeNode(new Name('*hidden*'));
+        return $violation->expected;
     }
 
     private static function getTemplate(Violation $violation, ?TypeNode $type): string
