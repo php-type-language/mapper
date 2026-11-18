@@ -24,12 +24,6 @@ final class ListType implements TypeInterface
          * @var TypeInterface<T>
          */
         public readonly TypeInterface $type,
-        /**
-         * Canonical description of the list, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
     ) {}
 
     public function isDenormalizable(mixed $value, Context $context): bool
@@ -59,7 +53,7 @@ final class ListType implements TypeInterface
         $input = $context->coercers->array->coerce($value);
 
         if ($input === null || !\array_is_list($input)) {
-            throw InvalidValueException::becauseInvalidType($this->name, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         $limit = $context->config->maxViolations;
@@ -111,7 +105,7 @@ final class ListType implements TypeInterface
     public function normalize(mixed $value, Context $context): array
     {
         if (!\is_array($value) || !\array_is_list($value)) {
-            throw InvalidValueException::becauseInvalidType($this->name, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         $type = $this->type;

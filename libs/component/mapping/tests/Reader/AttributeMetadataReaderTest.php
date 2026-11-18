@@ -58,13 +58,13 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertType('list<' . UserStub::class . '>', $accounts->read);
         self::assertType('list<' . UserStub::class . '>', $accounts->write);
         self::assertSame('AttributeStub.php', \basename((string) $accounts->read->source->file));
-        self::assertNull($accounts->read->isStrict);
+        self::assertNull($accounts->read->strict);
 
         $value = self::getProperty($metadata, 'value');
         self::assertType('int', $value->read);
         self::assertType('int', $value->write);
-        self::assertTrue($value->read->isStrict);
-        self::assertTrue($value->write->isStrict);
+        self::assertTrue($value->read->strict);
+        self::assertTrue($value->write->strict);
     }
 
     public function testNamedStrictArgumentAppliesToBothTypes(): void
@@ -73,8 +73,8 @@ final class AttributeMetadataReaderTest extends TestCase
 
         self::assertType('positive-int', $value->read);
         self::assertType('positive-int', $value->write);
-        self::assertTrue($value->read->isStrict);
-        self::assertTrue($value->write->isStrict);
+        self::assertTrue($value->read->strict);
+        self::assertTrue($value->write->strict);
     }
 
     public function testAttributeKeepsValuesItDoesNotSet(): void
@@ -330,7 +330,7 @@ final class AttributeMetadataReaderTest extends TestCase
             self::assertSame('Age is required', $age->undefinedErrorMessage);
             self::assertNull(self::getProperty($e->metadata, 'name')->typeErrorMessage);
             self::assertSame('Person is expected', $e->metadata->typeErrorMessage);
-            self::assertFalse($e->metadata->isNormalizeAsArray);
+            self::assertFalse($e->metadata->normalizeAsArray);
         }
     }
 

@@ -29,12 +29,6 @@ final class LiteralType implements TypeInterface
          * @var TypeInterface<int|float|string|bool|\UnitEnum>
          */
         public readonly TypeInterface $type,
-        /**
-         * Name of the type in messages, such as `'active'`
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
     ) {}
 
     public function isDenormalizable(mixed $value, Context $context): bool
@@ -58,7 +52,7 @@ final class LiteralType implements TypeInterface
         }
 
         if (!$this->isDenormalizable($value, $context)) {
-            throw InvalidValueException::becauseInvalidType($this->name, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         return $this->value;
@@ -78,6 +72,6 @@ final class LiteralType implements TypeInterface
             return $this->type->normalize($value, $context);
         }
 
-        throw InvalidValueException::becauseInvalidType($this->name, $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

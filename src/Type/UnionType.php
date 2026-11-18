@@ -44,12 +44,6 @@ final class UnionType implements TypeInterface
          * @var non-empty-list<TypeInterface<T>>
          */
         public readonly array $types,
-        /**
-         * Canonical description of the union, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
         ?array $coercionOrder = null,
     ) {
         $this->coercionOrder = $coercionOrder ?? $types;
@@ -71,7 +65,7 @@ final class UnionType implements TypeInterface
      */
     public function denormalize(mixed $value, Context $context): mixed
     {
-        $strict = $context->withStrictTypes(true);
+        $strict = $context->withStrict(true);
 
         foreach ($this->types as $type) {
             if ($type->isDenormalizable($value, $strict)) {
@@ -87,7 +81,7 @@ final class UnionType implements TypeInterface
             }
         }
 
-        throw InvalidValueException::becauseInvalidType($this->name, $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -112,6 +106,6 @@ final class UnionType implements TypeInterface
             }
         }
 
-        throw InvalidValueException::becauseInvalidType($this->name, $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

@@ -25,9 +25,9 @@ final class StringTypeTest extends TestCase
      */
     public static function nonDenormalizableDataProvider(): iterable
     {
-        yield 'boolean' => [true, '$: Value must be of type "string", but true given'];
-        yield 'null' => [null, '$: Value must be of type "string", but null given'];
-        yield 'array' => [[], '$: Value must be of type "string", but array(0) given'];
+        yield 'boolean' => [true, '$: Value must be of type string, but true given'];
+        yield 'null' => [null, '$: Value must be of type string, but null given'];
+        yield 'array' => [[], '$: Value must be of type string, but array(0) given'];
     }
 
     #[DataProvider('denormalizableDataProvider')]
@@ -50,8 +50,8 @@ final class StringTypeTest extends TestCase
         self::assertDenormalizationFails(
             'string',
             42,
-            '$: Value must be of type "string", but 42 given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type string, but 42 given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -62,6 +62,6 @@ final class StringTypeTest extends TestCase
 
     public function testNormalizationDoesNotCoerce(): void
     {
-        self::assertNormalizationFails('string', 42, '$: Value must be of type "string", but 42 given');
+        self::assertNormalizationFails('string', 42, '$: Value must be of type string, but 42 given');
     }
 }

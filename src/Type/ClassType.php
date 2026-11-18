@@ -14,6 +14,7 @@ use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Type\ClassType\Property;
+use TypeLang\Type\Name;
 
 /**
  * Object of a class: created and filled from an array or a
@@ -130,15 +131,15 @@ final class ClassType implements TypeInterface
                 return false;
             }
 
-            $isStrict = $property->metadata->write?->isStrict;
-            $current = $isStrict === null ? $context : $context->withStrictTypes($isStrict);
+            $isStrict = $property->metadata->write?->strict;
+            $current = $isStrict === null ? $context : $context->withStrict($isStrict);
 
             if (!$property->type->isDenormalizable($value[$key], $current)) {
                 return false;
             }
         }
 
-        return !$context->config->shouldRejectExtraFields
+        return !$context->config->rejectExtraFields
             || \array_diff_key($value, $this->keys) === [];
     }
 
@@ -161,7 +162,7 @@ final class ClassType implements TypeInterface
 
             $input = $value;
             $value = $context->coercers->array->coerce($input)
-                ?? throw InvalidValueException::becauseInvalidType($this->metadata->name, $input)
+                ?? throw InvalidValueException::becauseInvalidType($input)
                     ->withTemplate($this->metadata->typeErrorMessage);
 
             $object = $accessor->instantiator->instantiate($value);
@@ -207,7 +208,11 @@ final class ClassType implements TypeInterface
                 if ($default === null) {
                     InvalidValueException::collect(
                         $violations,
-                        InvalidValueException::becauseFieldIsMissing($key, new PropertySegment($key))
+                        InvalidValueException::becauseFieldIsMissing(
+                            $key,
+                            new PropertySegment($key),
+                            $property->declared,
+                        )
                             ->withTemplate($property->metadata->undefinedErrorMessage),
                         $limit,
                     );
@@ -221,12 +226,12 @@ final class ClassType implements TypeInterface
             }
 
             $field = $value[$key];
-            $isStrict = $property->metadata->write?->isStrict;
+            $isStrict = $property->metadata->write?->strict;
 
             try {
                 $accessor->writers[$name]->write($object, $property->type->denormalize(
                     $field,
-                    $isStrict === null ? $context : $context->withStrictTypes($isStrict),
+                    $isStrict === null ? $context : $context->withStrict($isStrict),
                 ));
             } catch (NotInterceptableExceptionInterface $e) {
                 throw $e;
@@ -238,13 +243,15 @@ final class ClassType implements TypeInterface
                         new PropertySegment($key),
                         $field,
                         $property->metadata->typeErrorMessage,
+                        $property->declared,
+                        $context->declaredTypes,
                     ),
                     $limit,
                 );
             }
         }
 
-        if ($context->config->shouldRejectExtraFields) {
+        if ($context->config->rejectExtraFields) {
             foreach (\array_diff_key($value, $this->keys) as $key => $field) {
                 InvalidValueException::collect(
                     $violations,
@@ -329,7 +336,7 @@ final class ClassType implements TypeInterface
     public function normalize(mixed $value, Context $context): array|\stdClass
     {
         if (!$value instanceof $this->metadata->name) {
-            throw InvalidValueException::becauseInvalidType($this->metadata->name, $value)
+            throw InvalidValueException::becauseInvalidType($value)
                 ->withTemplate($this->metadata->typeErrorMessage);
         }
 
@@ -371,6 +378,8 @@ final class ClassType implements TypeInterface
                     new PropertySegment($key),
                     $field,
                     $property->metadata->typeErrorMessage,
+                    $property->declared,
+                    $context->declaredTypes,
                 );
             }
         }
@@ -385,7 +394,7 @@ final class ClassType implements TypeInterface
             throw InvalidValueException::becauseValueIsRejected($e, $object);
         }
 
-        if ($this->metadata->isNormalizeAsArray ?? $context->config->isObjectAsArray) {
+        if ($this->metadata->normalizeAsArray ?? $context->config->normalizeAsArray) {
             return $result;
         }
 

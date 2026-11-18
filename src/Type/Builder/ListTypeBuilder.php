@@ -27,9 +27,9 @@ use TypeLang\Type\TypeNode;
  * );
  * ```
  *
- * @template-implements TypeBuilderInterface<list<mixed>>
+ * @template-implements CompositeTypeBuilderInterface<list<mixed>>
  */
-final class ListTypeBuilder implements TypeBuilderInterface
+final class ListTypeBuilder implements CompositeTypeBuilderInterface
 {
     private readonly NamedTypePattern $pattern;
 
@@ -55,16 +55,35 @@ final class ListTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $item = $arguments['T'] ?? new NamedTypeNode(new Name('mixed'));
-
-        $name = $context->printer->print($node);
-
-        $type = new ListType($context->types->getType($item), $name);
+        $type = new ListType($context->types->getType($this->getItemType($arguments)));
 
         if ($this->checks === []) {
             return $type;
         }
 
-        return new RefinedType($type, $this->checks, $name);
+        return new RefinedType($type, $this->checks);
+    }
+
+    /**
+     * Returns the type of the elements at any key, {@see null} for a key:
+     * the keys of a list are its positions.
+     */
+    public function tryGetNestedType(TypeNode $node, int|string $key, bool $isKey): ?TypeNode
+    {
+        $arguments = $this->pattern->findArguments($node);
+
+        if ($arguments === null || $isKey) {
+            return null;
+        }
+
+        return $this->getItemType($arguments);
+    }
+
+    /**
+     * @param array<non-empty-string, TypeNode> $arguments
+     */
+    private function getItemType(array $arguments): TypeNode
+    {
+        return $arguments['T'] ?? new NamedTypeNode(new Name('mixed'));
     }
 }

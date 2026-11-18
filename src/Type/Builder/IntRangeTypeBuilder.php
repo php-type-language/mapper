@@ -67,7 +67,7 @@ final class IntRangeTypeBuilder implements TypeBuilderInterface
             throw TypeDefinitionException::becauseRangeIsEmpty($name);
         }
 
-        return new RefinedType($this->type, [new IntRangeCheck($min, $max)], $name);
+        return new RefinedType($this->type, [new IntRangeCheck($min, $max)]);
     }
 
     /**
@@ -89,7 +89,7 @@ final class IntRangeTypeBuilder implements TypeBuilderInterface
             $bound instanceof NamedTypeNode
             && $bound->arguments === null
             && $bound->fields === null
-            && $bound->name->toLowerString() === $open
+            && $bound->name->is($open)
         ) {
             return null;
         }

@@ -29,9 +29,9 @@ final class BackedEnumTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
-        if (!\is_a($name, \BackedEnum::class, true)) {
+        if ($name === null || !\is_a($name, \BackedEnum::class, true)) {
             return null;
         }
 

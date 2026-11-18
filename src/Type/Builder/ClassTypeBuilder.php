@@ -38,9 +38,9 @@ final class ClassTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
-        if (!\class_exists($name)) {
+        if ($name === null || !\class_exists($name)) {
             return null;
         }
 
@@ -119,6 +119,6 @@ final class ClassTypeBuilder implements TypeBuilderInterface
             throw TypeDefinitionException::becausePropertyTypeCannotBeRead($class->name, $property->name, $type->error);
         }
 
-        return new Property($property, $context->types->getType($type->type));
+        return new Property($property, $context->types->getType($type->type), $type->type);
     }
 }

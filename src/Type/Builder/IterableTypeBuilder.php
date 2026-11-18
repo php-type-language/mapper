@@ -14,9 +14,9 @@ use TypeLang\Type\TypeNode;
  * Creates the type of `iterable`, `iterable<V>` and `iterable<K, V>`: the
  * array of the same arguments that also takes a {@see \Traversable}.
  *
- * @template-implements TypeBuilderInterface<array<array-key, mixed>>
+ * @template-implements CompositeTypeBuilderInterface<array<array-key, mixed>>
  */
-final class IterableTypeBuilder implements TypeBuilderInterface
+final class IterableTypeBuilder implements CompositeTypeBuilderInterface
 {
     private readonly ArrayTypeBuilder $arrays;
 
@@ -42,5 +42,10 @@ final class IterableTypeBuilder implements TypeBuilderInterface
         }
 
         return new IterableType($array);
+    }
+
+    public function tryGetNestedType(TypeNode $node, int|string $key, bool $isKey): ?TypeNode
+    {
+        return $this->arrays->tryGetNestedType($node, $key, $isKey);
     }
 }

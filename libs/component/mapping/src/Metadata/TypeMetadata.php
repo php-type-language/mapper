@@ -31,7 +31,7 @@ final class TypeMetadata
          * Whether a value must match the type exactly, without coercion,
          * {@see null} means the mapper configuration
          */
-        public readonly ?bool $isStrict = null,
+        public readonly ?bool $strict = null,
     ) {}
 
     public static function createFromType(TypeNode $type, SourceInfo $source): self
@@ -55,13 +55,13 @@ final class TypeMetadata
         );
     }
 
-    public function withStrict(bool $isStrict): self
+    public function withStrict(bool $strict): self
     {
         return new self(
             type: $this->type,
             error: $this->error,
             source: $this->source,
-            isStrict: $isStrict,
+            strict: $strict,
         );
     }
 }

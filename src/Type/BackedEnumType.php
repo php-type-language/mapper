@@ -78,7 +78,7 @@ final class BackedEnumType implements TypeInterface
     public function denormalize(mixed $value, Context $context): \BackedEnum
     {
         return $this->cases[$this->backing->denormalize($value, $context)]
-            ?? throw InvalidValueException::becauseInvalidType($this->class, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -95,7 +95,7 @@ final class BackedEnumType implements TypeInterface
     public function normalize(mixed $value, Context $context): int|string
     {
         if (!$value instanceof $this->class) {
-            throw InvalidValueException::becauseInvalidType($this->class, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         return $value->value;

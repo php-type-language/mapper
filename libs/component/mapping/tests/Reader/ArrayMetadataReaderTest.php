@@ -89,7 +89,7 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertType('positive-int', $id->write);
         self::assertSame($file, self::printFile($id->read->source->file));
         self::assertSame('$[\'' . UserStub::class . '\'].properties.id', $id->read->source->path);
-        self::assertNull($id->read->isStrict);
+        self::assertNull($id->read->strict);
         self::assertNull($id->default);
 
         $email = self::getProperty($metadata, 'email');
@@ -97,8 +97,8 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertType('string', $email->read);
         self::assertType('non-empty-string', $email->write);
         self::assertStringEndsWith('.properties.email.write_type', (string) $email->write->source->path);
-        self::assertTrue($email->read->isStrict);
-        self::assertTrue($email->write->isStrict);
+        self::assertTrue($email->read->strict);
+        self::assertTrue($email->write->strict);
         self::assertNotNull($email->default);
         self::assertSame('unknown', $email->default->value);
         self::assertStringEndsWith('.properties.email.default', (string) $email->default->source->path);
@@ -255,7 +255,7 @@ final class ArrayMetadataReaderTest extends TestCase
         $id = self::getProperty($metadata, 'id');
 
         self::assertSame('User is expected', $metadata->typeErrorMessage);
-        self::assertFalse($metadata->isNormalizeAsArray);
+        self::assertFalse($metadata->normalizeAsArray);
         self::assertSame('Id is a number', $id->typeErrorMessage);
         self::assertSame('Id is required', $id->undefinedErrorMessage);
     }
@@ -548,10 +548,10 @@ final class ArrayMetadataReaderTest extends TestCase
         $id = self::getProperty(self::readStrictness(['read_type' => 'positive-int', 'strict' => true]), 'id');
 
         self::assertType('positive-int', $id->read);
-        self::assertTrue($id->read->isStrict);
+        self::assertTrue($id->read->strict);
         self::assertType('int', $id->write);
         self::assertNull($id->write->source->path);
-        self::assertNull($id->write->isStrict);
+        self::assertNull($id->write->strict);
     }
 
     public function testStrictnessWithWriteTypeAppliesToWriteTypeOnly(): void
@@ -559,10 +559,10 @@ final class ArrayMetadataReaderTest extends TestCase
         $id = self::getProperty(self::readStrictness(['write_type' => 'positive-int', 'strict' => true]), 'id');
 
         self::assertType('positive-int', $id->write);
-        self::assertTrue($id->write->isStrict);
+        self::assertTrue($id->write->strict);
         self::assertType('int', $id->read);
         self::assertNull($id->read->source->path);
-        self::assertNull($id->read->isStrict);
+        self::assertNull($id->read->strict);
     }
 
     public function testStrictnessWithTypeAppliesToBothTypes(): void
@@ -571,8 +571,8 @@ final class ArrayMetadataReaderTest extends TestCase
 
         self::assertType('positive-int', $id->read);
         self::assertType('positive-int', $id->write);
-        self::assertTrue($id->read->isStrict);
-        self::assertTrue($id->write->isStrict);
+        self::assertTrue($id->read->strict);
+        self::assertTrue($id->write->strict);
     }
 
     public function testStrictnessWithoutTypeAppliesToLowerTypes(): void
@@ -582,8 +582,8 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertType('int', $id->read);
         self::assertType('int', $id->write);
         self::assertNull($id->read->source->path);
-        self::assertTrue($id->read->isStrict);
-        self::assertTrue($id->write->isStrict);
+        self::assertTrue($id->read->strict);
+        self::assertTrue($id->write->strict);
     }
 
     /**

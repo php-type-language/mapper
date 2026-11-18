@@ -18,7 +18,7 @@ final class IntType implements TypeInterface
     public function isDenormalizable(mixed $value, Context $context): bool
     {
         return \is_int($value)
-            || (!$context->config->isStrict && $context->coercers->int->coerce($value) !== null);
+            || (!$context->config->strict && $context->coercers->int->coerce($value) !== null);
     }
 
     /**
@@ -30,12 +30,12 @@ final class IntType implements TypeInterface
             return $value;
         }
 
-        if (!$context->config->isStrict) {
+        if (!$context->config->strict) {
             return $context->coercers->int->coerce($value)
-                ?? throw InvalidValueException::becauseInvalidType('int', $value);
+                ?? throw InvalidValueException::becauseInvalidType($value);
         }
 
-        throw InvalidValueException::becauseInvalidType('int', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -52,6 +52,6 @@ final class IntType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidType('int', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

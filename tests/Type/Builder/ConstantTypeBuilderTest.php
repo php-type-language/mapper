@@ -44,12 +44,12 @@ final class ConstantTypeBuilderTest extends TestCase
         self::assertDenormalizationFails(
             self::STUB . '::METHOD_GET',
             'POST',
-            \sprintf('$: Value must be of type "%s::METHOD_GET", but "POST" given', self::STUB),
+            '$: Value must be of type \'GET\', but "POST" given',
         );
         self::assertDenormalizationFails(
             self::STUB . '::METHOD_*',
             'PUT',
-            \sprintf('$: Value must be of type "%s::METHOD_*", but "PUT" given', self::STUB),
+            '$: Value must be of type \'GET\'|\'POST\', but "PUT" given',
         );
     }
 
@@ -64,7 +64,7 @@ final class ConstantTypeBuilderTest extends TestCase
         self::assertDenormalizationFails(
             'TypeLang\Mapper\Tests\Stub\LEVEL_*',
             3,
-            '$: Value must be of type "TypeLang\Mapper\Tests\Stub\LEVEL_*", but 3 given',
+            '$: Value must be of type 1|2, but 3 given',
         );
     }
 

@@ -38,7 +38,7 @@ final class UnionTypeTest extends TestCase
 
     public function testRejectsValueNoTypeAccepts(): void
     {
-        self::assertDenormalizationFails('int|string', [], '$: Value must be of type "int|string", but array(0) given');
+        self::assertDenormalizationFails('int|string', [], '$: Value must be of type int|string, but array(0) given');
     }
 
     public function testStrictContextSkipsCoercion(): void
@@ -46,8 +46,8 @@ final class UnionTypeTest extends TestCase
         self::assertDenormalizationFails(
             'int|string',
             42.0,
-            '$: Value must be of type "int|string", but 42.0 given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type int|string, but 42.0 given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -59,6 +59,6 @@ final class UnionTypeTest extends TestCase
 
     public function testNormalizationRejectsValueNoTypeAccepts(): void
     {
-        self::assertNormalizationFails('int|string', 4.5, '$: Value must be of type "int|string", but 4.5 given');
+        self::assertNormalizationFails('int|string', 4.5, '$: Value must be of type int|string, but 4.5 given');
     }
 }

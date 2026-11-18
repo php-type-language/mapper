@@ -80,7 +80,7 @@ final class IntMaskTypeBuilder implements TypeBuilderInterface
             }
         }
 
-        return new RefinedType($this->type, [new IntMaskCheck($mask)], $name);
+        return new RefinedType($this->type, [new IntMaskCheck($mask)]);
     }
 
     /**

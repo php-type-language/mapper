@@ -39,10 +39,10 @@ final class LiteralTypeTest extends TestCase
      */
     public static function nonDenormalizableDataProvider(): iterable
     {
-        yield 'other integer' => ['42', 43, '$: Value must be of type "42", but 43 given'];
-        yield 'other string' => ["'active'", 'banned', '$: Value must be of type "\'active\'", but "banned" given'];
-        yield 'opposite boolean' => ['true', false, '$: Value must be of type "true", but false given'];
-        yield 'value of other type' => ['42', [], '$: Value must be of type "42", but array(0) given'];
+        yield 'other integer' => ['42', 43, '$: Value must be of type 42, but 43 given'];
+        yield 'other string' => ["'active'", 'banned', '$: Value must be of type \'active\', but "banned" given'];
+        yield 'opposite boolean' => ['true', false, '$: Value must be of type true, but false given'];
+        yield 'value of other type' => ['42', [], '$: Value must be of type 42, but array(0) given'];
     }
 
     /**
@@ -69,8 +69,8 @@ final class LiteralTypeTest extends TestCase
         self::assertDenormalizationFails(
             '42',
             '42',
-            '$: Value must be of type "42", but "42" given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type 42, but "42" given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -80,13 +80,13 @@ final class LiteralTypeTest extends TestCase
         self::assertDenormalizationFails(
             "'draft'|'published'",
             'deleted',
-            '$: Value must be of type "\'draft\'|\'published\'", but "deleted" given',
+            '$: Value must be of type \'draft\'|\'published\', but "deleted" given',
         );
     }
 
     public function testNormalizesLiteralAsIs(): void
     {
         self::assertNormalizes("'active'", 'active', 'active');
-        self::assertNormalizationFails('42', '42', '$: Value must be of type "42", but "42" given');
+        self::assertNormalizationFails('42', '42', '$: Value must be of type 42, but "42" given');
     }
 }

@@ -22,7 +22,7 @@ final class BackedEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             StatusStub::class,
             'deleted',
-            \sprintf('$: Value must be of type "%s", but "deleted" given', StatusStub::class),
+            '$: Value must be of type \'active\'|\'banned\', but "deleted" given',
         );
     }
 
@@ -36,8 +36,8 @@ final class BackedEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             LevelStub::class,
             '2',
-            '$: Value must be of type "int", but "2" given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type 1|2, but "2" given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -56,7 +56,7 @@ final class BackedEnumTypeTest extends TestCase
             AliasStatusStub::class,
             'on',
             AliasStatusStub::Enabled,
-            self::createMapper(isStrict: true),
+            self::createMapper(strict: true),
         );
     }
 
@@ -66,8 +66,8 @@ final class BackedEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             AliasPriorityStub::class,
             '10',
-            '$: Value must be of type "int", but "10" given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type 1|2, but "10" given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -81,7 +81,7 @@ final class BackedEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             AliasStatusStub::class,
             'off',
-            \sprintf('$: Value must be of type "%s", but "off" given', AliasStatusStub::class),
+            '$: Value must be of type \'enabled\'|\'disabled\', but "off" given',
         );
     }
 
@@ -90,7 +90,7 @@ final class BackedEnumTypeTest extends TestCase
         self::assertNormalizationFails(
             StatusStub::class,
             'active',
-            \sprintf('$: Value must be of type "%s", but "active" given', StatusStub::class),
+            '$: Value must be of type TypeLang\Mapper\Tests\Stub\StatusStub, but "active" given',
         );
     }
 }

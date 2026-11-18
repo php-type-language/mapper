@@ -35,10 +35,11 @@ final class DateTimeTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
         if (
-            !(\class_exists($name) || \interface_exists($name))
+            $name === null
+            || !(\class_exists($name) || \interface_exists($name))
             || !\is_a($name, \DateTimeInterface::class, true)
         ) {
             return null;
@@ -57,7 +58,6 @@ final class DateTimeTypeBuilder implements TypeBuilderInterface
                 ?? throw TypeDefinitionException::becauseTypeIsNotSupported($printed),
             string: $string,
             format: self::readFormat($node, $printed),
-            name: $printed,
         );
     }
 

@@ -23,7 +23,7 @@ final class BuildContext
         public readonly ClassAccessors $accessors,
         /**
          * Prints the canonical description of a type in one line, such as
-         * for the name of a type in messages
+         * for the type in errors of its definition
          */
         public readonly TypePrinterInterface $printer,
     ) {}

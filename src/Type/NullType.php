@@ -28,7 +28,7 @@ final class NullType implements TypeInterface
             return null;
         }
 
-        throw InvalidValueException::becauseInvalidType('null', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool

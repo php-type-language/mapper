@@ -28,11 +28,11 @@ final class FloatTypeTest extends TestCase
     {
         yield 'integer losing precision' => [
             9_007_199_254_740_993,
-            '$: Value must be of type "float", but 9007199254740993 given',
+            '$: Value must be of type float, but 9007199254740993 given',
         ];
-        yield 'padded string' => [' 4.5', '$: Value must be of type "float", but " 4.5" given'];
-        yield 'boolean' => [true, '$: Value must be of type "float", but true given'];
-        yield 'null' => [null, '$: Value must be of type "float", but null given'];
+        yield 'padded string' => [' 4.5', '$: Value must be of type float, but " 4.5" given'];
+        yield 'boolean' => [true, '$: Value must be of type float, but true given'];
+        yield 'null' => [null, '$: Value must be of type float, but null given'];
     }
 
     #[DataProvider('denormalizableDataProvider')]
@@ -52,7 +52,7 @@ final class FloatTypeTest extends TestCase
 
     public function testStrictContextAcceptsExactInteger(): void
     {
-        self::assertDenormalizes('float', 42, 42.0, self::createMapper(isStrict: true));
+        self::assertDenormalizes('float', 42, 42.0, self::createMapper(strict: true));
     }
 
     public function testStrictContextRejectsNumericString(): void
@@ -60,8 +60,8 @@ final class FloatTypeTest extends TestCase
         self::assertDenormalizationFails(
             'float',
             '4.5',
-            '$: Value must be of type "float", but "4.5" given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type float, but "4.5" given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -80,6 +80,6 @@ final class FloatTypeTest extends TestCase
     public function testNormalizesFloatAsIs(): void
     {
         self::assertNormalizes('float', 4.5, 4.5);
-        self::assertNormalizationFails('float', 4, '$: Value must be of type "float", but 4 given');
+        self::assertNormalizationFails('float', 4, '$: Value must be of type float, but 4 given');
     }
 }

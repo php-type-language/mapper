@@ -13,8 +13,8 @@ use TypeLang\Mapper\Bridge\Symfony\Profiler\MapperDataCollector;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TraceableMapper;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TraceableMetadataProvider;
 use TypeLang\Mapper\Bridge\Symfony\Profiler\TypeBuildRecorder;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Coercers;
-use TypeLang\Mapper\Context\Configuration;
 use TypeLang\Mapper\DenormalizerInterface;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\MapperInterface;
@@ -41,12 +41,15 @@ use TypeLang\Parser\TypeParser;
  *
  * @phpstan-type MapperSettingsType array{
  *     strict: bool|null,
- *     object_as_array: bool|null,
+ *     normalize_as_array: bool|null,
  *     max_violations: int<1, max>|null,
  *     reject_extra_fields: bool|null,
+ *     expected_type_depth: int<0, max>|null,
+ *     expected_type_max_fields: int<1, max>|null,
  *     naming: non-empty-string|null,
  *     types: list<non-empty-string>,
  *     decorators: list<non-empty-string>,
+ *     expanders: list<non-empty-string>,
  *     hooks: list<non-empty-string>,
  *     instantiators: list<non-empty-string>,
  *     accessors: list<non-empty-string>,
@@ -64,12 +67,15 @@ use TypeLang\Parser\TypeParser;
  * }
  * @phpstan-type BundleConfigType array{
  *     strict: bool|null,
- *     object_as_array: bool|null,
+ *     normalize_as_array: bool|null,
  *     max_violations: int<1, max>|null,
  *     reject_extra_fields: bool|null,
+ *     expected_type_depth: int<0, max>|null,
+ *     expected_type_max_fields: int<1, max>|null,
  *     naming: non-empty-string|null,
  *     types: list<non-empty-string>,
  *     decorators: list<non-empty-string>,
+ *     expanders: list<non-empty-string>,
  *     hooks: list<non-empty-string>,
  *     instantiators: list<non-empty-string>,
  *     accessors: list<non-empty-string>,
@@ -197,6 +203,7 @@ final class MapperDefinitions
         return match ($kind) {
             ExtensionKind::TypeBuilder,
             ExtensionKind::TypeDecorator,
+            ExtensionKind::TypeExpander,
             ExtensionKind::ClassHook,
             ExtensionKind::InstantiationStrategy,
             ExtensionKind::AccessStrategy => self::getMapperId($name),
@@ -331,11 +338,15 @@ final class MapperDefinitions
     {
         $this->container->register(self::getInternalId($name, 'configuration'), Configuration::class)
             ->setArguments(self::filterNulls([
-                '$isStrict' => $settings['strict'] ?? $defaults['strict'] ?? null,
-                '$isObjectAsArray' => $settings['object_as_array'] ?? $defaults['object_as_array'] ?? null,
+                '$strict' => $settings['strict'] ?? $defaults['strict'] ?? null,
+                '$normalizeAsArray' => $settings['normalize_as_array'] ?? $defaults['normalize_as_array'] ?? null,
                 '$maxViolations' => $settings['max_violations'] ?? $defaults['max_violations'] ?? null,
-                '$shouldRejectExtraFields' => $settings['reject_extra_fields']
+                '$rejectExtraFields' => $settings['reject_extra_fields']
                     ?? $defaults['reject_extra_fields']
+                    ?? null,
+                '$expectedTypeDepth' => $settings['expected_type_depth'] ?? $defaults['expected_type_depth'] ?? null,
+                '$expectedTypeMaxFields' => $settings['expected_type_max_fields']
+                    ?? $defaults['expected_type_max_fields']
                     ?? null,
             ]));
 
@@ -358,6 +369,7 @@ final class MapperDefinitions
                 '$metadata' => new Reference(self::getInternalId($name, 'metadata')),
                 '$builders' => [],
                 '$decorators' => [],
+                '$expanders' => [],
                 '$parser' => new Reference(self::PARSER_ID),
                 '$accessors' => [],
                 '$instantiators' => [],

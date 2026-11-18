@@ -43,12 +43,6 @@ final class DateTimeType implements TypeInterface
          */
         public readonly TypeInterface $string,
         /**
-         * Canonical description of the type, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
-        /**
          * Format of {@see \DateTimeInterface::format()}, {@see null} in case
          * of any string the constructor accepts and RFC 3339 on output
          *
@@ -80,7 +74,7 @@ final class DateTimeType implements TypeInterface
 
         /** @var T */
         return $this->parse($this->string->denormalize($value, $context))
-            ?? throw InvalidValueException::becauseInvalidType($this->name, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -95,7 +89,7 @@ final class DateTimeType implements TypeInterface
     public function normalize(mixed $value, Context $context): string
     {
         if (!$value instanceof $this->class) {
-            throw InvalidValueException::becauseInvalidType($this->name, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         return $value->format($this->format ?? self::DEFAULT_FORMAT);

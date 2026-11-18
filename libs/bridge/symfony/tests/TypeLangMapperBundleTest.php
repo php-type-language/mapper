@@ -14,6 +14,7 @@ use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\AccessorStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\ApiShoutTypeBuilderStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\DecimalCommaCoercerStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\DecoratorStub;
+use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\ExpanderStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\GlobalShoutTypeBuilderStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\HookStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\InstantiatorStub;
@@ -182,6 +183,7 @@ final class TypeLangMapperBundleTest extends TestCase
     public static function attributeDataProvider(): iterable
     {
         yield 'decorator' => [DecoratorStub::class, 'type_lang_mapper.mapper', '$decorators'];
+        yield 'expander' => [ExpanderStub::class, 'type_lang_mapper.mapper', '$expanders'];
         yield 'hook' => [HookStub::class, 'type_lang_mapper.mapper.api', '$hooks'];
         yield 'instantiator' => [InstantiatorStub::class, 'type_lang_mapper.mapper', '$instantiators'];
         yield 'accessor' => [AccessorStub::class, 'type_lang_mapper.mapper', '$accessors'];

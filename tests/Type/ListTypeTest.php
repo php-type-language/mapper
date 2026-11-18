@@ -26,12 +26,12 @@ final class ListTypeTest extends TestCase
 
     public function testRejectsArrayWithOtherKeys(): void
     {
-        self::assertDenormalizationFails('list<int>', ['a' => 1], '$: Value must be of type "list<int>", but array(1) given');
+        self::assertDenormalizationFails('list<int>', ['a' => 1], '$: Value must be of type list<int>, but array(1) given');
     }
 
     public function testRejectsArrayWithGapInKeys(): void
     {
-        self::assertDenormalizationFails('list<int>', [1 => 1], '$: Value must be of type "list<int>", but array(1) given');
+        self::assertDenormalizationFails('list<int>', [1 => 1], '$: Value must be of type list<int>, but array(1) given');
     }
 
     public function testRejectsObjectOfNamedKeys(): void
@@ -39,13 +39,13 @@ final class ListTypeTest extends TestCase
         self::assertDenormalizationFails(
             'list<int>',
             (object) ['a' => 1],
-            '$: Value must be of type "list<int>", but object(stdClass) given',
+            '$: Value must be of type list<int>, but object given',
         );
     }
 
     public function testRejectsInvalidElementWithItsIndex(): void
     {
-        self::assertDenormalizationFails('list<int>', [1, 'x'], '$[1]: Value must be of type "int", but "x" given');
+        self::assertDenormalizationFails('list<int>', [1, 'x'], '$[1]: Value must be of type int, but "x" given');
     }
 
     public function testDenormalizesListOfObjects(): void
@@ -61,7 +61,7 @@ final class ListTypeTest extends TestCase
         self::assertDenormalizationFails(
             'list<' . AddressStub::class . '>',
             [['city' => 'Paris'], ['city' => []]],
-            '$[1].city: Value must be of type "string", but array(0) given',
+            '$[1].city: Value must be of type string, but array(0) given',
         );
     }
 
@@ -75,11 +75,11 @@ final class ListTypeTest extends TestCase
 
     public function testNormalizationRejectsArrayWithOtherKeys(): void
     {
-        self::assertNormalizationFails('list<int>', ['a' => 1], '$: Value must be of type "list<int>", but array(1) given');
+        self::assertNormalizationFails('list<int>', ['a' => 1], '$: Value must be of type list<int>, but array(1) given');
     }
 
     public function testNormalizationRejectsInvalidElementWithItsIndex(): void
     {
-        self::assertNormalizationFails('list<int>', [1, 'x'], '$[1]: Value must be of type "int", but "x" given');
+        self::assertNormalizationFails('list<int>', [1, 'x'], '$[1]: Value must be of type int, but "x" given');
     }
 }

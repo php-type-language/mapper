@@ -6,7 +6,10 @@ namespace TypeLang\Mapper\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
+use TypeLang\Mapper\Diagnostics\Printer\Value\ShortValuePrinter;
+use TypeLang\Mapper\Diagnostics\PublicViolationFormatter;
+use TypeLang\Mapper\Diagnostics\ViolationFormatter;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Hook\ClassHookInterface;
 use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
@@ -15,6 +18,10 @@ use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
+use TypeLang\Mapper\Type\Expander\TypeExpanderInterface;
+use TypeLang\Printer\PrettyTypePrinter;
+use TypeLang\Printer\PrinterOptions;
+use TypeLang\Printer\TypePrinterInterface;
 
 /**
  * Every assertion of a conversion checks the predicate too: `isX()` must
@@ -24,16 +31,36 @@ use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
 abstract class TestCase extends BaseTestCase
 {
     /**
+     * Creates the formatter with the short values and the types in a single
+     * line, the formatter of the developer with the declared types.
+     */
+    protected static function createFormatter(bool $shouldPrintDeclaredType = false): ViolationFormatter
+    {
+        return new ViolationFormatter(new ShortValuePrinter(), self::createTypePrinter(), $shouldPrintDeclaredType);
+    }
+
+    protected static function createPublicFormatter(): PublicViolationFormatter
+    {
+        return new PublicViolationFormatter(self::createTypePrinter());
+    }
+
+    private static function createTypePrinter(): TypePrinterInterface
+    {
+        return new PrettyTypePrinter(new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX));
+    }
+
+    /**
      * @param list<TypeBuilderInterface<mixed>> $builders
      * @param list<TypeDecoratorInterface> $decorators
      * @param list<ClassHookInterface> $hooks
      * @param list<AccessStrategyInterface> $accessors
      * @param list<InstantiationStrategyInterface> $instantiators
+     * @param list<TypeExpanderInterface> $expanders
      * @param Configuration|null $config configuration of the strictness in
      *        case of {@see null}
      */
     protected static function createMapper(
-        bool $isStrict = false,
+        bool $strict = false,
         array $builders = [],
         array $decorators = [],
         array $hooks = [],
@@ -41,12 +68,14 @@ abstract class TestCase extends BaseTestCase
         array $accessors = [],
         array $instantiators = [],
         ?MetadataProviderInterface $metadata = null,
+        array $expanders = [],
     ): Mapper {
         return new Mapper(
-            config: $config ?? new Configuration(isStrict: $isStrict),
+            config: $config ?? new Configuration(strict: $strict),
             builders: $builders,
             hooks: $hooks,
             decorators: $decorators,
+            expanders: $expanders,
             accessors: $accessors,
             instantiators: $instantiators,
             metadata: $metadata,

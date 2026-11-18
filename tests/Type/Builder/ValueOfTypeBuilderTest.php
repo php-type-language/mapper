@@ -27,7 +27,7 @@ final class ValueOfTypeBuilderTest extends TestCase
         self::assertDenormalizationFails(
             $type,
             'unknown',
-            \sprintf('$: Value must be of type "value-of<%s>", but "unknown" given', StatusStub::class),
+            '$: Value must be of type \'active\'|\'banned\', but "unknown" given',
         );
     }
 

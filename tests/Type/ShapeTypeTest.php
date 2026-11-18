@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\TestCase;
 
@@ -52,19 +52,19 @@ final class ShapeTypeTest extends TestCase
      */
     public static function rejectedDataProvider(): iterable
     {
-        yield 'not an array' => ['array{a: int}', 'x', '$: Value must be of type "array{a: int}", but "x" given'];
+        yield 'not an array' => ['array{a: int}', 'x', '$: Value must be of type array{a: int}, but "x" given'];
         yield 'absent required field' => ['array{a: int}', [], '$.a: Required field "a" is missing'];
-        yield 'invalid field' => ['array{a: int}', ['a' => 'x'], '$.a: Value must be of type "int", but "x" given'];
+        yield 'invalid field' => ['array{a: int}', ['a' => 'x'], '$.a: Value must be of type int, but "x" given'];
         yield 'invalid nested field' => [
             'array{a: list<int>}',
             ['a' => [1, 'x']],
-            '$.a[1]: Value must be of type "int", but "x" given',
+            '$.a[1]: Value must be of type int, but "x" given',
         ];
-        yield 'invalid implicit field' => ['array{int}', ['x'], '$[0]: Value must be of type "int", but "x" given'];
+        yield 'invalid implicit field' => ['array{int}', ['x'], '$[0]: Value must be of type int, but "x" given'];
         yield 'invalid field of object' => [
             'object{a: int}',
             ['a' => 'x'],
-            '$.a: Value must be of type "int", but "x" given',
+            '$.a: Value must be of type int, but "x" given',
         ];
     }
 
@@ -94,7 +94,7 @@ final class ShapeTypeTest extends TestCase
 
     public function testConfigurationNormalizesObjectShapeAsStdClass(): void
     {
-        $mapper = self::createMapper(config: new Configuration(isObjectAsArray: false));
+        $mapper = self::createMapper(config: new Configuration(normalizeAsArray: false));
 
         self::assertEquals(
             (object) ['a' => 1],
@@ -111,12 +111,12 @@ final class ShapeTypeTest extends TestCase
         self::assertNormalizationFails(
             'array{a: int}',
             (object) ['a' => 1],
-            '$: Value must be of type "array{a: int}", but object(stdClass) given',
+            '$: Value must be of type array{a: int}, but object(stdClass) given',
         );
         self::assertNormalizationFails(
             'object{a: int}',
             ['a' => 1],
-            '$: Value must be of type "object{a: int}", but array(1) given',
+            '$: Value must be of type object{a: int}, but array(1) given',
         );
         self::assertNormalizationFails('array{a: int}', [], '$.a: Required field "a" is missing');
     }

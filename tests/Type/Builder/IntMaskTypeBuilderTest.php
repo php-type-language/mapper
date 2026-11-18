@@ -43,10 +43,14 @@ final class IntMaskTypeBuilderTest extends TestCase
     #[DataProvider('maskDataProvider')]
     public function testRejectsBitsOutOfMask(string $type): void
     {
-        $name = \str_replace('\\TypeLang', 'TypeLang', $type);
+        $name = 'int-mask<1, 2, 4>';
 
-        self::assertDenormalizationFails($type, 8, \sprintf('$: Value must be of type "%s" (bits of 7)', $name));
-        self::assertDenormalizationFails($type, -1, \sprintf('$: Value must be of type "%s" (bits of 7)', $name));
+        if (\str_starts_with($type, 'int-mask-of')) {
+            $name = 'int-mask-of<1|2|4>';
+        }
+
+        self::assertDenormalizationFails($type, 8, \sprintf('$: Value must be of type %s (bits of 7)', $name));
+        self::assertDenormalizationFails($type, -1, \sprintf('$: Value must be of type %s (bits of 7)', $name));
     }
 
     /**

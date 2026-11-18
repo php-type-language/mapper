@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Diagnostics\Exception;
 
-use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\Printer\Path\PathPrinterInterface;
 use TypeLang\Mapper\Diagnostics\Violation;
-use TypeLang\Mapper\Diagnostics\ViolationFormatter;
 use TypeLang\Mapper\Diagnostics\ViolationFormatterInterface;
 
 /**
@@ -36,8 +34,8 @@ abstract class ViolationException extends \RuntimeException
      */
     protected static function formatSummary(
         array $violations,
-        ViolationFormatterInterface $formatter = new ViolationFormatter(),
-        PathPrinterInterface $pathPrinter = new JsonPathPrinter(),
+        ViolationFormatterInterface $formatter,
+        PathPrinterInterface $pathPrinter,
     ): string {
         $first = $violations[0];
         $summary = $pathPrinter->print($first->path) . ': ' . $formatter->format($first);

@@ -19,9 +19,9 @@ final class HookAttributeMetadataReaderTest extends TestCase
         $property = self::readHookProperty('name');
 
         self::assertType('non-empty-string', $property->read);
-        self::assertNull($property->read->isStrict);
+        self::assertNull($property->read->strict);
         self::assertType('int|string', $property->write);
-        self::assertTrue($property->write->isStrict);
+        self::assertTrue($property->write->strict);
     }
 
     public function testGetHookAttributeSetsOnlyReadType(): void

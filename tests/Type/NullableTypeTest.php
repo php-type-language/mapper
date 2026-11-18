@@ -43,7 +43,7 @@ final class NullableTypeTest extends TestCase
     #[DataProvider('nullableDataProvider')]
     public function testRejectsValueByType(string $type): void
     {
-        self::assertDenormalizationFails($type, 'x', '$: Value must be of type "int", but "x" given');
+        self::assertDenormalizationFails($type, 'x', \sprintf('$: Value must be of type %s, but "x" given', $type));
     }
 
     public function testNormalizesNullAndValue(): void
@@ -55,7 +55,7 @@ final class NullableTypeTest extends TestCase
     public function testNullIsTypeOfItsOwn(): void
     {
         self::assertDenormalizes('null', null, null);
-        self::assertDenormalizationFails('null', 0, '$: Value must be of type "null", but 0 given');
-        self::assertNormalizationFails('null', 0, '$: Value must be of type "null", but 0 given');
+        self::assertDenormalizationFails('null', 0, '$: Value must be of type null, but 0 given');
+        self::assertNormalizationFails('null', 0, '$: Value must be of type null, but 0 given');
     }
 }

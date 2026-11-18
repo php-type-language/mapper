@@ -39,12 +39,6 @@ final class ShapeType implements TypeInterface
          */
         public readonly array $fields,
         /**
-         * Canonical description of the shape, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
-        /**
          * Type of the keys not declared, {@see null} in case of the shape is
          * sealed and drops them
          *
@@ -85,7 +79,7 @@ final class ShapeType implements TypeInterface
         }
 
         if ($this->rest === null) {
-            return !$context->config->shouldRejectExtraFields
+            return !$context->config->rejectExtraFields
                 || \array_diff_key($input, $this->keys) === [];
         }
 
@@ -106,7 +100,7 @@ final class ShapeType implements TypeInterface
     public function denormalize(mixed $value, Context $context): array|\stdClass
     {
         $input = $context->coercers->array->coerce($value)
-            ?? throw InvalidValueException::becauseInvalidType($this->name, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
 
         $result = $this->denormalizeFields($input, $context);
 
@@ -160,11 +154,11 @@ final class ShapeType implements TypeInterface
     public function normalize(mixed $value, Context $context): array|\stdClass
     {
         $input = $this->read($value)
-            ?? throw InvalidValueException::becauseInvalidType($this->name, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
 
         $result = $this->normalizeFields($input, $context);
 
-        if ($this->isObject && !$context->config->isObjectAsArray) {
+        if ($this->isObject && !$context->config->normalizeAsArray) {
             return (object) $result;
         }
 
@@ -211,7 +205,7 @@ final class ShapeType implements TypeInterface
             }
         }
 
-        if ($this->rest === null && $context->config->shouldRejectExtraFields) {
+        if ($this->rest === null && $context->config->rejectExtraFields) {
             foreach (\array_diff_key($input, $this->keys) as $key => $item) {
                 InvalidValueException::collect(
                     $violations,

@@ -11,7 +11,11 @@ use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
 use Symfony\Component\VarDumper\Cloner\Data;
 use TypeLang\Mapper\Diagnostics\Exception\ViolationException;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
+use TypeLang\Mapper\Diagnostics\Printer\Value\ShortValuePrinter;
 use TypeLang\Mapper\Diagnostics\ViolationFormatter;
+use TypeLang\Mapper\Diagnostics\ViolationFormatterInterface;
+use TypeLang\Printer\PrettyTypePrinter;
+use TypeLang\Printer\PrinterOptions;
 
 /**
  * Collects the calls of the mappers, the types they build and the metadata
@@ -219,6 +223,9 @@ final class MapperDataCollector extends DataCollector implements LateDataCollect
     }
 
     /**
+     * Returns the violations for the developer: with the declared types and
+     * the messages of their causes, such as of an error of a hook.
+     *
      * @return list<array{path: non-empty-string, message: string}>
      */
     private static function readViolations(?\Throwable $error): array
@@ -227,17 +234,36 @@ final class MapperDataCollector extends DataCollector implements LateDataCollect
             return [];
         }
 
-        $formatter = new ViolationFormatter();
+        $formatter = self::createFormatter();
         $printer = new JsonPathPrinter();
         $result = [];
 
         foreach ($error->violations as $violation) {
+            $message = $formatter->format($violation);
+
+            if ($violation->cause !== null && $violation->cause->getMessage() !== '') {
+                $message .= ': ' . $violation->cause->getMessage();
+            }
+
             $result[] = [
                 'path' => $printer->print($violation->path),
-                'message' => $formatter->format($violation),
+                'message' => $message,
             ];
         }
 
         return $result;
+    }
+
+    /**
+     * Creates the formatter for the developer: the declared types with the
+     * classes of the application in a single line.
+     */
+    private static function createFormatter(): ViolationFormatterInterface
+    {
+        return new ViolationFormatter(
+            new ShortValuePrinter(),
+            new PrettyTypePrinter(new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX)),
+            shouldPrintDeclaredType: true,
+        );
     }
 }

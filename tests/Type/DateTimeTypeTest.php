@@ -62,7 +62,7 @@ final class DateTimeTypeTest extends TestCase
         self::assertDenormalizationFails(
             $type,
             $input,
-            \sprintf('$: Value must be of type "%s", but "%s" given', $type, $input),
+            \sprintf('$: Value must be of type string, but "%s" given', $input),
         );
     }
 
@@ -72,7 +72,7 @@ final class DateTimeTypeTest extends TestCase
             self::assertDenormalizationFails(
                 $type,
                 "2021-02-03\0",
-                \sprintf('$: Value must be of type "%s", but "2021-02-03\000" given', $type),
+                '$: Value must be of type string, but "2021-02-03\000" given',
             );
         }
     }
@@ -91,7 +91,7 @@ final class DateTimeTypeTest extends TestCase
         self::assertNormalizationFails(
             'DateTimeImmutable',
             new \DateTime('2021-02-03'),
-            '$: Value must be of type "DateTimeImmutable", but object(DateTime) given',
+            '$: Value must be of type DateTimeImmutable, but object(DateTime) given',
         );
     }
 

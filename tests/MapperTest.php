@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests;
 
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\ViolationFormatter;
 use TypeLang\Mapper\Exception\InvalidValueException;
@@ -94,7 +94,7 @@ final class MapperTest extends TestCase
     public function testStrictModeSkipsCoercersOfScalars(): void
     {
         $mapper = new Mapper(
-            config: new Configuration(isStrict: true),
+            config: new Configuration(strict: true),
             coercers: ['float' => new DecimalCommaCoercerStub()],
         );
 
@@ -159,7 +159,7 @@ final class MapperTest extends TestCase
     public function testStrictConfigurationDisablesCoercion(): void
     {
         $error = self::captureThrowable(
-            static fn(): mixed => (new Mapper(new Configuration(isStrict: true)))->denormalize('42', 'int'),
+            static fn(): mixed => (new Mapper(new Configuration(strict: true)))->denormalize('42', 'int'),
         );
 
         self::assertInstanceOf(InvalidValueException::class, $error);
@@ -230,7 +230,7 @@ final class MapperTest extends TestCase
 
     public function testAliasIsNotExtraField(): void
     {
-        $mapper = new Mapper(new Configuration(shouldRejectExtraFields: true));
+        $mapper = new Mapper(new Configuration(rejectExtraFields: true));
 
         $object = $mapper->denormalize(['mail' => 'a@b.c', 'login' => 'John'], AliasedStub::class);
 
@@ -262,7 +262,7 @@ final class MapperTest extends TestCase
 
     public function testRejectsExtraFieldsOfClassesAndSealedShapes(): void
     {
-        $mapper = new Mapper(new Configuration(maxViolations: 10, shouldRejectExtraFields: true));
+        $mapper = new Mapper(new Configuration(maxViolations: 10, rejectExtraFields: true));
         $data = ['city' => 'Paris', 'zip' => 1, '' => 2, "a\nb" => 3];
 
         self::assertFalse($mapper->isDenormalizable($data, AddressStub::class));
@@ -272,7 +272,7 @@ final class MapperTest extends TestCase
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame(['$.zip', "$['']", "$['a\\nb']"], self::printPaths($error));
         self::assertStringStartsWith('$.zip: Unexpected field "zip"', $error->getMessage());
-        self::assertSame('Unexpected field "a\nb"', (new ViolationFormatter())->format($error->violations[2]));
+        self::assertSame('Unexpected field "a\nb"', self::createFormatter()->format($error->violations[2]));
 
         self::assertFalse($mapper->isDenormalizable(['a' => 1, 'b' => 2], 'array{a: int}'));
         self::assertTrue($mapper->isDenormalizable(['a' => 1, 'b' => 2], 'array{a: int, ...}'));
@@ -287,7 +287,7 @@ final class MapperTest extends TestCase
 
     public function testTagOfBaseIsNotExtraFieldOfItsClass(): void
     {
-        $mapper = new Mapper(new Configuration(shouldRejectExtraFields: true));
+        $mapper = new Mapper(new Configuration(rejectExtraFields: true));
         $data = ['type' => 'circle', 'radius' => 1];
 
         self::assertInstanceOf(CircleStub::class, $mapper->denormalize($data, ShapeStub::class));

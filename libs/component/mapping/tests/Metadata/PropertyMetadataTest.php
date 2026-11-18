@@ -35,8 +35,8 @@ final class PropertyMetadataTest extends TestCase
     {
         $type = self::createType('int');
 
-        self::assertNull($type->isStrict);
-        self::assertTrue($type->withStrict(true)->isStrict);
+        self::assertNull($type->strict);
+        self::assertTrue($type->withStrict(true)->strict);
         self::assertSame($type->type, $type->withStrict(true)->type);
     }
 

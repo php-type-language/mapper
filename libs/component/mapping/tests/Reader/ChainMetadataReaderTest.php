@@ -116,8 +116,8 @@ final class ChainMetadataReaderTest extends TestCase
 
         $value = self::getProperty($metadata, 'value');
         self::assertType('string', $value->read);
-        self::assertNull($value->read->isStrict);
-        self::assertNull($value->write?->isStrict);
+        self::assertNull($value->read->strict);
+        self::assertNull($value->write?->strict);
     }
 
     public function testStrictnessWithoutTypeIsAppliedToLowerTypes(): void
@@ -136,18 +136,18 @@ final class ChainMetadataReaderTest extends TestCase
 
         $id = self::getProperty($metadata, 'id');
         self::assertType('int', $id->read);
-        self::assertTrue($id->read->isStrict);
-        self::assertTrue($id->write?->isStrict);
+        self::assertTrue($id->read->strict);
+        self::assertTrue($id->write?->strict);
 
         $accounts = self::getProperty($metadata, 'accounts');
         self::assertType('list<' . UserStub::class . '>', $accounts->read);
-        self::assertTrue($accounts->read->isStrict);
-        self::assertTrue($accounts->write?->isStrict);
+        self::assertTrue($accounts->read->strict);
+        self::assertTrue($accounts->write?->strict);
 
         $value = self::getProperty($metadata, 'value');
         self::assertType('int', $value->read);
-        self::assertFalse($value->read->isStrict);
-        self::assertFalse($value->write?->isStrict);
+        self::assertFalse($value->read->strict);
+        self::assertFalse($value->write?->strict);
     }
 
     public function testUnparsableDocBlockTypeOverriddenByAttributeIsNotError(): void

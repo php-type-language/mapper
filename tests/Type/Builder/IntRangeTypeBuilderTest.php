@@ -19,7 +19,7 @@ final class IntRangeTypeBuilderTest extends TestCase
     public function testBoundsAreChecked(): void
     {
         self::assertDenormalizes('int<-5, max>', -5, -5);
-        self::assertDenormalizationFails('int<-5, max>', -6, '$: Value must be of type "int<-5, max>" (>= -5)');
+        self::assertDenormalizationFails('int<-5, max>', -6, '$: Value must be of type int<-5, max> (>= -5)');
     }
 
     /**

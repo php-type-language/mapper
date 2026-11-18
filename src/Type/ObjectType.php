@@ -23,7 +23,7 @@ final class ObjectType implements TypeInterface
          */
         public readonly TypeInterface $input,
         /**
-         * Type selecting the type of an object by its class
+         * Type selecting the type of object by its class
          *
          * @var TypeInterface<mixed>
          */
@@ -60,7 +60,7 @@ final class ObjectType implements TypeInterface
     public function normalize(mixed $value, Context $context): mixed
     {
         if (!\is_object($value)) {
-            throw InvalidValueException::becauseInvalidType('object', $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         return $this->output->normalize($value, $context);

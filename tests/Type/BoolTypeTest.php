@@ -28,11 +28,11 @@ final class BoolTypeTest extends TestCase
      */
     public static function nonDenormalizableDataProvider(): iterable
     {
-        yield 'two' => [2, '$: Value must be of type "bool", but 2 given'];
-        yield 'float one' => [1.0, '$: Value must be of type "bool", but 1.0 given'];
-        yield 'empty string' => ['', '$: Value must be of type "bool", but "" given'];
-        yield 'ambiguous word' => ['y', '$: Value must be of type "bool", but "y" given'];
-        yield 'null' => [null, '$: Value must be of type "bool", but null given'];
+        yield 'two' => [2, '$: Value must be of type bool, but 2 given'];
+        yield 'float one' => [1.0, '$: Value must be of type bool, but 1.0 given'];
+        yield 'empty string' => ['', '$: Value must be of type bool, but "" given'];
+        yield 'ambiguous word' => ['y', '$: Value must be of type bool, but "y" given'];
+        yield 'null' => [null, '$: Value must be of type bool, but null given'];
     }
 
     #[DataProvider('denormalizableDataProvider')]
@@ -55,8 +55,8 @@ final class BoolTypeTest extends TestCase
         self::assertDenormalizationFails(
             'bool',
             1,
-            '$: Value must be of type "bool", but 1 given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type bool, but 1 given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -68,6 +68,6 @@ final class BoolTypeTest extends TestCase
     public function testNormalizesBooleanAsIs(): void
     {
         self::assertNormalizes('bool', false, false);
-        self::assertNormalizationFails('bool', 1, '$: Value must be of type "bool", but 1 given');
+        self::assertNormalizationFails('bool', 1, '$: Value must be of type bool, but 1 given');
     }
 }

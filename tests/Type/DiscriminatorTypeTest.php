@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
@@ -69,7 +69,7 @@ final class DiscriminatorTypeTest extends TestCase
         self::assertDenormalizationFails(
             ShapeStub::class,
             ['type' => 'triangle'],
-            '$.type: Value must be of type "\'circle\'|\'square\'|\'group\'", but "triangle" given',
+            '$.type: Value must be of type \'circle\'|\'square\'|\'group\', but "triangle" given',
         );
     }
 
@@ -78,7 +78,7 @@ final class DiscriminatorTypeTest extends TestCase
         self::assertDenormalizationFails(
             ShapeStub::class,
             ['type' => 'group', 'children' => [['type' => 'circle', 'radius' => 'x']]],
-            '$.children[0].radius: Value must be of type "int", but "x" given',
+            '$.children[0].radius: Value must be of type int, but "x" given',
         );
     }
 
@@ -114,7 +114,7 @@ final class DiscriminatorTypeTest extends TestCase
 
     public function testTagIsAddedToObjectNormalizedAsStdClass(): void
     {
-        $mapper = self::createMapper(config: new Configuration(isObjectAsArray: false));
+        $mapper = self::createMapper(config: new Configuration(normalizeAsArray: false));
 
         self::assertEquals(
             (object) ['type' => 'circle', 'radius' => 1],
@@ -159,7 +159,7 @@ final class DiscriminatorTypeTest extends TestCase
         self::assertDenormalizationFails(
             ShapeStub::class,
             'x',
-            \sprintf('$: Value must be of type "%s", but "x" given', ShapeStub::class),
+            '$: Value must be of type object, but "x" given',
         );
     }
 
@@ -168,7 +168,7 @@ final class DiscriminatorTypeTest extends TestCase
         self::assertNormalizationFails(
             ShapeStub::class,
             new AddressStub(),
-            \sprintf('$: Value must be of type "%s", but object(%s) given', ShapeStub::class, AddressStub::class),
+            '$: Value must be of type TypeLang\Mapper\Tests\Stub\Shape\ShapeStub, but object(TypeLang\Mapper\Tests\Stub\AddressStub) given',
         );
     }
 

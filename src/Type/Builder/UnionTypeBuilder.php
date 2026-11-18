@@ -64,12 +64,11 @@ final class UnionTypeBuilder implements TypeBuilderInterface
             $types[] = $others[] = $context->types->getType(new NullLiteralNode());
         }
 
-        $name = $context->printer->print($node);
         $coercionOrder = [...$others, ...$strings];
 
         \assert($types !== [] && $coercionOrder !== []);
 
-        return new UnionType($types, $name, $coercionOrder);
+        return new UnionType($types, $coercionOrder);
     }
 
     /**

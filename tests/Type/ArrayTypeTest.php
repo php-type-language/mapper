@@ -20,7 +20,7 @@ final class ArrayTypeTest extends TestCase
 
     public function testStringKeyTypeAcceptsKeyTurnedIntoIntegerByPhp(): void
     {
-        self::assertDenormalizes('array<string, int>', ['1' => 2], [1 => 2], self::createMapper(isStrict: true));
+        self::assertDenormalizes('array<string, int>', ['1' => 2], [1 => 2], self::createMapper(strict: true));
     }
 
     public function testRejectsInvalidKeyWithItsPath(): void
@@ -28,7 +28,7 @@ final class ArrayTypeTest extends TestCase
         self::assertDenormalizationFails(
             'array<int, string>',
             ['a' => 'x'],
-            '$.a: Key must be of type "int", but "a" given',
+            '$.a: Key must be of type int, but "a" given',
         );
     }
 
@@ -37,7 +37,7 @@ final class ArrayTypeTest extends TestCase
         self::assertDenormalizationFails(
             'array<string, int>',
             ['a' => 1, 'b' => 'x'],
-            '$.b: Value must be of type "int", but "x" given',
+            '$.b: Value must be of type int, but "x" given',
         );
     }
 
@@ -58,7 +58,7 @@ final class ArrayTypeTest extends TestCase
 
     public function testRejectsValueThatIsNotArray(): void
     {
-        self::assertDenormalizationFails('array<int>', 'x', '$: Value must be of type "array<int>", but "x" given');
+        self::assertDenormalizationFails('array<int>', 'x', '$: Value must be of type array<int>, but "x" given');
     }
 
     public function testNormalizesEachElementKeepingKeys(): void
@@ -71,7 +71,7 @@ final class ArrayTypeTest extends TestCase
         self::assertNormalizationFails(
             'array<string, int>',
             [5 => 1],
-            '$[5]: Key must be of type "string", but 5 given',
+            '$[5]: Key must be of type string, but 5 given',
         );
     }
 
@@ -80,19 +80,19 @@ final class ArrayTypeTest extends TestCase
         self::assertNormalizationFails(
             'array<string, int>',
             ['a' => 1, 'b' => 'x'],
-            '$.b: Value must be of type "int", but "x" given',
+            '$.b: Value must be of type int, but "x" given',
         );
     }
 
     public function testNormalizationRejectsValueThatIsNotArray(): void
     {
-        self::assertNormalizationFails('array<int>', 'x', '$: Value must be of type "array<int>", but "x" given');
+        self::assertNormalizationFails('array<int>', 'x', '$: Value must be of type array<int>, but "x" given');
     }
 
     public function testArrayKeyIsIntegerOrString(): void
     {
         self::assertDenormalizes('array-key', 5, 5);
         self::assertDenormalizes('array-key', 'a', 'a');
-        self::assertDenormalizationFails('array-key', 1.5, '$: Value must be of type "array-key", but 1.5 given');
+        self::assertDenormalizationFails('array-key', 1.5, '$: Value must be of type array-key, but 1.5 given');
     }
 }

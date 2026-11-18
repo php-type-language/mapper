@@ -19,7 +19,7 @@ final class UnitEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             SuitStub::class,
             'spades',
-            \sprintf('$: Value must be of type "%s", but "spades" given', SuitStub::class),
+            '$: Value must be of type \'Hearts\'|\'Spades\', but "spades" given',
         );
     }
 
@@ -28,8 +28,8 @@ final class UnitEnumTypeTest extends TestCase
         self::assertDenormalizationFails(
             SuitStub::class,
             42,
-            '$: Value must be of type "string", but 42 given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type \'Hearts\'|\'Spades\', but 42 given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -44,7 +44,7 @@ final class UnitEnumTypeTest extends TestCase
         self::assertNormalizationFails(
             SuitStub::class,
             'Hearts',
-            \sprintf('$: Value must be of type "%s", but "Hearts" given', SuitStub::class),
+            '$: Value must be of type TypeLang\Mapper\Tests\Stub\SuitStub, but "Hearts" given',
         );
     }
 }

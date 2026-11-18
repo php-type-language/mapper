@@ -63,7 +63,7 @@ final class ClassMetadata
      *
      * @phpstan-readonly-allow-private-mutation
      */
-    public ?bool $isNormalizeAsArray = null;
+    public ?bool $normalizeAsArray = null;
 
     /**
      * Naming strategy of the properties without an explicit name,
@@ -150,10 +150,10 @@ final class ClassMetadata
     /**
      * @return self<T>
      */
-    public function withNormalizeAsArray(bool $isNormalizeAsArray): self
+    public function withNormalizeAsArray(bool $normalizeAsArray): self
     {
         $self = clone $this;
-        $self->isNormalizeAsArray = $isNormalizeAsArray;
+        $self->normalizeAsArray = $normalizeAsArray;
 
         return $self;
     }

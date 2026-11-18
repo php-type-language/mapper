@@ -28,9 +28,9 @@ final class UnitEnumTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
-        if (!\enum_exists($name) || \is_a($name, \BackedEnum::class, true)) {
+        if ($name === null || !\enum_exists($name) || \is_a($name, \BackedEnum::class, true)) {
             return null;
         }
 

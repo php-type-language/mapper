@@ -19,7 +19,7 @@ final class FloatType implements TypeInterface
     public function isDenormalizable(mixed $value, Context $context): bool
     {
         return \is_float($value)
-            || ((\is_int($value) || !$context->config->isStrict) && $context->coercers->float->coerce($value) !== null);
+            || ((\is_int($value) || !$context->config->strict) && $context->coercers->float->coerce($value) !== null);
     }
 
     /**
@@ -31,12 +31,12 @@ final class FloatType implements TypeInterface
             return $value;
         }
 
-        if (\is_int($value) || !$context->config->isStrict) {
+        if (\is_int($value) || !$context->config->strict) {
             return $context->coercers->float->coerce($value)
-                ?? throw InvalidValueException::becauseInvalidType('float', $value);
+                ?? throw InvalidValueException::becauseInvalidType($value);
         }
 
-        throw InvalidValueException::becauseInvalidType('float', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -53,6 +53,6 @@ final class FloatType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidType('float', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

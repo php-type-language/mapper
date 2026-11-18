@@ -17,7 +17,6 @@ use TypeLang\Mapper\Type\Check\CheckInterface;
  * $type = new RefinedType(
  *     type: new StringType(),
  *     checks: [new NonEmptyCheck()],
- *     name: 'non-empty-string',
  * );
  *
  * $type->denormalize('', $context); // InvalidValueException
@@ -39,12 +38,6 @@ final class RefinedType implements TypeInterface
          * @var non-empty-list<CheckInterface>
          */
         public readonly array $checks,
-        /**
-         * Name of the type in messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
     ) {}
 
     public function isDenormalizable(mixed $value, Context $context): bool
@@ -75,7 +68,7 @@ final class RefinedType implements TypeInterface
 
         foreach ($this->checks as $check) {
             if (!$check->isValid($result)) {
-                throw InvalidValueException::becauseCheckFailed($this->name, $check->description, $value);
+                throw InvalidValueException::becauseCheckFailed($check->description, $value);
             }
         }
 

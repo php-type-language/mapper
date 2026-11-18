@@ -9,6 +9,7 @@ use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMetadata;
+use TypeLang\Mapper\Type\Extractor\LiteralTypeExtractor;
 
 /**
  * Polymorphic class: the tag in the field of the data selects the type the
@@ -82,7 +83,7 @@ final class DiscriminatorType implements TypeInterface
     public function denormalize(mixed $value, Context $context): object
     {
         $data = $context->coercers->array->coerce($value)
-            ?? throw InvalidValueException::becauseInvalidType($this->metadata->name, $value)
+            ?? throw InvalidValueException::becauseInvalidType($value)
                 ->withTemplate($this->metadata->typeErrorMessage);
 
         $type = $this->findType($data) ?? throw $this->createTagException($data);
@@ -116,7 +117,7 @@ final class DiscriminatorType implements TypeInterface
     public function normalize(mixed $value, Context $context): mixed
     {
         if (!$value instanceof $this->metadata->name) {
-            throw InvalidValueException::becauseInvalidType($this->metadata->name, $value)
+            throw InvalidValueException::becauseInvalidType($value)
                 ->withTemplate($this->metadata->typeErrorMessage);
         }
 
@@ -124,7 +125,7 @@ final class DiscriminatorType implements TypeInterface
 
         if ($tag === null) {
             if ($this->default === null) {
-                throw InvalidValueException::becauseInvalidType($this->getExpectedClasses(), $value)
+                throw InvalidValueException::becauseInvalidType($value)
                     ->withTemplate($this->metadata->typeErrorMessage);
             }
 
@@ -201,32 +202,13 @@ final class DiscriminatorType implements TypeInterface
             return InvalidValueException::becauseFieldIsMissing($field, new PropertySegment($field));
         }
 
-        $expected = [];
-
-        foreach ($this->types as $tag => $_) {
-            $expected[] = \var_export($tag, true);
-        }
+        $declared = LiteralTypeExtractor::extractAll(\array_keys($this->types));
 
         return InvalidValueException::wrapWithPath(
-            InvalidValueException::becauseInvalidType(\implode('|', $expected), $data[$field]),
+            InvalidValueException::becauseInvalidType($data[$field], $declared),
             new PropertySegment($field),
             $data[$field],
         );
-    }
-
-    /**
-     * Returns the classes of the map, the base class in case of the map has
-     * no classes.
-     *
-     * @return non-empty-string
-     */
-    private function getExpectedClasses(): string
-    {
-        if ($this->tags === []) {
-            return $this->metadata->name;
-        }
-
-        return \implode('|', \array_keys($this->tags));
     }
 
     private function getDiscriminator(): DiscriminatorMetadata

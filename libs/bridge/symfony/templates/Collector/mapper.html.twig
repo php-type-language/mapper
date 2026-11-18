@@ -99,32 +99,34 @@
                 {% if collector.calls is empty %}
                     <div class="empty"><p>No mapper was called.</p></div>
                 {% else %}
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Mapper</th>
-                                <th>Call</th>
-                                <th>Time</th>
-                                <th>Input</th>
-                                <th>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for call in collector.calls %}
-                                <tr class="{{ call.error ? 'status-error' }}">
-                                    <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
-                                    <td class="nowrap">{{ call.mapper }}</td>
-                                    <td>
+                    {% for call in collector.calls %}
+                        <table class="{{ call.error ? 'status-error' }}">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        <span class="text-muted">#{{ loop.index }}</span>
                                         <code>{{ call.method }}({{ call.type ?? 'mixed' }})</code>
+                                        <span class="text-small text-muted">
+                                            on <strong>{{ call.mapper }}</strong>
+                                            in {{ '%0.2f'|format(call.duration) }} ms
+                                        </span>
                                         {% if call.file %}
-                                            <div class="text-small text-muted">
+                                            <div class="text-small font-normal">
                                                 <a href="{{ call.file|file_link(call.line) }}">{{ call.file|file_relative|default(call.file) }}:{{ call.line }}</a>
                                             </div>
                                         {% endif %}
-                                    </td>
-                                    <td class="nowrap">{{ '%0.2f'|format(call.duration) }} ms</td>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row" class="font-normal text-small text-muted" style="width: 80px">Input</th>
                                     <td>{{ profiler_dump(call.input, maxDepth=1) }}</td>
+                                </tr>
+                                <tr class="{{ call.error ? 'status-error' }}">
+                                    <th scope="row" class="font-normal text-small text-muted" style="width: 80px">
+                                        {{ call.error ? 'Error' : 'Result' }}
+                                    </th>
                                     <td>
                                         {% if call.error %}
                                             <strong>{{ call.error.class|abbr_class }}</strong>
@@ -142,9 +144,9 @@
                                         {% endif %}
                                     </td>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    {% endfor %}
                 {% endif %}
             </div>
         </div>

@@ -30,18 +30,6 @@ final class ArrayType implements TypeInterface
          * @var TypeInterface<TValue>
          */
         public readonly TypeInterface $value,
-        /**
-         * Canonical description of the array, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $name,
-        /**
-         * Canonical description of the key type, for messages
-         *
-         * @var non-empty-string
-         */
-        public readonly string $keyName,
     ) {}
 
     public function isDenormalizable(mixed $value, Context $context): bool
@@ -52,7 +40,7 @@ final class ArrayType implements TypeInterface
             return false;
         }
 
-        $keys = $context->withStrictTypes(false);
+        $keys = $context->withStrict(false);
 
         foreach ($value as $key => $item) {
             if (!$this->key->isDenormalizable($key, $keys) || !$this->value->isDenormalizable($item, $context)) {
@@ -71,10 +59,10 @@ final class ArrayType implements TypeInterface
     public function denormalize(mixed $value, Context $context): array
     {
         $input = $context->coercers->array->coerce($value)
-            ?? throw InvalidValueException::becauseInvalidType($this->name, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
 
         $limit = $context->config->maxViolations;
-        $keys = $context->withStrictTypes(false);
+        $keys = $context->withStrict(false);
         $isAnyKey = $this->key instanceof ArrayKeyType;
         $result = [];
         $violations = [];
@@ -92,7 +80,7 @@ final class ArrayType implements TypeInterface
             } catch (\Exception) {
                 InvalidValueException::collect(
                     $violations,
-                    InvalidValueException::becauseInvalidKey($this->keyName, $key),
+                    InvalidValueException::becauseInvalidKey($key),
                     $limit,
                 );
 
@@ -142,14 +130,14 @@ final class ArrayType implements TypeInterface
     public function normalize(mixed $value, Context $context): array
     {
         if (!\is_array($value)) {
-            throw InvalidValueException::becauseInvalidType($this->name, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         $result = [];
 
         foreach ($value as $key => $item) {
             if (!$this->key->isNormalizable($key, $context)) {
-                throw InvalidValueException::becauseInvalidKey($this->keyName, $key);
+                throw InvalidValueException::becauseInvalidKey($key);
             }
 
             try {

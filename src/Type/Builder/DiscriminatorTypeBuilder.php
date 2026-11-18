@@ -43,9 +43,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
-        if (!\class_exists($name) && !\interface_exists($name)) {
+        if ($name === null || (!\class_exists($name) && !\interface_exists($name))) {
             return null;
         }
 
@@ -135,9 +135,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \ltrim($node->name->toString(), '\\');
+        $name = $node->name->toClassString();
 
-        if (!\class_exists($name) && !\interface_exists($name)) {
+        if ($name === null || (!\class_exists($name) && !\interface_exists($name))) {
             return null;
         }
 

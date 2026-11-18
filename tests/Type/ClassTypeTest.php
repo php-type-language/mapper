@@ -6,7 +6,7 @@ namespace TypeLang\Mapper\Tests\Type;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Instantiator\Exception\ClassNotInstantiableException;
@@ -74,7 +74,7 @@ final class ClassTypeTest extends TestCase
             UserStub::class,
             (object) ['id' => 7, 'name' => 'John', 'address' => (object) ['city' => 'Paris'], 'code' => 5],
             self::createUser(id: 7, name: 'John', address: self::createAddress('Paris'), code: 5),
-            self::createMapper(isStrict: true),
+            self::createMapper(strict: true),
         );
     }
 
@@ -86,11 +86,7 @@ final class ClassTypeTest extends TestCase
         self::assertDenormalizationFails(
             AddressStub::class,
             $input,
-            \sprintf(
-                '$: Value must be of type "%s", but object(%s) given',
-                AddressStub::class,
-                StdClassChildStub::class,
-            ),
+            '$: Value must be of type object{city: string}, but object given',
         );
     }
 
@@ -222,16 +218,16 @@ final class ClassTypeTest extends TestCase
         self::assertDenormalizationFails(
             UserStub::class,
             ['id' => 7, 'name' => 'John', 'address' => ['city' => []], 'code' => 5],
-            '$.address.city: Value must be of type "string", but array(0) given',
+            '$.address.city: Value must be of type string, but array(0) given',
         );
     }
 
     public function testRejectsValueThatIsNotArrayOrObject(): void
     {
         self::assertDenormalizationFails(
-            UserStub::class,
+            AddressStub::class,
             'x',
-            \sprintf('$: Value must be of type "%s", but "x" given', UserStub::class),
+            '$: Value must be of type object{city: string}, but "x" given',
         );
     }
 
@@ -258,7 +254,7 @@ final class ClassTypeTest extends TestCase
         self::assertDenormalizationFails(
             NodeStub::class,
             ['name' => 'a', 'next' => ['name' => 'b', 'next' => 'x']],
-            \sprintf('$.next.next: Value must be of type "%s", but "x" given', NodeStub::class),
+            '$.next.next: Value must be of type ?object{name: string, next: ?object}, but "x" given',
         );
     }
 
@@ -349,7 +345,7 @@ final class ClassTypeTest extends TestCase
         self::assertDenormalizationFails(
             AliasedStub::class,
             ['mail' => 'a@b.c', 'name' => 'John', 'years' => 'old'],
-            '$.years: Value must be of type "int", but "old" given',
+            '$.years: Value must be of type int, but "old" given',
         );
         self::assertDenormalizationFails(
             AliasedStub::class,
@@ -441,12 +437,12 @@ final class ClassTypeTest extends TestCase
             StrictnessStub::class,
             ['strict' => 1, 'loose' => '2'],
             $expected,
-            self::createMapper(isStrict: true),
+            self::createMapper(strict: true),
         );
         self::assertDenormalizationFails(
             StrictnessStub::class,
             ['strict' => '1', 'loose' => 2],
-            '$.strict: Value must be of type "int", but "1" given',
+            '$.strict: Value must be of type int, but "1" given',
         );
     }
 
@@ -469,7 +465,7 @@ final class ClassTypeTest extends TestCase
         self::assertNormalizationFails(
             UserStub::class,
             $user,
-            '$.code: Value must be of type "int|string", but 1.5 given',
+            '$.code: Value must be of type int|string, but 1.5 given',
         );
     }
 
@@ -517,7 +513,7 @@ final class ClassTypeTest extends TestCase
         self::assertNormalizationFails(
             MessageStub::class,
             new AddressStub(),
-            \sprintf('$: Person is expected, object(%s) given', AddressStub::class),
+            '$: Person is expected, object(TypeLang\Mapper\Tests\Stub\AddressStub) given',
         );
     }
 
@@ -546,7 +542,7 @@ final class ClassTypeTest extends TestCase
         $address = self::createAddress('Paris');
 
         foreach ([false, true] as $isStrict) {
-            $mapper = self::createMapper(config: new Configuration(isStrict: $isStrict, isObjectAsArray: false));
+            $mapper = self::createMapper(config: new Configuration(strict: $isStrict, normalizeAsArray: false));
 
             self::assertEquals((object) ['city' => 'Paris'], $mapper->normalize($address, AddressStub::class));
         }
@@ -721,7 +717,8 @@ final class ClassTypeTest extends TestCase
         $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize($value, UserStub::class));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
-        self::assertSame('$.address: City is not served', $error->getMessage());
+        self::assertSame('$.address: Value array(1) is rejected', $error->getMessage());
+        self::assertInstanceOf(\InvalidArgumentException::class, $error->violations[0]->cause);
     }
 
     public function testErrorOfProgramPassesThroughCompositeAsIs(): void
@@ -740,7 +737,7 @@ final class ClassTypeTest extends TestCase
         self::assertNormalizationFails(
             UserStub::class,
             self::createAddress('Paris'),
-            \sprintf('$: Value must be of type "%s", but object(%s) given', UserStub::class, AddressStub::class),
+            '$: Value must be of type TypeLang\Mapper\Tests\Stub\UserStub, but object(TypeLang\Mapper\Tests\Stub\AddressStub) given',
         );
     }
 
@@ -792,7 +789,7 @@ final class ClassTypeTest extends TestCase
         $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(['city' => 'Paris'], AddressStub::class));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
-        self::assertSame('$: a', $error->getMessage());
+        self::assertSame('$: Value array(1) is rejected', $error->getMessage());
         self::assertInstanceOf(\DomainException::class, $error->getPrevious());
 
         $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize(
@@ -801,7 +798,8 @@ final class ClassTypeTest extends TestCase
         ));
 
         self::assertInstanceOf(InvalidValueException::class, $error);
-        self::assertSame('$: b', $error->getMessage());
+        self::assertSame('$: Value array(4) is rejected', $error->getMessage());
+        self::assertInstanceOf(\DomainException::class, $error->getPrevious());
     }
 
     public function testMessageOfPropertyReplacesMessagesOfItsValueOnly(): void

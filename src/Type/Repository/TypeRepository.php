@@ -12,8 +12,6 @@ use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
-use TypeLang\Printer\PrettyTypePrinter;
-use TypeLang\Printer\PrinterOptions;
 use TypeLang\Printer\TypePrinterInterface;
 use TypeLang\Type\TypeNode;
 
@@ -21,7 +19,7 @@ use TypeLang\Type\TypeNode;
  * Builds types by the first builder supporting the node, wraps them by the
  * decorators and keeps them.
  */
-final class TypeRepository implements TypeRepositoryInterface
+final class TypeRepository implements InspectableTypeRepositoryInterface
 {
     private readonly BuildContext $build;
 
@@ -29,6 +27,20 @@ final class TypeRepository implements TypeRepositoryInterface
      * @var array<string, TypeInterface<mixed>>
      */
     private array $types = [];
+
+    /**
+     * Types as they are built by the keys of the types the decorators change
+     *
+     * @var array<string, TypeInterface<mixed>>
+     */
+    private array $undecorated = [];
+
+    /**
+     * Builders of the types by the keys of the types
+     *
+     * @var array<string, TypeBuilderInterface<mixed>>
+     */
+    private array $buildersOfTypes = [];
 
     /**
      * References to the types being built, by the keys of the types
@@ -45,15 +57,6 @@ final class TypeRepository implements TypeRepositoryInterface
      */
     private array $built = [];
 
-    /**
-     * Prints the canonical description of a type, the key of the type
-     */
-    private readonly TypePrinterInterface $printer;
-
-    /**
-     * @param TypePrinterInterface|null $printer prints the key of a type, a
-     *        single line with all fields of shapes in case of {@see null}
-     */
     public function __construct(
         /**
          * @var list<TypeBuilderInterface<mixed>>
@@ -71,21 +74,17 @@ final class TypeRepository implements TypeRepositoryInterface
          * context of the conversion
          */
         ClassAccessors $accessors,
-        ?TypePrinterInterface $printer = null,
+        /**
+         * Prints the canonical description of a type, the key of the type,
+         * it must keep all fields of shapes
+         */
+        private readonly TypePrinterInterface $printer,
     ) {
-        $this->printer = $printer ?? self::createDefaultTypePrinter();
         $this->build = new BuildContext(
             types: $this,
             metadata: $metadata,
             accessors: $accessors,
             printer: $this->printer
-        );
-    }
-
-    private static function createDefaultTypePrinter(): TypePrinterInterface
-    {
-        return new PrettyTypePrinter(
-            new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX),
         );
     }
 
@@ -105,7 +104,7 @@ final class TypeRepository implements TypeRepositoryInterface
         $mark = \count($this->built);
 
         try {
-            $type = $this->buildType($node);
+            $type = $this->buildType($node, $key);
         } catch (\Throwable $e) {
             unset($this->building[$key]);
             $this->forgetBuiltSince($mark);
@@ -131,6 +130,16 @@ final class TypeRepository implements TypeRepositoryInterface
         return $type;
     }
 
+    public function findUndecoratedType(TypeNode $node): ?TypeInterface
+    {
+        return $this->undecorated[$this->createKey($node)] ?? null;
+    }
+
+    public function findBuilder(TypeNode $node): ?TypeBuilderInterface
+    {
+        return $this->buildersOfTypes[$this->createKey($node)] ?? null;
+    }
+
     /**
      * Removes the types kept after the mark from the cache.
      *
@@ -139,23 +148,25 @@ final class TypeRepository implements TypeRepositoryInterface
     private function forgetBuiltSince(int $mark): void
     {
         foreach (\array_splice($this->built, $mark) as $key) {
-            unset($this->types[$key]);
+            unset($this->types[$key], $this->undecorated[$key], $this->buildersOfTypes[$key]);
         }
     }
 
     /**
      * Any other failure of a builder or a decorator, such as wrong metadata
-     * of a class, becomes the error of the declaration.
+     * of a class, becomes the error of the declaration. The type as it is
+     * built is kept by the key in case of a decorator changes it.
      *
      * @return TypeInterface<mixed>
      * @throws TypeDefinitionException in case of no builder supports the node
      *         or the type cannot be built
      */
-    private function buildType(TypeNode $node): TypeInterface
+    private function buildType(TypeNode $node, string $key): TypeInterface
     {
         try {
-            $type = $this->findInBuilders($node)
+            $built = $this->findInBuilders($node, $key)
                 ?? throw TypeDefinitionException::becauseTypeIsNotSupported($this->printer->print($node));
+            $type = $built;
 
             foreach ($this->decorators as $decorator) {
                 $type = $decorator->decorate($type, $node, $this->build);
@@ -166,20 +177,29 @@ final class TypeRepository implements TypeRepositoryInterface
             throw TypeDefinitionException::becauseTypeCannotBeBuilt($this->printer->print($node), $e);
         }
 
+        if ($type !== $built) {
+            $this->undecorated[$key] = $built;
+        }
+
         return $type;
     }
 
     /**
+     * Returns the type by the first builder supporting the node, the builder
+     * is kept by the key.
+     *
      * @return TypeInterface<mixed>|null
      * @throws TypeDefinitionException in case of a builder supports the node,
      *         but it is declared wrong
      */
-    private function findInBuilders(TypeNode $node): ?TypeInterface
+    private function findInBuilders(TypeNode $node, string $key): ?TypeInterface
     {
         foreach ($this->builders as $builder) {
             $type = $builder->tryBuild($node, $this->build);
 
             if ($type !== null) {
+                $this->buildersOfTypes[$key] = $builder;
+
                 return $type;
             }
         }

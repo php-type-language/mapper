@@ -34,7 +34,7 @@ final class IterableTypeTest extends TestCase
         self::assertDenormalizationFails(
             'iterable<string, int>',
             ['a' => 'x'],
-            '$.a: Value must be of type "int", but "x" given',
+            '$.a: Value must be of type int, but "x" given',
         );
     }
 
@@ -43,7 +43,7 @@ final class IterableTypeTest extends TestCase
         self::assertDenormalizationFails(
             'iterable<int>',
             'x',
-            '$: Value must be of type "iterable<int>", but "x" given',
+            '$: Value must be of type iterable<int>, but "x" given',
         );
     }
 }

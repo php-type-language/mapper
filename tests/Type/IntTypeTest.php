@@ -26,12 +26,12 @@ final class IntTypeTest extends TestCase
      */
     public static function nonDenormalizableDataProvider(): iterable
     {
-        yield 'padded string' => [' 42', '$: Value must be of type "int", but " 42" given'];
-        yield 'word' => ['x', '$: Value must be of type "int", but "x" given'];
-        yield 'fractional float' => [42.5, '$: Value must be of type "int", but 42.5 given'];
-        yield 'boolean' => [true, '$: Value must be of type "int", but true given'];
-        yield 'null' => [null, '$: Value must be of type "int", but null given'];
-        yield 'array' => [[], '$: Value must be of type "int", but array(0) given'];
+        yield 'padded string' => [' 42', '$: Value must be of type int, but " 42" given'];
+        yield 'word' => ['x', '$: Value must be of type int, but "x" given'];
+        yield 'fractional float' => [42.5, '$: Value must be of type int, but 42.5 given'];
+        yield 'boolean' => [true, '$: Value must be of type int, but true given'];
+        yield 'null' => [null, '$: Value must be of type int, but null given'];
+        yield 'array' => [[], '$: Value must be of type int, but array(0) given'];
     }
 
     #[DataProvider('denormalizableDataProvider')]
@@ -54,8 +54,8 @@ final class IntTypeTest extends TestCase
         self::assertDenormalizationFails(
             'int',
             '42',
-            '$: Value must be of type "int", but "42" given',
-            self::createMapper(isStrict: true),
+            '$: Value must be of type int, but "42" given',
+            self::createMapper(strict: true),
         );
     }
 
@@ -71,6 +71,6 @@ final class IntTypeTest extends TestCase
 
     public function testNormalizationDoesNotCoerce(): void
     {
-        self::assertNormalizationFails('int', '42', '$: Value must be of type "int", but "42" given');
+        self::assertNormalizationFails('int', '42', '$: Value must be of type int, but "42" given');
     }
 }

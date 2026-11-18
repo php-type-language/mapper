@@ -18,7 +18,7 @@ final class BoolType implements TypeInterface
     public function isDenormalizable(mixed $value, Context $context): bool
     {
         return \is_bool($value)
-            || (!$context->config->isStrict && $context->coercers->bool->coerce($value) !== null);
+            || (!$context->config->strict && $context->coercers->bool->coerce($value) !== null);
     }
 
     /**
@@ -30,12 +30,12 @@ final class BoolType implements TypeInterface
             return $value;
         }
 
-        if (!$context->config->isStrict) {
+        if (!$context->config->strict) {
             return $context->coercers->bool->coerce($value)
-                ?? throw InvalidValueException::becauseInvalidType('bool', $value);
+                ?? throw InvalidValueException::becauseInvalidType($value);
         }
 
-        throw InvalidValueException::becauseInvalidType('bool', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -52,6 +52,6 @@ final class BoolType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidType('bool', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

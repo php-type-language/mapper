@@ -41,7 +41,7 @@ final class ValueOfTypeBuilder implements TypeBuilderInterface
             || $node->fields !== null
             || $node->arguments === null
             || \count($node->arguments) !== 1
-            || $node->name->toLowerString() !== 'value-of'
+            || !$node->name->is('value-of')
         ) {
             return null;
         }
@@ -58,9 +58,9 @@ final class ValueOfTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $class = \ltrim($enum->name->toString(), '\\');
+        $class = $enum->name->toClassString();
 
-        if (!\enum_exists($class) || !\is_a($class, \BackedEnum::class, true)) {
+        if ($class === null || !\enum_exists($class) || !\is_a($class, \BackedEnum::class, true)) {
             return null;
         }
 
@@ -75,10 +75,7 @@ final class ValueOfTypeBuilder implements TypeBuilderInterface
         $types = [];
 
         foreach ($class::cases() as $case) {
-            /** @var non-empty-string */
-            $literal = \var_export($case->value, true);
-
-            $types[] = new LiteralType($case->value, $type, $literal);
+            $types[] = new LiteralType($case->value, $type);
         }
 
         if ($types === []) {
@@ -89,6 +86,6 @@ final class ValueOfTypeBuilder implements TypeBuilderInterface
             return $types[0];
         }
 
-        return new UnionType($types, $context->printer->print($node));
+        return new UnionType($types);
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Diagnostics;
 
 use TypeLang\Mapper\Diagnostics\Path\Path;
+use TypeLang\Type\TypeNode;
 
 /**
  * Single failure of mapping at a known location of the input.
@@ -32,6 +33,23 @@ final class Violation
          * @var non-empty-string|null
          */
         public readonly ?string $template = null,
+        /**
+         * Type the value at the path is declared with, such as the type of a
+         * property, with the classes, enums and constants of the application.
+         * {@see null} in case of it is unknown.
+         */
+        public readonly ?TypeNode $declared = null,
+        /**
+         * Type the value must be of for a reader outside of the application,
+         * without the classes, enums and constants of the application.
+         * {@see null} in case of it is unknown.
+         */
+        public readonly ?TypeNode $expected = null,
+        /**
+         * Error of another kind the value is rejected by, such as an error
+         * of a hook of a class. Its message is not a part of the violation.
+         */
+        public readonly ?\Throwable $cause = null,
     ) {}
 
     /**
@@ -39,6 +57,57 @@ final class Violation
      */
     public function withTemplate(string $template): self
     {
-        return new self($this->code, $this->parameters, $this->path, $this->value, $template);
+        return new self(
+            $this->code,
+            $this->parameters,
+            $this->path,
+            $this->value,
+            $template,
+            $this->declared,
+            $this->expected,
+            $this->cause,
+        );
+    }
+
+    public function withPath(Path $path): self
+    {
+        return new self(
+            $this->code,
+            $this->parameters,
+            $path,
+            $this->value,
+            $this->template,
+            $this->declared,
+            $this->expected,
+            $this->cause,
+        );
+    }
+
+    public function withDeclared(?TypeNode $declared): self
+    {
+        return new self(
+            $this->code,
+            $this->parameters,
+            $this->path,
+            $this->value,
+            $this->template,
+            $declared,
+            $this->expected,
+            $this->cause,
+        );
+    }
+
+    public function withExpected(?TypeNode $expected): self
+    {
+        return new self(
+            $this->code,
+            $this->parameters,
+            $this->path,
+            $this->value,
+            $this->template,
+            $this->declared,
+            $expected,
+            $this->cause,
+        );
     }
 }

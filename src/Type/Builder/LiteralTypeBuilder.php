@@ -50,8 +50,6 @@ final class LiteralTypeBuilder implements TypeBuilderInterface
         /** @var TypeInterface<int|float|string|bool> */
         $type = $context->types->getType(new NamedTypeNode(new Name($kind)));
 
-        $name = $context->printer->print($node);
-
-        return new LiteralType($value, $type, $name);
+        return new LiteralType($value, $type);
     }
 }

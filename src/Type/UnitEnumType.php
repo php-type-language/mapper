@@ -60,7 +60,7 @@ final class UnitEnumType implements TypeInterface
     public function denormalize(mixed $value, Context $context): \UnitEnum
     {
         return $this->cases[$this->string->denormalize($value, $context)]
-            ?? throw InvalidValueException::becauseInvalidType($this->class, $value);
+            ?? throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -75,7 +75,7 @@ final class UnitEnumType implements TypeInterface
     public function normalize(mixed $value, Context $context): string
     {
         if (!$value instanceof $this->class) {
-            throw InvalidValueException::becauseInvalidType($this->class, $value);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         return $value->name;

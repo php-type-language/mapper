@@ -73,7 +73,7 @@ final class MixedType implements TypeInterface
         if (self::isDynamicObject($value)) {
             $result = $this->normalize(\get_object_vars($value), $context);
 
-            if ($context->config->isObjectAsArray) {
+            if ($context->config->normalizeAsArray) {
                 return $result;
             }
 
@@ -106,7 +106,7 @@ final class MixedType implements TypeInterface
             return $context->types->get($value::class)->normalize($value, $context);
         }
 
-        throw InvalidValueException::becauseInvalidType('mixed', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     /**

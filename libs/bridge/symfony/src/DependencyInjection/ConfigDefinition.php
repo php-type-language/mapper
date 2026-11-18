@@ -76,7 +76,7 @@ final class ConfigDefinition
             ->info('Whether a value must match the type exactly, without coercion')
             ->defaultNull();
 
-        $children->booleanNode('object_as_array')
+        $children->booleanNode('normalize_as_array')
             ->info('Whether an object is normalized to an array or to a stdClass')
             ->defaultNull();
 
@@ -89,12 +89,23 @@ final class ConfigDefinition
             ->info('Whether a field no property takes is a violation')
             ->defaultNull();
 
+        $children->integerNode('expected_type_depth')
+            ->info('Number of levels of classes described by their fields in messages, 1 by default, 0 gives "object"')
+            ->min(0)
+            ->defaultNull();
+
+        $children->integerNode('expected_type_max_fields')
+            ->info('Number of fields of a class shown in messages, the others are "..."')
+            ->min(1)
+            ->defaultNull();
+
         $children->scalarNode('naming')
             ->info('Built-in naming strategy (snake_case, camelCase, ...) or a service')
             ->defaultNull();
 
         self::defineServiceList($children, 'types', 'Type builders');
         self::defineServiceList($children, 'decorators', 'Type decorators');
+        self::defineServiceList($children, 'expanders', 'Type expanders of the expected types of errors');
         self::defineServiceList($children, 'hooks', 'Class hooks');
         self::defineServiceList($children, 'instantiators', 'Instantiation strategies');
         self::defineServiceList($children, 'accessors', 'Property access strategies');

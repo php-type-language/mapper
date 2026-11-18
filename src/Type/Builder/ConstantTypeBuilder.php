@@ -73,7 +73,7 @@ final class ConstantTypeBuilder implements TypeBuilderInterface
         /** @var non-empty-list<TypeInterface<mixed>> */
         $order = [...$others, ...$strings];
 
-        return new UnionType($types, $name, $order);
+        return new UnionType($types, $order);
     }
 
     /**
@@ -207,14 +207,14 @@ final class ConstantTypeBuilder implements TypeBuilderInterface
             /** @var TypeInterface<\UnitEnum> */
             $type = $context->types->getType(new NamedTypeNode(Name::from($value::class)));
 
-            return new LiteralType($value, $type, $name);
+            return new LiteralType($value, $type);
         }
 
         if (\is_int($value) || \is_float($value) || \is_string($value) || \is_bool($value)) {
             /** @var TypeInterface<int|float|string|bool> */
             $type = $context->types->getType(new NamedTypeNode(new Name(\get_debug_type($value))));
 
-            return new LiteralType($value, $type, $name);
+            return new LiteralType($value, $type);
         }
 
         throw TypeDefinitionException::becauseConstantValueIsNotSupported($name, \get_debug_type($value));

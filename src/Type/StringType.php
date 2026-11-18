@@ -18,7 +18,7 @@ final class StringType implements TypeInterface
     public function isDenormalizable(mixed $value, Context $context): bool
     {
         return \is_string($value)
-            || (!$context->config->isStrict && $context->coercers->string->coerce($value) !== null);
+            || (!$context->config->strict && $context->coercers->string->coerce($value) !== null);
     }
 
     /**
@@ -30,12 +30,12 @@ final class StringType implements TypeInterface
             return $value;
         }
 
-        if (!$context->config->isStrict) {
+        if (!$context->config->strict) {
             return $context->coercers->string->coerce($value)
-                ?? throw InvalidValueException::becauseInvalidType('string', $value);
+                ?? throw InvalidValueException::becauseInvalidType($value);
         }
 
-        throw InvalidValueException::becauseInvalidType('string', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool
@@ -52,6 +52,6 @@ final class StringType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidType('string', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 }

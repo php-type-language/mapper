@@ -10,6 +10,7 @@ use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperHook;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperInstantiator;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperMetadataReader;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperTypeBuilder;
+use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperTypeExpander;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\MapperExtensionAttribute;
 use TypeLang\Mapper\Hook\ClassHookInterface;
 use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
@@ -17,6 +18,7 @@ use TypeLang\Mapper\Mapping\Reader\MetadataReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
+use TypeLang\Mapper\Type\Expander\TypeExpanderInterface;
 
 /**
  * Role of a service extending a mapper, the value is the tag of the
@@ -31,6 +33,7 @@ enum ExtensionKind: string
 {
     case TypeBuilder = 'type_lang_mapper.type_builder';
     case TypeDecorator = 'type_lang_mapper.type_decorator';
+    case TypeExpander = 'type_lang_mapper.type_expander';
     case ClassHook = 'type_lang_mapper.class_hook';
     case InstantiationStrategy = 'type_lang_mapper.instantiation_strategy';
     case AccessStrategy = 'type_lang_mapper.access_strategy';
@@ -46,6 +49,7 @@ enum ExtensionKind: string
         return match ($this) {
             self::TypeBuilder => AsMapperTypeBuilder::class,
             self::TypeDecorator => AsMapperDecorator::class,
+            self::TypeExpander => AsMapperTypeExpander::class,
             self::ClassHook => AsMapperHook::class,
             self::InstantiationStrategy => AsMapperInstantiator::class,
             self::AccessStrategy => AsMapperAccessor::class,
@@ -61,6 +65,7 @@ enum ExtensionKind: string
         return match ($this) {
             self::TypeBuilder => TypeBuilderInterface::class,
             self::TypeDecorator => TypeDecoratorInterface::class,
+            self::TypeExpander => TypeExpanderInterface::class,
             self::ClassHook => ClassHookInterface::class,
             self::InstantiationStrategy => InstantiationStrategyInterface::class,
             self::AccessStrategy => AccessStrategyInterface::class,
@@ -79,6 +84,7 @@ enum ExtensionKind: string
         return match ($this) {
             self::TypeBuilder => $settings['types'],
             self::TypeDecorator => $settings['decorators'],
+            self::TypeExpander => $settings['expanders'],
             self::ClassHook => $settings['hooks'],
             self::InstantiationStrategy => $settings['instantiators'],
             self::AccessStrategy => $settings['accessors'],
@@ -96,6 +102,7 @@ enum ExtensionKind: string
         return match ($this) {
             self::TypeBuilder => '$builders',
             self::TypeDecorator => '$decorators',
+            self::TypeExpander => '$expanders',
             self::ClassHook => '$hooks',
             self::InstantiationStrategy => '$instantiators',
             self::AccessStrategy => '$accessors',

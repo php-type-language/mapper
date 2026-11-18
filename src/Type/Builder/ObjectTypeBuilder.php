@@ -33,18 +33,19 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        $name = \strtolower(\ltrim($node->name->toString(), '\\'));
+        $isObject = $node->name->is('object');
+        $isStdClass = \strcasecmp($node->name->toClassString() ?? '', \stdClass::class) === 0;
 
-        if ($name !== 'object' && $name !== 'stdclass') {
+        if (!$isObject && !$isStdClass) {
             return null;
         }
 
         $mixed = $context->types->getType(new NamedTypeNode(new Name('mixed')));
 
-        if ($name === 'stdclass') {
-            return new ShapeType([], \stdClass::class, rest: $mixed, isObject: true);
+        if ($isStdClass) {
+            return new ShapeType([], rest: $mixed, isObject: true);
         }
 
-        return new ObjectType(new ShapeType([], 'object', rest: $mixed, isObject: true), $mixed);
+        return new ObjectType(new ShapeType([], rest: $mixed, isObject: true), $mixed);
     }
 }

@@ -10,6 +10,8 @@ use TypeLang\Mapper\Bridge\Symfony\Profiler\TraceableMapper;
 use TypeLang\Mapper\Bridge\Symfony\Tests\TestCase;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Mapper;
+use TypeLang\Mapper\Tests\Stub\AddressStub;
+use TypeLang\Mapper\Tests\Stub\HookStub;
 
 final class TraceableMapperTest extends TestCase
 {
@@ -49,7 +51,30 @@ final class TraceableMapperTest extends TestCase
 
         self::assertSame(InvalidValueException::class, $call['error']['class'] ?? null);
         self::assertSame('$[0]', $call['violations'][0]['path']);
+        self::assertSame('Value must be of type int, but "old" given', $call['violations'][0]['message']);
         self::assertSame(1, $collector->getErrorCount());
+    }
+
+    public function testViolationShowsMessageOfItsCause(): void
+    {
+        $collector = new MapperDataCollector();
+        $hook = new HookStub(AddressStub::class, beforeDenormalize: static function (): never {
+            throw new \DomainException('Address is blocked');
+        });
+        $mapper = new TraceableMapper(new Mapper(hooks: [$hook]), 'default', $collector);
+
+        try {
+            $mapper->denormalize(['city' => 'Paris'], AddressStub::class);
+            self::fail('The value is denormalized');
+        } catch (InvalidValueException) {
+        }
+
+        $collector->lateCollect();
+
+        self::assertSame(
+            'Value array(1) is rejected: Address is blocked',
+            $collector->getCalls()[0]['violations'][0]['message'],
+        );
     }
 
     public function testCallIsReportedToStopwatch(): void

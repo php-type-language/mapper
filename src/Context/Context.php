@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Context;
 
+use TypeLang\Mapper\Configuration;
+use TypeLang\Mapper\Exception\InvalidValueException\DeclaredTypeFinder;
+
 /**
  * State of the conversion, created once per mapper and passed to every
  * type.
@@ -30,24 +33,30 @@ final class Context
          */
         public readonly ClassAccessors $accessors,
         public readonly Coercers $coercers,
+        /**
+         * Finds the declared types of the nested values of an error, such
+         * as of an element of a property of `list<T>`
+         */
+        public readonly DeclaredTypeFinder $declaredTypes = new DeclaredTypeFinder(),
     ) {}
 
     /**
      * Returns the context with the strictness overridden, such as for a
      * property with its own strictness.
      */
-    public function withStrictTypes(bool $isStrict): self
+    public function withStrict(bool $strict): self
     {
-        if ($this->config->isStrict === $isStrict) {
+        if ($this->config->strict === $strict) {
             return $this;
         }
 
         if ($this->sibling === null) {
             $this->sibling = new self(
                 types: $this->types,
-                config: $this->config->withStrictTypes($isStrict),
+                config: $this->config->withStrict($strict),
                 accessors: $this->accessors,
                 coercers: $this->coercers,
+                declaredTypes: $this->declaredTypes,
             );
             $this->sibling->sibling = $this;
         }

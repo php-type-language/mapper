@@ -16,9 +16,9 @@ use TypeLang\Type\WrappingTypeNode\TypesListTypeNode;
  * Creates the type of `V[]`: an array of the elements of the type with the
  * keys of `array-key`, as `array<V>`.
  *
- * @template-implements TypeBuilderInterface<array<array-key, mixed>>
+ * @template-implements CompositeTypeBuilderInterface<array<array-key, mixed>>
  */
-final class TypesListTypeBuilder implements TypeBuilderInterface
+final class TypesListTypeBuilder implements CompositeTypeBuilderInterface
 {
     /**
      * @return ArrayType<array-key, mixed>|null
@@ -33,9 +33,23 @@ final class TypesListTypeBuilder implements TypeBuilderInterface
 
         $key = new NamedTypeNode(new Name('array-key'));
 
-        $name = $context->printer->print($node);
-
         /** @var ArrayType<array-key, mixed> */
-        return new ArrayType($context->types->getType($key), $context->types->getType($node->type), $name, 'array-key');
+        return new ArrayType($context->types->getType($key), $context->types->getType($node->type));
+    }
+
+    /**
+     * Returns the type of the elements or `array-key` at any key.
+     */
+    public function tryGetNestedType(TypeNode $node, int|string $key, bool $isKey): ?TypeNode
+    {
+        if (!$node instanceof TypesListTypeNode) {
+            return null;
+        }
+
+        if ($isKey) {
+            return new NamedTypeNode(new Name('array-key'));
+        }
+
+        return $node->type;
     }
 }

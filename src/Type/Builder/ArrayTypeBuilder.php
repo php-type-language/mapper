@@ -21,9 +21,9 @@ use TypeLang\Type\TypeNode;
  * type is `array-key` and the value type is `mixed` unless they are given.
  * With checks the array is refined by them, such as `non-empty-array<K, V>`.
  *
- * @template-implements TypeBuilderInterface<array<array-key, mixed>>
+ * @template-implements CompositeTypeBuilderInterface<array<array-key, mixed>>
  */
-final class ArrayTypeBuilder implements TypeBuilderInterface
+final class ArrayTypeBuilder implements CompositeTypeBuilderInterface
 {
     private readonly NamedTypePattern $pattern;
 
@@ -49,7 +49,41 @@ final class ArrayTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
-        return $this->create($node, $arguments['K'] ?? null, $arguments['V'] ?? null, $context);
+        return $this->create(self::getKeyType($arguments), self::getValueType($arguments), $context);
+    }
+
+    /**
+     * Returns the type of the values or of the keys at any key.
+     */
+    public function tryGetNestedType(TypeNode $node, int|string $key, bool $isKey): ?TypeNode
+    {
+        $arguments = $this->pattern->findArguments($node);
+
+        if ($arguments === null) {
+            return null;
+        }
+
+        if ($isKey) {
+            return self::getKeyType($arguments);
+        }
+
+        return self::getValueType($arguments);
+    }
+
+    /**
+     * @param array<non-empty-string, TypeNode> $arguments
+     */
+    private static function getKeyType(array $arguments): TypeNode
+    {
+        return $arguments['K'] ?? new NamedTypeNode(new Name('array-key'));
+    }
+
+    /**
+     * @param array<non-empty-string, TypeNode> $arguments
+     */
+    private static function getValueType(array $arguments): TypeNode
+    {
+        return $arguments['V'] ?? new NamedTypeNode(new Name('mixed'));
     }
 
     /**
@@ -57,22 +91,15 @@ final class ArrayTypeBuilder implements TypeBuilderInterface
      * @throws TypeDefinitionException in case of the key or the value type
      *         cannot be built
      */
-    private function create(TypeNode $node, ?TypeNode $key, ?TypeNode $value, BuildContext $context): TypeInterface
+    private function create(TypeNode $key, TypeNode $value, BuildContext $context): TypeInterface
     {
-        $key ??= new NamedTypeNode(new Name('array-key'));
-        $value ??= new NamedTypeNode(new Name('mixed'));
-
-        $name = $context->printer->print($node);
-
-        $keyName = $context->printer->print($key);
-
         /** @var ArrayType<array-key, mixed> */
-        $type = new ArrayType($context->types->getType($key), $context->types->getType($value), $name, $keyName);
+        $type = new ArrayType($context->types->getType($key), $context->types->getType($value));
 
         if ($this->checks === []) {
             return $type;
         }
 
-        return new RefinedType($type, $this->checks, $name);
+        return new RefinedType($type, $this->checks);
     }
 }

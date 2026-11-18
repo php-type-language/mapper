@@ -7,13 +7,14 @@ namespace TypeLang\Mapper\Tests\Context;
 use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\ClassTypes;
 use TypeLang\Mapper\Context\Coercers;
-use TypeLang\Mapper\Context\Configuration;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
 use TypeLang\Mapper\Mapping\MetadataProviderFactory;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Type\Repository\TypeRepository;
+use TypeLang\Printer\PrettyTypePrinter;
 
 final class ContextTest extends TestCase
 {
@@ -29,6 +30,7 @@ final class ContextTest extends TestCase
             metadata: MetadataProviderFactory::create(),
             decorators: [],
             accessors: $accessors,
+            printer: new PrettyTypePrinter(),
         );
         $context = new Context(
             types: new ClassTypes($repository),
@@ -36,10 +38,10 @@ final class ContextTest extends TestCase
             accessors: $accessors,
             coercers: Coercers::createDefault(),
         );
-        $strict = $context->withStrictTypes(true);
+        $strict = $context->withStrict(true);
 
-        self::assertTrue($strict->config->isStrict);
-        self::assertSame($context, $strict->withStrictTypes(false));
+        self::assertTrue($strict->config->strict);
+        self::assertSame($context, $strict->withStrict(false));
         self::assertSame($context->types, $strict->types);
         self::assertSame($context->accessors, $strict->accessors);
         self::assertSame($context->coercers, $strict->coercers);

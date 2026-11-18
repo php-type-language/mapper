@@ -29,7 +29,7 @@ final class ArrayKeyType implements TypeInterface
             return $value;
         }
 
-        throw InvalidValueException::becauseInvalidType('array-key', $value);
+        throw InvalidValueException::becauseInvalidType($value);
     }
 
     public function isNormalizable(mixed $value, Context $context): bool

@@ -8,11 +8,14 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Diagnostics\Path\Path;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
+use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\Printer\Path\PathPrinterInterface;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\InvalidInputStubException;
 use TypeLang\Mapper\Diagnostics\Tests\TestCase;
 use TypeLang\Mapper\Diagnostics\Violation;
 use TypeLang\Mapper\Diagnostics\ViolationCode;
+use TypeLang\Type\Name;
+use TypeLang\Type\NamedTypeNode;
 
 final class ViolationExceptionTest extends TestCase
 {
@@ -25,7 +28,7 @@ final class ViolationExceptionTest extends TestCase
     public static function summaryDataProvider(): iterable
     {
         $invalid = ViolationCode::InvalidType;
-        $int = ['expected' => 'int'];
+        $int = new NamedTypeNode(new Name('int'));
         $path = new Path([
             new KeySegment('items'),
             new KeySegment(3),
@@ -33,18 +36,18 @@ final class ViolationExceptionTest extends TestCase
         ]);
 
         yield 'single violation' => [
-            [new Violation($invalid, $int, $path, 'x')],
-            '$.items[3].name: Value must be of type "int", but "x" given',
+            [new Violation($invalid, [], $path, 'x', expected: $int)],
+            '$.items[3].name: Value must be of type int, but "x" given',
         ];
         yield 'violation at the root' => [
-            [new Violation($invalid, $int, new Path(), [])],
-            '$: Value must be of type "int", but array(0) given',
+            [new Violation($invalid, [], new Path(), [], expected: $int)],
+            '$: Value must be of type int, but array(0) given',
         ];
         yield 'several violations' => [
             [
                 new Violation(ViolationCode::MissingField, ['field' => 'id'], new Path([new KeySegment('id')])),
-                new Violation($invalid, $int, new Path([new KeySegment('age')]), 'x'),
-                new Violation($invalid, $int, new Path([new KeySegment('size')]), 'y'),
+                new Violation($invalid, [], new Path([new KeySegment('age')]), 'x', expected: $int),
+                new Violation($invalid, [], new Path([new KeySegment('size')]), 'y', expected: $int),
             ],
             '$.id: Required field "id" is missing (and 2 more)',
         ];
@@ -56,7 +59,11 @@ final class ViolationExceptionTest extends TestCase
     #[DataProvider('summaryDataProvider')]
     public function testMessageSummarizesViolations(array $violations, string $expected): void
     {
-        $exception = InvalidInputStubException::becauseInputIsInvalid($violations);
+        $exception = InvalidInputStubException::becauseInputIsInvalid(
+            $violations,
+            self::createFormatter(),
+            new JsonPathPrinter(),
+        );
 
         self::assertInstanceOf(\RuntimeException::class, $exception);
         self::assertSame($expected, $exception->getMessage());
@@ -65,7 +72,7 @@ final class ViolationExceptionTest extends TestCase
 
     public function testSummaryUsesTheGivenPathPrinter(): void
     {
-        $violation = new Violation(ViolationCode::InvalidValue, ['message' => 'Too short'], new Path(), 'a');
+        $violation = new Violation(ViolationCode::InvalidValue, [], new Path(), 'a');
         $printer = new class implements PathPrinterInterface {
             public function print(Path $path): string
             {
@@ -73,11 +80,8 @@ final class ViolationExceptionTest extends TestCase
             }
         };
 
-        $exception = InvalidInputStubException::becauseInputIsInvalid(
-            [$violation],
-            pathPrinter: $printer,
-        );
+        $exception = InvalidInputStubException::becauseInputIsInvalid([$violation], self::createFormatter(), $printer);
 
-        self::assertSame('custom: Too short', $exception->getMessage());
+        self::assertSame('custom: Value "a" is rejected', $exception->getMessage());
     }
 }
