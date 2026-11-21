@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Diagnostics\Printer\Value\ShortValuePrinter;
@@ -27,7 +26,6 @@ use TypeLang\Printer\TypePrinterInterface;
  * Every assertion of a conversion checks the predicate too: `isX()` must
  * agree with `X()` on the same value.
  */
-#[Group('unit'), Group('type-lang/mapper')]
 abstract class TestCase extends BaseTestCase
 {
     /**

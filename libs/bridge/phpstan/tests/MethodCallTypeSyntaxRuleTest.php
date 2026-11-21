@@ -7,14 +7,12 @@ namespace TypeLang\Mapper\Bridge\PHPStan\Tests;
 use PHPStan\Analyser\Error;
 use PHPStan\Rules\Rule;
 use PHPStan\Testing\RuleTestCase;
-use PHPUnit\Framework\Attributes\Group;
 use TypeLang\Mapper\Bridge\PHPStan\MethodCallTypeSyntaxRule;
 use TypeLang\Mapper\Bridge\PHPStan\TypeSyntaxChecker;
 
 /**
  * @extends RuleTestCase<MethodCallTypeSyntaxRule>
  */
-#[Group('unit'), Group('type-lang/mapper')]
 final class MethodCallTypeSyntaxRuleTest extends RuleTestCase
 {
     protected function getRule(): Rule

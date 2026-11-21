@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Coercer\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use TypeLang\Mapper\Coercer\CoercerInterface;
 use TypeLang\Mapper\Coercer\Tests\Stub\IntBackedEnumStub;
@@ -13,7 +12,6 @@ use TypeLang\Mapper\Coercer\Tests\Stub\StringableStub;
 use TypeLang\Mapper\Coercer\Tests\Stub\StringBackedEnumStub;
 use TypeLang\Mapper\Coercer\Tests\Stub\UnitEnumStub;
 
-#[Group('unit'), Group('type-lang/mapper')]
 abstract class TestCase extends BaseTestCase
 {
     /**

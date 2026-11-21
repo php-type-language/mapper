@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\MetadataException;
@@ -24,7 +23,6 @@ use TypeLang\PhpDoc\DocBlockParser;
 use TypeLang\PhpDoc\Platform\StandardPlatform;
 use TypeLang\Type\TypeNode;
 
-#[Group('unit'), Group('type-lang/mapper')]
 abstract class TestCase extends BaseTestCase
 {
     /**
