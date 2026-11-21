@@ -13,7 +13,6 @@
         <testsuite name="Component Tests">
             <directory>tests</directory>
             <directory>libs/bridge/phpstan/tests</directory>
-            <directory>libs/bridge/symfony/tests</directory>
             <directory>libs/component/coercer/tests</directory>
             <directory>libs/component/diagnostics/tests</directory>
             <directory>libs/component/instantiator/tests</directory>
@@ -30,7 +29,6 @@
         <include>
             <directory suffix=".php">src</directory>
             <directory suffix=".php">libs/bridge/phpstan/src</directory>
-            <directory suffix=".php">libs/bridge/symfony/src</directory>
             <directory suffix=".php">libs/component/coercer/src</directory>
             <directory suffix=".php">libs/component/diagnostics/src</directory>
             <directory suffix=".php">libs/component/instantiator/src</directory>

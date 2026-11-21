@@ -19,7 +19,6 @@
         "psr-4": {
             "TypeLang\\Mapper\\": "src",
             "TypeLang\\Mapper\\Bridge\\PHPStan\\": "libs/bridge/phpstan/src",
-            "TypeLang\\Mapper\\Bridge\\Symfony\\": "libs/bridge/symfony/src",
             "TypeLang\\Mapper\\Coercer\\": "libs/component/coercer/src",
             "TypeLang\\Mapper\\Diagnostics\\": "libs/component/diagnostics/src",
             "TypeLang\\Mapper\\Instantiator\\": "libs/component/instantiator/src",
@@ -37,15 +36,8 @@
         "phpunit/phpunit": "^10.5|^11.0|^12.0|^13.0",
         "psr/cache": "^2.0|^3.0",
         "psr/simple-cache": "^2.0|^3.0",
-        "symfony/config": "^6.4|^7.0|^8.0",
-        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
         "symfony/expression-language": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^6.4|^7.0|^8.0",
-        "symfony/http-kernel": "^6.4|^7.0|^8.0",
-        "symfony/stopwatch": "^6.4|^7.0|^8.0",
-        "symfony/var-dumper": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
-        "twig/twig": "^3.0",
         "type-lang/phpdoc": "^2.0"
     },
     "suggest": {
@@ -55,15 +47,14 @@
         "psr/cache": "(^2.0|^3.0) Allows caching metadata in a PSR-6 pool",
         "psr/simple-cache": "(^2.0|^3.0) Allows caching metadata in a PSR-16 cache",
         "symfony/expression-language": "(^6.4|^7.0|^8.0) Allows skipping properties by an expression",
-        "symfony/http-kernel": "(^6.4|^7.0|^8.0) Allows using the mapper as a Symfony bundle",
         "symfony/yaml": "(^6.4|^7.0|^8.0) Allows reading mapping configuration from YAML files",
+        "type-lang/mapper-symfony": "(^2.0) Allows using the mapper as a Symfony bundle",
         "type-lang/phpdoc": "(^2.0) Allows reading property types from PHPDoc"
     },
     "autoload-dev": {
         "psr-4": {
             "TypeLang\\Mapper\\Tests\\": "tests",
             "TypeLang\\Mapper\\Bridge\\PHPStan\\Tests\\": "libs/bridge/phpstan/tests",
-            "TypeLang\\Mapper\\Bridge\\Symfony\\Tests\\": "libs/bridge/symfony/tests",
             "TypeLang\\Mapper\\Coercer\\Tests\\": "libs/component/coercer/tests",
             "TypeLang\\Mapper\\Diagnostics\\Tests\\": "libs/component/diagnostics/tests",
             "TypeLang\\Mapper\\Instantiator\\Tests\\": "libs/component/instantiator/tests",

@@ -2,24 +2,17 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bridge\Symfony\Profiler;
+namespace TypeLang\Mapper\Profiler;
 
 use JetBrains\PhpStorm\Language;
-use Symfony\Component\Stopwatch\Stopwatch;
 use TypeLang\Mapper\MapperInterface;
 
 /**
  * Passes the calls of a mapper to the delegate and reports each of them to
- * the collector and to the stopwatch, as the decorator of the mapper
- * service in the debug mode.
+ * the profiler.
  */
 final class TraceableMapper implements MapperInterface
 {
-    /**
-     * Category of the stopwatch events
-     */
-    private const STOPWATCH_CATEGORY = 'type_lang_mapper';
-
     public function __construct(
         private readonly MapperInterface $delegate,
         /**
@@ -28,8 +21,7 @@ final class TraceableMapper implements MapperInterface
          * @var non-empty-string
          */
         private readonly string $name,
-        private readonly MapperDataCollector $collector,
-        private readonly ?Stopwatch $stopwatch = null,
+        private readonly ProfilerInterface $profiler,
     ) {}
 
     public function denormalize(mixed $value, #[Language('PHP')] string $type): mixed
@@ -72,7 +64,9 @@ final class TraceableMapper implements MapperInterface
     private function trace(string $method, ?string $type, mixed $value, \Closure $call): mixed
     {
         $caller = \debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1] ?? [];
-        $event = $this->stopwatch?->start(\sprintf('%s(%s)', $method, $type ?? 'mixed'), self::STOPWATCH_CATEGORY);
+
+        $this->profiler->startCall($this->name, $method, $type);
+
         $startedAt = \hrtime(true);
         $result = null;
         $error = null;
@@ -84,9 +78,7 @@ final class TraceableMapper implements MapperInterface
 
             throw $e;
         } finally {
-            $event?->stop();
-
-            $this->collector->collectCall(
+            $this->profiler->finishCall(new MapperCall(
                 mapper: $this->name,
                 method: $method,
                 type: $type,
@@ -96,7 +88,7 @@ final class TraceableMapper implements MapperInterface
                 duration: (\hrtime(true) - $startedAt) / 1e6,
                 file: $caller['file'] ?? null,
                 line: $caller['line'] ?? null,
-            );
+            ));
         }
 
         return $result;

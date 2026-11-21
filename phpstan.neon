@@ -1,6 +1,5 @@
 includes:
   - libs/bridge/phpstan/phpstan.neon
-  - libs/bridge/symfony/phpstan.neon
   - libs/component/coercer/phpstan.neon
   - libs/component/diagnostics/phpstan.neon
   - libs/component/instantiator/phpstan.neon

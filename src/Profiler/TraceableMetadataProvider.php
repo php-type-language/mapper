@@ -2,14 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bridge\Symfony\Profiler;
+namespace TypeLang\Mapper\Profiler;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 
 /**
- * Reports each metadata read of a mapper to the collector, as the
- * decorator of the metadata provider of the mapper in the debug mode.
+ * Reports each metadata read of a mapper to the profiler.
  */
 final class TraceableMetadataProvider implements MetadataProviderInterface
 {
@@ -21,7 +20,7 @@ final class TraceableMetadataProvider implements MetadataProviderInterface
          * @var non-empty-string
          */
         private readonly string $name,
-        private readonly MapperDataCollector $collector,
+        private readonly ProfilerInterface $profiler,
     ) {}
 
     public function read(\ReflectionClass $class): ClassMetadata
@@ -31,7 +30,7 @@ final class TraceableMetadataProvider implements MetadataProviderInterface
         try {
             return $this->delegate->read($class);
         } finally {
-            $this->collector->collectMetadata($this->name, $class->name, (\hrtime(true) - $startedAt) / 1e6);
+            $this->profiler->recordMetadataRead($this->name, $class->name, (\hrtime(true) - $startedAt) / 1e6);
         }
     }
 }

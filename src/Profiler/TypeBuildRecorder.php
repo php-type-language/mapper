@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Bridge\Symfony\Profiler;
+namespace TypeLang\Mapper\Profiler;
 
 use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
@@ -10,8 +10,8 @@ use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Type\TypeNode;
 
 /**
- * Reports each type a mapper builds to the collector and returns the type
- * as is, the last decorator of the mapper in the debug mode.
+ * Reports each type a mapper builds to the profiler and returns the type
+ * as is, the last decorator of the mapper.
  */
 final class TypeBuildRecorder implements TypeDecoratorInterface
 {
@@ -22,12 +22,12 @@ final class TypeBuildRecorder implements TypeDecoratorInterface
          * @var non-empty-string
          */
         private readonly string $name,
-        private readonly MapperDataCollector $collector,
+        private readonly ProfilerInterface $profiler,
     ) {}
 
     public function decorate(TypeInterface $type, TypeNode $node, BuildContext $context): TypeInterface
     {
-        $this->collector->collectType($this->name, $context->printer->print($node), $type::class);
+        $this->profiler->recordType($this->name, $context->printer->print($node), $type::class);
 
         return $type;
     }

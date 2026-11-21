@@ -1,4 +1,0 @@
-TypeLang\Mapper\Bridge\Symfony\Tests\Stub\UserStub:
-  properties:
-    userName:
-      name: login
