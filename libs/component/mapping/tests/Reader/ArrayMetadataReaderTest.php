@@ -437,6 +437,29 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertSame('this', $email[1]->variable);
     }
 
+    public function testNullValueOfSkipConfigIsNullCondition(): void
+    {
+        $reader = new ArrayMetadataReader([
+            UserStub::class => [
+                'properties' => [
+                    'id' => ['skip' => null],
+                    'email' => ['skip' => [null, 'empty']],
+                ],
+            ],
+        ]);
+
+        $metadata = self::readOverReflection($reader, UserStub::class);
+
+        $id = self::getProperty($metadata, 'id')->skip;
+        self::assertCount(1, $id);
+        self::assertInstanceOf(NullSkipCondition::class, $id[0]);
+
+        $email = self::getProperty($metadata, 'email')->skip;
+        self::assertCount(2, $email);
+        self::assertInstanceOf(NullSkipCondition::class, $email[0]);
+        self::assertInstanceOf(EmptySkipCondition::class, $email[1]);
+    }
+
     public function testWrongSkipConfigIsThrown(): void
     {
         $reader = new ArrayMetadataReader([

@@ -14,7 +14,7 @@ use TypeLang\Mapper\Exception\InvalidValueException\DeclaredTypeFinder;
 use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\Tests\Stub\CompositeTypeBuilderStub;
 use TypeLang\Mapper\Tests\Stub\MixedTypeBuilderStub;
@@ -285,7 +285,7 @@ final class InvalidValueExceptionTest extends TestCase
                 new CompositeTypeBuilderStub(),
                 new MixedTypeBuilderStub(),
             ],
-            metadata: MetadataProviderFactory::create(),
+            metadata: MetadataBuilder::createDefault()->build(),
             decorators: [],
             accessors: new ClassAccessors(
                 properties: PropertyAccessorFactory::createDefault(),

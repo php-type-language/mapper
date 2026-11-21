@@ -37,6 +37,13 @@ final class ClassNotInstantiableException extends InstantiationException
         return new self($class, $message);
     }
 
+    public static function becauseNoStrategyTakesClass(string $class): self
+    {
+        $message = \sprintf('No instantiation strategy takes class "%s"', \addcslashes($class, '"'));
+
+        return new self($class, $message);
+    }
+
     public static function becauseClassRequiresConstructor(string $class, ?\Throwable $previous = null): self
     {
         $message = \sprintf(

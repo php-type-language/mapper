@@ -10,7 +10,7 @@ use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Type\Repository\TypeRepository;
@@ -27,7 +27,7 @@ final class ContextTest extends TestCase
         );
         $repository = new TypeRepository(
             builders: [],
-            metadata: MetadataProviderFactory::create(),
+            metadata: MetadataBuilder::createDefault()->build(),
             decorators: [],
             accessors: $accessors,
             printer: new PrettyTypePrinter(),

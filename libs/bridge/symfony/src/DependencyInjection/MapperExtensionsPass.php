@@ -65,8 +65,10 @@ final class MapperExtensionsPass implements CompilerPassInterface
                     $references[] = new Reference($recorder);
                 }
 
-                $container->getDefinition(MapperDefinitions::getExtensionTargetId($name, $kind))
-                    ->setArgument($kind->getArgument(), $references);
+                $kind->addServices(
+                    $container->getDefinition(MapperDefinitions::getExtensionTargetId($name, $kind)),
+                    $references,
+                );
             }
         }
 

@@ -24,7 +24,8 @@ use TypeLang\Mapper\Mapping\SkipWhenNull;
 /**
  * Skip conditions of a property: {@see SkipWhenNull}, {@see SkipWhenEmpty},
  * {@see SkipWhen} and the `skip` key with one condition or a list of them
- * (`null`, `empty` or an expression over the object `this`). An expression
+ * (`null` as a string or as a value, `empty` or an expression over the
+ * object `this`). An expression
  * is parsed once, here. A wrong condition is an error, the others are set.
  *
  * ```
@@ -113,6 +114,9 @@ final class SkipOption implements PropertyOptionInterface
         $conditions = [];
 
         foreach ($values as $value) {
+            // skip: null
+            $value ??= 'null';
+
             if (!\is_string($value) || $value === '') {
                 $errors->addError(InvalidOptionValueException::becauseValueIsNotNonEmptyString(
                     self::KEY,

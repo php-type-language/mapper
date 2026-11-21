@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type\Repository;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\BrokenOwnerStub;
 use TypeLang\Mapper\Tests\Stub\CyclicChildStub;
@@ -12,8 +14,10 @@ use TypeLang\Mapper\Tests\Stub\MissingClassStub;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Mapper\Tests\Type\Repository\Stub\CountingDecoratorStub;
 use TypeLang\Mapper\Tests\Type\Repository\Stub\FixedTypeBuilderStub;
+use TypeLang\Mapper\Tests\Type\Repository\Stub\SelfReferringTypeBuilderStub;
 use TypeLang\Mapper\Type\Repository\TypeRepositoryInterface;
 use TypeLang\Mapper\Type\StringType;
+use TypeLang\Printer\NativeTypePrinter;
 
 final class TypeRepositoryTest extends TestCase
 {
@@ -87,6 +91,48 @@ final class TypeRepositoryTest extends TestCase
 
         self::assertInstanceOf(TypeDefinitionException::class, $error);
         self::assertSame('Type "unknown-type" is not supported', $error->getMessage());
+    }
+
+    /**
+     * @return iterable<non-empty-string, array{non-empty-string, mixed, mixed}>
+     */
+    public static function repeatedMembersDataProvider(): iterable
+    {
+        yield 'union' => ['int|int', 1, 1];
+        yield 'null union' => ['null|null', null, null];
+        yield 'nullable union' => ['int|int|null', null, null];
+        yield 'shape field' => ['array{a: int|int}', ['a' => 1], ['a' => 1]];
+        yield 'nested union' => ['(int|int)|int', 1, 1];
+    }
+
+    /**
+     * @param non-empty-string $type
+     */
+    #[DataProvider('repeatedMembersDataProvider')]
+    public function testRepeatedMembersOfUnionAreOneType(string $type, mixed $input, mixed $expected): void
+    {
+        self::assertDenormalizes($type, $input, $expected);
+        self::assertNormalizes($type, $expected, $input);
+    }
+
+    public function testTypeOfBuilderReferringToItselfIsErrorOfDefinition(): void
+    {
+        $mapper = self::createMapper(builders: [new SelfReferringTypeBuilderStub()]);
+
+        $error = self::captureBuildError('self-referring', $mapper);
+
+        self::assertInstanceOf(TypeDefinitionException::class, $error);
+        self::assertSame('Type "self-referring" refers to itself', $error->getMessage());
+    }
+
+    public function testPrinterOfUserDoesNotMergeTypes(): void
+    {
+        $mapper = new Mapper(printer: new NativeTypePrinter());
+
+        $mapper->denormalize(['a' => '1'], 'array{a: int}');
+
+        self::assertDenormalizes('array', ['zzz'], ['zzz'], $mapper);
+        self::assertDenormalizes('list<string>', ['zzz'], ['zzz'], $mapper);
     }
 
     public function testBuildContextGivesRepositoryToBuilders(): void

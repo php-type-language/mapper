@@ -11,9 +11,10 @@ use TypeLang\Mapper\Exception\InvalidValueException;
  * Date of {@see \DateTimeInterface} by its string. A string is parsed by
  * the format in case of it is given: the fields absent from the format are
  * zero (`!` is added unless the format has `!` or `|`), an impossible date
- * such as `2021-02-30` is rejected. Without the format a string is parsed
- * by the constructor of the class. An object of the type is denormalized as
- * is. A date is normalized by the format or by RFC 3339.
+ * such as `2021-02-30` is rejected. Without the format only a string is a
+ * date, it is parsed by the constructor of the class: a timestamp needs the
+ * format `U`. An object of the type is denormalized as is. A date is
+ * normalized by the format or by RFC 3339.
  *
  * @template T of \DateTimeInterface
  *
@@ -57,6 +58,10 @@ final class DateTimeType implements TypeInterface
             return true;
         }
 
+        if ($this->format === null && !\is_string($value)) {
+            return false;
+        }
+
         return $this->string->isDenormalizable($value, $context)
             && $this->parse($this->string->denormalize($value, $context)) !== null;
     }
@@ -70,6 +75,10 @@ final class DateTimeType implements TypeInterface
     {
         if ($value instanceof $this->class) {
             return $value;
+        }
+
+        if ($this->format === null && !\is_string($value)) {
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         /** @var T */

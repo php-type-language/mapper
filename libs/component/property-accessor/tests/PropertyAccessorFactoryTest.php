@@ -24,6 +24,7 @@ use TypeLang\Mapper\PropertyAccessor\Tests\Stub\AsymmetricStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\BaseStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\HookStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\InheritedStub;
+use TypeLang\Mapper\PropertyAccessor\Tests\Stub\ReadonlyInheritedStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\ReadonlyStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\StaticStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\VisibilityStub;
@@ -50,6 +51,34 @@ final class PropertyAccessorFactoryTest extends TestCase
             ReflectionPropertyReader::class,
             $factory->createReader($property, new PropertyMetadata('privateProperty')),
         );
+    }
+
+    public function testPropertyNotTakenByAnyStrategyIsNotRead(): void
+    {
+        $factory = new PropertyAccessorFactory([self::createStrategy(null)]);
+        $property = new \ReflectionProperty(VisibilityStub::class, 'publicProperty');
+
+        $this->expectException(PropertyNotReadableException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'No access strategy reads property "%s::$publicProperty"',
+            VisibilityStub::class,
+        ));
+
+        $factory->createReader($property, new PropertyMetadata('publicProperty'));
+    }
+
+    public function testPropertyNotTakenByAnyStrategyIsNotWritten(): void
+    {
+        $factory = new PropertyAccessorFactory([self::createStrategy(null)]);
+        $property = new \ReflectionProperty(VisibilityStub::class, 'publicProperty');
+
+        $this->expectException(PropertyNotWritableException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'No access strategy writes property "%s::$publicProperty"',
+            VisibilityStub::class,
+        ));
+
+        $factory->createWriter($property, new PropertyMetadata('publicProperty'));
     }
 
     #[RequiresPhp('>= 8.4.0')]
@@ -103,6 +132,15 @@ final class PropertyAccessorFactoryTest extends TestCase
 
         self::assertInstanceOf(ReflectionPropertyWriter::class, $writer);
         self::assertSame('written', $object->readonlyProperty);
+    }
+
+    public function testInitializesReadonlyPropertyOfParentClass(): void
+    {
+        $object = (new \ReflectionClass(ReadonlyInheritedStub::class))->newInstanceWithoutConstructor();
+
+        self::createWriter(ReadonlyInheritedStub::class, 'promoted')->write($object, 'written');
+
+        self::assertSame('written', $object->promoted);
     }
 
     public function testRewritingInitializedReadonlyPropertyFails(): void

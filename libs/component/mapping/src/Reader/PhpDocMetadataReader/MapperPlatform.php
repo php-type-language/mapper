@@ -12,9 +12,6 @@ use TypeLang\PhpDoc\Platform\Platform;
 /**
  * Tags of a docblock the mapper reads types from: `@var`, `@param` and
  * `@return` under the given names and aliases.
- *
- * @internal this is an internal library class, please do not use it in your code
- * @psalm-internal TypeLang\Mapper\Mapping
  */
 final class MapperPlatform extends Platform
 {

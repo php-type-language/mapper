@@ -11,6 +11,7 @@ use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotReadableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\DirectAccessStrategy;
+use TypeLang\Mapper\PropertyAccessor\Strategy\PropertyDeclaration;
 use TypeLang\Mapper\PropertyAccessor\Strategy\RawAccessStrategy;
 use TypeLang\Mapper\PropertyAccessor\Strategy\ReflectionAccessStrategy;
 
@@ -73,7 +74,11 @@ final class PropertyAccessorFactory
             }
         }
 
-        throw PropertyNotReadableException::becausePropertyIsWriteOnly($property->class, $property->name);
+        if (PropertyDeclaration::isVirtual($property) && !PropertyDeclaration::hasGetHook($property)) {
+            throw PropertyNotReadableException::becausePropertyIsWriteOnly($property->class, $property->name);
+        }
+
+        throw PropertyNotReadableException::becauseNoStrategyReadsProperty($property->class, $property->name);
     }
 
     /**
@@ -98,6 +103,10 @@ final class PropertyAccessorFactory
             }
         }
 
-        throw PropertyNotWritableException::becausePropertyIsReadOnly($property->class, $property->name);
+        if (PropertyDeclaration::isVirtual($property) && !PropertyDeclaration::hasSetHook($property)) {
+            throw PropertyNotWritableException::becausePropertyIsReadOnly($property->class, $property->name);
+        }
+
+        throw PropertyNotWritableException::becauseNoStrategyWritesProperty($property->class, $property->name);
     }
 }

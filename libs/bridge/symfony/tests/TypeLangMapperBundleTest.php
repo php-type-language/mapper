@@ -22,6 +22,7 @@ use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\MetadataReaderStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\MisplacedHookStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\ShoutTypeBuilderStub;
 use TypeLang\Mapper\Bridge\Symfony\Tests\Stub\UserStub;
+use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\DenormalizerInterface;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
@@ -95,6 +96,43 @@ final class TypeLangMapperBundleTest extends TestCase
         $this->expectException(InvalidValueException::class);
 
         $api->denormalize('42', 'int');
+    }
+
+    public function testOptionsArePassedToConfiguration(): void
+    {
+        $container = self::createContainer(
+            config: [
+                'strict' => true,
+                'normalize_as_array' => false,
+                'max_violations' => 5,
+                'reject_extra_fields' => true,
+                'expected_type_depth' => 3,
+                'expected_type_max_fields' => 7,
+                'mappers' => ['api' => ['max_violations' => 9, 'expected_type_max_fields' => 2]],
+            ],
+            public: ['.type_lang_mapper.default.configuration', '.type_lang_mapper.api.configuration'],
+        );
+
+        $default = $container->get('test..type_lang_mapper.default.configuration');
+        $api = $container->get('test..type_lang_mapper.api.configuration');
+
+        self::assertEquals(new Configuration(
+            strict: true,
+            normalizeAsArray: false,
+            maxViolations: 5,
+            rejectExtraFields: true,
+            expectedTypeDepth: 3,
+            expectedTypeMaxFields: 7,
+        ), $default);
+
+        self::assertEquals(new Configuration(
+            strict: true,
+            normalizeAsArray: false,
+            maxViolations: 9,
+            rejectExtraFields: true,
+            expectedTypeDepth: 3,
+            expectedTypeMaxFields: 2,
+        ), $api);
     }
 
     public function testConfiguredTypeOfNamedMapperIsNotInDefaultOne(): void
@@ -187,7 +225,6 @@ final class TypeLangMapperBundleTest extends TestCase
         yield 'hook' => [HookStub::class, 'type_lang_mapper.mapper.api', '$hooks'];
         yield 'instantiator' => [InstantiatorStub::class, 'type_lang_mapper.mapper', '$instantiators'];
         yield 'accessor' => [AccessorStub::class, 'type_lang_mapper.mapper', '$accessors'];
-        yield 'metadata reader' => [MetadataReaderStub::class, '.type_lang_mapper.default.metadata', '$readers'];
     }
 
     /**
@@ -207,6 +244,21 @@ final class TypeLangMapperBundleTest extends TestCase
         );
 
         self::assertEquals([new Reference($class)], $container->getDefinition($target)->getArgument($argument));
+    }
+
+    public function testMetadataReaderAttributeAddsReaderOverDefaultOnes(): void
+    {
+        $container = self::createContainer(
+            configure: static function (ContainerBuilder $container): void {
+                $container->register(MetadataReaderStub::class)->setAutoconfigured(true);
+            },
+            isCompiled: false,
+        );
+
+        self::assertContainsEquals(
+            ['withAddedReader', [new Reference(MetadataReaderStub::class), \PHP_INT_MAX], true],
+            $container->getDefinition('.type_lang_mapper.default.metadata_builder')->getMethodCalls(),
+        );
     }
 
     public function testHookForNamedMapperIsNotInDefaultOne(): void
@@ -334,25 +386,16 @@ final class TypeLangMapperBundleTest extends TestCase
     {
         $container = self::createContainer(isDebug: true, isCompiled: false);
 
-        self::assertArrayNotHasKey(
-            '$cache',
-            $container->getDefinition('.type_lang_mapper.default.metadata')->getArguments(),
-        );
+        self::assertSame([], self::getCacheCalls($container, 'default'));
     }
 
     public function testCacheUsesDefaultPoolIfItIsDeclared(): void
     {
         $container = self::createContainer(config: ['mappers' => ['api' => []]], isCompiled: false);
+        $pool = new Reference('cache.type_lang_mapper', ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
 
-        $default = $container->getDefinition('.type_lang_mapper.default.metadata');
-        $api = $container->getDefinition('.type_lang_mapper.api.metadata');
-
-        self::assertEquals(
-            new Reference('cache.type_lang_mapper', ContainerInterface::NULL_ON_INVALID_REFERENCE),
-            $default->getArgument('$cache'),
-        );
-        self::assertSame('tlm_default_', $default->getArgument('$prefix'));
-        self::assertSame('tlm_api_', $api->getArgument('$prefix'));
+        self::assertEquals([['withPsr6Cache', [$pool, 'tlm_default_']]], self::getCacheCalls($container, 'default'));
+        self::assertEquals([['withPsr6Cache', [$pool, 'tlm_api_']]], self::getCacheCalls($container, 'api'));
     }
 
     public function testCacheEnabledInConfigRequiresPool(): void
@@ -364,22 +407,67 @@ final class TypeLangMapperBundleTest extends TestCase
         );
 
         self::assertEquals(
-            new Reference('cache.type_lang_mapper'),
-            $container->getDefinition('.type_lang_mapper.default.metadata')->getArgument('$cache'),
+            [['withPsr6Cache', [new Reference('cache.type_lang_mapper'), 'tlm_default_']]],
+            self::getCacheCalls($container, 'default'),
         );
     }
 
-    public function testNamedMapperOverridesCachePool(): void
+    public function testCachePoolsAreAddedInOrderOfConfig(): void
     {
         $container = self::createContainer(
-            config: ['mappers' => ['api' => ['metadata' => ['cache' => ['pool' => 'app.cache']]]]],
+            config: ['metadata' => ['cache' => ['pools' => [
+                ['psr16' => 'app.redis', 'prefix' => 'hot_'],
+                ['psr6' => 'app.files'],
+            ]]]],
+            isCompiled: false,
+        );
+
+        self::assertEquals([
+            ['withPsr16Cache', [new Reference('app.redis'), 'hot_']],
+            ['withPsr6Cache', [new Reference('app.files'), 'tlm_default_']],
+        ], self::getCacheCalls($container, 'default'));
+    }
+
+    public function testNamedMapperOverridesCachePools(): void
+    {
+        $container = self::createContainer(
+            config: [
+                'metadata' => ['cache' => ['pools' => [['psr6' => 'app.files']]]],
+                'mappers' => ['api' => ['metadata' => ['cache' => ['pools' => [['psr16' => 'app.redis']]]]]],
+            ],
             isCompiled: false,
         );
 
         self::assertEquals(
-            new Reference('app.cache'),
-            $container->getDefinition('.type_lang_mapper.api.metadata')->getArgument('$cache'),
+            [['withPsr16Cache', [new Reference('app.redis'), 'tlm_api_']]],
+            self::getCacheCalls($container, 'api'),
         );
+    }
+
+    public function testCachePoolOfBothStandardsIsRejected(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+
+        self::createContainer(config: ['metadata' => ['cache' => ['pools' => [['psr6' => 'a', 'psr16' => 'b']]]]]);
+    }
+
+    /**
+     * @param non-empty-string $mapper
+     * @return list<array{string, array<array-key, mixed>}>
+     */
+    private static function getCacheCalls(ContainerBuilder $container, string $mapper): array
+    {
+        $result = [];
+
+        $definition = $container->getDefinition('.type_lang_mapper.' . $mapper . '.metadata_builder');
+
+        foreach ($definition->getMethodCalls() as [$method, $arguments]) {
+            if (\str_ends_with($method, 'Cache')) {
+                $result[] = [$method, $arguments];
+            }
+        }
+
+        return $result;
     }
 
     public function testMappingConfigDirectoryIsRead(): void

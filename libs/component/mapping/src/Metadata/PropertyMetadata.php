@@ -52,7 +52,7 @@ final class PropertyMetadata
      *
      * @phpstan-readonly-allow-private-mutation
      */
-    public AliasConflict $aliasConflict = AliasConflict::Fail;
+    public AliasConflict $aliasConflict = AliasConflict::DEFAULT;
 
     /**
      * Type of the value read from the property on normalization

@@ -15,8 +15,10 @@ use TypeLang\Type\TypeNode;
  * it is written, see {@see TypeExpander}.
  *
  * ```
- * public function tryExpand(TypeInterface $type, ExpandContext $context): ?TypeNode
- * {
+ * public function tryExpand(
+ *     TypeInterface $type,
+ *     ExpandContext $context,
+ * ): ?TypeNode {
  *     if (!$type instanceof UuidType) {
  *         return null;
  *     }

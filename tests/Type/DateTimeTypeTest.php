@@ -77,6 +77,25 @@ final class DateTimeTypeTest extends TestCase
         }
     }
 
+    public function testRejectsTimestampWithoutFormat(): void
+    {
+        foreach ([1714557600, 1714557600.5] as $input) {
+            self::assertDenormalizationFails(
+                'DateTimeImmutable',
+                $input,
+                \sprintf('$: Value must be of type string, but %s given', $input),
+            );
+        }
+    }
+
+    public function testDenormalizesTimestampByFormat(): void
+    {
+        $date = new \DateTimeImmutable('@1714557600');
+
+        self::assertDenormalizes("DateTimeImmutable<'U'>", 1714557600, $date);
+        self::assertDenormalizes("DateTimeImmutable<'U'>", '1714557600', $date);
+    }
+
     public function testNormalizesDateByFormat(): void
     {
         $date = new \DateTime('2021-02-03 04:05:06 UTC');

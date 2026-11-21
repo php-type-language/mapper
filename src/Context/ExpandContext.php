@@ -14,8 +14,10 @@ use TypeLang\Type\TypeNode;
  * expander describes the whole type.
  *
  * ```
- * public function tryExpand(TypeInterface $type, ExpandContext $context): ?TypeNode
- * {
+ * public function tryExpand(
+ *     TypeInterface $type,
+ *     ExpandContext $context,
+ * ): ?TypeNode {
  *     // ...
  *     $field = $context->expand($type->declaredType);
  * }

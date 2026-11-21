@@ -71,7 +71,7 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
      * Reads the type from `@return` of the `get` hook and `@param` of the
      * `set` hook, then from `@var` of the property, then from `@param` of the
      * constructor for a promoted property. A property with the `set` hook
-     * takes the write type from this hook only.
+     * declaring its input takes the write type from this hook only.
      */
     private function readProperty(PropertyContext $context, PropertyMetadata $property): PropertyMetadata
     {
@@ -83,13 +83,13 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
             $write = self::findSetHookType($context, $set);
         }
 
-        if ($read === null || $set === null) {
+        if ($read === null || $write === null) {
             $type = self::findVarType($context) ?? self::findPromotedParamType($context);
 
             $read ??= $type;
 
-            if ($set === null) {
-                $write = $type;
+            if ($set === null || !self::hasOwnWriteType($context->reflection, $set)) {
+                $write ??= $type;
             }
         }
 
@@ -141,6 +141,21 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
             class: ReturnTag::class,
             variable: $context->reflection->name,
         ));
+    }
+
+    /**
+     * Returns {@see true} in case of the `set` hook declares its input: it
+     * has a docblock or takes another native type than the property.
+     */
+    private static function hasOwnWriteType(\ReflectionProperty $property, \ReflectionMethod $set): bool
+    {
+        if ($set->getDocComment() !== false) {
+            return true;
+        }
+
+        $parameter = $set->getParameters()[0] ?? null;
+
+        return (string) $parameter?->getType() !== (string) $property->getType();
     }
 
     private static function findSetHookType(PropertyContext $context, \ReflectionMethod $set): ?TypeMetadata

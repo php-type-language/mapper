@@ -64,7 +64,8 @@ final class InstantiatorFactory
             $class->isInterface() => ClassNotInstantiableException::becauseClassIsInterface($class->name),
             $class->isTrait() => ClassNotInstantiableException::becauseClassIsTrait($class->name),
             $class->isEnum() => ClassNotInstantiableException::becauseClassIsEnum($class->name),
-            default => ClassNotInstantiableException::becauseClassIsAbstract($class->name),
+            $class->isAbstract() => ClassNotInstantiableException::becauseClassIsAbstract($class->name),
+            default => ClassNotInstantiableException::becauseNoStrategyTakesClass($class->name),
         };
     }
 }

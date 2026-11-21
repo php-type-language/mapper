@@ -129,6 +129,29 @@ final class InstantiatorFactoryTest extends TestCase
         self::assertSame(\sprintf($message, $class), $error->getMessage());
     }
 
+    public function testClassNotTakenByAnyStrategyIsRejected(): void
+    {
+        $factory = new InstantiatorFactory([new class implements InstantiationStrategyInterface {
+            public function tryCreateInstantiator(
+                \ReflectionClass $class,
+                ClassMetadata $metadata,
+            ): ?InstantiatorInterface {
+                return null;
+            }
+        }]);
+
+        $error = self::captureThrowable(static fn(): object => $factory->createInstantiator(
+            new \ReflectionClass(EmptyStub::class),
+            new ClassMetadata(EmptyStub::class),
+        ));
+
+        self::assertInstanceOf(ClassNotInstantiableException::class, $error);
+        self::assertSame(
+            \sprintf('No instantiation strategy takes class "%s"', EmptyStub::class),
+            $error->getMessage(),
+        );
+    }
+
     /**
      * @template TArgObject of object
      * @param class-string<TArgObject> $class

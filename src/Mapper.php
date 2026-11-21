@@ -20,7 +20,7 @@ use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Hook\ClassHookInterface;
 use TypeLang\Mapper\Instantiator\InstantiatorFactory;
 use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
@@ -109,7 +109,7 @@ final class Mapper implements MapperInterface
     private array $types = [];
 
     /**
-     * Parsed types by their strings, the expected types of the violations
+     * Parsed types by their strings, the declared types of the violations
      *
      * @var array<non-empty-string, TypeNode>
      */
@@ -133,6 +133,9 @@ final class Mapper implements MapperInterface
      *    bool?: ?CoercerInterface<bool>,
      *    array?: ?CoercerInterface<array<array-key, mixed>>,
      * } $coercers how values written in another form become values of the types
+     * @param MetadataProviderInterface|null $metadata metadata of the classes,
+     *        {@see MetadataBuilder::createDefault()} in case of
+     *        {@see null}
      * @param ViolationFormatterInterface|null $denormalizationFormatter writes
      *        the messages of the errors of denormalization, of the data of
      *        a client: {@see PublicViolationFormatter} in case of
@@ -141,9 +144,9 @@ final class Mapper implements MapperInterface
      *        the messages of the errors of normalization, of the values of
      *        the application: {@see ViolationFormatter} in case of
      *        {@see null}
-     * @param TypePrinterInterface|null $printer prints the key of a type and
-     *        the type in errors of its definition and of values, a single
-     *        line with all fields of shapes in case of {@see null}
+     * @param TypePrinterInterface|null $printer prints the type in errors of
+     *        its definition and of values, a single line with all fields of
+     *        shapes in case of {@see null}
      * @throws InvalidPatternException in case of a pattern of a default type
      *         is written wrong
      */
@@ -172,7 +175,8 @@ final class Mapper implements MapperInterface
 
         $this->repository = new TypeRepository(
             builders: self::createDefaultTypes($this->parser, $builders),
-            metadata: $metadata ?? MetadataProviderFactory::create(),
+            metadata: $metadata ?? MetadataBuilder::createDefault()
+                ->build(),
             decorators: $decorators,
             accessors: $classes,
             printer: $printer,

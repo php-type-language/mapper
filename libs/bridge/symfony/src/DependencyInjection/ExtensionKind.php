@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Bridge\Symfony\DependencyInjection;
 
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperAccessor;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperDecorator;
 use TypeLang\Mapper\Bridge\Symfony\Attribute\AsMapperHook;
@@ -93,20 +95,32 @@ enum ExtensionKind: string
     }
 
     /**
-     * Returns the named argument of the service taking the extensions.
+     * Passes the extensions to the service taking them: an argument of the
+     * mapper, the readers are added to the metadata builder over the default
+     * ones in the order of the list.
      *
-     * @return non-empty-string
+     * @param list<Reference> $references
      */
-    public function getArgument(): string
+    public function addServices(Definition $definition, array $references): void
     {
-        return match ($this) {
+        $argument = match ($this) {
             self::TypeBuilder => '$builders',
             self::TypeDecorator => '$decorators',
             self::TypeExpander => '$expanders',
             self::ClassHook => '$hooks',
             self::InstantiationStrategy => '$instantiators',
             self::AccessStrategy => '$accessors',
-            self::MetadataReader => '$readers',
+            self::MetadataReader => null,
         };
+
+        if ($argument !== null) {
+            $definition->setArgument($argument, $references);
+
+            return;
+        }
+
+        foreach (\array_reverse($references) as $reference) {
+            $definition->addMethodCall('withAddedReader', [$reference, \PHP_INT_MAX], true);
+        }
     }
 }

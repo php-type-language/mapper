@@ -33,9 +33,11 @@ use TypeLang\Type\Name;
  * property.
  *
  * A property that cannot be read on normalization, such as an uninitialized
- * one, is a fault of the object: its {@see \Error} becomes a violation with
- * the path of the property. A property whose skip condition is matched by
- * its value is left out of the data and is not checked.
+ * one or a get hook that throws, is a fault of the object: its error becomes
+ * a violation with the path of the property. A property whose skip
+ * condition is matched by its value is left out of the data and is not
+ * checked, an {@see \Exception} of the condition is a violation with the
+ * path of the property.
  *
  * @template T of object
  *
@@ -306,12 +308,16 @@ final class ClassType implements TypeInterface
         foreach ($this->readable as $property) {
             try {
                 $field = $accessor->readers[$property->metadata->name]->read($value);
-            } catch (\Error) {
+            } catch (\Throwable) {
                 return false;
             }
 
-            if ($property->metadata->skip !== [] && self::isSkipped($property, $value, $field)) {
-                continue;
+            try {
+                if ($property->metadata->skip !== [] && self::isSkipped($property, $value, $field)) {
+                    continue;
+                }
+            } catch (\Exception) {
+                return false;
             }
 
             if (!$property->type->isNormalizable($field, $context)) {
@@ -360,12 +366,23 @@ final class ClassType implements TypeInterface
 
             try {
                 $field = $accessor->readers[$property->metadata->name]->read($value);
-            } catch (\Error $e) {
-                throw InvalidValueException::wrapWithPath($e, new PropertySegment($key), null);
+            } catch (\Throwable $e) {
+                throw InvalidValueException::wrapWithPath(
+                    $e,
+                    new PropertySegment($key),
+                    null,
+                    null,
+                    $property->declared,
+                    $context->declaredTypes,
+                );
             }
 
-            if ($property->metadata->skip !== [] && self::isSkipped($property, $value, $field)) {
-                continue;
+            try {
+                if ($property->metadata->skip !== [] && self::isSkipped($property, $value, $field)) {
+                    continue;
+                }
+            } catch (\Exception $e) {
+                throw InvalidValueException::wrapWithPath($e, new PropertySegment($key), $field);
             }
 
             try {

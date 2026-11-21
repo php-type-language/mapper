@@ -35,7 +35,7 @@ final class MapAlias
         array|int|string $aliases,
         /**
          * What a property takes when the data has several of its names,
-         * {@see AliasConflict::Fail} in case of {@see null}. Not allowed for
+         * {@see AliasConflict::DEFAULT} in case of {@see null}. Not allowed for
          * a case.
          */
         public readonly ?AliasConflict $onConflict = null,

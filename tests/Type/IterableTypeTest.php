@@ -38,6 +38,39 @@ final class IterableTypeTest extends TestCase
         );
     }
 
+    public function testRejectsTraversalThatThrows(): void
+    {
+        $generator = static function (): \Generator {
+            yield 1;
+
+            throw new \RuntimeException('Broken');
+        };
+
+        $mapper = self::createMapper();
+
+        self::assertFalse($mapper->isDenormalizable($generator(), 'iterable<int>'));
+        self::assertFalse($mapper->isNormalizable($generator(), 'iterable<int>'));
+
+        self::assertDenormalizationFails('iterable<int>', $generator(), '$: Value object is rejected');
+        self::assertNormalizationFails('iterable<int>', $generator(), '$: Value object(Generator) is rejected');
+    }
+
+    public function testRejectsTraversalWithKeyThatIsNotArrayKey(): void
+    {
+        $generator = static function (mixed $key): \Generator {
+            yield $key => 1;
+        };
+
+        $mapper = self::createMapper();
+
+        self::assertFalse($mapper->isDenormalizable($generator([1]), 'iterable<int>'));
+        self::assertFalse($mapper->isDenormalizable($generator(1.5), 'iterable<int>'));
+        self::assertFalse($mapper->isNormalizable($generator(1.5), 'iterable<int>'));
+
+        self::assertDenormalizationFails('iterable<int>', $generator(1.5), '$: Value object is rejected');
+        self::assertNormalizationFails('iterable<int>', $generator([1]), '$: Value object(Generator) is rejected');
+    }
+
     public function testRejectsValueThatIsNotIterable(): void
     {
         self::assertDenormalizationFails(

@@ -18,4 +18,14 @@ final class PropertyNotWritableException extends PropertyAccessException
 
         return new self($class, $property, $message);
     }
+
+    /**
+     * @param class-string $class
+     */
+    public static function becauseNoStrategyWritesProperty(string $class, string $property): self
+    {
+        $message = \sprintf('No access strategy writes property %s', self::formatProperty($class, $property));
+
+        return new self($class, $property, $message);
+    }
 }

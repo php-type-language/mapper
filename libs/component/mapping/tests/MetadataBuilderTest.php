@@ -2,13 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TypeLang\Mapper\Mapping\Tests\Provider;
+namespace TypeLang\Mapper\Mapping\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
+use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Reader\ArrayMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader;
+use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader\MapperPlatform;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertySelectorInterface;
 use TypeLang\Mapper\Mapping\Tests\Stub\ArrayCache;
 use TypeLang\Mapper\Mapping\Tests\Stub\ArrayCachePool;
@@ -19,12 +21,12 @@ use TypeLang\Mapper\Mapping\Tests\Stub\DuplicateNameStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\EnumNamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\InstanceNamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\NamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\TagPriorityStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UserStub;
-use TypeLang\Mapper\Mapping\Tests\TestCase;
 use TypeLang\Mapper\Naming\KebabCaseNamingStrategy;
 use TypeLang\Mapper\Naming\SnakeCaseNamingStrategy;
 
-final class MetadataProviderFactoryTest extends TestCase
+final class MetadataBuilderTest extends TestCase
 {
     public function testDefaultStackTakesHigherReaderForEachValue(): void
     {
@@ -38,7 +40,9 @@ final class MetadataProviderFactoryTest extends TestCase
             ],
         ]);
 
-        $metadata = MetadataProviderFactory::create(readers: [$config])
+        $metadata = MetadataBuilder::createDefault()
+            ->withAddedReader($config, MetadataBuilder::ATTRIBUTE_PRIORITY + 1)
+            ->build()
             ->read(new \ReflectionClass(AttributeStub::class));
         $path = '$[\'' . AttributeStub::class . '\'].properties';
 
@@ -64,22 +68,94 @@ final class MetadataProviderFactoryTest extends TestCase
         self::assertNull($count->default->source->path);
     }
 
+    public function testNewBuilderReadsReflectionOnly(): void
+    {
+        $metadata = (new MetadataBuilder())
+            ->build()
+            ->read(new \ReflectionClass(DocBlockStub::class));
+
+        self::assertType('array', self::getProperty($metadata, 'accounts')->read);
+    }
+
+    public function testHigherPriorityOverridesLowerOne(): void
+    {
+        $metadata = (new MetadataBuilder())
+            ->withAddedReader(self::createTypeReader('positive-int'), 10)
+            ->withAddedReader(self::createTypeReader('int'))
+            ->build()
+            ->read(new \ReflectionClass(UserStub::class));
+
+        self::assertType('positive-int', self::getProperty($metadata, 'id')->read);
+    }
+
+    public function testLaterReaderOfEqualPriorityOverridesEarlierOne(): void
+    {
+        $metadata = (new MetadataBuilder())
+            ->withAddedReader(self::createTypeReader('int'))
+            ->withAddedReader(self::createTypeReader('positive-int'))
+            ->build()
+            ->read(new \ReflectionClass(UserStub::class));
+
+        self::assertType('positive-int', self::getProperty($metadata, 'id')->read);
+    }
+
+    public function testBuilderIsNotChangedByItsMethods(): void
+    {
+        $builder = new MetadataBuilder();
+        $builder->withAddedReader(self::createTypeReader('positive-int'));
+
+        $metadata = $builder->build()->read(new \ReflectionClass(UserStub::class));
+
+        self::assertType('int', self::getProperty($metadata, 'id')->read);
+    }
+
+    public function testSpecialTagsOverrideStandardOnes(): void
+    {
+        $metadata = MetadataBuilder::createDefault()
+            ->build()
+            ->read(new \ReflectionClass(TagPriorityStub::class));
+
+        self::assertType('list<int>', self::getProperty($metadata, 'special')->read);
+    }
+
+    public function testDocBlockReaderReadsGivenTags(): void
+    {
+        $metadata = (new MetadataBuilder())
+            ->withPhpDocReader()
+            ->withPhpDocReader(new MapperPlatform(
+                var: 'api-var',
+                varAliases: [],
+                return: 'api-return',
+                returnAliases: [],
+                param: 'api-param',
+                paramAliases: [],
+            ), 10)
+            ->build()
+            ->read(new \ReflectionClass(TagPriorityStub::class));
+
+        self::assertType('list<string>', self::getProperty($metadata, 'custom')->read);
+        self::assertType('array', self::getProperty($metadata, 'special')->read);
+    }
+
     public function testStrategyNamesPropertiesWithoutExternalName(): void
     {
-        $metadata = MetadataProviderFactory::create(strategy: new SnakeCaseNamingStrategy())
-            ->read(new \ReflectionClass(AttributeStub::class));
+        $builder = MetadataBuilder::createDefault()
+            ->withNamingStrategy(new SnakeCaseNamingStrategy());
+
+        $metadata = $builder->build()->read(new \ReflectionClass(AttributeStub::class));
 
         self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
 
-        $metadata = MetadataProviderFactory::create(strategy: new SnakeCaseNamingStrategy())
-            ->read(new \ReflectionClass(UserStub::class));
+        $metadata = $builder->build()->read(new \ReflectionClass(UserStub::class));
 
         self::assertSame('display_name', self::getProperty($metadata, 'displayName')->externalName);
     }
 
     public function testStrategyOfClassOverridesStrategyOfMapper(): void
     {
-        $metadata = MetadataProviderFactory::create(strategy: new KebabCaseNamingStrategy())
+        $metadata = MetadataBuilder::createDefault()
+            ->withNamingStrategy(new KebabCaseNamingStrategy())
+            ->build()
             ->read(new \ReflectionClass(NamingStub::class));
 
         self::assertSame('first_name', self::getProperty($metadata, 'firstName')->externalName);
@@ -104,7 +180,7 @@ final class MetadataProviderFactoryTest extends TestCase
     #[DataProvider('strategyOfClassDataProvider')]
     public function testStrategyOfClassNamesPropertiesWithoutStrategyOfMapper(string $class, string $expected): void
     {
-        $metadata = MetadataProviderFactory::create()->read(new \ReflectionClass($class));
+        $metadata = MetadataBuilder::createDefault()->build()->read(new \ReflectionClass($class));
 
         self::assertSame($expected, self::getProperty($metadata, 'firstName')->externalName);
     }
@@ -118,23 +194,26 @@ final class MetadataProviderFactoryTest extends TestCase
             }
         };
 
-        $metadata = MetadataProviderFactory::create(selector: $selector)
+        $metadata = MetadataBuilder::createDefault()
+            ->withReflectionReader($selector)
+            ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
         self::assertSame(['id'], \array_keys($metadata->properties));
     }
 
-    public function testDefaultStackChecksFinalMetadata(): void
+    public function testStackChecksFinalMetadata(): void
     {
-        $errors = self::getErrors(static fn() => MetadataProviderFactory::create()
+        $errors = self::getErrors(static fn() => MetadataBuilder::createDefault()
+            ->build()
             ->read(new \ReflectionClass(DuplicateNameStub::class)));
 
         self::assertCount(1, $errors);
     }
 
-    public function testDefaultStackKeepsMetadataInMemory(): void
+    public function testStackKeepsMetadataInMemory(): void
     {
-        $provider = MetadataProviderFactory::create();
+        $provider = MetadataBuilder::createDefault()->build();
 
         $first = $provider->read(new \ReflectionClass(UserStub::class));
         $second = $provider->read(new \ReflectionClass(UserStub::class));
@@ -142,28 +221,41 @@ final class MetadataProviderFactoryTest extends TestCase
         self::assertSame($first, $second);
     }
 
-    public function testDefaultStackStoresMetadataInPsrCache(): void
+    public function testStackStoresMetadataInEachCache(): void
     {
         $pool = new ArrayCachePool();
         $cache = new ArrayCache();
 
-        MetadataProviderFactory::create(cache: $pool, prefix: 'app_')
-            ->read(new \ReflectionClass(UserStub::class));
-        MetadataProviderFactory::create(cache: $cache, prefix: 'app_')
+        MetadataBuilder::createDefault()
+            ->withPsr16Cache($cache, 'hot_')
+            ->withPsr6Cache($pool, 'cold_')
+            ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertStringStartsWith('app_', (string) \array_key_first($pool->values));
-        self::assertStringStartsWith('app_', (string) \array_key_first($cache->values));
+        self::assertStringStartsWith('hot_', (string) \array_key_first($cache->values));
+        self::assertStringStartsWith('cold_', (string) \array_key_first($pool->values));
     }
 
-    public function testGivenReadersAreChainedInGivenOrder(): void
+    public function testFirstCacheIsFilledFromNextOne(): void
     {
-        $metadata = MetadataProviderFactory::create(readers: [
-            new ArrayMetadataReader([UserStub::class => ['properties' => ['id' => 'positive-int']]]),
-            new ArrayMetadataReader([UserStub::class => ['properties' => ['id' => 'int']]]),
-        ])->read(new \ReflectionClass(UserStub::class));
+        $pool = new ArrayCachePool();
 
-        self::assertType('positive-int', self::getProperty($metadata, 'id')->read);
+        MetadataBuilder::createDefault()
+            ->withPsr6Cache($pool, 'cold_')
+            ->build()
+            ->read(new \ReflectionClass(UserStub::class));
+
+        $cache = new ArrayCache();
+
+        $metadata = (new MetadataBuilder())
+            ->withAddedReader(self::createTypeReader('positive-int'))
+            ->withPsr16Cache($cache, 'hot_')
+            ->withPsr6Cache($pool, 'cold_')
+            ->build()
+            ->read(new \ReflectionClass(UserStub::class));
+
+        self::assertType('int', self::getProperty($metadata, 'id')->read);
+        self::assertCount(1, $cache->values);
     }
 
     #[RunInSeparateProcess]
@@ -171,9 +263,29 @@ final class MetadataProviderFactoryTest extends TestCase
     {
         self::hidePhpDocPackage();
 
-        $metadata = MetadataProviderFactory::create()->read(new \ReflectionClass(DocBlockStub::class));
+        $metadata = MetadataBuilder::createDefault()
+            ->build()
+            ->read(new \ReflectionClass(DocBlockStub::class));
 
         self::assertType('array', self::getProperty($metadata, 'accounts')->read);
+    }
+
+    #[RunInSeparateProcess]
+    public function testDocBlockReaderWithoutPhpDocPackageIsRejected(): void
+    {
+        self::hidePhpDocPackage();
+
+        $this->expectException(MissingDependencyException::class);
+
+        (new MetadataBuilder())->withPhpDocReader();
+    }
+
+    /**
+     * @param non-empty-string $type
+     */
+    private static function createTypeReader(string $type): ArrayMetadataReader
+    {
+        return new ArrayMetadataReader([UserStub::class => ['properties' => ['id' => $type]]]);
     }
 
     /**

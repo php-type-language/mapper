@@ -14,12 +14,20 @@ use TypeLang\Mapper\Mapping\Tests\TestCase;
 #[RequiresPhp('>= 8.4.0')]
 final class HookPhpDocMetadataReaderTest extends TestCase
 {
-    public function testVarOfPropertyWithSetHookSetsOnlyReadType(): void
+    public function testVarOfPropertyWithWiderSetHookSetsOnlyReadType(): void
     {
         $property = self::readHookProperty('name');
 
         self::assertType('non-empty-string', $property->read);
         self::assertType('string|int', $property->write);
+    }
+
+    public function testVarOfPropertyWithSetHookOfPropertyTypeSetsBothTypes(): void
+    {
+        $property = self::readHookProperty('items');
+
+        self::assertType('list<int>', $property->read);
+        self::assertType('list<int>', $property->write);
     }
 
     public function testTypesAreReadFromHookDocBlocks(): void

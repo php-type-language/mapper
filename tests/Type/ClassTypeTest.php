@@ -24,6 +24,7 @@ use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Tests\Stub\AbstractShapeStub;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\AliasedStub;
+use TypeLang\Mapper\Tests\Stub\BrokenSkipStub;
 use TypeLang\Mapper\Tests\Stub\ComputedStub;
 use TypeLang\Mapper\Tests\Stub\FirstInDataAliasStub;
 use TypeLang\Mapper\Tests\Stub\HookStub;
@@ -40,6 +41,7 @@ use TypeLang\Mapper\Tests\Stub\ReadonlyStub;
 use TypeLang\Mapper\Tests\Stub\RelativeNameStub;
 use TypeLang\Mapper\Tests\Stub\RenamedStub;
 use TypeLang\Mapper\Tests\Stub\SkipStub;
+use TypeLang\Mapper\Tests\Stub\ThrowingHookStub;
 use TypeLang\Mapper\Tests\Stub\StdClassChildStub;
 use TypeLang\Mapper\Tests\Stub\StrictnessStub;
 use TypeLang\Mapper\Tests\Stub\UntypedStub;
@@ -491,6 +493,25 @@ final class ClassTypeTest extends TestCase
             'email' => 'user@example.com',
             'isPrivate' => false,
         ]);
+    }
+
+    public function testFailingSkipConditionIsViolationWithPathOfProperty(): void
+    {
+        self::assertNormalizationFails(
+            'list<' . BrokenSkipStub::class . '>',
+            [new BrokenSkipStub()],
+            '$[0].name: Value "John" is rejected',
+        );
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testThrowingGetHookIsViolationWithPathOfProperty(): void
+    {
+        self::assertNormalizationFails(
+            'list<' . ThrowingHookStub::class . '>',
+            [new ThrowingHookStub()],
+            '$[0].greeting: Value null is rejected',
+        );
     }
 
     public function testMessagesOfUserReplaceMessagesOfMapper(): void

@@ -15,6 +15,15 @@ final class HookStub
         }
     }
 
+    /**
+     * @var list<int>
+     */
+    public array $items = [] {
+        set {
+            $this->items = $value;
+        }
+    }
+
     public string $title = 'title' {
         /**
          * @return non-empty-string

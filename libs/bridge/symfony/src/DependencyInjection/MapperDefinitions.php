@@ -18,7 +18,7 @@ use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\DenormalizerInterface;
 use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\MapperInterface;
-use TypeLang\Mapper\Mapping\MetadataProviderFactory;
+use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Provider\CacheMetadataProvider;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\Mapping\Reader\FileMetadataReader;
@@ -60,7 +60,11 @@ use TypeLang\Parser\TypeParser;
  *         selector: non-empty-string|null,
  *         cache: array{
  *             enabled: bool|null,
- *             pool: non-empty-string|null,
+ *             pools: list<array{
+ *                 psr6: non-empty-string|null,
+ *                 psr16: non-empty-string|null,
+ *                 prefix: string|null,
+ *             }>,
  *         },
  *     },
  *     ...
@@ -86,7 +90,11 @@ use TypeLang\Parser\TypeParser;
  *         selector: non-empty-string|null,
  *         cache: array{
  *             enabled: bool|null,
- *             pool: non-empty-string|null,
+ *             pools: list<array{
+ *                 psr6: non-empty-string|null,
+ *                 psr16: non-empty-string|null,
+ *                 prefix: string|null,
+ *             }>,
  *         },
  *     },
  *     mappers: array<non-empty-string, MapperSettingsType>,
@@ -207,7 +215,7 @@ final class MapperDefinitions
             ExtensionKind::ClassHook,
             ExtensionKind::InstantiationStrategy,
             ExtensionKind::AccessStrategy => self::getMapperId($name),
-            ExtensionKind::MetadataReader => self::getInternalId($name, 'metadata'),
+            ExtensionKind::MetadataReader => self::getMetadataBuilderId($name),
         };
     }
 
@@ -350,18 +358,7 @@ final class MapperDefinitions
                     ?? null,
             ]));
 
-        $selector = $settings['metadata']['selector'] ?? $defaults['metadata']['selector'] ?? null;
-
-        $this->container->register(self::getInternalId($name, 'metadata'), MetadataProviderInterface::class)
-            ->setFactory([MetadataProviderFactory::class, 'create'])
-            ->setArguments(self::filterNulls([
-                '$readers' => [],
-                '$strategy' => $this->createNamingStrategy($settings['naming'] ?? $defaults['naming'] ?? null),
-                '$cache' => $this->createCacheReference($settings, $defaults),
-                '$prefix' => CacheMetadataProvider::DEFAULT_PREFIX . $name . '_',
-                '$parser' => new Reference(self::PARSER_ID),
-                '$selector' => $selector === null ? null : new Reference($selector),
-            ]));
+        $this->registerMetadata($name, $settings, $defaults);
 
         $this->container->register(self::getMapperId($name), Mapper::class)
             ->setArguments([
@@ -389,6 +386,52 @@ final class MapperDefinitions
         ];
 
         return $extensions;
+    }
+
+    /**
+     * Returns the id of the builder of the metadata provider of the mapper.
+     *
+     * @param non-empty-string $name
+     * @return non-empty-string
+     */
+    public static function getMetadataBuilderId(string $name): string
+    {
+        return self::getInternalId($name, 'metadata_builder');
+    }
+
+    /**
+     * Registers the builder of the metadata provider of the mapper and the
+     * provider built by it. The readers are added by
+     * {@see MapperExtensionsPass}.
+     *
+     * @param non-empty-string $name
+     * @param MapperSettingsType $settings
+     * @param MapperSettingsType|null $defaults
+     */
+    private function registerMetadata(string $name, array $settings, ?array $defaults): void
+    {
+        $builder = $this->container->register(self::getMetadataBuilderId($name), MetadataBuilder::class)
+            ->setFactory([MetadataBuilder::class, 'createDefault'])
+            ->setArguments(['$parser' => new Reference(self::PARSER_ID)]);
+
+        $strategy = $this->createNamingStrategy($settings['naming'] ?? $defaults['naming'] ?? null);
+
+        if ($strategy !== null) {
+            $builder->addMethodCall('withNamingStrategy', [$strategy], true);
+        }
+
+        $selector = $settings['metadata']['selector'] ?? $defaults['metadata']['selector'] ?? null;
+
+        if ($selector !== null) {
+            $builder->addMethodCall('withReflectionReader', [new Reference($selector)], true);
+        }
+
+        foreach ($this->createCacheCalls($name, $settings, $defaults) as [$method, $arguments]) {
+            $builder->addMethodCall($method, $arguments, true);
+        }
+
+        $this->container->register(self::getInternalId($name, 'metadata'), MetadataProviderInterface::class)
+            ->setFactory([new Reference(self::getMetadataBuilderId($name)), 'build']);
     }
 
     /**
@@ -526,33 +569,57 @@ final class MapperDefinitions
     }
 
     /**
-     * Returns the cache of the metadata, {@see null} in case of it is
-     * disabled. The default pool is skipped in case of it is not declared,
-     * a pool given in the config or a cache enabled in the config is
-     * required.
+     * Returns the calls of the builder adding the caches of the metadata,
+     * none in case of the cache is disabled. The pools of a named mapper
+     * replace the ones of the default mapper. Without pools the default
+     * pool is used, it is skipped in case of it is not declared and the
+     * cache is not enabled in the config.
      *
+     * @param non-empty-string $name
      * @param MapperSettingsType $settings
      * @param MapperSettingsType|null $defaults
+     * @return list<array{non-empty-string, list<mixed>}>
      */
-    private function createCacheReference(array $settings, ?array $defaults): ?Reference
+    private function createCacheCalls(string $name, array $settings, ?array $defaults): array
     {
         $isEnabled = $settings['metadata']['cache']['enabled']
             ?? $defaults['metadata']['cache']['enabled']
             ?? null;
 
-        $pool = $settings['metadata']['cache']['pool']
-            ?? $defaults['metadata']['cache']['pool']
-            ?? null;
-
         if ($isEnabled === false || ($isEnabled === null && $this->isDebug())) {
-            return null;
+            return [];
         }
 
-        if ($isEnabled === null && $pool === null) {
-            return new Reference(self::DEFAULT_CACHE_POOL, ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        $prefix = CacheMetadataProvider::DEFAULT_PREFIX . $name . '_';
+        $pools = $settings['metadata']['cache']['pools'];
+
+        if ($pools === [] && $defaults !== null) {
+            $pools = $defaults['metadata']['cache']['pools'];
         }
 
-        return new Reference($pool ?? self::DEFAULT_CACHE_POOL);
+        if ($pools === [] && $isEnabled === null) {
+            $pool = new Reference(self::DEFAULT_CACHE_POOL, ContainerInterface::IGNORE_ON_INVALID_REFERENCE);
+
+            return [['withPsr6Cache', [$pool, $prefix]]];
+        }
+
+        if ($pools === []) {
+            return [['withPsr6Cache', [new Reference(self::DEFAULT_CACHE_POOL), $prefix]]];
+        }
+
+        $result = [];
+
+        foreach ($pools as $pool) {
+            if ($pool['psr6'] !== null) {
+                $result[] = ['withPsr6Cache', [new Reference($pool['psr6']), $pool['prefix'] ?? $prefix]];
+            }
+
+            if ($pool['psr16'] !== null) {
+                $result[] = ['withPsr16Cache', [new Reference($pool['psr16']), $pool['prefix'] ?? $prefix]];
+            }
+        }
+
+        return $result;
     }
 
     private function isDebug(): bool

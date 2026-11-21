@@ -81,9 +81,7 @@ final class ClassAccessors
                     continue;
                 }
 
-                // the property in the scope of the class declaring it
-                $declaring = $class->getProperty($property->name)->class;
-                $reflection = new \ReflectionProperty($declaring, $property->name);
+                $reflection = $class->getProperty($property->name);
 
                 if ($property->isReadable) {
                     $readers[$property->name] = $this->properties->createReader($reflection, $property);

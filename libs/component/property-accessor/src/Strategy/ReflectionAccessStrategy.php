@@ -32,6 +32,10 @@ final class ReflectionAccessStrategy implements AccessStrategyInterface
             return null;
         }
 
-        return new ReflectionPropertyWriter($property);
+        // a `readonly` property is initialized in the scope of the class
+        // declaring it
+        return new ReflectionPropertyWriter(
+            new \ReflectionProperty($property->class, $property->name),
+        );
     }
 }

@@ -41,6 +41,14 @@ final class TypeDefinitionException extends \LogicException implements
         );
     }
 
+    /**
+     * @param string $type the type a builder returned as the type of itself
+     */
+    public static function becauseTypeRefersToItself(string $type): self
+    {
+        return new self(\sprintf('Type "%s" refers to itself', \addcslashes($type, '"')));
+    }
+
     public static function becauseRecursiveTypeIsNotBuilt(): self
     {
         return new self('Recursive type is used before it is built');

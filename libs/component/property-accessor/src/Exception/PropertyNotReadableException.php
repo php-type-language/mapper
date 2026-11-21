@@ -18,4 +18,14 @@ final class PropertyNotReadableException extends PropertyAccessException
 
         return new self($class, $property, $message);
     }
+
+    /**
+     * @param class-string $class
+     */
+    public static function becauseNoStrategyReadsProperty(string $class, string $property): self
+    {
+        $message = \sprintf('No access strategy reads property %s', self::formatProperty($class, $property));
+
+        return new self($class, $property, $message);
+    }
 }

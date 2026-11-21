@@ -12,7 +12,10 @@ use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\Type\Builder\TypeBuilderInterface;
 use TypeLang\Mapper\Type\Decorator\TypeDecoratorInterface;
 use TypeLang\Mapper\Type\TypeInterface;
+use TypeLang\Printer\PrettyTypePrinter;
+use TypeLang\Printer\PrinterOptions;
 use TypeLang\Printer\TypePrinterInterface;
+use TypeLang\Type\LogicalTypeNode;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -22,6 +25,11 @@ use TypeLang\Type\TypeNode;
 final class TypeRepository implements InspectableTypeRepositoryInterface
 {
     private readonly BuildContext $build;
+
+    /**
+     * Prints the key of a type: a single line with all fields of shapes
+     */
+    private readonly TypePrinterInterface $keys;
 
     /**
      * @var array<string, TypeInterface<mixed>>
@@ -75,11 +83,14 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
          */
         ClassAccessors $accessors,
         /**
-         * Prints the canonical description of a type, the key of the type,
-         * it must keep all fields of shapes
+         * Prints a type in errors of its definition
          */
         private readonly TypePrinterInterface $printer,
     ) {
+        $this->keys = new PrettyTypePrinter(
+            new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX),
+        );
+
         $this->build = new BuildContext(
             types: $this,
             metadata: $metadata,
@@ -94,6 +105,13 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
 
         if (isset($this->types[$key])) {
             return $this->types[$key];
+        }
+
+        // int|int
+        $same = $this->findMemberOfSameKey($node, $key);
+
+        if ($same !== null) {
+            return $this->getType($same);
         }
 
         if (isset($this->building[$key])) {
@@ -115,6 +133,12 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
         /** @var list<RecursiveTypeReference> */
         $references = $this->building[$key];
         unset($this->building[$key]);
+
+        if ($type instanceof RecursiveTypeReference && \in_array($type, $references, true)) {
+            $this->forgetBuiltSince($mark);
+
+            throw TypeDefinitionException::becauseTypeRefersToItself($this->printer->print($node));
+        }
 
         foreach ($references as $reference) {
             $reference->resolve($type);
@@ -208,6 +232,26 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
     }
 
     /**
+     * Returns the member of a union or an intersection whose key is the key
+     * of the whole node, such as `int` of `int|int`: the repeated members
+     * are printed once, the node is the member.
+     */
+    private function findMemberOfSameKey(TypeNode $node, string $key): ?TypeNode
+    {
+        if (!$node instanceof LogicalTypeNode) {
+            return null;
+        }
+
+        foreach ($node->children as $child) {
+            if ($this->createKey($child) === $key) {
+                return $child;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the canonical description of the type, a fully qualified
      * name is written without the leading `\`: `\App\User` and `App\User`
      * are one type. Quoted strings, such as the literal `'\Foo'`, are kept
@@ -218,7 +262,7 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
         return (string) \preg_replace(
             '/(?:\'(?:[^\'\\\\]|\\\\.)*\'|"(?:[^"\\\\]|\\\\.)*")(*SKIP)(*FAIL)|(?<![\w\\\\])\\\\(?=\w)/s',
             '',
-            $this->printer->print($node),
+            $this->keys->print($node),
         );
     }
 }

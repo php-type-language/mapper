@@ -95,7 +95,7 @@ final class ConfigDefinition
             ->defaultNull();
 
         $children->integerNode('expected_type_max_fields')
-            ->info('Number of fields of a class shown in messages, the others are "..."')
+            ->info('Number of fields of a class shown in messages, the others are "...", all of them in case of none')
             ->min(1)
             ->defaultNull();
 
@@ -145,8 +145,21 @@ final class ConfigDefinition
 
         $cacheChildren = $cache->children();
         $cacheChildren->booleanNode('enabled')->defaultNull();
-        $cacheChildren->scalarNode('pool')
-            ->info('PSR-6 or PSR-16 cache service')
+
+        $pools = $cacheChildren->arrayNode('pools');
+        $pools->info('Caches from the first one checked to the last one, the default pool in case of none');
+        $pools->defaultValue([]);
+
+        $pool = $pools->arrayPrototype();
+        $pool->validate()
+            ->ifTrue(static fn(array $value): bool => ($value['psr6'] === null) === ($value['psr16'] === null))
+            ->thenInvalid('A metadata cache pool requires exactly one of "psr6" and "psr16" services');
+
+        $poolChildren = $pool->children();
+        $poolChildren->scalarNode('psr6')->info('PSR-6 cache service')->defaultNull();
+        $poolChildren->scalarNode('psr16')->info('PSR-16 cache service')->defaultNull();
+        $poolChildren->scalarNode('prefix')
+            ->info('Prefix of the cache keys, "tlm_<mapper>_" in case of none')
             ->defaultNull();
     }
 

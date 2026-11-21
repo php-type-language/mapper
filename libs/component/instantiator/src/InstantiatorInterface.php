@@ -9,6 +9,10 @@ namespace TypeLang\Mapper\Instantiator;
  * mapped properties are written after it. The way of creating is chosen
  * once by {@see InstantiatorFactory::createInstantiator()}.
  *
+ * A check of the data that creates no object, such as the choice of a branch
+ * of a union, does not call it: an exception of it is seen by the conversion
+ * only.
+ *
  * ```
  * $instantiator = $factory->createInstantiator($class, $metadata);
  *
