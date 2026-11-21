@@ -10,10 +10,10 @@
     },
     "require": {
         "php": "^8.1",
-        "type-lang/parser": "^2.0",
-        "type-lang/printer": "^2.0",
-        "type-lang/reader": "^2.0",
-        "type-lang/types": "^2.0"
+        "type-lang/parser": "self.version",
+        "type-lang/printer": "self.version",
+        "type-lang/reader": "self.version",
+        "type-lang/types": "self.version"
     },
     "autoload": {
         "psr-4": {
@@ -38,7 +38,7 @@
         "psr/simple-cache": "^2.0|^3.0",
         "symfony/expression-language": "^6.4|^7.0|^8.0",
         "symfony/yaml": "^6.4|^7.0|^8.0",
-        "type-lang/phpdoc": "^2.0"
+        "type-lang/phpdoc": "self.version"
     },
     "suggest": {
         "ext-json": "(*) Allows reading mapping configuration from JSON files",
