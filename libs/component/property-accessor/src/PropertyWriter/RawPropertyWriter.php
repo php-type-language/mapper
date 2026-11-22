@@ -19,8 +19,10 @@ final class RawPropertyWriter implements PropertyWriterInterface
     ) {}
 
     /**
-     * @throws \TypeError in case of the value does not match the type of
-     *         the property
+     * A scalar of another type is coerced as in the coercive typing mode.
+     *
+     * @throws \TypeError in case of the value cannot be coerced to the type
+     *         of the property
      */
     public function write(object $object, mixed $value): void
     {

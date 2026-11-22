@@ -7,8 +7,8 @@ namespace TypeLang\Mapper\Mapping\Metadata;
 use TypeLang\Type\TypeNode;
 
 /**
- * Type of a property with its options and the source that defined it: a
- * type tree or the reason the source cannot read the type.
+ * Type with the source that defined it: a type tree or the reason the
+ * source cannot read the type.
  */
 final class TypeMetadata
 {
@@ -27,11 +27,6 @@ final class TypeMetadata
          */
         public readonly ?string $error,
         public readonly SourceInfo $source,
-        /**
-         * Whether a value must match the type exactly, without coercion,
-         * {@see null} means the mapper configuration
-         */
-        public readonly ?bool $strict = null,
     ) {}
 
     public static function createFromType(TypeNode $type, SourceInfo $source): self
@@ -52,16 +47,6 @@ final class TypeMetadata
             type: null,
             error: $error,
             source: $source,
-        );
-    }
-
-    public function withStrict(bool $strict): self
-    {
-        return new self(
-            type: $this->type,
-            error: $this->error,
-            source: $this->source,
-            strict: $strict,
         );
     }
 }

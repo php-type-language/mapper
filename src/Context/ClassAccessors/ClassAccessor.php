@@ -27,13 +27,13 @@ final class ClassAccessor
          */
         public readonly InstantiatorInterface $instantiator,
         /**
-         * Readers of the readable properties by PHP name
+         * Readers of the readable properties by the name of the property
          *
          * @var array<non-empty-string, PropertyReaderInterface<T, mixed>>
          */
         public readonly array $readers,
         /**
-         * Writers of the writable properties by PHP name
+         * Writers of the writable properties by the name of the property
          *
          * @var array<non-empty-string, PropertyWriterInterface<T, mixed>>
          */

@@ -9,24 +9,30 @@ use TypeLang\Mapper\Mapping\Tests\Stub\UserStub as Account;
 
 final class HookAttributeStub
 {
+    private string $stored = '';
+
     #[MapType('non-empty-string')]
-    public string $name = 'name' {
-        get => $this->name;
+    public string $name {
+        get => $this->stored;
         #[MapType('int|string', strict: true)]
         set(int|string $value) {
-            $this->name = (string) $value;
+            $this->stored = (string) $value;
         }
     }
 
-    public string $title = 'title' {
+    public string $title {
         #[MapType('Account')]
-        get => $this->title;
+        get => $this->stored;
+        set(string $value) {
+            $this->stored = $value;
+        }
     }
 
-    public string $code = 'code' {
+    public string $code {
+        get => $this->stored;
         #[MapType('numeric-string')]
         set(string $value) {
-            $this->code = $value;
+            $this->stored = $value;
         }
     }
 }

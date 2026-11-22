@@ -13,8 +13,8 @@ namespace TypeLang\Mapper\PropertyAccessor;
  * check it.
  *
  * ```
- * $property = new \ReflectionProperty(User::class, 'email');
- * $reader = $factory->createReader($property, $metadata);
+ * $class = new \ReflectionClass(User::class);
+ * $reader = $factory->createReader($class, $metadata);
  *
  * echo $reader->read($user); // user@example.com
  * ```

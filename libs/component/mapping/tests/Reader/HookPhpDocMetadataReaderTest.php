@@ -8,42 +8,76 @@ use PHPUnit\Framework\Attributes\RequiresPhp;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\BrokenHookStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\Php84\DescribedSetHookStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\HookStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\Php84\VirtualHookDocStub;
 use TypeLang\Mapper\Mapping\Tests\TestCase;
 
 #[RequiresPhp('>= 8.4.0')]
 final class HookPhpDocMetadataReaderTest extends TestCase
 {
-    public function testVarOfPropertyWithWiderSetHookSetsOnlyReadType(): void
+    public function testVarOfPropertyWithStorageSetsBothTypesWhateverSetHookTakes(): void
     {
         $property = self::readHookProperty('name');
 
-        self::assertType('non-empty-string', $property->read);
-        self::assertType('string|int', $property->write);
+        self::assertType('non-empty-string', $property->read?->type);
+        self::assertType('non-empty-string', $property->write?->type);
     }
 
-    public function testVarOfPropertyWithSetHookOfPropertyTypeSetsBothTypes(): void
+    public function testVarOfPropertyWithStorageAndSetHookOfPropertyTypeSetsBothTypes(): void
     {
         $property = self::readHookProperty('items');
 
-        self::assertType('list<int>', $property->read);
-        self::assertType('list<int>', $property->write);
+        self::assertType('list<int>', $property->read?->type);
+        self::assertType('list<int>', $property->write?->type);
     }
 
-    public function testTypesAreReadFromHookDocBlocks(): void
+    public function testHookDocBlocksOfPropertyWithStorageAreNotRead(): void
     {
         $property = self::readHookProperty('title');
 
-        self::assertType('non-empty-string', $property->read);
-        self::assertType('positive-int|non-empty-string', $property->write);
+        self::assertType('string', $property->read?->type);
+        self::assertType('string', $property->write?->type);
     }
 
-    public function testUnparsableSetHookParamIsNotRead(): void
+    public function testVarOfVirtualPropertyWithWiderSetHookSetsOnlyReadType(): void
+    {
+        $property = self::readHookProperty('name', VirtualHookDocStub::class);
+
+        self::assertType('non-empty-string', $property->read?->type);
+        self::assertType('string|int', $property->write?->type);
+    }
+
+    public function testVarOfVirtualPropertyWithSetHookOfPropertyTypeSetsBothTypes(): void
+    {
+        $property = self::readHookProperty('items', VirtualHookDocStub::class);
+
+        self::assertType('list<int>', $property->read?->type);
+        self::assertType('list<int>', $property->write?->type);
+    }
+
+    public function testTypesOfVirtualPropertyAreReadFromHookDocBlocks(): void
+    {
+        $property = self::readHookProperty('title', VirtualHookDocStub::class);
+
+        self::assertType('non-empty-string', $property->read?->type);
+        self::assertType('positive-int|non-empty-string', $property->write?->type);
+    }
+
+    public function testUnparsableSetHookParamIsSkippedForVar(): void
     {
         $property = self::readHookProperty('title', BrokenHookStub::class);
 
-        self::assertType('non-empty-string', $property->read);
-        self::assertType('string', $property->write);
+        self::assertType('non-empty-string', $property->read?->type);
+        self::assertType('non-empty-string', $property->write?->type);
+    }
+
+    public function testSetHookDocBlockWithoutParamKeepsVar(): void
+    {
+        $property = self::readHookProperty('name', DescribedSetHookStub::class);
+
+        self::assertType('non-empty-string', $property->read?->type);
+        self::assertType('non-empty-string', $property->write?->type);
     }
 
     /**

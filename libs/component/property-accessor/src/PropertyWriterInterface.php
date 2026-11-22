@@ -15,8 +15,8 @@ namespace TypeLang\Mapper\PropertyAccessor;
  * by the rules of the coercive typing mode.
  *
  * ```
- * $property = new \ReflectionProperty(User::class, 'email');
- * $writer = $factory->createWriter($property, $metadata);
+ * $class = new \ReflectionClass(User::class);
+ * $writer = $factory->createWriter($class, $metadata);
  *
  * $writer->write($user, 'user@example.com');
  * ```
@@ -27,12 +27,13 @@ namespace TypeLang\Mapper\PropertyAccessor;
 interface PropertyWriterInterface
 {
     /**
-     * Exceptions of a set hook are thrown as is.
+     * Exceptions of a set hook are thrown as is. Whether a scalar of
+     * another type is coerced depends on the writer.
      *
      * @param TObject $object
      * @param TValue $value
-     * @throws \TypeError in case of the value does not match the type of
-     *         the property
+     * @throws \TypeError in case of the writer does not take the value for
+     *         the type of the property
      * @throws \Error in case of the `readonly` property is already
      *         initialized
      */

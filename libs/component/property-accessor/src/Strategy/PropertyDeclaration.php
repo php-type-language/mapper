@@ -4,16 +4,39 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\PropertyAccessor\Strategy;
 
+use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotFoundException;
+
 /**
  * Features of the declaration of a property the default strategies choose
- * by: a virtual property, its hooks, writing it outside the class. There is
- * neither a virtual property nor a hook before PHP 8.4.
+ * by: the property of an access point, a virtual property, its hooks,
+ * writing it outside the class. There is neither a virtual property nor a
+ * hook before PHP 8.4.
  *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\PropertyAccessor
  */
 final class PropertyDeclaration
 {
+    /**
+     * @param \ReflectionClass<object> $class
+     * @throws PropertyNotFoundException in case of the class has no property
+     *         of the name or it is static
+     */
+    public static function getProperty(\ReflectionClass $class, string $name): \ReflectionProperty
+    {
+        if (!$class->hasProperty($name)) {
+            throw PropertyNotFoundException::becausePropertyDoesNotExist($class->name, $name);
+        }
+
+        $property = $class->getProperty($name);
+
+        if ($property->isStatic()) {
+            throw PropertyNotFoundException::becausePropertyIsStatic($property->class, $property->name);
+        }
+
+        return $property;
+    }
+
     public static function isVirtual(\ReflectionProperty $property): bool
     {
         if (\PHP_VERSION_ID < 80400) {

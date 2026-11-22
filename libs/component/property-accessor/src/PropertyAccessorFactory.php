@@ -6,27 +6,23 @@ namespace TypeLang\Mapper\PropertyAccessor;
 
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyAccessorExceptionInterface;
-use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotFoundException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotReadableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
-use TypeLang\Mapper\PropertyAccessor\Strategy\DirectAccessStrategy;
-use TypeLang\Mapper\PropertyAccessor\Strategy\PropertyDeclaration;
-use TypeLang\Mapper\PropertyAccessor\Strategy\RawAccessStrategy;
-use TypeLang\Mapper\PropertyAccessor\Strategy\ReflectionAccessStrategy;
+use TypeLang\Mapper\PropertyAccessor\Strategy\HookAccessStrategy;
+use TypeLang\Mapper\PropertyAccessor\Strategy\MethodAccessStrategy;
+use TypeLang\Mapper\PropertyAccessor\Strategy\StorageAccessStrategy;
 
 /**
  * Creates the reader and the writer of a property once by the first
- * strategy that takes the property. A static property is rejected, so is a
- * property no strategy takes, such as a virtual one without the hook of the
- * direction. The default strategies, after the ones of the user, bypass the
- * hook of a property with a backing store, then use `$object->name`, then
- * the reflection.
+ * strategy that takes the access point of the direction in the metadata.
+ * The default strategies, after the ones of the user, take one point each:
+ * the backing store, the hook and the method.
  *
  * ```
- * $factory = PropertyAccessorFactory::createDefault([new GetterSetterStrategy()]);
+ * $factory = PropertyAccessorFactory::createDefault([new LazyAccessStrategy()]);
  *
- * $factory->createWriter($property, $metadata)->write($user, 'user@example.com');
+ * $factory->createWriter($class, $metadata)->write($user, 'user@example.com');
  * ```
  */
 final class PropertyAccessorFactory
@@ -46,67 +42,59 @@ final class PropertyAccessorFactory
     {
         return new self([
             ...$strategies,
-            new RawAccessStrategy(),
-            new DirectAccessStrategy(),
-            new ReflectionAccessStrategy(),
+            new StorageAccessStrategy(),
+            new HookAccessStrategy(),
+            new MethodAccessStrategy(),
         ]);
     }
 
     /**
+     * @param \ReflectionClass<object> $class
      * @return PropertyReaderInterface<object, mixed>
-     * @throws PropertyNotFoundException in case of the property is static
-     * @throws PropertyNotReadableException in case of no strategy reads the
-     *         property, such as a virtual one without a get hook
+     * @throws PropertyNotReadableException in case of the property has no
+     *         read direction or no strategy takes its point
      * @throws PropertyAccessorExceptionInterface in case of a strategy takes
-     *         the property, but it cannot be read
+     *         the point, but it cannot be read
      */
-    public function createReader(\ReflectionProperty $property, PropertyMetadata $metadata): PropertyReaderInterface
+    public function createReader(\ReflectionClass $class, PropertyMetadata $metadata): PropertyReaderInterface
     {
-        if ($property->isStatic()) {
-            throw PropertyNotFoundException::becausePropertyIsStatic($property->class, $property->name);
+        if ($metadata->read === null) {
+            throw PropertyNotReadableException::becausePropertyIsWriteOnly($class->name, $metadata->name);
         }
 
         foreach ($this->strategies as $strategy) {
-            $reader = $strategy->tryCreateReader($property, $metadata);
+            $reader = $strategy->tryCreateReader($class, $metadata);
 
             if ($reader !== null) {
                 return $reader;
             }
         }
 
-        if (PropertyDeclaration::isVirtual($property) && !PropertyDeclaration::hasGetHook($property)) {
-            throw PropertyNotReadableException::becausePropertyIsWriteOnly($property->class, $property->name);
-        }
-
-        throw PropertyNotReadableException::becauseNoStrategyReadsProperty($property->class, $property->name);
+        throw PropertyNotReadableException::becauseNoStrategyReadsProperty($class->name, $metadata->name);
     }
 
     /**
+     * @param \ReflectionClass<object> $class
      * @return PropertyWriterInterface<object, mixed>
-     * @throws PropertyNotFoundException in case of the property is static
-     * @throws PropertyNotWritableException in case of no strategy writes the
-     *         property, such as a virtual one without a set hook
+     * @throws PropertyNotWritableException in case of the property has no
+     *         write direction or no strategy takes its point
      * @throws PropertyAccessorExceptionInterface in case of a strategy takes
-     *         the property, but it cannot be written
+     *         the point, but it cannot be written
      */
-    public function createWriter(\ReflectionProperty $property, PropertyMetadata $metadata): PropertyWriterInterface
+    public function createWriter(\ReflectionClass $class, PropertyMetadata $metadata): PropertyWriterInterface
     {
-        if ($property->isStatic()) {
-            throw PropertyNotFoundException::becausePropertyIsStatic($property->class, $property->name);
+        if ($metadata->write === null) {
+            throw PropertyNotWritableException::becausePropertyIsReadOnly($class->name, $metadata->name);
         }
 
         foreach ($this->strategies as $strategy) {
-            $writer = $strategy->tryCreateWriter($property, $metadata);
+            $writer = $strategy->tryCreateWriter($class, $metadata);
 
             if ($writer !== null) {
                 return $writer;
             }
         }
 
-        if (PropertyDeclaration::isVirtual($property) && !PropertyDeclaration::hasSetHook($property)) {
-            throw PropertyNotWritableException::becausePropertyIsReadOnly($property->class, $property->name);
-        }
-
-        throw PropertyNotWritableException::becauseNoStrategyWritesProperty($property->class, $property->name);
+        throw PropertyNotWritableException::becauseNoStrategyWritesProperty($class->name, $metadata->name);
     }
 }

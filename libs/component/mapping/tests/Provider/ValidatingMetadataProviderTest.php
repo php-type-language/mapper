@@ -38,7 +38,7 @@ final class ValidatingMetadataProviderTest extends TestCase
 
         $metadata = $provider->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('int', self::getProperty($metadata, 'id')->read);
+        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
     }
 
     public function testSameExternalNameIsCheckedByProviderOnly(): void
@@ -126,7 +126,7 @@ final class ValidatingMetadataProviderTest extends TestCase
                 "Cannot read metadata of \"{$class}\":\n  - " . \implode("\n  - ", $errors),
                 $e->getMessage(),
             );
-            self::assertNotNull($e->metadata->findProperty('items')?->read?->error);
+            self::assertNotNull($e->metadata->findProperty('items')?->read?->type?->error);
 
             return;
         }
@@ -178,11 +178,9 @@ final class ValidatingMetadataProviderTest extends TestCase
                 $source = new SourceInfo();
 
                 return new ClassMetadata($class->name, [
-                    'id' => new PropertyMetadata(
-                        name: 'id',
-                        read: TypeMetadata::createFromError($this->read, $source),
-                        write: TypeMetadata::createFromError($this->write, $source),
-                    ),
+                    'id' => (new PropertyMetadata('id'))
+                        ->withReadType(TypeMetadata::createFromError($this->read, $source))
+                        ->withWriteType(TypeMetadata::createFromError($this->write, $source)),
                 ]);
             }
         };

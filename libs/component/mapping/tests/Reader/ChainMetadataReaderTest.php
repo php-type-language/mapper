@@ -39,7 +39,7 @@ final class ChainMetadataReaderTest extends TestCase
         $metadata = self::readOverReflection($chain, AttributeStub::class);
 
         self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
-        self::assertType('int', self::getProperty($metadata, 'id')->read);
+        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
     }
 
     public function testChainDoesNotCheckFinalMetadata(): void
@@ -49,7 +49,7 @@ final class ChainMetadataReaderTest extends TestCase
         $unparsable = $chain->read(new \ReflectionClass(UnparsableTypeStub::class));
         $duplicate = $chain->read(new \ReflectionClass(DuplicateNameStub::class));
 
-        self::assertNotNull(self::getProperty($unparsable, 'items')->write?->error);
+        self::assertNotNull(self::getProperty($unparsable, 'items')->write?->type?->error);
         self::assertSame('id', self::getProperty($duplicate, 'first')->externalName);
         self::assertSame('id', self::getProperty($duplicate, 'second')->externalName);
     }
@@ -64,7 +64,7 @@ final class ChainMetadataReaderTest extends TestCase
             new ChainMetadataReader([new AttributeMetadataReader(), new ReflectionMetadataReader()]),
         );
 
-        self::assertType('list<int>', self::getProperty($metadata, 'items')->write);
+        self::assertType('list<int>', self::getProperty($metadata, 'items')->write?->type);
     }
 
     public function testErrorsOfAllReadersAreThrownTogether(): void
@@ -86,7 +86,7 @@ final class ChainMetadataReaderTest extends TestCase
             self::assertStringContainsString(': value of "name" ', $e->errors[1]->getMessage());
             self::assertInstanceOf(UnknownKeyException::class, $e->errors[2]);
             self::assertStringContainsString(': unknown key "colour"', $e->errors[2]->getMessage());
-            self::assertNotNull($e->metadata->findProperty('items')?->read?->error);
+            self::assertNotNull($e->metadata->findProperty('items')?->read?->type?->error);
 
             return;
         }
@@ -108,19 +108,18 @@ final class ChainMetadataReaderTest extends TestCase
         self::assertStringStartsWith(BrokenAttributeStub::class . ': unknown key "colour" in ', $errors[2]);
     }
 
-    public function testHigherTypeOverridesStrictnessOfLowerType(): void
+    public function testHigherTypeKeepsStrictnessOfLowerReader(): void
     {
         $config = new ArrayMetadataReader([AttributeStub::class => ['properties' => ['value' => 'string']]]);
 
         $metadata = self::provideDefault(AttributeStub::class, $config);
 
         $value = self::getProperty($metadata, 'value');
-        self::assertType('string', $value->read);
-        self::assertNull($value->read->strict);
-        self::assertNull($value->write?->strict);
+        self::assertType('string', $value->read?->type);
+        self::assertTrue($value->strict);
     }
 
-    public function testStrictnessWithoutTypeIsAppliedToLowerTypes(): void
+    public function testStrictnessWithoutTypeKeepsTypesOfLowerReaders(): void
     {
         $config = new ArrayMetadataReader([
             AttributeStub::class => [
@@ -135,19 +134,16 @@ final class ChainMetadataReaderTest extends TestCase
         $metadata = self::provideDefault(AttributeStub::class, $config);
 
         $id = self::getProperty($metadata, 'id');
-        self::assertType('int', $id->read);
-        self::assertTrue($id->read->strict);
-        self::assertTrue($id->write?->strict);
+        self::assertType('int', $id->read?->type);
+        self::assertTrue($id->strict);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read);
-        self::assertTrue($accounts->read->strict);
-        self::assertTrue($accounts->write?->strict);
+        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
+        self::assertTrue($accounts->strict);
 
         $value = self::getProperty($metadata, 'value');
-        self::assertType('int', $value->read);
-        self::assertFalse($value->read->strict);
-        self::assertFalse($value->write?->strict);
+        self::assertType('int', $value->read?->type);
+        self::assertFalse($value->strict);
     }
 
     public function testUnparsableDocBlockTypeOverriddenByAttributeIsNotError(): void
@@ -159,7 +155,7 @@ final class ChainMetadataReaderTest extends TestCase
             new ReflectionMetadataReader(),
         );
 
-        self::assertType('positive-int', self::getProperty($metadata, 'count')->read);
+        self::assertType('positive-int', self::getProperty($metadata, 'count')->read?->type);
     }
 
     public function testUnparsableAttributeTypeOverriddenByConfigIsNotError(): void
@@ -173,7 +169,7 @@ final class ChainMetadataReaderTest extends TestCase
             new ReflectionMetadataReader(),
         );
 
-        self::assertType('list<int>', self::getProperty($metadata, 'items')->write);
+        self::assertType('list<int>', self::getProperty($metadata, 'items')->write?->type);
     }
 
     public function testConfigOverridesAttribute(): void
@@ -195,8 +191,8 @@ final class ChainMetadataReaderTest extends TestCase
         );
 
         self::assertSame('identifier', self::getProperty($metadata, 'id')->externalName);
-        self::assertType('array', self::getProperty($metadata, 'accounts')->read);
-        self::assertType('array', self::getProperty($metadata, 'accounts')->write);
+        self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
+        self::assertType('array', self::getProperty($metadata, 'accounts')->write?->type);
     }
 
     public function testBrokenAttributeIsErrorEvenIfConfigSetsSameValue(): void

@@ -51,19 +51,19 @@ final class MetadataBuilderTest extends TestCase
         self::assertSame($path . '.id.default', $id->default->source->path);
 
         $value = self::getProperty($metadata, 'value');
-        self::assertType('string', $value->read);
-        self::assertType('string', $value->write);
-        self::assertSame($path . '.value', $value->read->source->path);
+        self::assertType('string', $value->read?->type);
+        self::assertType('string', $value->write?->type);
+        self::assertSame($path . '.value', $value->read?->type?->source->path);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read);
-        self::assertType('array', $accounts->write);
-        self::assertNull($accounts->read->source->path);
-        self::assertSame($path . '.accounts.write_type', $accounts->write->source->path);
+        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('array', $accounts->write?->type);
+        self::assertNull($accounts->read?->type?->source->path);
+        self::assertSame($path . '.accounts.write_type', $accounts->write?->type?->source->path);
 
         $count = self::getProperty($metadata, 'count');
-        self::assertType('positive-int', $count->read);
-        self::assertType('positive-int', $count->write);
+        self::assertType('positive-int', $count->read?->type);
+        self::assertType('positive-int', $count->write?->type);
         self::assertSame(1, $count->default?->value);
         self::assertNull($count->default->source->path);
     }
@@ -74,7 +74,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(DocBlockStub::class));
 
-        self::assertType('array', self::getProperty($metadata, 'accounts')->read);
+        self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
     }
 
     public function testHigherPriorityOverridesLowerOne(): void
@@ -85,7 +85,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('positive-int', self::getProperty($metadata, 'id')->read);
+        self::assertType('positive-int', self::getProperty($metadata, 'id')->read?->type);
     }
 
     public function testLaterReaderOfEqualPriorityOverridesEarlierOne(): void
@@ -96,7 +96,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('positive-int', self::getProperty($metadata, 'id')->read);
+        self::assertType('positive-int', self::getProperty($metadata, 'id')->read?->type);
     }
 
     public function testBuilderIsNotChangedByItsMethods(): void
@@ -106,7 +106,7 @@ final class MetadataBuilderTest extends TestCase
 
         $metadata = $builder->build()->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('int', self::getProperty($metadata, 'id')->read);
+        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
     }
 
     public function testSpecialTagsOverrideStandardOnes(): void
@@ -115,7 +115,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(TagPriorityStub::class));
 
-        self::assertType('list<int>', self::getProperty($metadata, 'special')->read);
+        self::assertType('list<int>', self::getProperty($metadata, 'special')->read?->type);
     }
 
     public function testDocBlockReaderReadsGivenTags(): void
@@ -133,8 +133,8 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(TagPriorityStub::class));
 
-        self::assertType('list<string>', self::getProperty($metadata, 'custom')->read);
-        self::assertType('array', self::getProperty($metadata, 'special')->read);
+        self::assertType('list<string>', self::getProperty($metadata, 'custom')->read?->type);
+        self::assertType('array', self::getProperty($metadata, 'special')->read?->type);
     }
 
     public function testStrategyNamesPropertiesWithoutExternalName(): void
@@ -254,7 +254,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('int', self::getProperty($metadata, 'id')->read);
+        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
         self::assertCount(1, $cache->values);
     }
 
@@ -267,7 +267,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(DocBlockStub::class));
 
-        self::assertType('array', self::getProperty($metadata, 'accounts')->read);
+        self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
     }
 
     #[RunInSeparateProcess]

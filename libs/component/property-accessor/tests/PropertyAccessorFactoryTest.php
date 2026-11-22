@@ -6,24 +6,33 @@ namespace TypeLang\Mapper\PropertyAccessor\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\AccessPointInterface;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\MethodAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\PropertyAccessor\Exception\MethodNotCallableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotFoundException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotReadableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
-use TypeLang\Mapper\PropertyAccessor\PropertyReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyReader\DirectPropertyReader;
+use TypeLang\Mapper\PropertyAccessor\PropertyReader\MethodPropertyReader;
 use TypeLang\Mapper\PropertyAccessor\PropertyReader\RawPropertyReader;
 use TypeLang\Mapper\PropertyAccessor\PropertyReader\ReflectionPropertyReader;
-use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
+use TypeLang\Mapper\PropertyAccessor\PropertyReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriter\DirectPropertyWriter;
+use TypeLang\Mapper\PropertyAccessor\PropertyWriter\MethodPropertyWriter;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriter\RawPropertyWriter;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriter\ReflectionPropertyWriter;
+use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\AsymmetricStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\BaseStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\HookStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\InheritedStub;
+use TypeLang\Mapper\PropertyAccessor\Tests\Stub\MethodStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\ReadonlyInheritedStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\ReadonlyStub;
 use TypeLang\Mapper\PropertyAccessor\Tests\Stub\StaticStub;
@@ -36,41 +45,54 @@ final class PropertyAccessorFactoryTest extends TestCase
         $reader = new DirectPropertyReader('publicProperty');
         $factory = PropertyAccessorFactory::createDefault([self::createStrategy($reader)]);
 
-        $property = new \ReflectionProperty(VisibilityStub::class, 'privateProperty');
-
-        self::assertSame($reader, $factory->createReader($property, new PropertyMetadata('privateProperty')));
+        self::assertSame($reader, $factory->createReader(
+            new \ReflectionClass(VisibilityStub::class),
+            new PropertyMetadata('privateProperty'),
+        ));
     }
 
-    public function testPropertyNotTakenByStrategyOfUserIsAccessedByDefaultOnes(): void
+    public function testPointNotTakenByStrategyOfUserIsAccessedByDefaultOnes(): void
     {
         $factory = PropertyAccessorFactory::createDefault([self::createStrategy(null)]);
 
-        $property = new \ReflectionProperty(VisibilityStub::class, 'privateProperty');
-
-        self::assertInstanceOf(
-            ReflectionPropertyReader::class,
-            $factory->createReader($property, new PropertyMetadata('privateProperty')),
-        );
+        self::assertInstanceOf(ReflectionPropertyReader::class, $factory->createReader(
+            new \ReflectionClass(VisibilityStub::class),
+            new PropertyMetadata('privateProperty'),
+        ));
     }
 
-    public function testPropertyNotTakenByAnyStrategyIsNotRead(): void
+    public function testStrategyOfUserTakesItsOwnPoint(): void
     {
-        $factory = new PropertyAccessorFactory([self::createStrategy(null)]);
-        $property = new \ReflectionProperty(VisibilityStub::class, 'publicProperty');
+        $reader = new DirectPropertyReader('publicProperty');
+        $factory = PropertyAccessorFactory::createDefault([self::createStrategy($reader)]);
+        $point = new class implements AccessPointInterface {};
+
+        self::assertSame($reader, $factory->createReader(
+            new \ReflectionClass(VisibilityStub::class),
+            (new PropertyMetadata('virtual'))->withReadAccess(new AccessMetadata($point)),
+        ));
+    }
+
+    public function testPointNotTakenByAnyStrategyIsNotRead(): void
+    {
+        $factory = PropertyAccessorFactory::createDefault();
+        $point = new class implements AccessPointInterface {};
 
         $this->expectException(PropertyNotReadableException::class);
         $this->expectExceptionMessage(\sprintf(
-            'No access strategy reads property "%s::$publicProperty"',
+            'No access strategy reads property "%s::$virtual"',
             VisibilityStub::class,
         ));
 
-        $factory->createReader($property, new PropertyMetadata('publicProperty'));
+        $factory->createReader(
+            new \ReflectionClass(VisibilityStub::class),
+            (new PropertyMetadata('virtual'))->withReadAccess(new AccessMetadata($point)),
+        );
     }
 
-    public function testPropertyNotTakenByAnyStrategyIsNotWritten(): void
+    public function testPointNotTakenByAnyStrategyIsNotWritten(): void
     {
         $factory = new PropertyAccessorFactory([self::createStrategy(null)]);
-        $property = new \ReflectionProperty(VisibilityStub::class, 'publicProperty');
 
         $this->expectException(PropertyNotWritableException::class);
         $this->expectExceptionMessage(\sprintf(
@@ -78,18 +100,37 @@ final class PropertyAccessorFactoryTest extends TestCase
             VisibilityStub::class,
         ));
 
-        $factory->createWriter($property, new PropertyMetadata('publicProperty'));
+        $factory->createWriter(new \ReflectionClass(VisibilityStub::class), new PropertyMetadata('publicProperty'));
     }
 
-    #[RequiresPhp('>= 8.4.0')]
-    public function testStrategyOfUserReadsVirtualPropertyWithoutGetHook(): void
+    public function testPropertyWithoutReadDirectionIsNotRead(): void
     {
-        $reader = new DirectPropertyReader('virtualWriteOnly');
-        $factory = PropertyAccessorFactory::createDefault([self::createStrategy($reader)]);
+        $this->expectException(PropertyNotReadableException::class);
+        $this->expectExceptionMessage(\sprintf('Property "%s::$publicProperty" is write-only', VisibilityStub::class));
 
-        $property = new \ReflectionProperty(HookStub::class, 'virtualWriteOnly');
+        PropertyAccessorFactory::createDefault()->createReader(
+            new \ReflectionClass(VisibilityStub::class),
+            (new PropertyMetadata('publicProperty'))->withReadAccess(null),
+        );
+    }
 
-        self::assertSame($reader, $factory->createReader($property, new PropertyMetadata('virtualWriteOnly')));
+    public function testPropertyWithoutWriteDirectionIsNotWritten(): void
+    {
+        $this->expectException(PropertyNotWritableException::class);
+        $this->expectExceptionMessage(\sprintf('Property "%s::$publicProperty" is read-only', VisibilityStub::class));
+
+        PropertyAccessorFactory::createDefault()->createWriter(
+            new \ReflectionClass(VisibilityStub::class),
+            (new PropertyMetadata('publicProperty'))->withWriteAccess(null),
+        );
+    }
+
+    public function testMissingPropertyOfPointIsNotFound(): void
+    {
+        $this->expectException(PropertyNotFoundException::class);
+        $this->expectExceptionMessage(\sprintf('Property "%s::$missing" does not exist', VisibilityStub::class));
+
+        self::createReader(VisibilityStub::class, 'missing');
     }
 
     public function testWritesPublicPropertyDirectly(): void
@@ -231,7 +272,7 @@ final class PropertyAccessorFactoryTest extends TestCase
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testReadsPropertyWithGetHookBypassingHook(): void
+    public function testReadsStorageOfPropertyWithGetHookBypassingHook(): void
     {
         $reader = self::createReader(HookStub::class, 'hooked');
 
@@ -240,50 +281,101 @@ final class PropertyAccessorFactoryTest extends TestCase
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testReadsVirtualPropertyThroughGetHook(): void
-    {
-        $reader = self::createReader(HookStub::class, 'virtualReadOnly');
-
-        self::assertInstanceOf(DirectPropertyReader::class, $reader);
-        self::assertSame('computed', $reader->read(new HookStub()));
-    }
-
-    #[RequiresPhp('>= 8.4.0')]
-    public function testVirtualPropertyWithoutGetHookIsNotRead(): void
-    {
-        $this->expectException(PropertyNotReadableException::class);
-        $this->expectExceptionMessage(\sprintf('Property "%s::$virtualWriteOnly" is write-only', HookStub::class));
-
-        self::createReader(HookStub::class, 'virtualWriteOnly');
-    }
-
-    #[RequiresPhp('>= 8.4.0')]
-    public function testWritesPropertyWithSetHookBypassingHook(): void
+    public function testWritesStorageOfPropertyWithSetHookBypassingHook(): void
     {
         $object = new HookStub();
-        $property = new \ReflectionProperty(HookStub::class, 'hooked');
-        $writer = PropertyAccessorFactory::createDefault()->createWriter($property, new PropertyMetadata($property->name));
+        $writer = self::createWriter(HookStub::class, 'hooked');
 
         $writer->write($object, 'written');
 
         self::assertInstanceOf(RawPropertyWriter::class, $writer);
         // @phpstan-ignore-next-line PHP 8.4 API, phpVersion.min is 8.1
-        self::assertSame('written', $property->getRawValue($object));
+        self::assertSame('written', (new \ReflectionProperty(HookStub::class, 'hooked'))->getRawValue($object));
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testVirtualPropertyWithoutSetHookIsNotWritten(): void
+    public function testStorageOfVirtualPropertyIsNotRead(): void
+    {
+        $this->expectException(PropertyNotReadableException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Property "%s::$virtualReadOnly" has no backing store to read',
+            HookStub::class,
+        ));
+
+        self::createReader(HookStub::class, 'virtualReadOnly');
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testStorageOfVirtualPropertyIsNotWritten(): void
     {
         $this->expectException(PropertyNotWritableException::class);
-        $this->expectExceptionMessage(\sprintf('Property "%s::$virtualReadOnly" is read-only', HookStub::class));
+        $this->expectExceptionMessage(\sprintf(
+            'Property "%s::$virtualWriteOnly" has no backing store to write',
+            HookStub::class,
+        ));
 
-        self::createWriter(HookStub::class, 'virtualReadOnly');
+        self::createWriter(HookStub::class, 'virtualWriteOnly');
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testReadsThroughGetHook(): void
+    {
+        $reader = self::createReader(HookStub::class, 'hooked', new HookAccessPoint('hooked'));
+
+        self::assertInstanceOf(DirectPropertyReader::class, $reader);
+        self::assertSame('via-get-hook', $reader->read(new HookStub()));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testReadsVirtualPropertyThroughGetHook(): void
+    {
+        $reader = self::createReader(HookStub::class, 'virtualReadOnly', new HookAccessPoint('virtualReadOnly'));
+
+        self::assertSame('computed', $reader->read(new HookStub()));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testWritesThroughSetHook(): void
+    {
+        $object = new HookStub();
+        $writer = self::createWriter(HookStub::class, 'hooked', new HookAccessPoint('hooked'));
+
+        $writer->write($object, 'x');
+
+        self::assertInstanceOf(DirectPropertyWriter::class, $writer);
+        // @phpstan-ignore-next-line PHP 8.4 API, phpVersion.min is 8.1
+        self::assertSame('via-set-hook:x', (new \ReflectionProperty(HookStub::class, 'hooked'))->getRawValue($object));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testHookPointWithoutGetHookIsNotRead(): void
+    {
+        $this->expectException(PropertyNotReadableException::class);
+        $this->expectExceptionMessage(\sprintf('Property "%s::$virtualWriteOnly" has no get hook', HookStub::class));
+
+        self::createReader(HookStub::class, 'virtualWriteOnly', new HookAccessPoint('virtualWriteOnly'));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testHookPointWithoutSetHookIsNotWritten(): void
+    {
+        $this->expectException(PropertyNotWritableException::class);
+        $this->expectExceptionMessage(\sprintf('Property "%s::$virtualReadOnly" has no set hook', HookStub::class));
+
+        self::createWriter(HookStub::class, 'virtualReadOnly', new HookAccessPoint('virtualReadOnly'));
+    }
+
+    public function testHookPointOfPropertyWithoutHooksIsNotRead(): void
+    {
+        $this->expectException(PropertyNotReadableException::class);
+
+        self::createReader(VisibilityStub::class, 'publicProperty', new HookAccessPoint('publicProperty'));
     }
 
     #[RequiresPhp('>= 8.4.0')]
     public function testExceptionOfSetHookIsThrownAsIs(): void
     {
-        $writer = self::createWriter(HookStub::class, 'virtualWriteOnly');
+        $writer = self::createWriter(HookStub::class, 'virtualWriteOnly', new HookAccessPoint('virtualWriteOnly'));
 
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Rejected x');
@@ -326,15 +418,103 @@ final class PropertyAccessorFactoryTest extends TestCase
         self::assertInstanceOf(DirectPropertyReader::class, self::createReader(AsymmetricStub::class, $name));
     }
 
+    public function testReadsThroughGetter(): void
+    {
+        $reader = self::createReader(MethodStub::class, 'value', new MethodAccessPoint('getValue'));
+
+        self::assertInstanceOf(MethodPropertyReader::class, $reader);
+        self::assertSame('initial', $reader->read(new MethodStub()));
+    }
+
+    public function testReadsThroughGetterWithOptionalParameter(): void
+    {
+        $reader = self::createReader(MethodStub::class, 'value', new MethodAccessPoint('withOptional'));
+
+        self::assertSame('default', $reader->read(new MethodStub()));
+    }
+
+    public function testWritesThroughSetterIgnoringResult(): void
+    {
+        $object = new MethodStub();
+        $writer = self::createWriter(MethodStub::class, 'value', new MethodAccessPoint('setValue'));
+
+        $writer->write($object, 'x');
+
+        self::assertInstanceOf(MethodPropertyWriter::class, $writer);
+        self::assertSame('set:x', $object->getValue());
+    }
+
+    /**
+     * @return iterable<non-empty-string, array{non-empty-string, non-empty-string}>
+     */
+    public static function invalidGetterDataProvider(): iterable
+    {
+        yield 'missing' => ['missing', 'does not exist'];
+        yield 'not public' => ['hidden', 'is not public'];
+        yield 'static' => ['create', 'is static'];
+        yield 'required parameter' => ['find', 'requires arguments, a getter takes none'];
+    }
+
+    /**
+     * @param non-empty-string $method
+     */
+    #[DataProvider('invalidGetterDataProvider')]
+    public function testInvalidGetterIsNotCalled(string $method, string $reason): void
+    {
+        $this->expectException(MethodNotCallableException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Method "%s::%s()" of property "%1$s::$value" %s',
+            MethodStub::class,
+            $method,
+            $reason,
+        ));
+
+        self::createReader(MethodStub::class, 'value', new MethodAccessPoint($method));
+    }
+
+    /**
+     * @return iterable<non-empty-string, array{non-empty-string, non-empty-string}>
+     */
+    public static function invalidSetterDataProvider(): iterable
+    {
+        yield 'missing' => ['missing', 'does not exist'];
+        yield 'no parameters' => ['getValue', 'must take exactly one value as a setter'];
+        yield 'two required parameters' => ['replace', 'must take exactly one value as a setter'];
+    }
+
+    /**
+     * @param non-empty-string $method
+     */
+    #[DataProvider('invalidSetterDataProvider')]
+    public function testInvalidSetterIsNotCalled(string $method, string $reason): void
+    {
+        $this->expectException(MethodNotCallableException::class);
+        $this->expectExceptionMessage(\sprintf(
+            'Method "%s::%s()" of property "%1$s::$value" %s',
+            MethodStub::class,
+            $method,
+            $reason,
+        ));
+
+        self::createWriter(MethodStub::class, 'value', new MethodAccessPoint($method));
+    }
+
     /**
      * @param class-string $class
      * @param non-empty-string $name
      * @return PropertyWriterInterface<object, mixed>
      */
-    private static function createWriter(string $class, string $name): PropertyWriterInterface
-    {
-        return PropertyAccessorFactory::createDefault()
-            ->createWriter(new \ReflectionProperty($class, $name), new PropertyMetadata($name));
+    private static function createWriter(
+        string $class,
+        string $name,
+        ?AccessPointInterface $point = null,
+    ): PropertyWriterInterface {
+        $access = new AccessMetadata($point ?? new StorageAccessPoint($name));
+
+        return PropertyAccessorFactory::createDefault()->createWriter(
+            new \ReflectionClass($class),
+            (new PropertyMetadata($name))->withWriteAccess($access),
+        );
     }
 
     /**
@@ -342,10 +522,17 @@ final class PropertyAccessorFactoryTest extends TestCase
      * @param non-empty-string $name
      * @return PropertyReaderInterface<object, mixed>
      */
-    private static function createReader(string $class, string $name): PropertyReaderInterface
-    {
-        return PropertyAccessorFactory::createDefault()
-            ->createReader(new \ReflectionProperty($class, $name), new PropertyMetadata($name));
+    private static function createReader(
+        string $class,
+        string $name,
+        ?AccessPointInterface $point = null,
+    ): PropertyReaderInterface {
+        $access = new AccessMetadata($point ?? new StorageAccessPoint($name));
+
+        return PropertyAccessorFactory::createDefault()->createReader(
+            new \ReflectionClass($class),
+            (new PropertyMetadata($name))->withReadAccess($access),
+        );
     }
 
     /**
@@ -362,14 +549,14 @@ final class PropertyAccessorFactoryTest extends TestCase
             ) {}
 
             public function tryCreateReader(
-                \ReflectionProperty $property,
+                \ReflectionClass $class,
                 PropertyMetadata $metadata,
             ): ?PropertyReaderInterface {
                 return $this->reader;
             }
 
             public function tryCreateWriter(
-                \ReflectionProperty $property,
+                \ReflectionClass $class,
                 PropertyMetadata $metadata,
             ): ?PropertyWriterInterface {
                 return null;

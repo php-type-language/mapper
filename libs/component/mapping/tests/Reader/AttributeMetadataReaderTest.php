@@ -55,39 +55,37 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read);
-        self::assertType('list<' . UserStub::class . '>', $accounts->write);
-        self::assertSame('AttributeStub.php', \basename((string) $accounts->read->source->file));
-        self::assertNull($accounts->read->strict);
+        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('list<' . UserStub::class . '>', $accounts->write?->type);
+        self::assertSame('AttributeStub.php', \basename((string) $accounts->read?->type?->source->file));
+        self::assertNull($accounts->strict);
 
         $value = self::getProperty($metadata, 'value');
-        self::assertType('int', $value->read);
-        self::assertType('int', $value->write);
-        self::assertTrue($value->read->strict);
-        self::assertTrue($value->write->strict);
+        self::assertType('int', $value->read?->type);
+        self::assertType('int', $value->write?->type);
+        self::assertTrue($value->strict);
     }
 
     public function testNamedStrictArgumentAppliesToBothTypes(): void
     {
         $value = self::getProperty(self::readAttributes(StrictAttributeStub::class), 'value');
 
-        self::assertType('positive-int', $value->read);
-        self::assertType('positive-int', $value->write);
-        self::assertTrue($value->read->strict);
-        self::assertTrue($value->write->strict);
+        self::assertType('positive-int', $value->read?->type);
+        self::assertType('positive-int', $value->write?->type);
+        self::assertTrue($value->strict);
     }
 
     public function testAttributeKeepsValuesItDoesNotSet(): void
     {
         $id = self::getProperty(self::readAttributes(AttributeStub::class), 'id');
 
-        self::assertType('int', $id->read);
+        self::assertType('int', $id->read?->type);
         self::assertSame(0, $id->default?->value);
     }
 
     public function testAttributeOfTraitPropertyUsesImportsOfTraitFileAndSelfOfClass(): void
     {
-        $type = self::getProperty(self::readAttributes(TraitUserStub::class), 'main')->read;
+        $type = self::getProperty(self::readAttributes(TraitUserStub::class), 'main')->read?->type;
 
         self::assertType(UserStub::class . '|' . TraitUserStub::class, $type);
         self::assertSame('OwnerTrait.php', \basename((string) $type->source->file));
@@ -122,17 +120,17 @@ final class AttributeMetadataReaderTest extends TestCase
 
         $metadata = self::readOverReflection($reader, AttributeStub::class);
 
-        self::assertNotNull(self::getProperty($metadata, 'accounts')->read?->error);
-        self::assertType('positive-int', self::getProperty($metadata, 'count')->read);
+        self::assertNotNull(self::getProperty($metadata, 'accounts')->read?->type?->error);
+        self::assertType('positive-int', self::getProperty($metadata, 'count')->read?->type);
     }
 
     public function testUnparsableTypeIsTypeWithErrorAndIsNotThrown(): void
     {
         $items = self::getProperty(self::readAttributes(UnparsableTypeStub::class), 'items');
 
-        self::assertNotNull($items->read?->error);
-        self::assertSame('UnparsableTypeStub.php', \basename((string) $items->read->source->file));
-        self::assertSame($items->read, $items->write);
+        self::assertNotNull($items->read?->type?->error);
+        self::assertSame('UnparsableTypeStub.php', \basename((string) $items->read?->type?->source->file));
+        self::assertSame($items->read?->type, $items->write?->type);
     }
 
     public function testMapTypeOfMethodIsThrownAndPropertyIsStillRead(): void
@@ -153,7 +151,7 @@ final class AttributeMetadataReaderTest extends TestCase
         try {
             $read();
         } catch (InvalidMetadataException $e) {
-            self::assertType('positive-int', self::getProperty($e->metadata, 'id')->read);
+            self::assertType('positive-int', self::getProperty($e->metadata, 'id')->read?->type);
         }
     }
 

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Metadata;
 
+use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
@@ -31,13 +34,13 @@ final class PropertyMetadataTest extends TestCase
         self::assertTrue((new PropertyMetadata('userId', externalName: 'user_id'))->isExternalNameExplicit);
     }
 
-    public function testStrictnessIsOptionOfType(): void
+    public function testBothDirectionsAccessStorageWithoutTypeByDefault(): void
     {
-        $type = self::createType('int');
+        $property = new PropertyMetadata('userId');
 
-        self::assertNull($type->strict);
-        self::assertTrue($type->withStrict(true)->strict);
-        self::assertSame($type->type, $type->withStrict(true)->type);
+        self::assertEquals(new AccessMetadata(new StorageAccessPoint('userId')), $property->read);
+        self::assertEquals(new AccessMetadata(new StorageAccessPoint('userId')), $property->write);
+        self::assertNull($property->strict);
     }
 
     public function testTypeIsTreeOrError(): void
@@ -49,7 +52,6 @@ final class PropertyMetadataTest extends TestCase
         self::assertNull($type->error);
         self::assertNull($error->type);
         self::assertSame('Unexpected end of input', $error->error);
-        self::assertSame('Unexpected end of input', $error->withStrict(true)->error);
     }
 
     public function testWithersKeepOtherValues(): void
@@ -62,13 +64,42 @@ final class PropertyMetadataTest extends TestCase
             ->withExternalName('user_id')
             ->withReadType($read)
             ->withWriteType($write)
+            ->withStrict(true)
             ->withDefaultValue($default);
 
         self::assertSame('id', $property->name);
         self::assertSame('user_id', $property->externalName);
-        self::assertSame($read, $property->read);
-        self::assertSame($write, $property->write);
+        self::assertSame($read, $property->read?->type);
+        self::assertSame($write, $property->write?->type);
+        self::assertTrue($property->strict);
         self::assertSame($default, $property->default);
+    }
+
+    public function testTypeKeepsPointOfDirection(): void
+    {
+        $type = self::createType('int');
+        $hook = new AccessMetadata(new HookAccessPoint('id'));
+
+        $property = (new PropertyMetadata('id'))->withWriteAccess($hook)->withType($type);
+
+        self::assertInstanceOf(StorageAccessPoint::class, $property->read?->point);
+        self::assertSame($hook->point, $property->write?->point);
+        self::assertSame($type, $property->read->type);
+        self::assertSame($type, $property->write->type);
+    }
+
+    public function testTypeDoesNotAddMissingDirection(): void
+    {
+        $type = self::createType('int');
+
+        $property = (new PropertyMetadata('id'))
+            ->withReadAccess(null)
+            ->withType($type)
+            ->withReadType($type);
+
+        self::assertNull($property->read);
+        self::assertSame($type, $property->write?->type);
+        self::assertNull($property->withWriteAccess(null)->withWriteType($type)->write);
     }
 
     public function testWitherDoesNotChangeOriginal(): void

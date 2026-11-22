@@ -8,10 +8,13 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Exception\InvalidValueException;
+use TypeLang\Mapper\Exception\MapperExceptionInterface;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Instantiator\Exception\ClassNotInstantiableException;
 use TypeLang\Mapper\Instantiator\InstantiatorInterface;
 use TypeLang\Mapper\Instantiator\Strategy\InstantiationStrategyInterface;
+use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
@@ -25,6 +28,7 @@ use TypeLang\Mapper\Tests\Stub\AbstractShapeStub;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\AliasedStub;
 use TypeLang\Mapper\Tests\Stub\BrokenSkipStub;
+use TypeLang\Mapper\Tests\Stub\BypassedSetHookStub;
 use TypeLang\Mapper\Tests\Stub\ComputedStub;
 use TypeLang\Mapper\Tests\Stub\FirstInDataAliasStub;
 use TypeLang\Mapper\Tests\Stub\HookStub;
@@ -46,6 +50,8 @@ use TypeLang\Mapper\Tests\Stub\StdClassChildStub;
 use TypeLang\Mapper\Tests\Stub\StrictnessStub;
 use TypeLang\Mapper\Tests\Stub\UntypedStub;
 use TypeLang\Mapper\Tests\Stub\UserStub;
+use TypeLang\Mapper\Tests\Stub\VirtualStringableStub;
+use TypeLang\Mapper\Tests\Stub\WiderSetHookStub;
 use TypeLang\Mapper\Tests\TestCase;
 use TypeLang\Type\Name;
 use TypeLang\Type\NamedTypeNode;
@@ -379,15 +385,84 @@ final class ClassTypeTest extends TestCase
     }
 
     #[RequiresPhp('>= 8.4.0')]
+    public function testValueOutsideTypeOfPropertyWithWiderSetHookIsViolation(): void
+    {
+        self::assertDenormalizationFails(
+            WiderSetHookStub::class,
+            ['list' => ['a', 'b']],
+            '$.list: Value must be of type string, but array(2) given',
+        );
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyWithWiderSetHookIsCoercedByMapperBypassingHook(): void
+    {
+        $object = self::createMapper()->denormalize(['number' => 42], WiderSetHookStub::class);
+
+        self::assertInstanceOf(WiderSetHookStub::class, $object);
+        self::assertSame('42', $object->number);
+        self::assertDenormalizationFails(
+            WiderSetHookStub::class,
+            ['number' => 42],
+            '$.number: Value must be of type string, but 42 given',
+            self::createMapper(strict: true),
+        );
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyWithSetHookOfUnsupportedTypeIsBuilt(): void
+    {
+        $object = self::createMapper()->denormalize(['id' => 'a'], WiderSetHookStub::class);
+
+        self::assertInstanceOf(WiderSetHookStub::class, $object);
+        self::assertSame('a', $object->id);
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testPropertyWithWiderSetHookRoundTrips(): void
+    {
+        $mapper = self::createMapper();
+        $data = ['list' => 'a,b', 'number' => '42', 'id' => 'a'];
+
+        $object = $mapper->denormalize($data, WiderSetHookStub::class);
+
+        self::assertSame($data, $mapper->normalize($object, WiderSetHookStub::class));
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testTypeAttributeOfBypassedSetHookIsErrorOfMetadata(): void
+    {
+        $mapper = self::createMapper();
+
+        $error = self::captureThrowable(
+            static fn(): mixed => $mapper->denormalize(['tags' => ['a', 'b']], BypassedSetHookStub::class),
+        );
+
+        self::assertNotInstanceOf(\TypeError::class, $error);
+        self::assertInstanceOf(MapperExceptionInterface::class, $error);
+        self::assertStringContainsString('of the set hook has no effect', $error->getMessage());
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
+    public function testVirtualPropertyWithSetHookOfUnsupportedTypeIsErrorOfType(): void
+    {
+        $error = self::captureBuildError(VirtualStringableStub::class);
+
+        self::assertInstanceOf(TypeDefinitionException::class, $error);
+        self::assertStringContainsString('Stringable', $error->getMessage());
+    }
+
+    #[RequiresPhp('>= 8.4.0')]
     public function testPropertyThatCannotBeAccessedInItsDirectionIsErrorOfType(): void
     {
         $metadata = new class implements MetadataProviderInterface {
             public function read(\ReflectionClass $class): ClassMetadata
             {
                 $type = TypeMetadata::createFromType(new NamedTypeNode(new Name('string')), new SourceInfo());
+                $hook = new AccessMetadata(new HookAccessPoint('greeting'), $type);
+                $property = (new PropertyMetadata('greeting'))->withReadAccess($hook)->withWriteAccess($hook);
 
-                return (new ClassMetadata($class->name))
-                    ->withProperty(new PropertyMetadata('greeting', read: $type, write: $type));
+                return (new ClassMetadata($class->name))->withProperty($property);
             }
         };
 
@@ -399,7 +474,7 @@ final class ClassTypeTest extends TestCase
         self::assertInstanceOf(PropertyNotWritableException::class, $error->getPrevious());
         self::assertSame(
             \sprintf(
-                'Class "%s" cannot be mapped: Property "%s::$greeting" is read-only',
+                'Class "%s" cannot be mapped: Property "%s::$greeting" has no set hook',
                 ComputedStub::class,
                 ComputedStub::class,
             ),
@@ -578,7 +653,7 @@ final class ClassTypeTest extends TestCase
             public array $names = [];
 
             public function tryCreateReader(
-                \ReflectionProperty $property,
+                \ReflectionClass $class,
                 PropertyMetadata $metadata,
             ): ?PropertyReaderInterface {
                 $this->names[] = $metadata->externalName;
@@ -587,7 +662,7 @@ final class ClassTypeTest extends TestCase
             }
 
             public function tryCreateWriter(
-                \ReflectionProperty $property,
+                \ReflectionClass $class,
                 PropertyMetadata $metadata,
             ): ?PropertyWriterInterface {
                 $this->names[] = $metadata->externalName;

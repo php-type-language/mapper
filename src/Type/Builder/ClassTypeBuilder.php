@@ -54,12 +54,12 @@ final class ClassTypeBuilder implements TypeBuilderInterface
         $writable = $readable = [];
 
         foreach ($metadata->properties as $property) {
-            if ($property->isWritable) {
-                $writable[] = self::createProperty($class, $property, $property->write, $context);
+            if ($property->write !== null) {
+                $writable[] = self::createProperty($class, $property, $property->write->type, $context);
             }
 
-            if ($property->isReadable) {
-                $readable[] = self::createProperty($class, $property, $property->read ?? $property->write, $context);
+            if ($property->read !== null) {
+                $readable[] = self::createProperty($class, $property, $property->read->type, $context);
             }
         }
 

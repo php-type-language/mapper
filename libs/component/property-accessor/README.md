@@ -1,17 +1,16 @@
 # Property Accessor
 
-Reads and writes one property of any object of its class, regardless of its
-visibility, the way of access is chosen once by the declaration of the
-property and its metadata. Strategies of the user are tried before the
-default ones.
+Reads and writes one property of any object of its class at the access
+point given by its metadata: the backing store, a hook or a method.
+Strategies of the user are tried before the default ones.
 
 ```php
 use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 
-$property = new \ReflectionProperty(User::class, 'email');
-$factory = PropertyAccessorFactory::createDefault([new GetterSetterStrategy()]);
+$class = new \ReflectionClass(User::class);
+$factory = PropertyAccessorFactory::createDefault([new LazyAccessStrategy()]);
 
-$factory->createWriter($property, $metadata)->write($user, 'user@example.com');
+$factory->createWriter($class, $metadata)->write($user, 'user@example.com');
 
-echo $factory->createReader($property, $metadata)->read($user); // user@example.com
+echo $factory->createReader($class, $metadata)->read($user); // user@example.com
 ```

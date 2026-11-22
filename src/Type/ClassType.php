@@ -133,7 +133,7 @@ final class ClassType implements TypeInterface
                 return false;
             }
 
-            $isStrict = $property->metadata->write?->strict;
+            $isStrict = $property->metadata->strict;
             $current = $isStrict === null ? $context : $context->withStrict($isStrict);
 
             if (!$property->type->isDenormalizable($value[$key], $current)) {
@@ -228,7 +228,7 @@ final class ClassType implements TypeInterface
             }
 
             $field = $value[$key];
-            $isStrict = $property->metadata->write?->strict;
+            $isStrict = $property->metadata->strict;
 
             try {
                 $accessor->writers[$name]->write($object, $property->type->denormalize(

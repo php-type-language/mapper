@@ -8,7 +8,8 @@ use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Naming\NamingStrategyInterface;
 
 /**
- * Value of an attribute argument or of a config key has a wrong type.
+ * Value of an attribute argument or of a config key has a wrong type or
+ * does not apply to its property.
  */
 final class InvalidOptionValueException extends MetadataException
 {
@@ -134,6 +135,26 @@ final class InvalidOptionValueException extends MetadataException
     public static function becausePropertyConfigIsNotStringOrMap(string $property, SourceInfo $source): self
     {
         return new self($property, $source, 'config must be a string or a map');
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becausePropertyIsNotNormalized(string $key, string $property, SourceInfo $source): self
+    {
+        $message = \sprintf('"%s" is given, but the property is not normalized', \addcslashes($key, '"'));
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becausePropertyIsNotDenormalized(string $key, string $property, SourceInfo $source): self
+    {
+        $message = \sprintf('"%s" is given, but the property is not denormalized', \addcslashes($key, '"'));
+
+        return new self($property, $source, $message);
     }
 
     private static function formatValue(string $key, string $expected): string

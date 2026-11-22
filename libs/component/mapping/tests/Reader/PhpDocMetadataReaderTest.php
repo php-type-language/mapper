@@ -32,31 +32,31 @@ final class PhpDocMetadataReaderTest extends TestCase
         $metadata = self::readPhpDoc(DocBlockStub::class);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read);
-        self::assertType('list<' . UserStub::class . '>', $accounts->write);
-        self::assertSame('DocBlockStub.php', \basename((string) $accounts->read->source->file));
+        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('list<' . UserStub::class . '>', $accounts->write?->type);
+        self::assertSame('DocBlockStub.php', \basename((string) $accounts->read?->type?->source->file));
     }
 
     public function testNamesWithoutImportAreKeptAsWritten(): void
     {
         $metadata = self::readPhpDoc(DocBlockStub::class);
 
-        self::assertType('T', self::getProperty($metadata, 'template')->read);
-        self::assertType(DocBlockStub::class . '<T>|null', self::getProperty($metadata, 'self')->read);
+        self::assertType('T', self::getProperty($metadata, 'template')->read?->type);
+        self::assertType(DocBlockStub::class . '<T>|null', self::getProperty($metadata, 'self')->read?->type);
     }
 
     public function testSelfIsDeclaringClassAndStaticIsReadClass(): void
     {
         $metadata = self::readPhpDoc(SelfChildStub::class);
 
-        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'self')->read);
-        self::assertType(SelfChildStub::class . '|null', self::getProperty($metadata, 'static')->read);
-        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'parent')->read);
+        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'self')->read?->type);
+        self::assertType(SelfChildStub::class . '|null', self::getProperty($metadata, 'static')->read?->type);
+        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'parent')->read?->type);
     }
 
     public function testParentOfClassWithoutParentIsErrorOfType(): void
     {
-        $type = self::getProperty(self::readPhpDoc(OrphanParentStub::class), 'parent')->read;
+        $type = self::getProperty(self::readPhpDoc(OrphanParentStub::class), 'parent')->read?->type;
 
         self::assertNotNull($type);
         self::assertNull($type->type);
@@ -70,15 +70,15 @@ final class PhpDocMetadataReaderTest extends TestCase
     {
         $metadata = self::readPhpDoc(PromotedStub::class);
 
-        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write);
+        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
     }
 
     public function testTagUnknownToParserIsIgnoredAndTagOfOtherVariableIsSkipped(): void
     {
         $metadata = self::readPhpDoc(DocBlockStub::class);
 
-        self::assertType('array', self::getProperty($metadata, 'prefixed')->read);
-        self::assertType('mixed', self::getProperty($metadata, 'foreign')->read);
+        self::assertType('array', self::getProperty($metadata, 'prefixed')->read?->type);
+        self::assertType('mixed', self::getProperty($metadata, 'foreign')->read?->type);
     }
 
     public function testFirstTagOfKindWinsAmongAliases(): void
@@ -87,7 +87,7 @@ final class PhpDocMetadataReaderTest extends TestCase
 
         $metadata = self::readOverReflection($reader, DocBlockStub::class);
 
-        self::assertType('array', self::getProperty($metadata, 'prefixed')->read);
+        self::assertType('array', self::getProperty($metadata, 'prefixed')->read?->type);
     }
 
     public function testAliasOfParserPlatformIsReadAsItsTag(): void
@@ -96,32 +96,40 @@ final class PhpDocMetadataReaderTest extends TestCase
 
         $metadata = self::readOverReflection($reader, BrokenDocBlockStub::class);
 
-        self::assertType('positive-int', self::getProperty($metadata, 'value')->read);
+        self::assertType('positive-int', self::getProperty($metadata, 'value')->read?->type);
+    }
+
+    public function testBothDirectionsOfStorageShareOneType(): void
+    {
+        $property = self::getProperty(self::readPhpDoc(PromotedStub::class), 'users');
+
+        self::assertNotNull($property->read?->type);
+        self::assertSame($property->read->type, $property->write?->type);
     }
 
     public function testPromotedPropertyIsReadFromVarThenFromConstructorParam(): void
     {
         $metadata = self::readPhpDoc(PromotedStub::class);
 
-        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write);
-        self::assertType('positive-int', self::getProperty($metadata, 'count')->read);
-        self::assertType('TItem', self::getProperty($metadata, 'item')->read);
-        self::assertType('string', self::getProperty($metadata, 'required')->read);
+        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
+        self::assertType('positive-int', self::getProperty($metadata, 'count')->read?->type);
+        self::assertType('TItem', self::getProperty($metadata, 'item')->read?->type);
+        self::assertType('string', self::getProperty($metadata, 'required')->read?->type);
     }
 
     public function testUnparsableConstructorParamIsNotRead(): void
     {
         $metadata = self::readPhpDoc(BrokenPromotedStub::class);
 
-        self::assertType('array', self::getProperty($metadata, 'users')->read);
-        self::assertType('?int', self::getProperty($metadata, 'nullable')->read);
-        self::assertType('positive-int', self::getProperty($metadata, 'count')->read);
-        self::assertType('non-empty-string', self::getProperty($metadata, 'name')->read);
+        self::assertType('array', self::getProperty($metadata, 'users')->read?->type);
+        self::assertType('?int', self::getProperty($metadata, 'nullable')->read?->type);
+        self::assertType('positive-int', self::getProperty($metadata, 'count')->read?->type);
+        self::assertType('non-empty-string', self::getProperty($metadata, 'name')->read?->type);
     }
 
     public function testTraitPropertyIsResolvedByImportsOfTraitFile(): void
     {
-        $type = self::getProperty(self::readPhpDoc(TraitUserStub::class), 'owners')->read;
+        $type = self::getProperty(self::readPhpDoc(TraitUserStub::class), 'owners')->read?->type;
 
         self::assertType('list<' . UserStub::class . '>', $type);
         self::assertSame('OwnerTrait.php', \basename((string) $type->source->file));
@@ -134,8 +142,8 @@ final class PhpDocMetadataReaderTest extends TestCase
 
         $metadata = self::createPhpDocReader(['type-lang-var' => 'var'])->read($class, $lower);
 
-        self::assertType('int', self::getProperty($lower, 'value')->read);
-        self::assertType('positive-int', self::getProperty($metadata, 'value')->read);
+        self::assertType('int', self::getProperty($lower, 'value')->read?->type);
+        self::assertType('positive-int', self::getProperty($metadata, 'value')->read?->type);
     }
 
     /**

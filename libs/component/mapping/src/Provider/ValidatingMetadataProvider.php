@@ -70,10 +70,10 @@ final class ValidatingMetadataProvider implements MetadataProviderInterface
         $errors = [];
 
         foreach ($metadata->properties as $property) {
-            $types = [$property->read];
+            $types = [$property->read?->type];
 
-            if (!self::isSameFailure($property->read, $property->write)) {
-                $types[] = $property->write;
+            if (!self::isSameFailure($property->read?->type, $property->write?->type)) {
+                $types[] = $property->write?->type;
             }
 
             foreach ($types as $type) {

@@ -77,18 +77,12 @@ final class ClassAccessors
             $readers = $writers = [];
 
             foreach ($metadata->properties as $property) {
-                if (!$property->isReadable && !$property->isWritable) {
-                    continue;
+                if ($property->read !== null) {
+                    $readers[$property->name] = $this->properties->createReader($class, $property);
                 }
 
-                $reflection = $class->getProperty($property->name);
-
-                if ($property->isReadable) {
-                    $readers[$property->name] = $this->properties->createReader($reflection, $property);
-                }
-
-                if ($property->isWritable) {
-                    $writers[$property->name] = $this->properties->createWriter($reflection, $property);
+                if ($property->write !== null) {
+                    $writers[$property->name] = $this->properties->createWriter($class, $property);
                 }
             }
         } catch (PropertyAccessorExceptionInterface|InstantiatorExceptionInterface|\ReflectionException $e) {

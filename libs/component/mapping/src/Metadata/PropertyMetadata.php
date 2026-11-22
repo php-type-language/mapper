@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Metadata;
 
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\SkipConditionInterface;
 
 /**
@@ -55,22 +56,36 @@ final class PropertyMetadata
     public AliasConflict $aliasConflict = AliasConflict::DEFAULT;
 
     /**
-     * Type of the value read from the property on normalization
+     * Where the value is read from on normalization and its type there,
+     * {@see null} in case of the property is not normalized, such as a
+     * virtual one without a get hook
      *
      * @readonly
      *
      * @phpstan-readonly-allow-private-mutation
      */
-    public ?TypeMetadata $read;
+    public ?AccessMetadata $read;
 
     /**
-     * Type of the value written to the property on denormalization
+     * Where the value is written to on denormalization and its type there,
+     * {@see null} in case of the property is not denormalized, such as a
+     * virtual one without a set hook
      *
      * @readonly
      *
      * @phpstan-readonly-allow-private-mutation
      */
-    public ?TypeMetadata $write;
+    public ?AccessMetadata $write;
+
+    /**
+     * Whether a value must match the write type exactly, without coercion,
+     * {@see null} means the mapper configuration
+     *
+     * @readonly
+     *
+     * @phpstan-readonly-allow-private-mutation
+     */
+    public ?bool $strict = null;
 
     /**
      * Value used when mapped data has none, {@see null} in case of the
@@ -81,28 +96,6 @@ final class PropertyMetadata
      * @phpstan-readonly-allow-private-mutation
      */
     public ?DefaultValueMetadata $default;
-
-    /**
-     * Whether the property takes part in normalization, {@see false} for a
-     * property that has no value to read, such as a virtual one without a
-     * get hook
-     *
-     * @readonly
-     *
-     * @phpstan-readonly-allow-private-mutation
-     */
-    public bool $isReadable;
-
-    /**
-     * Whether the property takes part in denormalization, {@see false} for
-     * a property that takes no value, such as a virtual one without a set
-     * hook
-     *
-     * @readonly
-     *
-     * @phpstan-readonly-allow-private-mutation
-     */
-    public bool $isWritable;
 
     /**
      * Conditions the property is left out of the normalized data under, any
@@ -141,30 +134,28 @@ final class PropertyMetadata
     public ?string $undefinedErrorMessage = null;
 
     /**
+     * Both directions access the backing store of the PHP property of the
+     * name and have no type.
+     *
      * @param non-empty-string|null $externalName name of the property in
      *        mapped data, the PHP name in case of {@see null}
      * @param list<SkipConditionInterface> $skip
      */
     public function __construct(
         /**
+         * Name of the property, the key of its reader and writer
+         *
          * @var non-empty-string
          */
         public readonly string $name,
         ?string $externalName = null,
-        ?TypeMetadata $read = null,
-        ?TypeMetadata $write = null,
         ?DefaultValueMetadata $default = null,
-        bool $isReadable = true,
-        bool $isWritable = true,
         array $skip = [],
     ) {
         $this->externalName = $externalName ?? $name;
         $this->isExternalNameExplicit = $externalName !== null;
-        $this->read = $read;
-        $this->write = $write;
+        $this->read = $this->write = new AccessMetadata(new StorageAccessPoint($name));
         $this->default = $default;
-        $this->isReadable = $isReadable;
-        $this->isWritable = $isWritable;
         $this->skip = $skip;
     }
 
@@ -203,18 +194,34 @@ final class PropertyMetadata
         return $self;
     }
 
-    public function withReadable(bool $isReadable): self
+    /**
+     * Returns a copy reading the value from the given point, {@see null}
+     * leaves the property out of normalization.
+     */
+    public function withReadAccess(?AccessMetadata $access): self
     {
         $self = clone $this;
-        $self->isReadable = $isReadable;
+        $self->read = $access;
 
         return $self;
     }
 
-    public function withWritable(bool $isWritable): self
+    /**
+     * Returns a copy writing the value to the given point, {@see null}
+     * leaves the property out of denormalization.
+     */
+    public function withWriteAccess(?AccessMetadata $access): self
     {
         $self = clone $this;
-        $self->isWritable = $isWritable;
+        $self->write = $access;
+
+        return $self;
+    }
+
+    public function withStrict(bool $strict): self
+    {
+        $self = clone $this;
+        $self->strict = $strict;
 
         return $self;
     }
@@ -252,27 +259,39 @@ final class PropertyMetadata
         return $self;
     }
 
+    /**
+     * Returns a copy with the type of the directions of the property, a
+     * missing direction is not added.
+     */
     public function withType(TypeMetadata $type): self
     {
         $self = clone $this;
-        $self->read = $type;
-        $self->write = $type;
+        $self->read = $this->read?->withType($type);
+        $self->write = $this->write?->withType($type);
 
         return $self;
     }
 
+    /**
+     * Returns a copy with the read type, the property without the read
+     * direction is returned as is.
+     */
     public function withReadType(TypeMetadata $type): self
     {
         $self = clone $this;
-        $self->read = $type;
+        $self->read = $this->read?->withType($type);
 
         return $self;
     }
 
+    /**
+     * Returns a copy with the write type, the property without the write
+     * direction is returned as is.
+     */
     public function withWriteType(TypeMetadata $type): self
     {
         $self = clone $this;
-        $self->write = $type;
+        $self->write = $this->write?->withType($type);
 
         return $self;
     }

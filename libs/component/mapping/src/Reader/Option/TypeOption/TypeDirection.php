@@ -27,14 +27,4 @@ enum TypeDirection: string
      * Key `write_type`
      */
     case Write = 'write_type';
-
-    public function isRead(): bool
-    {
-        return $this !== self::Write;
-    }
-
-    public function isWrite(): bool
-    {
-        return $this !== self::Read;
-    }
 }

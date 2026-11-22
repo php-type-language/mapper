@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Metadata;
 
+use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DefaultValueMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
@@ -50,12 +52,13 @@ final class ClassMetadataTest extends TestCase
     public function testSerializationKeepsTypesAndSources(): void
     {
         $source = new SourceInfo('/app/mapping.yaml', '$.properties.id.type');
-        $type = TypeMetadata::createFromType(new NamedTypeNode(new Name('int')), $source)->withStrict(true);
+        $type = TypeMetadata::createFromType(new NamedTypeNode(new Name('int')), $source);
         $error = TypeMetadata::createFromError('Unexpected end of input', $source);
 
         $property = (new PropertyMetadata('id'))
-            ->withWriteType($type)
             ->withReadType($error)
+            ->withWriteAccess(new AccessMetadata(new HookAccessPoint('id'), $type))
+            ->withStrict(true)
             ->withDefaultValue(new DefaultValueMetadata(1, $source));
 
         $metadata = (new ClassMetadata(\stdClass::class))->withProperty($property);

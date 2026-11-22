@@ -10,48 +10,52 @@ use TypeLang\Mapper\PropertyAccessor\PropertyReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
 
 /**
- * One way of reading and writing a property, such as through a getter and
- * a setter, chosen by the declaration of the property and its metadata,
- * such as by an attribute or a config of the property. A strategy may take
- * one direction only.
+ * One way of reading and writing a property, chosen by the access point of
+ * the direction in the metadata, such as the backing store or a method of
+ * the class. A strategy may take one direction only.
  *
  * ```
- * public function tryCreateReader(\ReflectionProperty $property, PropertyMetadata $metadata): ?PropertyReaderInterface
- * {
- *     $getter = 'get' . \ucfirst($property->name);
+ * public function tryCreateReader(
+ *     \ReflectionClass $class,
+ *     PropertyMetadata $metadata,
+ * ): ?PropertyReaderInterface {
+ *     $point = $metadata->read?->point;
  *
- *     if (!\method_exists($property->class, $getter)) {
+ *     if (!$point instanceof LazyAccessPoint) {
  *         return null;
  *     }
  *
- *     return new GetterReader($getter);
+ *     return new LazyReader($point->loader);
  * }
  * ```
  */
 interface AccessStrategyInterface
 {
     /**
-     * Returns {@see null} in case of the strategy does not read the property.
+     * Returns {@see null} in case of the strategy does not take the access
+     * point of the read direction.
      *
+     * @param \ReflectionClass<object> $class
      * @return PropertyReaderInterface<object, mixed>|null
      * @throws PropertyAccessorExceptionInterface in case of the strategy
-     *         takes the property, but it cannot be read
+     *         takes the point, but it cannot be read
      */
     public function tryCreateReader(
-        \ReflectionProperty $property,
+        \ReflectionClass $class,
         PropertyMetadata $metadata,
     ): ?PropertyReaderInterface;
 
     /**
-     * Returns {@see null} in case of the strategy does not write the
-     * property.
+     * Returns {@see null} in case of the strategy does not take the access
+     * point of the write direction.
      *
+     * @param \ReflectionClass<object> $class
      * @return PropertyWriterInterface<object, mixed>|null
      * @throws PropertyAccessorExceptionInterface in case of the strategy
-     *         takes the property, but it cannot be written
+     *         takes the point, but it cannot be written
      */
     public function tryCreateWriter(
-        \ReflectionProperty $property,
+        \ReflectionClass $class,
         PropertyMetadata $metadata,
     ): ?PropertyWriterInterface;
 }
