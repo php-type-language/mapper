@@ -12,6 +12,7 @@ use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownKeyException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\MethodAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
@@ -84,7 +85,8 @@ final class ArrayMetadataReaderTest extends TestCase
     #[DataProvider('configDataProvider')]
     public function testConfigIsReadTheSameInEveryFormat(MetadataReaderInterface $reader, ?string $file): void
     {
-        $metadata = self::readOverReflection($reader, UserStub::class);
+        $metadata = (new ChainMetadataReader([$reader, new ReflectionMetadataReader()]))
+            ->read(new \ReflectionClass(UserStub::class));
 
         $id = self::getProperty($metadata, 'id');
         self::assertType('positive-int', $id->read?->type);
@@ -103,11 +105,16 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertNotNull($email->default);
         self::assertSame('unknown', $email->default->value);
         self::assertStringEndsWith('.properties.email.default', (string) $email->default->source->path);
+        self::assertEquals(new MethodAccessPoint('setEmail'), $email->write?->point);
 
         $friend = self::getProperty($metadata, 'friend');
         self::assertType('self|null', $friend->read?->type);
         self::assertNotNull($friend->default);
         self::assertNull($friend->default->value);
+
+        $displayName = self::getProperty($metadata, 'displayName');
+        self::assertEquals(new MethodAccessPoint('getDisplayName'), $displayName->read?->point);
+        self::assertNull($displayName->write);
     }
 
     public function testHigherFileOverridesValuesOfLowerFile(): void
@@ -127,6 +134,8 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertSame('mail', $email->externalName);
         self::assertType('non-empty-string', $email->write?->type);
         self::assertSame('config.json', self::printFile($email->write?->type?->source->file));
+        // the chain given the metadata of the base reads the access points first
+        self::assertEquals(new MethodAccessPoint('setEmail'), $email->write?->point);
     }
 
     public function testFileIsDecodedOnceOnFirstRead(): void

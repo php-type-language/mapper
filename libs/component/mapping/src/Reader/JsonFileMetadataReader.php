@@ -8,6 +8,8 @@ use TypeLang\Mapper\Mapping\Exception\ConfigLoadingException;
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Reader\ReaderInterface;
+use TypeLang\Reader\ReflectionReader;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -20,16 +22,21 @@ final class JsonFileMetadataReader extends FileMetadataReader implements Optiona
      * @param non-empty-string $path
      * @param TypeParserInterface<TypeNode, string> $parser parser of the
      *        types of the config
+     * @param ReaderInterface $nativeTypeReader reader of the native types of
+     *        the getters and the setters
      * @throws MissingDependencyException in case of `json_decode()` is not
      *         available
      */
-    public function __construct(string $path, TypeParserInterface $parser = new TypeParser())
-    {
+    public function __construct(
+        string $path,
+        TypeParserInterface $parser = new TypeParser(),
+        ReaderInterface $nativeTypeReader = new ReflectionReader(),
+    ) {
         if (!self::isAvailable()) {
             throw MissingDependencyException::becauseFunctionIsNotAvailable('json_decode', 'JSON config');
         }
 
-        parent::__construct($path, $parser);
+        parent::__construct($path, $parser, $nativeTypeReader);
     }
 
     public static function isAvailable(): bool

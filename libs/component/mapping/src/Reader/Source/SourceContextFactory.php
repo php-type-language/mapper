@@ -53,6 +53,28 @@ final class SourceContextFactory
     }
 
     /**
+     * Creates the place of a value of the property given by its method,
+     * such as by its getter, the types are resolved by the file declaring
+     * the method.
+     *
+     * @param \ReflectionClass<object> $class class the property is read from
+     * @param non-empty-string $property
+     */
+    public function createFromMethod(
+        \ReflectionClass $class,
+        \ReflectionMethod $method,
+        string $property,
+    ): SourceContext {
+        $scope = self::findMethodScope($method->getDeclaringClass(), $method);
+
+        return new SourceContext(
+            target: MetadataException::formatPropertyTarget($class->name, $property),
+            source: SourceInfo::createFromReflection($method),
+            resolver: fn(): TypeResolver => $this->getResolver($scope, $method->getDeclaringClass(), $class),
+        );
+    }
+
+    /**
      * Creates the place of a value of the class itself, such as of its
      * attribute, the types are resolved by its file.
      *
@@ -122,5 +144,39 @@ final class SourceContextFactory
         }
 
         return $class;
+    }
+
+    /**
+     * Returns the class or trait whose body declares the method: a method of
+     * the class overrides the one of its trait, so the trait is the scope
+     * only in case of its lines contain the method, also of an alias of the
+     * trait method.
+     *
+     * @param \ReflectionClass<object> $class
+     * @return \ReflectionClass<object>
+     */
+    private static function findMethodScope(\ReflectionClass $class, \ReflectionMethod $method): \ReflectionClass
+    {
+        foreach ($class->getTraits() as $trait) {
+            $scope = self::findMethodScope($trait, $method);
+
+            if (self::isDeclaredIn($method, $scope)) {
+                return $scope;
+            }
+        }
+
+        return $class;
+    }
+
+    /**
+     * @param \ReflectionClass<object> $scope
+     */
+    private static function isDeclaredIn(\ReflectionMethod $method, \ReflectionClass $scope): bool
+    {
+        $line = $method->getStartLine();
+
+        return $method->getFileName() === $scope->getFileName()
+            && $line >= $scope->getStartLine()
+            && $line <= $scope->getEndLine();
     }
 }

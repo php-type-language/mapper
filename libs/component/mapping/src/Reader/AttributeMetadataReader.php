@@ -10,13 +10,17 @@ use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
 use TypeLang\Mapper\Mapping\MapAlias;
+use TypeLang\Mapper\Mapping\MapGetter;
 use TypeLang\Mapper\Mapping\MapName;
+use TypeLang\Mapper\Mapping\MapOnly;
+use TypeLang\Mapper\Mapping\MapSetter;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\NamingStrategy;
 use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\OnTypeError;
 use TypeLang\Mapper\Mapping\OnUndefinedError;
+use TypeLang\Mapper\Mapping\Reader\Option\AccessOption;
 use TypeLang\Mapper\Mapping\Reader\Option\Options;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 use TypeLang\Mapper\Mapping\Reader\Source\SourceContextFactory;
@@ -25,6 +29,8 @@ use TypeLang\Mapper\Mapping\SkipWhenEmpty;
 use TypeLang\Mapper\Mapping\SkipWhenNull;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Reader\ReaderInterface;
+use TypeLang\Reader\ReflectionReader;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -36,25 +42,32 @@ use TypeLang\Type\TypeNode;
  * {@see DiscriminatorMap}, {@see OnTypeError}, {@see NormalizeAsArray},
  * {@see NamingStrategy} of a class, {@see MapAlias} of a case. Names in the
  * types are resolved by the file declaring the property or the class.
+ * The access points are read by {@see self::readAccess()}.
  */
-final class AttributeMetadataReader implements MetadataReaderInterface
+final class AttributeMetadataReader implements AccessSourceReaderInterface
 {
     private readonly SourceContextFactory $contexts;
 
     private readonly Options $options;
+
+    private readonly AccessOption $access;
 
     /**
      * @param TypeParserInterface<TypeNode, string> $parser parser of the
      *        types of {@see MapType}
      * @param ExpressionLanguage|null $expressions parser of the expressions of
      *        {@see SkipWhen}, created on the first one in case of {@see null}
+     * @param ReaderInterface $nativeTypeReader reader of the native types of
+     *        the getters and the setters
      */
     public function __construct(
         TypeParserInterface $parser = new TypeParser(),
         ?ExpressionLanguage $expressions = null,
+        ReaderInterface $nativeTypeReader = new ReflectionReader(),
     ) {
         $this->contexts = new SourceContextFactory();
         $this->options = Options::createDefault($parser, $expressions);
+        $this->access = new AccessOption($nativeTypeReader);
     }
 
     /**
@@ -76,6 +89,23 @@ final class AttributeMetadataReader implements MetadataReaderInterface
         foreach ($this->options->classes as $option) {
             $metadata = $option->readClassAttributes($class, $metadata, $this->contexts, $errors);
         }
+
+        $errors->throwIfNotEmpty($metadata);
+
+        return $metadata;
+    }
+
+    /**
+     * Reads {@see MapGetter}, {@see MapSetter} and {@see MapOnly}.
+     *
+     * @throws InvalidMetadataException in case of an attribute is wrong or
+     *         belongs to a property that is not given
+     */
+    public function readAccess(\ReflectionClass $class, ClassMetadata $metadata): ClassMetadata
+    {
+        $errors = new ErrorCollector();
+
+        $metadata = $this->access->readAttributes($class, $metadata, $this->contexts, $errors);
 
         $errors->throwIfNotEmpty($metadata);
 

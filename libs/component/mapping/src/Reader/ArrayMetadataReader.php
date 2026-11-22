@@ -15,6 +15,7 @@ use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reader\ArrayMetadataReader\ClassIndex;
+use TypeLang\Mapper\Mapping\Reader\Option\AccessOption;
 use TypeLang\Mapper\Mapping\Reader\Option\Options;
 use TypeLang\Mapper\Mapping\Reader\Option\TypeOption\TypeDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigPath;
@@ -22,6 +23,8 @@ use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Reader\ReaderInterface;
+use TypeLang\Reader\ReflectionReader;
 use TypeLang\Type\TypeNode;
 
 /**
@@ -57,13 +60,23 @@ use TypeLang\Type\TypeNode;
  *       skip: [null, 'this.isPrivate()']
  *       type_error_message: 'Email must be a string'
  *       undefined_error_message: 'Email is required'
+ *     name:
+ *       getter: getName
+ *       setter: true
+ *     createdAt:
+ *       only: normalization
  * ```
+ *
+ * The `getter`, `setter` and `only` keys are read by
+ * {@see self::readAccess()}.
  */
-final class ArrayMetadataReader implements MetadataReaderInterface
+final class ArrayMetadataReader implements AccessSourceReaderInterface
 {
     private const PROPERTIES_KEY = 'properties';
 
     private readonly Options $options;
+
+    private readonly AccessOption $access;
 
     /**
      * Keys of a class config: of the properties and of the options
@@ -86,6 +99,8 @@ final class ArrayMetadataReader implements MetadataReaderInterface
      *        types of the config
      * @param ExpressionLanguage|null $expressions parser of the expressions
      *        of `skip`, created on the first one in case of {@see null}
+     * @param ReaderInterface $nativeTypeReader reader of the native types of
+     *        the getters and the setters
      */
     public function __construct(
         /**
@@ -101,8 +116,10 @@ final class ArrayMetadataReader implements MetadataReaderInterface
         private readonly ?string $file = null,
         TypeParserInterface $parser = new TypeParser(),
         ?ExpressionLanguage $expressions = null,
+        ReaderInterface $nativeTypeReader = new ReflectionReader(),
     ) {
         $this->options = Options::createDefault($parser, $expressions);
+        $this->access = new AccessOption($nativeTypeReader);
 
         $classKeys = [self::PROPERTIES_KEY => true];
 
@@ -112,7 +129,8 @@ final class ArrayMetadataReader implements MetadataReaderInterface
             }
         }
 
-        $propertyKeys = [];
+        // the access keys are read by the access phase
+        $propertyKeys = \array_fill_keys($this->access->getConfigKeys(), true);
 
         foreach ($this->options->properties as $option) {
             foreach ($option->getPropertyKeys() as $key) {
@@ -135,8 +153,7 @@ final class ArrayMetadataReader implements MetadataReaderInterface
     public function read(\ReflectionClass $class, ?ClassMetadata $metadata = null): ClassMetadata
     {
         $metadata ??= new ClassMetadata($class->getName());
-        $this->index ??= new ClassIndex($this->config, $this->file);
-        $key = $this->index->findKey($class);
+        $key = $this->findKey($class);
 
         if ($key === null) {
             return $metadata;
@@ -149,6 +166,73 @@ final class ArrayMetadataReader implements MetadataReaderInterface
         $errors->throwIfNotEmpty($metadata);
 
         return $metadata;
+    }
+
+    /**
+     * Reads the `getter`, `setter` and `only` keys of the mapped properties,
+     * a wrong structure of the config is left to {@see self::read()}.
+     *
+     * @throws ConfigLoadingException in case of the config is not a map of
+     *         classes
+     * @throws InvalidMetadataException in case of an access key is wrong
+     */
+    public function readAccess(\ReflectionClass $class, ClassMetadata $metadata): ClassMetadata
+    {
+        $key = $this->findKey($class);
+
+        if ($key === null) {
+            return $metadata;
+        }
+
+        $config = $this->config[$key];
+        $properties = null;
+
+        if (\is_array($config)) {
+            $properties = $config[self::PROPERTIES_KEY] ?? null;
+        }
+
+        if (!\is_array($properties)) {
+            return $metadata;
+        }
+
+        $errors = new ErrorCollector();
+        $path = ConfigPath::createRoot($this->file)->withKey($key)->withKey(self::PROPERTIES_KEY);
+
+        foreach ($properties as $name => $values) {
+            $name = (string) $name;
+            $property = null;
+
+            if ($name !== '') {
+                $property = $metadata->findProperty($name);
+            }
+
+            if ($property === null || !\is_array($values)) {
+                continue;
+            }
+
+            $target = MetadataException::formatPropertyTarget($class->name, $property->name);
+            $section = ConfigSection::createFromMap($target, $values, $path->withKey($property->name));
+            $property = $this->access->readConfig($class, $section, $property, $errors);
+
+            $metadata = $metadata->withProperty($property);
+        }
+
+        $errors->throwIfNotEmpty($metadata);
+
+        return $metadata;
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     * @return non-empty-string|null
+     * @throws ConfigLoadingException in case of the config is not a map of
+     *         classes
+     */
+    private function findKey(\ReflectionClass $class): ?string
+    {
+        $this->index ??= new ClassIndex($this->config, $this->file);
+
+        return $this->index->findKey($class);
     }
 
     /**

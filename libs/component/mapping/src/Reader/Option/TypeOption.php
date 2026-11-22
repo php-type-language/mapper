@@ -6,8 +6,12 @@ namespace TypeLang\Mapper\Mapping\Reader\Option;
 
 use TypeLang\Mapper\Mapping\Exception\InvalidAttributeException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
+use TypeLang\Mapper\Mapping\MapGetter;
+use TypeLang\Mapper\Mapping\MapSetter;
 use TypeLang\Mapper\Mapping\MapType;
+use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\MethodAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
@@ -27,10 +31,11 @@ use TypeLang\Type\TypeNode;
  * denormalization. No source adds a direction.
  *
  * {@see MapType} of the property sets the types of its directions, of its
- * `get` hook the read type, of its `set` hook the write type. The attribute
- * of a hook the mapper does not access the property through, of any other
- * method and `strict` of the `get` hook are errors. `strict` of the property
- * and the `set` hook attributes is the strictness of the property.
+ * `get` hook or getter the read type, of its `set` hook or setter the write
+ * type. The attribute of a hook the mapper does not access the property
+ * through, of any other method and `strict` of a getter are errors.
+ * `strict` of the property, the `set` hook and the setter attributes is the
+ * strictness of the property.
  *
  * The `type`, `read_type` and `write_type` keys set the types, `read_type`
  * and `write_type` of a missing direction are errors. The `strict` key sets
@@ -101,18 +106,13 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
         $source = SourceInfo::createFromReflection($hook);
 
         if (!$metadata->read?->point instanceof HookAccessPoint) {
-            $errors->addError(InvalidAttributeException::becauseHookIsBypassed(
-                attribute: MapType::class,
-                hook: 'get',
-                property: $context->target,
-                source: $source,
-            ));
+            self::addBypassedHookError($hook, 'get', $context, $errors);
 
             return $metadata;
         }
 
         if ($attribute->strict !== null) {
-            $errors->addError(InvalidAttributeException::becauseStrictIsOnGetHook(
+            $errors->addError(InvalidAttributeException::becauseStrictIsOnGetter(
                 attribute: MapType::class,
                 property: $context->target,
                 source: $source,
@@ -135,12 +135,7 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
         ErrorCollector $errors,
     ): PropertyMetadata {
         if (!$metadata->write?->point instanceof HookAccessPoint) {
-            $errors->addError(InvalidAttributeException::becauseHookIsBypassed(
-                attribute: MapType::class,
-                hook: 'set',
-                property: $context->target,
-                source: SourceInfo::createFromReflection($hook),
-            ));
+            self::addBypassedHookError($hook, 'set', $context, $errors);
 
             return $metadata;
         }
@@ -148,6 +143,31 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
         $metadata = $metadata->withWriteType($this->parseAttributeType($attribute, $context));
 
         return self::readStrictAttribute($metadata, $attribute);
+    }
+
+    /**
+     * Adds the error of {@see MapType} of the hook the mapper does not
+     * access the property through, a hook chosen as the point of a higher
+     * reader is skipped.
+     *
+     * @param 'get'|'set' $name
+     */
+    private static function addBypassedHookError(
+        \ReflectionMethod $hook,
+        string $name,
+        SourceContext $context,
+        ErrorCollector $errors,
+    ): void {
+        if (self::isChosenPoint($hook)) {
+            return;
+        }
+
+        $errors->addError(InvalidAttributeException::becauseHookIsBypassed(
+            attribute: MapType::class,
+            hook: $name,
+            property: $context->target,
+            source: SourceInfo::createFromReflection($hook),
+        ));
     }
 
     public function getPropertyKeys(): array
@@ -185,8 +205,9 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
     }
 
     /**
-     * Adds an error for each {@see MapType} of a method that is not a
-     * property hook.
+     * Sets the types of the directions accessed through a method by
+     * {@see MapType} of the method, {@see MapType} of any other method that
+     * is not a hook is an error.
      */
     public function readClassAttributes(
         \ReflectionClass $class,
@@ -201,18 +222,92 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
                 continue;
             }
 
-            $source = SourceInfo::createFromReflection($method);
+            $isPoint = false;
+
+            foreach ($metadata->properties as $property) {
+                $isRead = self::isMethodPoint($property->read, $method);
+                $isWrite = self::isMethodPoint($property->write, $method);
+
+                if (!$isRead && !$isWrite) {
+                    continue;
+                }
+
+                $isPoint = true;
+                $context = $contexts->createFromMethod($class, $method, $property->name);
+                $attribute = self::findAttribute($attributes, $context, $errors);
+
+                if ($attribute === null) {
+                    continue;
+                }
+
+                if ($isRead) {
+                    $property = $this->readGetterAttribute($property, $method, $attribute, $context, $errors);
+                }
+
+                if ($isWrite) {
+                    $property = $property->withWriteType($this->parseAttributeType($attribute, $context));
+                    $property = self::readStrictAttribute($property, $attribute);
+                }
+
+                $metadata = $metadata->withProperty($property);
+            }
+
+            // a higher reader has chosen another point of the method
+            if ($isPoint || self::isChosenPoint($method)) {
+                continue;
+            }
 
             foreach ($attributes as $attribute) {
                 $errors->addError(InvalidAttributeException::becauseAttributeIsOnMethod(
                     attribute: $attribute->getName(),
                     method: $class->name . '::' . $method->name . '()',
-                    source: $source,
+                    source: SourceInfo::createFromReflection($method),
                 ));
             }
         }
 
         return $metadata;
+    }
+
+    /**
+     * Returns {@see true} in case of the hook or the method is chosen as an
+     * access point by its attribute: {@see MapType} of it is not applied
+     * when a higher reader chooses another point.
+     */
+    private static function isChosenPoint(\ReflectionMethod $method): bool
+    {
+        return $method->getAttributes(MapGetter::class) !== []
+            || $method->getAttributes(MapSetter::class) !== [];
+    }
+
+    private static function isMethodPoint(?AccessMetadata $access, \ReflectionMethod $method): bool
+    {
+        $point = $access?->point;
+
+        return $point instanceof MethodAccessPoint
+            && \strcasecmp($point->method, $method->name) === 0;
+    }
+
+    /**
+     * Sets the read type of the property read through the method, the
+     * strictness of a getter is an error.
+     */
+    private function readGetterAttribute(
+        PropertyMetadata $metadata,
+        \ReflectionMethod $method,
+        MapType $attribute,
+        SourceContext $context,
+        ErrorCollector $errors,
+    ): PropertyMetadata {
+        if ($attribute->strict !== null) {
+            $errors->addError(InvalidAttributeException::becauseStrictIsOnGetter(
+                attribute: MapType::class,
+                property: $context->target,
+                source: SourceInfo::createFromReflection($method),
+            ));
+        }
+
+        return $metadata->withReadType($this->parseAttributeType($attribute, $context));
     }
 
     public function getClassKeys(): array
@@ -293,8 +388,9 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
             return $metadata->withReadType($type);
         }
 
-        $errors->addError(InvalidOptionValueException::becausePropertyIsNotNormalized(
+        $errors->addError(InvalidOptionValueException::becauseDirectionIsMissing(
             TypeDirection::Read->value,
+            'normalized',
             $context->target,
             $context->source,
         ));
@@ -312,8 +408,9 @@ final class TypeOption implements PropertyOptionInterface, ClassOptionInterface
             return $metadata->withWriteType($type);
         }
 
-        $errors->addError(InvalidOptionValueException::becausePropertyIsNotDenormalized(
+        $errors->addError(InvalidOptionValueException::becauseDirectionIsMissing(
             TypeDirection::Write->value,
+            'denormalized',
             $context->target,
             $context->source,
         ));

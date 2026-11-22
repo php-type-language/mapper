@@ -91,6 +91,12 @@ final class ClassType implements TypeInterface
             }
         }
 
+        // the normalized data of the class is not extra, such as a field of
+        // a property that is only read
+        foreach ($readable as $property) {
+            $keys[$property->metadata->externalName] = true;
+        }
+
         $this->keys = $keys;
     }
 

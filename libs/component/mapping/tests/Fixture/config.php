@@ -16,10 +16,15 @@ return [
                 'write_type' => 'non-empty-string',
                 'strict' => true,
                 'default' => 'unknown',
+                'setter' => 'setEmail',
             ],
             'friend' => [
                 'type' => 'self|null',
                 'default' => null,
+            ],
+            'displayName' => [
+                'getter' => 'getDisplayName',
+                'only' => 'normalization',
             ],
         ],
     ],

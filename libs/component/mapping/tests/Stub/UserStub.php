@@ -23,4 +23,14 @@ final class UserStub
 
     // @phpstan-ignore-next-line the property is only read by reflection
     private string $hidden = '';
+
+    public function getDisplayName(): ?string
+    {
+        return $this->displayName;
+    }
+
+    public function setEmail(?string $email): void
+    {
+        $this->email = $email;
+    }
 }

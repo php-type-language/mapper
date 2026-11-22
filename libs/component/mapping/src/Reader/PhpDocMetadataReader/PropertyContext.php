@@ -52,6 +52,28 @@ final class PropertyContext
     }
 
     /**
+     * Returns the context of the docblock of the getter or the setter of the
+     * property: its types are resolved by the file declaring the method.
+     *
+     * @param \ReflectionClass<object> $class
+     */
+    public function withMethod(
+        \ReflectionClass $class,
+        \ReflectionMethod $method,
+        SourceContextFactory $contexts,
+    ): self {
+        /** @var non-empty-string */
+        $property = $this->reflection->name;
+
+        return new self(
+            reflection: $this->reflection,
+            scope: $this->scope,
+            parser: $this->parser,
+            sourceContext: $contexts->createFromMethod($class, $method, $property),
+        );
+    }
+
+    /**
      * Returns the first tag of the class in the docblock, a tag naming a
      * variable other than the given one is skipped.
      *

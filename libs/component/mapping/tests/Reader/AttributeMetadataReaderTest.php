@@ -142,7 +142,8 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertInstanceOf(InvalidAttributeException::class, $exceptions[0]);
         self::assertSame([
             \sprintf(
-                '%s::getId(): attribute "%s" is allowed only on a property or its hook in MethodAttributeStub.php',
+                '%s::getId(): attribute "%s" is allowed only on a property, its hook or its getter or setter'
+                    . ' in MethodAttributeStub.php',
                 MethodAttributeStub::class,
                 MapType::class,
             ),

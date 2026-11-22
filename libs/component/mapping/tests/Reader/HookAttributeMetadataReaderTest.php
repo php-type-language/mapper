@@ -52,7 +52,7 @@ final class HookAttributeMetadataReaderTest extends TestCase
             [
                 "{$class}::\$title: attribute \"{$attribute}\" of the get {$bypassed} in BrokenHookAttributeStub.php",
                 "{$class}::\$tags: attribute \"{$attribute}\" of the set {$bypassed} in BrokenHookAttributeStub.php",
-                "{$class}::\$code: argument \"strict\" of attribute \"{$attribute}\" of the get hook has no effect,"
+                "{$class}::\$code: argument \"strict\" of attribute \"{$attribute}\" of a getter has no effect,"
                     . ' it applies to denormalization in BrokenHookAttributeStub.php',
             ],
             self::getErrors(static fn() => self::readOverReflection(new AttributeMetadataReader(), $class)),

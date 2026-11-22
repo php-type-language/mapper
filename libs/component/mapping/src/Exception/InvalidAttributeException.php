@@ -48,12 +48,90 @@ final class InvalidAttributeException extends MetadataException
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseStrictIsOnGetHook(string $attribute, string $property, SourceInfo $source): self
+    public static function becauseStrictIsOnGetter(string $attribute, string $property, SourceInfo $source): self
     {
         $message = \sprintf(
-            'argument "strict" of attribute "%s" of the get hook has no effect, it applies to denormalization',
+            'argument "strict" of attribute "%s" of a getter has no effect, it applies to denormalization',
             $attribute,
         );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseHookTakesNoPropertyName(
+        string $attribute,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf('attribute "%s" of a hook takes no property name', $attribute);
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $method method reference: `App\User::getId()`
+     */
+    public static function becauseMethodRequiresPropertyName(
+        string $attribute,
+        string $method,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf('attribute "%s" of a method requires the name of the property', $attribute);
+
+        return new self($method, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     * @param string $method method reference: `App\User::getId()`
+     */
+    public static function becauseAccessMethodIsDuplicated(
+        string $attribute,
+        string $property,
+        string $method,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            'attribute "%s" of "%s" is the second one of the property',
+            $attribute,
+            \addcslashes($method, '"'),
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseDirectionIsLeftOut(
+        string $attribute,
+        string $only,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            'attribute "%s" of the property is given, but attribute "%s" leaves its direction out',
+            $attribute,
+            $only,
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     * @param 'normalized'|'denormalized' $direction
+     */
+    public static function becauseDirectionIsMissing(
+        string $attribute,
+        string $direction,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf('attribute "%s" is given, but the property is not %s', $attribute, $direction);
 
         return new self($property, $source, $message);
     }
@@ -63,7 +141,10 @@ final class InvalidAttributeException extends MetadataException
      */
     public static function becauseAttributeIsOnMethod(string $attribute, string $method, SourceInfo $source): self
     {
-        $message = \sprintf('attribute "%s" is allowed only on a property or its hook', $attribute);
+        $message = \sprintf(
+            'attribute "%s" is allowed only on a property, its hook or its getter or setter',
+            $attribute,
+        );
 
         return new self($method, $source, $message);
     }

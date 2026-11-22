@@ -9,13 +9,15 @@ use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Reader\ReaderInterface;
+use TypeLang\Reader\ReflectionReader;
 use TypeLang\Type\TypeNode;
 
 /**
  * Overrides values of the given properties with a config stored in a file,
  * see {@see ArrayMetadataReader}.
  */
-abstract class FileMetadataReader implements MetadataReaderInterface
+abstract class FileMetadataReader implements AccessSourceReaderInterface
 {
     private ?ArrayMetadataReader $reader = null;
 
@@ -30,6 +32,10 @@ abstract class FileMetadataReader implements MetadataReaderInterface
          * @var TypeParserInterface<TypeNode, string>
          */
         private readonly TypeParserInterface $parser = new TypeParser(),
+        /**
+         * Reader of the native types of the getters and the setters
+         */
+        private readonly ReaderInterface $nativeTypeReader = new ReflectionReader(),
     ) {}
 
     /**
@@ -40,9 +46,17 @@ abstract class FileMetadataReader implements MetadataReaderInterface
      */
     public function read(\ReflectionClass $class, ?ClassMetadata $metadata = null): ClassMetadata
     {
-        $this->reader ??= new ArrayMetadataReader($this->load(), $this->path, $this->parser);
+        return $this->getReader()->read($class, $metadata);
+    }
 
-        return $this->reader->read($class, $metadata);
+    /**
+     * @throws ConfigLoadingException in case of the file cannot be read or
+     *         is not a map of classes
+     * @throws InvalidMetadataException in case of an access key is wrong
+     */
+    public function readAccess(\ReflectionClass $class, ClassMetadata $metadata): ClassMetadata
+    {
+        return $this->getReader()->readAccess($class, $metadata);
     }
 
     /**
@@ -52,6 +66,22 @@ abstract class FileMetadataReader implements MetadataReaderInterface
      *         decoded
      */
     abstract protected function decode(): mixed;
+
+    /**
+     * Returns the reader of the config, the file is loaded on the first call.
+     *
+     * @throws ConfigLoadingException in case of the file cannot be read or
+     *         decoded
+     */
+    private function getReader(): ArrayMetadataReader
+    {
+        return $this->reader ??= new ArrayMetadataReader(
+            config: $this->load(),
+            file: $this->path,
+            parser: $this->parser,
+            nativeTypeReader: $this->nativeTypeReader,
+        );
+    }
 
     /**
      * @return array<array-key, mixed>

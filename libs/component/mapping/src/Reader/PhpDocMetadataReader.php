@@ -6,7 +6,9 @@ namespace TypeLang\Mapper\Mapping\Reader;
 
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\AccessPointInterface;
 use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\AccessPoint\MethodAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
@@ -22,8 +24,8 @@ use TypeLang\PhpDoc\DocBlockParser;
 /**
  * Overrides types of the given properties with types from docblocks and
  * adds no properties. The docblock is chosen by the access point of the
- * direction: the property for the backing store, the hook and then the
- * property for a hook, a method is not read.
+ * direction: the property for the backing store, the hook or the method and
+ * then the property for a hook or a method.
  *
  * Note: Requires the `type-lang/phpdoc` package.
  */
@@ -54,7 +56,7 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
         $metadata ??= new ClassMetadata($class->getName());
 
         foreach ($metadata->properties as $property) {
-            $read = $this->findReadType($class, $property->read);
+            $read = $this->findReadType($class, $property->name, $property->read);
 
             if ($read !== null) {
                 $property = $property->withReadType($read);
@@ -64,7 +66,7 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
             $write = $read;
 
             if (!self::isSameStorage($property->read, $property->write)) {
-                $write = $this->findWriteType($class, $property->write);
+                $write = $this->findWriteType($class, $property->name, $property->write);
             }
 
             if ($write !== null) {
@@ -79,20 +81,27 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
 
     /**
      * Reads the type of the backing store from the property, of the `get`
-     * hook from its `@return`, then from the property.
+     * hook and of the getter from its `@return`, then from the property, for
+     * the getter of the native type of the property only.
      *
      * @param \ReflectionClass<object> $class
+     * @param non-empty-string $name
      */
-    private function findReadType(\ReflectionClass $class, ?AccessMetadata $access): ?TypeMetadata
+    private function findReadType(\ReflectionClass $class, string $name, ?AccessMetadata $access): ?TypeMetadata
     {
-        $context = $this->findContext($class, $access);
+        $point = $access?->point;
+        $context = $this->findContext($class, self::findPointProperty($name, $point));
 
         if ($context === null) {
             return null;
         }
 
-        if ($access?->point instanceof StorageAccessPoint) {
+        if ($point instanceof StorageAccessPoint) {
             return self::findPropertyType($context);
+        }
+
+        if ($point instanceof MethodAccessPoint) {
+            return $this->findGetterType($class, $context, $point);
         }
 
         return self::findGetHookType($context) ?? self::findPropertyType($context);
@@ -100,32 +109,107 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
 
     /**
      * Reads the type of the backing store from the property, of the `set`
-     * hook from its `@param`, then from the property in case of the hook
-     * does not declare its input.
+     * hook and of the setter from its `@param`, then from the property in
+     * case of the parameter has the native type of the property.
      *
      * @param \ReflectionClass<object> $class
+     * @param non-empty-string $name
      */
-    private function findWriteType(\ReflectionClass $class, ?AccessMetadata $access): ?TypeMetadata
+    private function findWriteType(\ReflectionClass $class, string $name, ?AccessMetadata $access): ?TypeMetadata
     {
-        $context = $this->findContext($class, $access);
+        $point = $access?->point;
+        $context = $this->findContext($class, self::findPointProperty($name, $point));
 
         if ($context === null) {
             return null;
         }
 
-        $set = PropertyHooks::findSet($context->reflection);
-
-        if ($access?->point instanceof StorageAccessPoint || $set === null) {
+        if ($point instanceof StorageAccessPoint) {
             return self::findPropertyType($context);
         }
 
-        $type = self::findSetHookType($context, $set);
+        if ($point instanceof MethodAccessPoint) {
+            $setter = self::findMethod($class, $point);
 
-        if ($type !== null || self::hasOwnWriteType($context->reflection, $set)) {
+            if ($setter === null) {
+                return null;
+            }
+
+            return self::findSetterType($context, $context->withMethod($class, $setter, $this->contexts), $setter);
+        }
+
+        $setter = PropertyHooks::findSet($context->reflection);
+
+        if ($setter === null) {
+            return self::findPropertyType($context);
+        }
+
+        return self::findSetterType($context, $context, $setter);
+    }
+
+    /**
+     * Returns the PHP property whose docblock the point reads: of the
+     * backing store or the hook, the property of the name for a method.
+     *
+     * @param non-empty-string $name
+     * @return non-empty-string|null
+     */
+    private static function findPointProperty(string $name, ?AccessPointInterface $point): ?string
+    {
+        if ($point instanceof StorageAccessPoint || $point instanceof HookAccessPoint) {
+            return $point->property;
+        }
+
+        if ($point instanceof MethodAccessPoint) {
+            return $name;
+        }
+
+        return null;
+    }
+
+    /**
+     * Reads `@return` of the getter, then the property in case of the
+     * getter returns the native type of the property: a getter may return
+     * another value than the property, a hook may not.
+     *
+     * @param \ReflectionClass<object> $class
+     */
+    private function findGetterType(
+        \ReflectionClass $class,
+        PropertyContext $context,
+        MethodAccessPoint $point,
+    ): ?TypeMetadata {
+        $getter = self::findMethod($class, $point);
+
+        if ($getter === null) {
+            return null;
+        }
+
+        $getterContext = $context->withMethod($class, $getter, $this->contexts);
+
+        $type = $getterContext->createType($getterContext->findTag(
+            docComment: $getter->getDocComment(),
+            class: ReturnTag::class,
+            variable: $context->reflection->name,
+        ));
+
+        if ($type !== null || (string) $getter->getReturnType() !== (string) $context->reflection->getType()) {
             return $type;
         }
 
         return self::findPropertyType($context);
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     */
+    private static function findMethod(\ReflectionClass $class, MethodAccessPoint $point): ?\ReflectionMethod
+    {
+        if (!$class->hasMethod($point->method)) {
+            return null;
+        }
+
+        return $class->getMethod($point->method);
     }
 
     private static function isSameStorage(?AccessMetadata $read, ?AccessMetadata $write): bool
@@ -136,26 +220,20 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
     }
 
     /**
-     * Returns the context of the PHP property of the point, {@see null} for
-     * a point without a PHP property, such as a method.
+     * Returns the context of the PHP property, {@see null} in case of the
+     * class has no property of the name.
      *
      * @param \ReflectionClass<object> $class
      */
-    private function findContext(\ReflectionClass $class, ?AccessMetadata $access): ?PropertyContext
+    private function findContext(\ReflectionClass $class, ?string $property): ?PropertyContext
     {
-        $point = $access?->point;
-
-        if (!$point instanceof StorageAccessPoint && !$point instanceof HookAccessPoint) {
-            return null;
-        }
-
-        if (!$class->hasProperty($point->property)) {
+        if ($property === null || !$class->hasProperty($property)) {
             return null;
         }
 
         return PropertyContext::create(
             class: $class,
-            reflection: $class->getProperty($point->property),
+            reflection: $class->getProperty($property),
             parser: $this->parser,
             contexts: $this->contexts,
         );
@@ -210,29 +288,44 @@ final class PhpDocMetadataReader implements OptionalMetadataReaderInterface
     }
 
     /**
-     * Returns {@see true} in case of the `set` hook takes another native
-     * type than the property. Its `@param` is read before.
+     * Returns {@see true} in case of the `set` hook or the setter takes
+     * another native type than the property. Its `@param` is read before.
      */
-    private static function hasOwnWriteType(\ReflectionProperty $property, \ReflectionMethod $set): bool
+    private static function hasOwnWriteType(\ReflectionProperty $property, \ReflectionMethod $setter): bool
     {
-        $parameter = $set->getParameters()[0] ?? null;
+        $parameter = $setter->getParameters()[0] ?? null;
 
         return (string) $parameter?->getType() !== (string) $property->getType();
     }
 
-    private static function findSetHookType(PropertyContext $context, \ReflectionMethod $set): ?TypeMetadata
-    {
-        $parameter = $set->getParameters()[0]->name ?? '';
+    /**
+     * Reads `@param` of the `set` hook or the setter, then the property in
+     * case of the setter takes the native type of the property.
+     *
+     * @param PropertyContext $setterContext context of the docblock of the
+     *        setter
+     */
+    private static function findSetterType(
+        PropertyContext $context,
+        PropertyContext $setterContext,
+        \ReflectionMethod $setter,
+    ): ?TypeMetadata {
+        $parameter = $setter->getParameters()[0]->name ?? '';
+        $type = null;
 
-        if ($parameter === '') {
-            return null;
+        if ($parameter !== '') {
+            $type = $setterContext->createType($setterContext->findTag(
+                docComment: $setter->getDocComment(),
+                class: ParamTag::class,
+                variable: $parameter,
+            ));
         }
 
-        return $context->createType($context->findTag(
-            docComment: $set->getDocComment(),
-            class: ParamTag::class,
-            variable: $parameter,
-        ));
+        if ($type !== null || self::hasOwnWriteType($context->reflection, $setter)) {
+            return $type;
+        }
+
+        return self::findPropertyType($context);
     }
 
     private static function createDefaultDocBlockParser(): DocBlockParser

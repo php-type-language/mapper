@@ -27,6 +27,7 @@ use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\Tests\Stub\AbstractShapeStub;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\AliasedStub;
+use TypeLang\Mapper\Tests\Stub\AccessorStub;
 use TypeLang\Mapper\Tests\Stub\BrokenSkipStub;
 use TypeLang\Mapper\Tests\Stub\BypassedSetHookStub;
 use TypeLang\Mapper\Tests\Stub\ComputedStub;
@@ -427,6 +428,44 @@ final class ClassTypeTest extends TestCase
         $object = $mapper->denormalize($data, WiderSetHookStub::class);
 
         self::assertSame($data, $mapper->normalize($object, WiderSetHookStub::class));
+    }
+
+    public function testPropertyIsWrittenAndReadThroughItsMethods(): void
+    {
+        $mapper = self::createMapper();
+
+        $object = $mapper->denormalize(['name' => 'john'], AccessorStub::class);
+
+        self::assertInstanceOf(AccessorStub::class, $object);
+        self::assertSame('set:john', $object->name);
+        self::assertSame(
+            ['name' => 'SET:JOHN', 'createdAt' => 'today'],
+            $mapper->normalize($object, AccessorStub::class),
+        );
+    }
+
+    public function testDefaultValueIsWrittenThroughSetter(): void
+    {
+        $object = self::createMapper()->denormalize([], AccessorStub::class);
+
+        self::assertInstanceOf(AccessorStub::class, $object);
+        self::assertSame('set:default', $object->name);
+    }
+
+    public function testFieldOfPropertyThatIsOnlyReadIsNotExtra(): void
+    {
+        $mapper = self::createMapper(config: new Configuration(rejectExtraFields: true));
+
+        $object = $mapper->denormalize(['name' => 'john', 'createdAt' => 'tomorrow'], AccessorStub::class);
+
+        self::assertInstanceOf(AccessorStub::class, $object);
+        self::assertSame('today', $object->createdAt);
+        self::assertDenormalizationFails(
+            AccessorStub::class,
+            ['name' => 'john', 'extra' => 1],
+            '$.extra: Unexpected field "extra"',
+            $mapper,
+        );
     }
 
     #[RequiresPhp('>= 8.4.0')]

@@ -138,11 +138,20 @@ final class InvalidOptionValueException extends MetadataException
     }
 
     /**
+     * @param 'normalized'|'denormalized' $direction
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becausePropertyIsNotNormalized(string $key, string $property, SourceInfo $source): self
-    {
-        $message = \sprintf('"%s" is given, but the property is not normalized', \addcslashes($key, '"'));
+    public static function becauseDirectionIsMissing(
+        string $key,
+        string $direction,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            '"%s" is given, but the property is not %s',
+            \addcslashes($key, '"'),
+            $direction,
+        );
 
         return new self($property, $source, $message);
     }
@@ -150,9 +159,62 @@ final class InvalidOptionValueException extends MetadataException
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becausePropertyIsNotDenormalized(string $key, string $property, SourceInfo $source): self
+    public static function becauseValueIsNotMethodOrTrue(string $key, string $property, SourceInfo $source): self
     {
-        $message = \sprintf('"%s" is given, but the property is not denormalized', \addcslashes($key, '"'));
+        return new self($property, $source, self::formatValue($key, 'a method name or true'));
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseMethodDoesNotExist(
+        string $key,
+        string $method,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            'method "%s" of "%s" does not exist',
+            \addcslashes($method, '"'),
+            \addcslashes($key, '"'),
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseDirectionIsLeftOut(
+        string $key,
+        string $only,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            '"%s" is given, but "%s" leaves its direction out',
+            \addcslashes($key, '"'),
+            \addcslashes($only, '"'),
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     * @param 'get'|'set' $hook
+     */
+    public static function becausePropertyHasNoHook(
+        string $key,
+        string $hook,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf(
+            '"%s" is true, but the property has no %s hook',
+            \addcslashes($key, '"'),
+            $hook,
+        );
 
         return new self($property, $source, $message);
     }
