@@ -33,7 +33,7 @@
         "nette/neon": "^3.4",
         "nikic/php-parser": "^5.9",
         "phpstan/phpstan": "^2.3.6",
-        "phpunit/phpunit": "^10.5|^11.0|^12.0|^13.0",
+        "phpunit/phpunit": "^10.5.36|^11.0|^12.0|^13.0",
         "psr/cache": "^2.0|^3.0",
         "psr/simple-cache": "^2.0|^3.0",
         "symfony/expression-language": "^6.4|^7.0|^8.0",

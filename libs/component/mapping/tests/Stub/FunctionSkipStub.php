@@ -8,10 +8,10 @@ use TypeLang\Mapper\Mapping\SkipWhen;
 
 final class FunctionSkipStub
 {
-    #[SkipWhen('max(1, 2) > 1')]
+    #[SkipWhen('constant("PHP_INT_SIZE") > 1')]
     public string $email = '';
 
-    #[SkipWhen('this.isPrivate(min(1, 2))')]
+    #[SkipWhen('this.isPrivate(constant("PHP_INT_SIZE"))')]
     public string $phone = '';
 
     #[SkipWhen('this.isPrivate(1) and this.isPublic')]

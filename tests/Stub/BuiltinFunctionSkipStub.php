@@ -8,7 +8,7 @@ use TypeLang\Mapper\Mapping\SkipWhen;
 
 final class BuiltinFunctionSkipStub
 {
-    #[SkipWhen('max(1, 2) > 1 and value === ""')]
+    #[SkipWhen('constant("PHP_INT_SIZE") > 1 and value === ""')]
     public string $email = '';
 
     public string $name = 'John';
