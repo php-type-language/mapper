@@ -1,0 +1,10 @@
+<?php
+
+declare(strict_types=1);
+
+namespace TypeLang\Mapper\Tests\Stub\Clash;
+
+use TypeLang\Mapper\Mapping\DiscriminatorMap;
+
+#[DiscriminatorMap(field: 'type', map: ['left' => ClashBothStub::class])]
+interface ClashLeftStub {}

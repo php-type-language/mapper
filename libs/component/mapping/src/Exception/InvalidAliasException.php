@@ -22,9 +22,9 @@ final class InvalidAliasException extends MetadataException
     /**
      * @param string $target class or case: `App\Status`, `App\Status::Enabled`
      */
-    public static function becauseClassIsNotBackedEnum(string $target, SourceInfo $source): self
+    public static function becauseClassIsNotEnum(string $target, SourceInfo $source): self
     {
-        return new self($target, $source, 'aliases are allowed only for the cases of a backed enum');
+        return new self($target, $source, 'aliases are allowed only for the cases of an enum');
     }
 
     /**

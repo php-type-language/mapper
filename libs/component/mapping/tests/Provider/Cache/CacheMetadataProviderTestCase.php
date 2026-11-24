@@ -78,7 +78,7 @@ abstract class CacheMetadataProviderTestCase extends TestCase
             ->read(new \ReflectionClass(\stdClass::class));
 
         self::assertStringStartsWith(
-            'tlm_v' . ClassMetadata::FORMAT_VERSION . '_',
+            'tlm_v' . ClassMetadata::FORMAT_VERSION . 'c_',
             (string) \array_key_first($cache->values),
         );
     }

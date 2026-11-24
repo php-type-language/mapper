@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Mapping\Reader;
 
 use Nette\Neon\Exception as NeonException;
 use Nette\Neon\Neon;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Mapping\Exception\ConfigLoadingException;
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Parser\TypeParser;
@@ -24,6 +25,8 @@ final class NeonFileMetadataReader extends FileMetadataReader implements Optiona
      * @param non-empty-string $path
      * @param TypeParserInterface<TypeNode, string> $parser parser of the
      *        types of the config
+     * @param ExpressionLanguage|null $expressions parser of the expressions
+     *        of `skip`, created on the first one in case of {@see null}
      * @param ReaderInterface $nativeTypeReader reader of the native types of
      *        the getters and the setters
      * @throws MissingDependencyException in case of the `nette/neon` package
@@ -32,13 +35,14 @@ final class NeonFileMetadataReader extends FileMetadataReader implements Optiona
     public function __construct(
         string $path,
         TypeParserInterface $parser = new TypeParser(),
+        ?ExpressionLanguage $expressions = null,
         ReaderInterface $nativeTypeReader = new ReflectionReader(),
     ) {
         if (!self::isAvailable()) {
             throw MissingDependencyException::becausePackageIsNotInstalled('nette/neon', 'NEON config');
         }
 
-        parent::__construct($path, $parser, $nativeTypeReader);
+        parent::__construct($path, $parser, $expressions, $nativeTypeReader);
     }
 
     public static function isAvailable(): bool

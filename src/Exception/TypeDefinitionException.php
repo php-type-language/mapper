@@ -36,7 +36,7 @@ final class TypeDefinitionException extends \LogicException implements
     public static function becauseTypeCannotBeBuilt(string $type, \Throwable $previous): self
     {
         return new self(
-            message: \sprintf('Type "%s" cannot be built: %s', \addcslashes($type, '"'), $previous->getMessage()),
+            message: \sprintf('Type "%s" cannot be built, %s', \addcslashes($type, '"'), \lcfirst($previous->getMessage())),
             previous: $previous,
         );
     }
@@ -160,11 +160,12 @@ final class TypeDefinitionException extends \LogicException implements
      * @param class-string $class
      * @param non-empty-string $error why the source cannot read the type
      */
-    public static function becausePropertyTypeCannotBeRead(string $class, string $property, string $error): self
+    public static function becauseFieldTypeCannotBeRead(string $class, string $field, string $error): self
     {
         return new self(\sprintf(
-            'Type of property "%s" is invalid: %s',
-            \addcslashes($class . '::$' . $property, '"'),
+            'Type of field "%s" of "%s" is invalid: %s',
+            \addcslashes($field, '"'),
+            \addcslashes($class, '"'),
             $error,
         ));
     }
@@ -172,11 +173,30 @@ final class TypeDefinitionException extends \LogicException implements
     /**
      * @param class-string $class
      */
-    public static function becausePropertyTypeIsNotDefined(string $class, string $property): self
+    public static function becauseSkipExpressionIsInvalid(
+        string $class,
+        string $field,
+        string $expression,
+        \Throwable $previous,
+    ): self {
+        return new self(\sprintf(
+            'Skip expression "%s" of field "%s" of "%s" is invalid: %s',
+            \addcslashes($expression, '"'),
+            \addcslashes($field, '"'),
+            \addcslashes($class, '"'),
+            $previous->getMessage(),
+        ), previous: $previous);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public static function becauseFieldTypeIsNotDefined(string $class, string $field): self
     {
         return new self(\sprintf(
-            'Type of property "%s" is not defined',
-            \addcslashes($class . '::$' . $property, '"'),
+            'Type of field "%s" of "%s" is not defined',
+            \addcslashes($field, '"'),
+            \addcslashes($class, '"'),
         ));
     }
 
@@ -222,6 +242,44 @@ final class TypeDefinitionException extends \LogicException implements
             '%s is invalid: "%s" does not extend it',
             self::describeDiscriminator($class, $tag),
             \addcslashes($child, '"'),
+        ));
+    }
+
+    /**
+     * @param class-string $class
+     * @param class-string $base class with the discriminator
+     */
+    public static function becauseClassIsNotInDiscriminatorMap(string $class, string $base): self
+    {
+        return new self(\sprintf(
+            'Class "%s" is not in the discriminator map of "%s": neither it nor its children have a tag',
+            \addcslashes($class, '"'),
+            \addcslashes($base, '"'),
+        ));
+    }
+
+    /**
+     * @param class-string $class
+     * @param non-empty-string $field
+     * @param class-string $first base of the first tag
+     * @param class-string $second base of the second tag
+     */
+    public static function becauseDiscriminatorFieldIsAmbiguous(
+        string $class,
+        string $field,
+        string $first,
+        int|string $firstTag,
+        string $second,
+        int|string $secondTag,
+    ): self {
+        return new self(\sprintf(
+            'Class "%s" has two tags in field "%s": "%s" of class "%s" and "%s" of class "%s"',
+            \addcslashes($class, '"'),
+            \addcslashes($field, '"'),
+            \addcslashes((string) $firstTag, '"'),
+            \addcslashes($first, '"'),
+            \addcslashes((string) $secondTag, '"'),
+            \addcslashes($second, '"'),
         ));
     }
 

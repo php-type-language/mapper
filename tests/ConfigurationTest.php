@@ -40,6 +40,11 @@ final class ConfigurationTest extends TestCase
             'expectedTypeMaxFields',
             5,
         ];
+        yield 'max depth' => [
+            static fn(Configuration $c): Configuration => $c->withMaxDepth(64),
+            'maxDepth',
+            64,
+        ];
     }
 
     /**

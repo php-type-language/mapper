@@ -6,15 +6,16 @@ namespace TypeLang\Mapper\Mapping\Tests\Stub\Php84;
 
 use TypeLang\Mapper\Mapping\MapGetter;
 use TypeLang\Mapper\Mapping\MapSetter;
-use TypeLang\Mapper\Mapping\MapType;
 
+/**
+ * Property read and written through its hooks.
+ */
 final class ChosenHookStub
 {
     public string $title = '' {
-        #[MapGetter]
-        #[MapType('non-empty-string')]
+        #[MapGetter(type: 'non-empty-string')]
         get => \strtoupper($this->title);
-        #[MapSetter]
+        #[MapSetter('heading')]
         set(int|string $value) {
             $this->title = (string) $value;
         }

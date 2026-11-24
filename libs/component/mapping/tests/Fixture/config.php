@@ -11,20 +11,30 @@ return [
         'properties' => [
             'id' => 'positive-int',
             'email' => [
-                'name' => 'e_mail',
-                'read_type' => 'string',
-                'write_type' => 'non-empty-string',
-                'strict' => true,
-                'default' => 'unknown',
-                'setter' => 'setEmail',
+                'get' => [
+                    'name' => 'e_mail',
+                    'type' => 'string',
+                ],
+                'set' => [
+                    'name' => 'e_mail',
+                    'type' => 'non-empty-string',
+                    'strict' => true,
+                    'default' => 'unknown',
+                ],
             ],
             'friend' => [
                 'type' => 'self|null',
                 'default' => null,
             ],
             'displayName' => [
-                'getter' => 'getDisplayName',
-                'only' => 'normalization',
+                'get' => [],
+            ],
+        ],
+        'methods' => [
+            'setEmail' => [
+                'set' => [
+                    'name' => 'email_in',
+                ],
             ],
         ],
     ],

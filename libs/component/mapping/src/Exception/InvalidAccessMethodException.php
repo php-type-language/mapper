@@ -7,53 +7,58 @@ namespace TypeLang\Mapper\Mapping\Exception;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 
 /**
- * Method chosen as the getter or the setter of a property cannot be one.
+ * Method declared as a getter or a setter cannot be one.
  */
 final class InvalidAccessMethodException extends MetadataException
 {
     /**
      * @param string $method method reference: `App\User::getId()`
-     * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseMethodIsNotPublic(string $method, string $property, SourceInfo $source): self
+    public static function becauseMethodIsNotPublic(string $method, SourceInfo $source): self
     {
-        return self::create($method, 'is not public', $property, $source);
+        return new self($method, $source, 'method is not public');
+    }
+
+    /**
+     * @param string $method method reference: `App\User::__construct()`
+     */
+    public static function becauseMethodIsMagic(string $method, SourceInfo $source): self
+    {
+        return new self($method, $source, 'method is the constructor or a magic method');
     }
 
     /**
      * @param string $method method reference: `App\User::getId()`
-     * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseMethodIsStatic(string $method, string $property, SourceInfo $source): self
+    public static function becauseMethodIsStatic(string $method, SourceInfo $source): self
     {
-        return self::create($method, 'is static', $property, $source);
+        return new self($method, $source, 'method is static');
     }
 
     /**
      * @param string $method method reference: `App\User::getId()`
-     * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseGetterRequiresArguments(string $method, string $property, SourceInfo $source): self
+    public static function becauseGetterRequiresArguments(string $method, SourceInfo $source): self
     {
-        return self::create($method, 'requires arguments, a getter takes none', $property, $source);
+        return new self($method, $source, 'method requires arguments, a getter takes none');
+    }
+
+    /**
+     * @param string $method method reference: `App\User::getId()`
+     * @param 'void'|'never' $type
+     */
+    public static function becauseGetterReturnsNothing(string $method, string $type, SourceInfo $source): self
+    {
+        $message = \sprintf('method returns %s, a getter returns a value', $type);
+
+        return new self($method, $source, $message);
     }
 
     /**
      * @param string $method method reference: `App\User::setId()`
-     * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseSetterDoesNotTakeOneValue(
-        string $method,
-        string $property,
-        SourceInfo $source,
-    ): self {
-        return self::create($method, 'must take exactly one value as a setter', $property, $source);
-    }
-
-    private static function create(string $method, string $reason, string $property, SourceInfo $source): self
+    public static function becauseSetterDoesNotTakeOneValue(string $method, SourceInfo $source): self
     {
-        $message = \sprintf('method "%s" %s', \addcslashes($method, '"'), $reason);
-
-        return new self($property, $source, $message);
+        return new self($method, $source, 'method must take exactly one value as a setter');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Profiler;
 
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\EnumMetadata;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 
 /**
@@ -31,6 +32,17 @@ final class TraceableMetadataProvider implements MetadataProviderInterface
             return $this->delegate->read($class);
         } finally {
             $this->profiler->recordMetadataRead($this->name, $class->name, (\hrtime(true) - $startedAt) / 1e6);
+        }
+    }
+
+    public function readEnum(\ReflectionEnum $enum): EnumMetadata
+    {
+        $startedAt = \hrtime(true);
+
+        try {
+            return $this->delegate->readEnum($enum);
+        } finally {
+            $this->profiler->recordMetadataRead($this->name, $enum->name, (\hrtime(true) - $startedAt) / 1e6);
         }
     }
 }

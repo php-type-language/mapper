@@ -32,6 +32,8 @@ final class MethodStub
 
     public function replace(string $key, string $value): void {}
 
+    public function tag(string ...$tags): void {}
+
     public static function create(): self
     {
         return new self();

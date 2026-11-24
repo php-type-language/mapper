@@ -7,20 +7,15 @@ namespace TypeLang\Mapper\Mapping\Tests\Stub;
 use TypeLang\Mapper\Mapping\MapGetter;
 use TypeLang\Mapper\Mapping\MapSetter;
 
+/**
+ * Methods that cannot be getters or setters.
+ */
 final class WrongSignatureStub
 {
-    public string $a = '';
-
-    public string $b = '';
-
-    public string $c = '';
-
-    public string $d = '';
-
     #[MapGetter('a')]
     private function getA(): string
     {
-        return $this->a;
+        return '';
     }
 
     #[MapGetter('b')]
@@ -36,8 +31,8 @@ final class WrongSignatureStub
     }
 
     #[MapSetter('d')]
-    public function resetD(): void
-    {
-        $this->d = '';
-    }
+    public function resetD(): void {}
+
+    #[MapSetter('e')]
+    public function setE(string ...$tags): void {}
 }

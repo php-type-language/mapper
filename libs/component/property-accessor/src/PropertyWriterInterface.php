@@ -36,6 +36,7 @@ interface PropertyWriterInterface
      *         the type of the property
      * @throws \Error in case of the `readonly` property is already
      *         initialized
+     * @throws \Exception in case of a set hook or a setter throws it
      */
     public function write(object $object, mixed $value): void;
 }

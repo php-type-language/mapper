@@ -12,16 +12,6 @@ final class PropertyNotWritableException extends PropertyAccessException
     /**
      * @param class-string $class
      */
-    public static function becausePropertyIsReadOnly(string $class, string $property): self
-    {
-        $message = \sprintf('Property %s is read-only', self::formatProperty($class, $property));
-
-        return new self($class, $property, $message);
-    }
-
-    /**
-     * @param class-string $class
-     */
     public static function becausePropertyIsVirtual(string $class, string $property): self
     {
         $message = \sprintf('Property %s has no backing store to write', self::formatProperty($class, $property));
@@ -35,16 +25,6 @@ final class PropertyNotWritableException extends PropertyAccessException
     public static function becausePropertyHasNoSetHook(string $class, string $property): self
     {
         $message = \sprintf('Property %s has no set hook', self::formatProperty($class, $property));
-
-        return new self($class, $property, $message);
-    }
-
-    /**
-     * @param class-string $class
-     */
-    public static function becauseNoStrategyWritesProperty(string $class, string $property): self
-    {
-        $message = \sprintf('No access strategy writes property %s', self::formatProperty($class, $property));
 
         return new self($class, $property, $message);
     }

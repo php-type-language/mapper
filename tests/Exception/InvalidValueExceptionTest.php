@@ -36,6 +36,50 @@ use TypeLang\Type\TypeNode;
 
 final class InvalidValueExceptionTest extends TestCase
 {
+    public function testUnexpectedFieldNameIsCutAndValidUtf8(): void
+    {
+        $long = InvalidValueException::becauseFieldIsUnexpected(
+            \str_repeat('a', 100),
+            new KeySegment('x'),
+            1,
+        );
+        $broken = InvalidValueException::becauseFieldIsUnexpected("bad\xffname", new KeySegment('x'), 1);
+        $mixed = InvalidValueException::becauseFieldIsUnexpected("ok \u{444} \xd0", new KeySegment('x'), 1);
+        $multibyte = InvalidValueException::becauseFieldIsUnexpected(
+            \str_repeat("\u{444}", 65),
+            new KeySegment('x'),
+            1,
+        );
+        $exact = InvalidValueException::becauseFieldIsUnexpected(\str_repeat("\u{444}", 64), new KeySegment('x'), 1);
+        $huge = InvalidValueException::becauseFieldIsUnexpected(\str_repeat('a', 1_000_000), new KeySegment('x'), 1);
+
+        $formatter = self::createFormatter();
+
+        self::assertSame(
+            'Unexpected field "' . \str_repeat('a', 64) . '..."',
+            $formatter->format($long->violations[0]),
+        );
+        self::assertSame('Unexpected field "bad\xFFname"', $formatter->format($broken->violations[0]));
+        self::assertSame('Unexpected field "ok \xD1\x84 \xD0"', $formatter->format($mixed->violations[0]));
+        self::assertSame(
+            'Unexpected field "' . \str_repeat("\u{444}", 64) . '..."',
+            $formatter->format($multibyte->violations[0]),
+        );
+        self::assertSame(
+            'Unexpected field "' . \str_repeat("\u{444}", 64) . '"',
+            $formatter->format($exact->violations[0]),
+        );
+        self::assertSame(
+            'Unexpected field "' . \str_repeat('a', 64) . '..."',
+            $formatter->format($huge->violations[0]),
+        );
+
+        foreach ([$long, $broken, $mixed, $multibyte, $exact, $huge] as $error) {
+            self::assertNotSame('', \json_encode($error->getMessage(), \JSON_THROW_ON_ERROR));
+            self::assertNotSame('', \json_encode($formatter->format($error->violations[0]), \JSON_THROW_ON_ERROR));
+        }
+    }
+
     public function testWrappedErrorIsNotHeldByTraceOfNewOne(): void
     {
         $inner = InvalidValueException::becauseInvalidType('x');

@@ -24,6 +24,14 @@ final class Options
     public function __construct(
         public readonly array $properties,
         public readonly array $classes,
+        /**
+         * Conditions of the getters and the hooks
+         */
+        public readonly SkipOption $skip,
+        /**
+         * Strategy of the class, read for its parents too
+         */
+        public readonly NamingStrategyOption $naming,
     ) {}
 
     /**
@@ -37,6 +45,8 @@ final class Options
         $types = new TypeOption($parser);
         $messages = new MessageOption();
         $aliases = new AliasOption();
+        $skip = new SkipOption($expressions);
+        $naming = new NamingStrategyOption();
 
         return new self(
             properties: [
@@ -44,17 +54,18 @@ final class Options
                 $aliases,
                 $types,
                 new DefaultOption(),
-                new SkipOption($expressions),
+                $skip,
                 $messages,
             ],
             classes: [
-                $types,
                 new DiscriminatorOption($parser),
                 $messages,
                 new NormalizeAsArrayOption(),
-                new NamingStrategyOption(),
+                $naming,
                 $aliases,
             ],
+            skip: $skip,
+            naming: $naming,
         );
     }
 }

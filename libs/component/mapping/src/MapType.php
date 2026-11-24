@@ -13,7 +13,7 @@ namespace TypeLang\Mapper\Mapping;
  * public array $addresses;
  * ```
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_PROPERTY)]
 final class MapType
 {
     public function __construct(

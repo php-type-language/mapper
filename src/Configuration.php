@@ -56,30 +56,24 @@ final class Configuration
          * @var int<1, max>|null
          */
         public readonly ?int $expectedTypeMaxFields = null,
+        /**
+         * Number of levels of nested objects a normalization goes through
+         * before it fails, an object and an array of a `mixed` value are a
+         * level each. Stops the normalization of a cyclic graph.
+         *
+         * @var int<1, max>
+         */
+        public readonly int $maxDepth = 512,
     ) {}
 
     public function withStrict(bool $strict): self
     {
-        return new self(
-            strict: $strict,
-            normalizeAsArray: $this->normalizeAsArray,
-            maxViolations: $this->maxViolations,
-            rejectExtraFields: $this->rejectExtraFields,
-            expectedTypeDepth: $this->expectedTypeDepth,
-            expectedTypeMaxFields: $this->expectedTypeMaxFields,
-        );
+        return $this->with(strict: $strict);
     }
 
     public function withNormalizeAsArray(bool $normalizeAsArray): self
     {
-        return new self(
-            strict: $this->strict,
-            normalizeAsArray: $normalizeAsArray,
-            maxViolations: $this->maxViolations,
-            rejectExtraFields: $this->rejectExtraFields,
-            expectedTypeDepth: $this->expectedTypeDepth,
-            expectedTypeMaxFields: $this->expectedTypeMaxFields,
-        );
+        return $this->with(normalizeAsArray: $normalizeAsArray);
     }
 
     /**
@@ -87,26 +81,12 @@ final class Configuration
      */
     public function withMaxViolations(int $maxViolations): self
     {
-        return new self(
-            strict: $this->strict,
-            normalizeAsArray: $this->normalizeAsArray,
-            maxViolations: $maxViolations,
-            rejectExtraFields: $this->rejectExtraFields,
-            expectedTypeDepth: $this->expectedTypeDepth,
-            expectedTypeMaxFields: $this->expectedTypeMaxFields,
-        );
+        return $this->with(maxViolations: $maxViolations);
     }
 
     public function withRejectExtraFields(bool $rejectExtraFields): self
     {
-        return new self(
-            strict: $this->strict,
-            normalizeAsArray: $this->normalizeAsArray,
-            maxViolations: $this->maxViolations,
-            rejectExtraFields: $rejectExtraFields,
-            expectedTypeDepth: $this->expectedTypeDepth,
-            expectedTypeMaxFields: $this->expectedTypeMaxFields,
-        );
+        return $this->with(rejectExtraFields: $rejectExtraFields);
     }
 
     /**
@@ -114,14 +94,7 @@ final class Configuration
      */
     public function withExpectedTypeDepth(int $expectedTypeDepth): self
     {
-        return new self(
-            strict: $this->strict,
-            normalizeAsArray: $this->normalizeAsArray,
-            maxViolations: $this->maxViolations,
-            rejectExtraFields: $this->rejectExtraFields,
-            expectedTypeDepth: $expectedTypeDepth,
-            expectedTypeMaxFields: $this->expectedTypeMaxFields,
-        );
+        return $this->with(expectedTypeDepth: $expectedTypeDepth);
     }
 
     /**
@@ -129,13 +102,24 @@ final class Configuration
      */
     public function withExpectedTypeMaxFields(?int $expectedTypeMaxFields): self
     {
-        return new self(
-            strict: $this->strict,
-            normalizeAsArray: $this->normalizeAsArray,
-            maxViolations: $this->maxViolations,
-            rejectExtraFields: $this->rejectExtraFields,
-            expectedTypeDepth: $this->expectedTypeDepth,
-            expectedTypeMaxFields: $expectedTypeMaxFields,
-        );
+        return $this->with(expectedTypeMaxFields: $expectedTypeMaxFields);
+    }
+
+    /**
+     * @param int<1, max> $maxDepth
+     */
+    public function withMaxDepth(int $maxDepth): self
+    {
+        return $this->with(maxDepth: $maxDepth);
+    }
+
+    /**
+     * Returns the copy with the given settings replaced, by constructor
+     * argument names.
+     */
+    private function with(mixed ...$changes): self
+    {
+        // @phpstan-ignore-next-line properties are the constructor arguments
+        return new self(...$changes + \get_object_vars($this));
     }
 }

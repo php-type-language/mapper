@@ -6,13 +6,14 @@ namespace TypeLang\Mapper\Mapping\Reader\Option;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\ExpressionSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\NullSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\SkipConditionInterface;
+use TypeLang\Mapper\Mapping\Reader\Access\AccessDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -22,11 +23,13 @@ use TypeLang\Mapper\Mapping\SkipWhenEmpty;
 use TypeLang\Mapper\Mapping\SkipWhenNull;
 
 /**
- * Skip conditions of a property: {@see SkipWhenNull}, {@see SkipWhenEmpty},
- * {@see SkipWhen} and the `skip` key with one condition or a list of them
+ * Skip conditions of the field of the normalization: {@see SkipWhenNull},
+ * {@see SkipWhenEmpty}, {@see SkipWhen} of a property, a getter or a `get`
+ * hook and the `skip` key with one condition or a list of them
  * (`null` as a string or as a value, `empty` or an expression over the
- * object `this`). An expression
- * is parsed once, here. A wrong condition is an error, the others are set.
+ * object `this` and the value `value`). An expression is parsed once, here,
+ * by the given language: only its functions are allowed in the expression.
+ * A wrong condition is an error, the others are set.
  *
  * ```
  * skip: [null, 'this.isPrivate()']
@@ -52,9 +55,26 @@ final class SkipOption implements PropertyOptionInterface
         private ?ExpressionLanguage $language = null,
     ) {}
 
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool
+    public function getPropertyAttributes(): array
     {
-        return self::getAttributes($property) !== [];
+        return \array_fill_keys(self::ATTRIBUTES, AccessDirection::Read);
+    }
+
+    /**
+     * Returns the attributes of the conditions given on the property, the
+     * method or the hook.
+     *
+     * @return list<\ReflectionAttribute<object>>
+     */
+    public static function getAttributes(\ReflectionProperty|\ReflectionMethod $reflector): array
+    {
+        $result = [];
+
+        foreach (self::ATTRIBUTES as $class) {
+            $result = [...$result, ...$reflector->getAttributes($class)];
+        }
+
+        return $result;
     }
 
     /**
@@ -63,11 +83,26 @@ final class SkipOption implements PropertyOptionInterface
      */
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
-        $attributes = self::getAttributes($property);
+    ): MemberDraft {
+        return $this->readAttributes($property, $metadata, $context, $errors);
+    }
+
+    /**
+     * Reads the conditions given on the property, the method or the hook.
+     *
+     * @throws MissingDependencyException in case of {@see SkipWhen} is given,
+     *         but the `symfony/expression-language` package is not installed
+     */
+    public function readAttributes(
+        \ReflectionProperty|\ReflectionMethod $reflector,
+        MemberDraft $metadata,
+        SourceContext $context,
+        ErrorCollector $errors,
+    ): MemberDraft {
+        $attributes = self::getAttributes($reflector);
 
         if ($attributes === []) {
             return $metadata;
@@ -97,9 +132,9 @@ final class SkipOption implements PropertyOptionInterface
      */
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }
@@ -142,20 +177,6 @@ final class SkipOption implements PropertyOptionInterface
     }
 
     /**
-     * @return list<\ReflectionAttribute<object>>
-     */
-    private static function getAttributes(\ReflectionProperty $property): array
-    {
-        $result = [];
-
-        foreach (self::ATTRIBUTES as $class) {
-            $result = [...$result, ...$property->getAttributes($class)];
-        }
-
-        return $result;
-    }
-
-    /**
      * @throws MissingDependencyException in case of an expression is given,
      *         but the `symfony/expression-language` package is not installed
      */
@@ -178,10 +199,11 @@ final class SkipOption implements PropertyOptionInterface
     }
 
     /**
-     * Returns {@see null} in case of the expression cannot be parsed, the
+     * Returns {@see null} in case of the expression cannot be parsed or the
+     * name of the object is not a variable name other than `value`, the
      * error is added.
      *
-     * @param non-empty-string $variable name of the object in the expression
+     * @param string $variable name of the object in the expression
      * @throws MissingDependencyException in case of the
      *         `symfony/expression-language` package is not installed
      */
@@ -191,10 +213,21 @@ final class SkipOption implements PropertyOptionInterface
         SourceContext $context,
         ErrorCollector $errors,
     ): ?ExpressionSkipCondition {
+        if ($variable === ExpressionSkipCondition::VALUE
+            || \preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $variable) !== 1) {
+            $errors->addError(InvalidOptionValueException::becauseValueIsNotVariableName(
+                'context',
+                $context->target,
+                $context->source,
+            ));
+
+            return null;
+        }
+
         $this->language ??= self::createLanguage();
 
         try {
-            $parsed = $this->language->parse($expression, [$variable]);
+            $parsed = $this->language->parse($expression, [$variable, ExpressionSkipCondition::VALUE]);
         } catch (SyntaxError $e) {
             $errors->addError(InvalidOptionValueException::becauseExpressionIsInvalid(
                 expression: $expression,

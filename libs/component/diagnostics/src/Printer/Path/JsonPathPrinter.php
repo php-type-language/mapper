@@ -8,9 +8,17 @@ use TypeLang\Mapper\Diagnostics\Path\Path;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\SegmentInterface;
+use TypeLang\Mapper\Diagnostics\Printer\Name\NameSanitizer;
 
 /**
  * Prints a path as JSONPath: `$.items[3].name`, `$['a b']`.
+ *
+ * A name of a segment is cut to 64 characters and ends with `...` inside the
+ * quotes: `$['aaaa...']`, such a path is not exact. Bytes that are not valid
+ * UTF-8 are printed as `\xFF`, the result is always valid UTF-8.
+ *
+ * The path follows JSONPath except for the escapes of invalid bytes and the
+ * cut names.
  *
  * @link https://www.rfc-editor.org/rfc/rfc9535
  */
@@ -68,6 +76,8 @@ final class JsonPathPrinter implements PathPrinterInterface
      */
     private static function printName(string $name): string
     {
+        $name = NameSanitizer::limit($name);
+
         if (\preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/D', $name) === 1) {
             return '.' . $name;
         }
@@ -79,10 +89,12 @@ final class JsonPathPrinter implements PathPrinterInterface
     {
         $escaped = \strtr($name, self::ESCAPES);
 
-        return (string) \preg_replace_callback(
+        $escaped = (string) \preg_replace_callback(
             pattern: '/[\x00-\x1f]/',
             callback: static fn(array $char): string => \sprintf('\u%04x', \ord($char[0])),
             subject: $escaped,
         );
+
+        return NameSanitizer::escapeInvalidBytes($escaped);
     }
 }

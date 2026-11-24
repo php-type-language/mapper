@@ -84,4 +84,62 @@ final class ViolationExceptionTest extends TestCase
 
         self::assertSame('custom: Value "a" is rejected', $exception->getMessage());
     }
+
+    public function testViolationsAreIteratedAndCounted(): void
+    {
+        $violations = [
+            new Violation(ViolationCode::MissingField, ['field' => 'id'], new Path([new KeySegment('id')])),
+            new Violation(ViolationCode::InvalidValue, [], new Path([new KeySegment('age')]), 'x'),
+        ];
+
+        $exception = self::createException($violations);
+
+        self::assertCount(2, $exception);
+        self::assertSame($violations, \iterator_to_array($exception));
+    }
+
+    public function testViolationsCausedByErrorsAreFatal(): void
+    {
+        $error = new \DivisionByZeroError('Division by zero');
+        $exception = new \InvalidArgumentException('rejected');
+        $fatal = new Violation(ViolationCode::InvalidValue, [], new Path([new KeySegment('a')]), 1, cause: $error);
+        $rejected = new Violation(
+            ViolationCode::InvalidValue,
+            [],
+            new Path([new KeySegment('b')]),
+            2,
+            cause: $exception,
+        );
+        $missing = new Violation(ViolationCode::MissingField, ['field' => 'c'], new Path([new KeySegment('c')]));
+
+        $all = self::createException([$missing, $rejected, $fatal]);
+
+        self::assertTrue($fatal->isFatal);
+        self::assertFalse($rejected->isFatal);
+        self::assertTrue($all->hasFatalViolations);
+        self::assertSame([$fatal], $all->getFatalViolations());
+        self::assertSame([$exception, $error], $all->getCauses());
+
+        $errors = [];
+
+        foreach ($all->getFatalErrors() as $violation => $cause) {
+            $errors[] = [$violation, $cause];
+        }
+
+        self::assertSame([[$fatal, $error]], $errors);
+
+        self::assertFalse(self::createException([$missing, $rejected])->hasFatalViolations);
+    }
+
+    /**
+     * @param non-empty-list<Violation> $violations
+     */
+    private static function createException(array $violations): InvalidInputStubException
+    {
+        return InvalidInputStubException::becauseInputIsInvalid(
+            $violations,
+            self::createFormatter(),
+            new JsonPathPrinter(),
+        );
+    }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenDocBlockStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenPromotedStub;
@@ -24,7 +24,7 @@ final class PhpDocMetadataReaderTest extends TestCase
         $metadata = self::readAsFirst(new PhpDocMetadataReader(), DocBlockStub::class);
 
         self::assertSame(DocBlockStub::class, $metadata->name);
-        self::assertSame([], $metadata->properties);
+        self::assertSame([], $metadata->members);
     }
 
     public function testVarTagIsResolvedByImportsOfClassFile(): void
@@ -149,10 +149,10 @@ final class PhpDocMetadataReaderTest extends TestCase
     /**
      * @template T of object
      * @param class-string<T> $class
-     * @return ClassMetadata<T>
+     * @return ClassDraft<T>
      * @throws \Throwable
      */
-    private static function readPhpDoc(string $class): ClassMetadata
+    private static function readPhpDoc(string $class): ClassDraft
     {
         return self::readOverReflection(new PhpDocMetadataReader(), $class);
     }

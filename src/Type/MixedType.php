@@ -42,10 +42,22 @@ final class MixedType implements TypeInterface
         }
 
         if (\is_array($value)) {
-            foreach ($value as $item) {
-                if (!$this->isNormalizable($item, $context)) {
-                    return false;
+            $nesting = $context->nesting;
+
+            if ($nesting->depth >= $context->config->maxDepth) {
+                return false;
+            }
+
+            ++$nesting->depth;
+
+            try {
+                foreach ($value as $item) {
+                    if (!$this->isNormalizable($item, $context)) {
+                        return false;
+                    }
                 }
+            } finally {
+                --$nesting->depth;
             }
 
             return true;
@@ -60,7 +72,7 @@ final class MixedType implements TypeInterface
 
     /**
      * @throws InvalidValueException in case of an element or an object
-     *         cannot be normalized
+     *         cannot be normalized or is nested deeper than the limit
      * @throws TypeDefinitionException in case of the type of an object
      *         cannot be built
      */
@@ -81,25 +93,19 @@ final class MixedType implements TypeInterface
         }
 
         if (\is_array($value)) {
-            $result = [];
+            $nesting = $context->nesting;
 
-            foreach ($value as $key => $item) {
-                if ($item === null || \is_scalar($item)) {
-                    $result[$key] = $item;
-
-                    continue;
-                }
-
-                try {
-                    $result[$key] = $this->normalize($item, $context);
-                } catch (NotInterceptableExceptionInterface $e) {
-                    throw $e;
-                } catch (\Exception $e) {
-                    throw InvalidValueException::wrapWithPath($e, new KeySegment($key), $item);
-                }
+            if ($nesting->depth >= $context->config->maxDepth) {
+                throw InvalidValueException::becauseDepthIsExceeded($context->config->maxDepth, $value);
             }
 
-            return $result;
+            ++$nesting->depth;
+
+            try {
+                return $this->normalizeArray($value, $context);
+            } finally {
+                --$nesting->depth;
+            }
         }
 
         if (\is_object($value)) {
@@ -107,6 +113,37 @@ final class MixedType implements TypeInterface
         }
 
         throw InvalidValueException::becauseInvalidType($value);
+    }
+
+    /**
+     * @param array<array-key, mixed> $value
+     * @return array<array-key, mixed>
+     * @throws InvalidValueException in case of an element cannot be
+     *         normalized
+     * @throws TypeDefinitionException in case of the type of an object
+     *         cannot be built
+     */
+    private function normalizeArray(array $value, Context $context): array
+    {
+        $result = [];
+
+        foreach ($value as $key => $item) {
+            if ($item === null || \is_scalar($item)) {
+                $result[$key] = $item;
+
+                continue;
+            }
+
+            try {
+                $result[$key] = $this->normalize($item, $context);
+            } catch (NotInterceptableExceptionInterface $e) {
+                throw $e;
+            } catch (\Exception $e) {
+                throw InvalidValueException::wrapWithPath($e, new KeySegment($key), $item);
+            }
+        }
+
+        return $result;
     }
 
     /**

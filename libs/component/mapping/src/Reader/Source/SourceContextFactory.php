@@ -44,31 +44,32 @@ final class SourceContextFactory
     public function createFromReflection(\ReflectionClass $class, \ReflectionProperty $property): SourceContext
     {
         $scope = $this->findScope($property);
+        $owner = $class->name;
+
+        // a private property is named by the class declaring it
+        if ($property->isPrivate()) {
+            $owner = $property->class;
+        }
 
         return new SourceContext(
-            target: MetadataException::formatPropertyTarget($class->name, $property->name),
+            target: MetadataException::formatPropertyTarget($owner, $property->name),
             source: SourceInfo::createFromReflection($scope),
             resolver: fn(): TypeResolver => $this->getResolver($scope, $property->getDeclaringClass(), $class),
         );
     }
 
     /**
-     * Creates the place of a value of the property given by its method,
-     * such as by its getter, the types are resolved by the file declaring
-     * the method.
+     * Creates the place of a value of the method, such as of its attribute,
+     * the types are resolved by the file declaring the method.
      *
-     * @param \ReflectionClass<object> $class class the property is read from
-     * @param non-empty-string $property
+     * @param \ReflectionClass<object> $class class the method is read from
      */
-    public function createFromMethod(
-        \ReflectionClass $class,
-        \ReflectionMethod $method,
-        string $property,
-    ): SourceContext {
+    public function createFromMethod(\ReflectionClass $class, \ReflectionMethod $method): SourceContext
+    {
         $scope = self::findMethodScope($method->getDeclaringClass(), $method);
 
         return new SourceContext(
-            target: MetadataException::formatPropertyTarget($class->name, $property),
+            target: $class->name . '::' . $method->name . '()',
             source: SourceInfo::createFromReflection($method),
             resolver: fn(): TypeResolver => $this->getResolver($scope, $method->getDeclaringClass(), $class),
         );

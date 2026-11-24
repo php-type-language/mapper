@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
+use TypeLang\Mapper\Mapping\Reader\Access\AccessDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 use TypeLang\Mapper\Mapping\Reader\Source\SourceContext;
@@ -20,17 +21,21 @@ use TypeLang\Mapper\Mapping\Reader\Source\SourceContext;
 interface PropertyOptionInterface
 {
     /**
-     * Returns whether the property or its hooks have attributes of the
-     * option, an attribute of a property that is not mapped is an error.
+     * Returns the attributes of a property the option reads and the
+     * direction of each, {@see null} for both. An attribute of a property
+     * that is not mapped or of a direction the member does not take part in
+     * is an error.
+     *
+     * @return array<class-string, AccessDirection|null>
      */
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool;
+    public function getPropertyAttributes(): array;
 
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata;
+    ): MemberDraft;
 
     /**
      * Returns the keys of a property config the option reads.
@@ -41,7 +46,7 @@ interface PropertyOptionInterface
 
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata;
+    ): MemberDraft;
 }

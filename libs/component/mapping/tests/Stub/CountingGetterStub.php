@@ -6,27 +6,34 @@ namespace TypeLang\Mapper\Mapping\Tests\Stub;
 
 use TypeLang\Mapper\Mapping\MapGetter;
 
+/**
+ * Getters typed by their own signature and docblock only.
+ */
 final class CountingGetterStub
 {
     /**
      * @var list<string>
      */
-    public array $items = [];
+    private array $items = [];
 
-    /**
-     * @var list<string>
-     */
-    public array $tags = [];
-
-    #[MapGetter('items')]
+    #[MapGetter('count')]
     public function countItems(): int
     {
         return \count($this->items);
     }
 
-    #[MapGetter('tags')]
-    public function getTags(): array
+    /**
+     * @return list<string>
+     */
+    #[MapGetter('items')]
+    public function getItems(): array
     {
-        return $this->tags;
+        return $this->items;
+    }
+
+    #[MapGetter('raw')]
+    public function getRaw(): array
+    {
+        return $this->items;
     }
 }

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidAttributeException;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownKeyException;
 use TypeLang\Mapper\Mapping\MapName;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Reader\ArrayMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\ChainMetadataReader;
@@ -29,7 +29,7 @@ final class ChainMetadataReaderTest extends TestCase
         $metadata = (new ChainMetadataReader([]))->read(new \ReflectionClass(UserStub::class));
 
         self::assertSame(UserStub::class, $metadata->name);
-        self::assertSame([], $metadata->properties);
+        self::assertSame([], $metadata->members);
     }
 
     public function testLowestReaderGetsGivenMetadata(): void
@@ -38,7 +38,7 @@ final class ChainMetadataReaderTest extends TestCase
 
         $metadata = self::readOverReflection($chain, AttributeStub::class);
 
-        self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
+        self::assertSame('user_id', self::getProperty($metadata, 'id')->read?->name);
         self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
     }
 
@@ -50,8 +50,8 @@ final class ChainMetadataReaderTest extends TestCase
         $duplicate = $chain->read(new \ReflectionClass(DuplicateNameStub::class));
 
         self::assertNotNull(self::getProperty($unparsable, 'items')->write?->type?->error);
-        self::assertSame('id', self::getProperty($duplicate, 'first')->externalName);
-        self::assertSame('id', self::getProperty($duplicate, 'second')->externalName);
+        self::assertSame('id', self::getProperty($duplicate, 'first')->read?->name);
+        self::assertSame('id', self::getProperty($duplicate, 'second')->read?->name);
     }
 
     public function testNestedChainDoesNotCheckOverriddenFailure(): void
@@ -86,7 +86,7 @@ final class ChainMetadataReaderTest extends TestCase
             self::assertStringContainsString(': value of "name" ', $e->errors[1]->getMessage());
             self::assertInstanceOf(UnknownKeyException::class, $e->errors[2]);
             self::assertStringContainsString(': unknown key "colour"', $e->errors[2]->getMessage());
-            self::assertNotNull($e->metadata->findProperty('items')?->read?->type?->error);
+            self::assertNotNull($e->metadata->findMember('items')?->read?->type?->error);
 
             return;
         }
@@ -190,7 +190,7 @@ final class ChainMetadataReaderTest extends TestCase
             new ReflectionMetadataReader(),
         );
 
-        self::assertSame('identifier', self::getProperty($metadata, 'id')->externalName);
+        self::assertSame('identifier', self::getProperty($metadata, 'id')->read?->name);
         self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
         self::assertType('array', self::getProperty($metadata, 'accounts')->write?->type);
     }
@@ -230,10 +230,10 @@ final class ChainMetadataReaderTest extends TestCase
      *
      * @template T of object
      * @param class-string<T> $class
-     * @return ClassMetadata<T>
+     * @return ClassDraft<T>
      * @throws \Throwable
      */
-    private static function provideDefault(string $class, ArrayMetadataReader $config): ClassMetadata
+    private static function provideDefault(string $class, ArrayMetadataReader $config): ClassDraft
     {
         return self::provide(
             $class,

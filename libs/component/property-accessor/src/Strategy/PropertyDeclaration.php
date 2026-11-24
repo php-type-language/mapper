@@ -8,7 +8,7 @@ use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotFoundException;
 
 /**
  * Features of the declaration of a property the default strategies choose
- * by: the property of an access point, a virtual property, its hooks,
+ * by: the property of an access, a virtual property, its hooks,
  * writing it outside the class. There is neither a virtual property nor a
  * hook before PHP 8.4.
  *
@@ -19,19 +19,55 @@ final class PropertyDeclaration
 {
     /**
      * @param \ReflectionClass<object> $class
+     * @param class-string|null $parent class declaring the private
+     *        property, the class itself or its parent
      * @throws PropertyNotFoundException in case of the class has no property
      *         of the name or it is static
      */
-    public static function getProperty(\ReflectionClass $class, string $name): \ReflectionProperty
-    {
-        if (!$class->hasProperty($name)) {
-            throw PropertyNotFoundException::becausePropertyDoesNotExist($class->name, $name);
-        }
+    public static function getProperty(
+        \ReflectionClass $class,
+        string $name,
+        ?string $parent = null,
+    ): \ReflectionProperty {
+        $property = self::findProperty($class, $name, $parent);
 
-        $property = $class->getProperty($name);
+        if ($property === null) {
+            throw PropertyNotFoundException::becausePropertyDoesNotExist($parent ?? $class->name, $name);
+        }
 
         if ($property->isStatic()) {
             throw PropertyNotFoundException::becausePropertyIsStatic($property->class, $property->name);
+        }
+
+        return $property;
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     * @param class-string|null $parent
+     */
+    private static function findProperty(\ReflectionClass $class, string $name, ?string $parent): ?\ReflectionProperty
+    {
+        if ($parent === null) {
+            if (!$class->hasProperty($name)) {
+                return null;
+            }
+
+            return $class->getProperty($name);
+        }
+
+        if ($class->name !== $parent && !$class->isSubclassOf($parent)) {
+            return null;
+        }
+
+        if (!\property_exists($parent, $name)) {
+            return null;
+        }
+
+        $property = new \ReflectionProperty($parent, $name);
+
+        if ($property->class !== $parent || !$property->isPrivate()) {
+            return null;
         }
 
         return $property;

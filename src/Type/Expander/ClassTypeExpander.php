@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Expander;
 
 use TypeLang\Mapper\Context\ExpandContext;
+use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
 use TypeLang\Mapper\Type\ClassType;
-use TypeLang\Mapper\Type\ClassType\Property;
+use TypeLang\Mapper\Type\ClassType\Field;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Type\Identifier;
 use TypeLang\Type\Literal\StringLiteralNode;
@@ -19,7 +20,7 @@ use TypeLang\Type\TypeNode;
 
 /**
  * Expands a class into `object` with the fields of the written properties
- * by their external names, a field with a default value is optional.
+ * by their names, a field the data may omit is optional.
  *
  * ```
  * // object{id: int, status: 'new'|'paid', role?: string}
@@ -46,24 +47,24 @@ final class ClassTypeExpander implements TypeExpanderInterface
     }
 
     /**
-     * @param Property<mixed> $property
+     * @param Field<InputFieldMetadata, mixed> $property
      */
-    private function getField(Property $property, ExpandContext $context): NamedFieldNode|ScalarFieldNode
+    private function getField(Field $property, ExpandContext $context): NamedFieldNode|ScalarFieldNode
     {
-        $name = $property->metadata->externalName;
+        $name = $property->metadata->name;
 
         if ($this->isIdentifier($name)) {
             return new NamedFieldNode(
                 key: new Identifier($name),
                 type: $context->expand($property->declared),
-                isOptional: $property->metadata->default !== null,
+                isOptional: $property->metadata->isOptional,
             );
         }
 
         return new ScalarFieldNode(
             key: new StringLiteralNode($name),
             type: $context->expand($property->declared),
-            isOptional: $property->metadata->default !== null,
+            isOptional: $property->metadata->isOptional,
         );
     }
 

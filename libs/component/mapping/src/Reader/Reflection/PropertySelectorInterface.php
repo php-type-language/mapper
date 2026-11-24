@@ -8,7 +8,8 @@ use TypeLang\Mapper\Mapping\Reader\ReflectionMetadataReader;
 
 /**
  * Decides which properties of a class are mapped,
- * {@see ReflectionMetadataReader} adds them.
+ * {@see ReflectionMetadataReader} adds them. Static and virtual properties
+ * are not given to the selector.
  */
 interface PropertySelectorInterface
 {

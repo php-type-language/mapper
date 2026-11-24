@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
 use TypeLang\Mapper\Mapping\DiscriminatorMap;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownKeyException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
@@ -16,13 +16,15 @@ use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 use TypeLang\Mapper\Mapping\Reader\Source\SourceContext;
 use TypeLang\Mapper\Mapping\Reader\Source\SourceContextFactory;
 use TypeLang\Parser\TypeParserInterface;
+use TypeLang\Type\NamedTypeNode;
 use TypeLang\Type\TypeNode;
 
 /**
  * Polymorphism of a class: {@see DiscriminatorMap} and the `discriminator`
  * key with the `field`, `map` and `otherwise` keys. The types of the map are
  * parsed by the place: with the imports of the file of the attribute, as
- * written in the config.
+ * written in the config. A type of the map is a class, another one is a
+ * type with a failure.
  *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Mapping\Reader
@@ -45,10 +47,10 @@ final class DiscriminatorOption implements ClassOptionInterface
 
     public function readClassAttributes(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         SourceContextFactory $contexts,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         $attributes = $class->getAttributes(DiscriminatorMap::class);
 
         if ($attributes === []) {
@@ -83,9 +85,9 @@ final class DiscriminatorOption implements ClassOptionInterface
     public function readClassConfig(
         \ReflectionClass $class,
         ConfigSection $config,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }
@@ -179,7 +181,7 @@ final class DiscriminatorOption implements ClassOptionInterface
                 return null;
             }
 
-            $types[$tag] = $context->parseType($this->parser, $type);
+            $types[$tag] = self::checkClass($context->parseType($this->parser, $type), $type, $context);
         }
 
         return new DiscriminatorMetadata(
@@ -188,6 +190,31 @@ final class DiscriminatorOption implements ClassOptionInterface
             source: $context->source,
             default: $this->findDefault($otherwise, $context, $placeOf('otherwise'), $errors),
         );
+    }
+
+    /**
+     * Returns the type of the map as is in case of it names a class or an
+     * interface without arguments, a type with a failure otherwise.
+     */
+    private static function checkClass(TypeMetadata $type, string $definition, SourceContext $context): TypeMetadata
+    {
+        $node = $type->type;
+
+        if ($node === null) {
+            return $type;
+        }
+
+        if ($node instanceof NamedTypeNode && $node->arguments === null && $node->fields === null) {
+            $class = $node->name->toClassString();
+
+            if ($class !== null && (\class_exists($class) || \interface_exists($class))) {
+                return $type;
+            }
+        }
+
+        $message = \sprintf('type "%s" of the map is not a class', \addcslashes($definition, '"'));
+
+        return TypeMetadata::createFromError($message, $context->source);
     }
 
     /**

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
 use PHPUnit\Framework\Attributes\RequiresPhp;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
+use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader;
+use TypeLang\Mapper\Mapping\Reader\ReflectionMetadataReader;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\BrokenHookStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\DescribedSetHookStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\HookStub;
@@ -85,9 +87,14 @@ final class HookPhpDocMetadataReaderTest extends TestCase
      * @param class-string $class
      * @throws \Throwable
      */
-    private static function readHookProperty(string $name, string $class = HookStub::class): PropertyMetadata
+    private static function readHookProperty(string $name, string $class = HookStub::class): MemberDraft
     {
-        $metadata = self::readOverReflection(new PhpDocMetadataReader(), $class);
+        $metadata = self::provide(
+            $class,
+            new AttributeMetadataReader(),
+            new PhpDocMetadataReader(),
+            new ReflectionMetadataReader(),
+        );
 
         return self::getProperty($metadata, $name);
     }

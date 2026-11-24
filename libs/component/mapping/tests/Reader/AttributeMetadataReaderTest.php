@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidAttributeException;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
+use TypeLang\Mapper\Mapping\MapAlias;
+use TypeLang\Mapper\Mapping\MapGetter;
 use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapType;
 use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\ExpressionSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\NullSkipCondition;
+use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
+use TypeLang\Mapper\Mapping\Reader\ReflectionMetadataReader;
 use TypeLang\Mapper\Mapping\Tests\Stub\AliasConflictCaseStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\AliasConstantStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\AliasStub;
@@ -27,18 +32,27 @@ use TypeLang\Mapper\Mapping\Tests\Stub\BrokenNamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenPropertyAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\BrokenSkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Concern\OwnerTrait;
+use TypeLang\Mapper\Mapping\Tests\Stub\ConflictingAliasStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\CustomFunctionSkipStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\FunctionSkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\MessageStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\MethodAttributeStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\MisplacedAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\NamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PropertyAliasStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\RepeatedAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ShapeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\SkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StatusStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StrictAttributeStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\ThrowingNamingStrategyStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\ThrowingNamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\TraitUserStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\UnitAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UnparsableTypeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UnselectedAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UserStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\WrongContextSkipStub;
 use TypeLang\Mapper\Mapping\Tests\TestCase;
 use TypeLang\Mapper\Naming\NamingStrategyInterface;
 use TypeLang\Mapper\Naming\SnakeCaseNamingStrategy;
@@ -51,8 +65,8 @@ final class AttributeMetadataReaderTest extends TestCase
     {
         $metadata = self::readAttributes(AttributeStub::class);
 
-        self::assertSame(['id', 'accounts', 'value', 'count'], \array_keys($metadata->properties));
-        self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
+        self::assertSame(['id', 'accounts', 'value', 'count'], \array_keys($metadata->members));
+        self::assertSame('user_id', self::getProperty($metadata, 'id')->read?->name);
 
         $accounts = self::getProperty($metadata, 'accounts');
         self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
@@ -80,7 +94,7 @@ final class AttributeMetadataReaderTest extends TestCase
         $id = self::getProperty(self::readAttributes(AttributeStub::class), 'id');
 
         self::assertType('int', $id->read?->type);
-        self::assertSame(0, $id->default?->value);
+        self::assertTrue($id->isOptional);
     }
 
     public function testAttributeOfTraitPropertyUsesImportsOfTraitFileAndSelfOfClass(): void
@@ -133,6 +147,34 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertSame($items->read?->type, $items->write?->type);
     }
 
+    public function testRepeatedAttributeIsThrownOnce(): void
+    {
+        $class = RepeatedAttributeStub::class;
+        $at = ' in RepeatedAttributeStub.php';
+
+        self::assertSame(
+            [
+                \sprintf(
+                    '%s::$declared: attribute "%s" cannot be created (Attribute "%2$s" must not be repeated)%s',
+                    $class,
+                    MapGetter::class,
+                    $at,
+                ),
+                \sprintf(
+                    '%s::$renamed: attribute "%s" cannot be created (Attribute "%2$s" must not be repeated)%s',
+                    $class,
+                    MapName::class,
+                    $at,
+                ),
+            ],
+            self::getErrors(static fn() => self::provide(
+                $class,
+                new AttributeMetadataReader(),
+                new ReflectionMetadataReader(),
+            )),
+        );
+    }
+
     public function testMapTypeOfMethodIsThrownAndPropertyIsStillRead(): void
     {
         $read = static fn() => self::readAttributes(MethodAttributeStub::class);
@@ -142,8 +184,7 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertInstanceOf(InvalidAttributeException::class, $exceptions[0]);
         self::assertSame([
             \sprintf(
-                '%s::getId(): attribute "%s" is allowed only on a property, its hook or its getter or setter'
-                    . ' in MethodAttributeStub.php',
+                '%s::getId(): attribute "%s" is not allowed on a method or a hook in MethodAttributeStub.php',
                 MethodAttributeStub::class,
                 MapType::class,
             ),
@@ -160,12 +201,13 @@ final class AttributeMetadataReaderTest extends TestCase
     {
         $read = static fn() => self::readAttributes(UnselectedAttributeStub::class);
         $class = UnselectedAttributeStub::class;
+        $hint = 'property is not mapped, give it "MapGetter" or "MapSetter" or choose it by the selector';
 
         self::assertContainsOnlyInstancesOf(UnknownPropertyException::class, self::getExceptions($read));
         self::assertSame([
-            "{$class}::\$secret: property is not mapped in UnselectedAttributeStub.php",
-            "{$class}::\$hidden: property is not mapped in UnselectedAttributeStub.php",
-            "{$class}::\$counter: property is not mapped in UnselectedAttributeStub.php",
+            "{$class}::\$secret: {$hint} in UnselectedAttributeStub.php",
+            "{$class}::\$hidden: {$hint} in UnselectedAttributeStub.php",
+            "{$class}::\$counter: property is static and cannot be mapped in UnselectedAttributeStub.php",
         ], self::getErrors($read));
     }
 
@@ -174,12 +216,13 @@ final class AttributeMetadataReaderTest extends TestCase
         $reader = new AttributeMetadataReader();
         $errors = self::getErrors(static fn() => self::readAsFirst($reader, AttributeStub::class));
         $class = AttributeStub::class;
+        $hint = 'property is not mapped, give it "MapGetter" or "MapSetter" or choose it by the selector';
 
         self::assertSame([
-            "{$class}::\$id: property is not mapped in AttributeStub.php",
-            "{$class}::\$accounts: property is not mapped in AttributeStub.php",
-            "{$class}::\$value: property is not mapped in AttributeStub.php",
-            "{$class}::\$count: property is not mapped in AttributeStub.php",
+            "{$class}::\$id: {$hint} in AttributeStub.php",
+            "{$class}::\$accounts: {$hint} in AttributeStub.php",
+            "{$class}::\$value: {$hint} in AttributeStub.php",
+            "{$class}::\$count: {$hint} in AttributeStub.php",
         ], $errors);
     }
 
@@ -188,7 +231,7 @@ final class AttributeMetadataReaderTest extends TestCase
         $metadata = self::readAsFirst(new AttributeMetadataReader(), UserStub::class);
 
         self::assertSame(UserStub::class, $metadata->name);
-        self::assertSame([], $metadata->properties);
+        self::assertSame([], $metadata->members);
     }
 
     public function testDiscriminatorMapSetsPolymorphismWithTypesResolvedByFile(): void
@@ -237,6 +280,10 @@ final class AttributeMetadataReaderTest extends TestCase
             ['on' => 'enabled', 'active' => 'enabled', 'enabled_v1' => 'enabled'],
             self::readAttributes(AliasStub::class)->aliases,
         );
+        self::assertSame(
+            ['on' => 'Enabled', 'yes' => 'Enabled'],
+            self::readAttributes(UnitAliasStub::class)->aliases,
+        );
     }
 
     public function testWrongAliasesAreThrown(): void
@@ -254,7 +301,7 @@ final class AttributeMetadataReaderTest extends TestCase
         );
         self::assertSame(
             [
-                AliasConstantStub::class . '::A: aliases are allowed only for the cases of a backed enum'
+                AliasConstantStub::class . '::A: aliases are allowed only for the cases of an enum'
                     . ' in AliasConstantStub.php',
             ],
             self::getErrors(static fn() => self::readAttributes(AliasConstantStub::class)),
@@ -289,6 +336,50 @@ final class AttributeMetadataReaderTest extends TestCase
             ],
             self::getErrors(static fn() => self::readAttributes(AliasConflictCaseStub::class)),
         );
+        self::assertSame(
+            [
+                ConflictingAliasStub::class . '::$email: repeated attribute "' . MapAlias::class . '" gives'
+                    . ' different "onConflict" in ConflictingAliasStub.php',
+            ],
+            self::getErrors(static fn() => self::readAttributes(ConflictingAliasStub::class)),
+        );
+    }
+
+    public function testAttributesOnPlacesTheirDeclarationsDoNotAllowAreThrown(): void
+    {
+        $class = MisplacedAttributeStub::class;
+        $at = ' in MisplacedAttributeStub.php';
+
+        self::assertSame(
+            [
+                \sprintf('%s: attribute "%s" is not allowed on a class%s', $class, MapName::class, $at),
+                \sprintf(
+                    '%s::LIMIT: attribute "%s" is not allowed on a constant or a case%s',
+                    $class,
+                    MapType::class,
+                    $at,
+                ),
+                \sprintf(
+                    '%s::$name: attribute "%s" is not allowed on a property%s',
+                    $class,
+                    NormalizeAsArray::class,
+                    $at,
+                ),
+            ],
+            self::getErrors(static fn() => self::readAttributes($class)),
+        );
+    }
+
+    public function testNameOfObjectOfExpressionThatIsNotVariableNameIsThrown(): void
+    {
+        $class = WrongContextSkipStub::class;
+        $message = '%s::$%s: value of "context" must be a variable name other than "value"'
+            . ' in WrongContextSkipStub.php';
+
+        self::assertSame(
+            [\sprintf($message, $class, 'reserved'), \sprintf($message, $class, 'spaced')],
+            self::getErrors(static fn() => self::readAttributes($class)),
+        );
     }
 
     public function testNamingStrategyIsReadWithoutRenaming(): void
@@ -296,7 +387,7 @@ final class AttributeMetadataReaderTest extends TestCase
         $metadata = self::readAttributes(NamingStub::class);
 
         self::assertInstanceOf(SnakeCaseNamingStrategy::class, $metadata->namingStrategy);
-        self::assertSame('firstName', self::getProperty($metadata, 'firstName')->externalName);
+        self::assertSame('firstName', self::getProperty($metadata, 'firstName')->read?->name);
     }
 
     public function testUnknownNamingStrategyIsThrown(): void
@@ -307,6 +398,13 @@ final class AttributeMetadataReaderTest extends TestCase
                     . ' instantiable class of "' . NamingStrategyInterface::class . '" in BrokenNamingStub.php',
             ],
             self::getErrors(static fn() => self::readAttributes(BrokenNamingStub::class)),
+        );
+        self::assertSame(
+            [
+                ThrowingNamingStub::class . ': naming strategy "' . ThrowingNamingStrategyStub::class
+                    . '" cannot be created (boom) in ThrowingNamingStub.php',
+            ],
+            self::getErrors(static fn() => self::readAttributes(ThrowingNamingStub::class)),
         );
     }
 
@@ -345,6 +443,44 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertStringEndsWith(' in BrokenSkipStub.php', $errors[0]);
     }
 
+    public function testFunctionsOfDefaultLanguageInExpressionAreAccepted(): void
+    {
+        $metadata = self::readAttributes(FunctionSkipStub::class);
+
+        foreach (['email', 'phone', 'name'] as $name) {
+            $conditions = self::getProperty($metadata, $name)->skip;
+
+            self::assertCount(1, $conditions);
+            self::assertInstanceOf(ExpressionSkipCondition::class, $conditions[0]);
+        }
+    }
+
+    public function testFunctionOfGivenLanguageInExpressionIsAccepted(): void
+    {
+        $language = new ExpressionLanguage();
+        $language->register(
+            'blank',
+            static fn(string $v): string => $v,
+            static fn(array $v, mixed $x): bool => $x === '',
+        );
+
+        $reader = new AttributeMetadataReader(expressions: $language);
+        $metadata = self::readOverReflection($reader, CustomFunctionSkipStub::class);
+
+        self::assertCount(1, self::getProperty($metadata, 'email')->skip);
+    }
+
+    public function testUnknownFunctionInExpressionIsThrown(): void
+    {
+        $errors = self::getErrors(static fn() => self::readAttributes(CustomFunctionSkipStub::class));
+
+        self::assertCount(1, $errors);
+        self::assertStringStartsWith(
+            CustomFunctionSkipStub::class . '::$email: expression "blank(value)" is invalid (',
+            $errors[0],
+        );
+    }
+
     public function testBrokenDiscriminatorMapIsThrown(): void
     {
         $class = BrokenDiscriminatorStub::class;
@@ -358,10 +494,10 @@ final class AttributeMetadataReaderTest extends TestCase
     /**
      * @template T of object
      * @param class-string<T> $class
-     * @return ClassMetadata<T>
+     * @return ClassDraft<T>
      * @throws \Throwable
      */
-    private static function readAttributes(string $class): ClassMetadata
+    private static function readAttributes(string $class): ClassDraft
     {
         return self::readOverReflection(new AttributeMetadataReader(), $class);
     }

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\MapName;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -22,17 +22,17 @@ final class NameOption implements PropertyOptionInterface
 {
     private const KEY = 'name';
 
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool
+    public function getPropertyAttributes(): array
     {
-        return $property->getAttributes(MapName::class) !== [];
+        return [MapName::class => null];
     }
 
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $attributes = AttributeFactory::create(
             $property->getAttributes(MapName::class),
             MapName::class,
@@ -54,9 +54,9 @@ final class NameOption implements PropertyOptionInterface
 
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }
@@ -66,12 +66,12 @@ final class NameOption implements PropertyOptionInterface
 
     private static function apply(
         mixed $name,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         if (\is_string($name) && $name !== '') {
-            return $metadata->withExternalName($name);
+            return $metadata->withName($name);
         }
 
         $errors->addError(InvalidOptionValueException::becauseValueIsNotNonEmptyString(

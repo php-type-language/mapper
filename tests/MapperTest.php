@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Tests;
 
 use TypeLang\Mapper\Configuration;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
+use TypeLang\Mapper\Diagnostics\ViolationCode;
 use TypeLang\Mapper\Diagnostics\ViolationFormatter;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\MapperExceptionInterface;
@@ -14,6 +15,8 @@ use TypeLang\Mapper\Mapper;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Tests\Stub\AddressStub;
 use TypeLang\Mapper\Tests\Stub\AliasedStub;
+use TypeLang\Mapper\Tests\Stub\BranchNodeStub;
+use TypeLang\Mapper\Tests\Stub\ChainLinkStub;
 use TypeLang\Mapper\Tests\Stub\DecimalCommaCoercerStub;
 use TypeLang\Mapper\Tests\Stub\DuplicateNameStub;
 use TypeLang\Mapper\Tests\Stub\JsonArrayCoercerStub;
@@ -46,7 +49,10 @@ final class MapperTest extends TestCase
             self::assertInstanceOf(TypeDefinitionException::class, $error);
             self::assertInstanceOf(InvalidMetadataException::class, $error->getPrevious());
             self::assertStringStartsWith(
-                \sprintf('Type "%s" cannot be built: Cannot read metadata of', DuplicateNameStub::class),
+                \sprintf(
+                    'Type "%1$s" cannot be built, the mapping for class "%1$s" contains errors:',
+                    DuplicateNameStub::class,
+                ),
                 $error->getMessage(),
             );
         }
@@ -293,6 +299,125 @@ final class MapperTest extends TestCase
         self::assertInstanceOf(CircleStub::class, $mapper->denormalize($data, ShapeStub::class));
         self::assertInstanceOf(CircleStub::class, $mapper->denormalize($data, CircleStub::class));
         self::assertFalse($mapper->isDenormalizable($data + ['side' => 2], ShapeStub::class));
+    }
+
+    public function testChainOfObjectsAtLimitOfDepthIsNormalized(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 5));
+        $chain = ChainLinkStub::chain(5);
+
+        self::assertTrue($mapper->isNormalizable($chain, ChainLinkStub::class));
+        self::assertSame(
+            ['next' => ['next' => ['next' => ['next' => ['next' => null, 'children' => []],
+                'children' => []], 'children' => []], 'children' => []], 'children' => []],
+            $mapper->normalize($chain, ChainLinkStub::class),
+        );
+    }
+
+    public function testChainOfObjectsBeyondLimitOfDepthIsRejectedWithPath(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 5));
+        $chain = ChainLinkStub::chain(6);
+
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($chain, ChainLinkStub::class));
+
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame(['$.next.next.next.next.next'], self::printPaths($error));
+        self::assertSame(
+            '$.next.next.next.next.next: Nesting depth exceeds the limit of 5',
+            $error->getMessage(),
+        );
+    }
+
+    public function testCyclicGraphIsRejectedByDefaultLimitOfDepth(): void
+    {
+        $mapper = new Mapper();
+        $node = new ChainLinkStub();
+        $node->next = $node;
+
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($node));
+
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame(ViolationCode::DepthExceeded, $error->violations[0]->code);
+        self::assertCount(512, $error->violations[0]->path->segments);
+    }
+
+    public function testCyclicObjectBehindUnionIsRejected(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 3));
+        $node = new ChainLinkStub();
+        $node->next = $node;
+
+        $error = self::captureThrowable(
+            static fn(): mixed => $mapper->normalize($node, ChainLinkStub::class . '|int'),
+        );
+
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame(ViolationCode::InvalidType, $error->violations[0]->code);
+    }
+
+    public function testBranchingCyclicGraphIsRejectedByDefaultLimitOfDepthQuickly(): void
+    {
+        $mapper = new Mapper();
+        $root = BranchNodeStub::create();
+
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($root));
+
+        self::assertFalse($mapper->isNormalizable($root));
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame(ViolationCode::DepthExceeded, $error->violations[0]->code);
+    }
+
+    public function testCycleThroughListIsRejectedWithPath(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 3));
+        $node = new ChainLinkStub();
+        $node->children = [$node];
+
+        $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($node, ChainLinkStub::class));
+
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertSame(['$.children[0].children[0].children[0]'], self::printPaths($error));
+    }
+
+    public function testCyclicDynamicObjectAndArrayAreRejected(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 4));
+        $object = new \stdClass();
+        $object->self = $object;
+        $array = [];
+        $array['self'] = &$array;
+
+        foreach ([$object, $array] as $value) {
+            $error = self::captureThrowable(static fn(): mixed => $mapper->normalize($value));
+
+            self::assertInstanceOf(InvalidValueException::class, $error);
+            self::assertSame(ViolationCode::DepthExceeded, $error->violations[0]->code);
+        }
+    }
+
+    public function testMapperNormalizesAgainAfterRejectedDepth(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 3));
+        $node = new ChainLinkStub();
+        $node->next = $node;
+
+        for ($i = 0; $i < 3; ++$i) {
+            self::captureThrowable(static fn(): mixed => $mapper->normalize($node));
+        }
+
+        self::assertSame(
+            ['next' => null, 'children' => []],
+            $mapper->normalize(ChainLinkStub::chain(1)),
+        );
+    }
+
+    public function testDepthIsNotLimitedOnDenormalization(): void
+    {
+        $mapper = new Mapper(new Configuration(maxDepth: 1));
+        $data = ['next' => ['next' => ['next' => null]]];
+
+        self::assertInstanceOf(ChainLinkStub::class, $mapper->denormalize($data, ChainLinkStub::class));
     }
 
     /**

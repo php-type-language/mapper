@@ -35,13 +35,15 @@ final class BackedEnumTypeBuilder implements TypeBuilderInterface
             return null;
         }
 
+        $enum = new \ReflectionEnum($name);
+
         /** @var 'int'|'string' */
-        $backing = (string) (new \ReflectionEnum($name))->getBackingType();
+        $backing = (string) $enum->getBackingType();
 
         /** @var TypeInterface<int|string> */
         $type = $context->types->getType(new NamedTypeNode(new Name($backing)));
 
-        $aliases = $context->metadata->read(new \ReflectionClass($name))->aliases;
+        $aliases = $context->metadata->readEnum($enum)->aliases;
 
         return new BackedEnumType($name, $type, $aliases);
     }

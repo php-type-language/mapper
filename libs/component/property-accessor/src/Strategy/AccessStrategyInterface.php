@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\PropertyAccessor\Strategy;
 
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\OutputFieldMetadata;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyAccessorExceptionInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyReaderInterface;
 use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
 
 /**
- * One way of reading and writing a property, chosen by the access point of
- * the direction in the metadata, such as the backing store or a method of
+ * One way of reading and writing the value of a field, chosen by the access
+ * of the field in the metadata, such as the backing store or a method of
  * the class. A strategy may take one direction only.
  *
  * ```
  * public function tryCreateReader(
  *     \ReflectionClass $class,
- *     PropertyMetadata $metadata,
+ *     OutputFieldMetadata $field,
  * ): ?PropertyReaderInterface {
- *     $point = $metadata->read?->point;
+ *     $access = $field->access;
  *
- *     if (!$point instanceof LazyAccessPoint) {
+ *     if (!$access instanceof LazyAccessMetadata) {
  *         return null;
  *     }
  *
- *     return new LazyReader($point->loader);
+ *     return new LazyReader($access->loader);
  * }
  * ```
  */
@@ -33,29 +34,29 @@ interface AccessStrategyInterface
 {
     /**
      * Returns {@see null} in case of the strategy does not take the access
-     * point of the read direction.
+     * of the field.
      *
      * @param \ReflectionClass<object> $class
      * @return PropertyReaderInterface<object, mixed>|null
      * @throws PropertyAccessorExceptionInterface in case of the strategy
-     *         takes the point, but it cannot be read
+     *         takes the access, but it cannot be read
      */
     public function tryCreateReader(
         \ReflectionClass $class,
-        PropertyMetadata $metadata,
+        OutputFieldMetadata $field,
     ): ?PropertyReaderInterface;
 
     /**
      * Returns {@see null} in case of the strategy does not take the access
-     * point of the write direction.
+     * of the field.
      *
      * @param \ReflectionClass<object> $class
      * @return PropertyWriterInterface<object, mixed>|null
      * @throws PropertyAccessorExceptionInterface in case of the strategy
-     *         takes the point, but it cannot be written
+     *         takes the access, but it cannot be written
      */
     public function tryCreateWriter(
         \ReflectionClass $class,
-        PropertyMetadata $metadata,
+        InputFieldMetadata $field,
     ): ?PropertyWriterInterface;
 }

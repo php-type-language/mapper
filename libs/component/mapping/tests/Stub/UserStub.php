@@ -12,9 +12,6 @@ final class UserStub
 
     public ?string $email = null;
 
-    // @phpstan-ignore-next-line the property is untyped on purpose
-    public $untyped;
-
     public ?self $friend = null;
 
     public ?string $displayName = null;

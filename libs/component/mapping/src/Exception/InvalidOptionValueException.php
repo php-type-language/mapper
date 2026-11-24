@@ -24,6 +24,14 @@ final class InvalidOptionValueException extends MetadataException
     /**
      * @param string $target property or class: `App\User::$id`, `App\User`
      */
+    public static function becauseValueIsNotVariableName(string $key, string $target, SourceInfo $source): self
+    {
+        return new self($target, $source, self::formatValue($key, 'a variable name other than "value"'));
+    }
+
+    /**
+     * @param string $target property or class: `App\User::$id`, `App\User`
+     */
     public static function becauseValueIsNotBoolean(string $key, string $target, SourceInfo $source): self
     {
         return new self($target, $source, self::formatValue($key, 'a boolean'));
@@ -56,9 +64,9 @@ final class InvalidOptionValueException extends MetadataException
     /**
      * @param string $target property or class: `App\User::$id`, `App\User`
      */
-    public static function becauseValueIsNotList(string $key, string $target, SourceInfo $source): self
+    public static function becauseValueIsNotStringOrList(string $key, string $target, SourceInfo $source): self
     {
-        return new self($target, $source, self::formatValue($key, 'a list'));
+        return new self($target, $source, self::formatValue($key, 'a string or a list'));
     }
 
     /**
@@ -124,6 +132,24 @@ final class InvalidOptionValueException extends MetadataException
         return new self($target, $source, $message);
     }
 
+    /**
+     * @param string $target property or class: `App\User::$id`, `App\User`
+     */
+    public static function becauseNamingStrategyCannotBeCreated(
+        string $class,
+        string $target,
+        SourceInfo $source,
+        \Throwable $previous,
+    ): self {
+        $message = \sprintf(
+            'naming strategy "%s" cannot be created (%s)',
+            \addcslashes($class, '"'),
+            $previous->getMessage(),
+        );
+
+        return new self($target, $source, $message, $previous);
+    }
+
     public static function becauseClassConfigIsNotMap(string $class, SourceInfo $source): self
     {
         return new self($class, $source, 'config must be a map');
@@ -139,43 +165,44 @@ final class InvalidOptionValueException extends MetadataException
 
     /**
      * @param 'normalized'|'denormalized' $direction
-     * @param string $property property reference: `App\User::$id`
+     * @param string $target member reference: `App\User::$id`,
+     *        `App\User::getId()`
      */
     public static function becauseDirectionIsMissing(
         string $key,
         string $direction,
-        string $property,
+        string $target,
         SourceInfo $source,
     ): self {
         $message = \sprintf(
-            '"%s" is given, but the property is not %s',
+            '"%s" is given, but the member is not %s',
             \addcslashes($key, '"'),
             $direction,
         );
 
-        return new self($property, $source, $message);
+        return new self($target, $source, $message);
     }
 
     /**
-     * @param string $property property reference: `App\User::$id`
+     * @param string $target member reference: `App\User::$id`
      */
-    public static function becauseValueIsNotMethodOrTrue(string $key, string $property, SourceInfo $source): self
+    public static function becauseKeyIsNextToDirections(string $key, string $target, SourceInfo $source): self
     {
-        return new self($property, $source, self::formatValue($key, 'a method name or true'));
+        $message = \sprintf(
+            '"%s" is not allowed next to "get" or "set", give it in them',
+            \addcslashes($key, '"'),
+        );
+
+        return new self($target, $source, $message);
     }
 
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseMethodDoesNotExist(
-        string $key,
-        string $method,
-        string $property,
-        SourceInfo $source,
-    ): self {
+    public static function becausePropertyHasNoSlot(string $key, string $property, SourceInfo $source): self
+    {
         $message = \sprintf(
-            'method "%s" of "%s" does not exist',
-            \addcslashes($method, '"'),
+            '"%s" accesses the backing store, but the property is virtual: add "hook: true"',
             \addcslashes($key, '"'),
         );
 
@@ -185,19 +212,45 @@ final class InvalidOptionValueException extends MetadataException
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseDirectionIsLeftOut(
-        string $key,
-        string $only,
-        string $property,
-        SourceInfo $source,
-    ): self {
-        $message = \sprintf(
-            '"%s" is given, but "%s" leaves its direction out',
-            \addcslashes($key, '"'),
-            \addcslashes($only, '"'),
+    public static function becausePropertyIsVirtual(string $property, SourceInfo $source): self
+    {
+        return new self(
+            $property,
+            $source,
+            'a virtual property is mapped by "get" or "set" with "hook: true"',
         );
+    }
 
-        return new self($property, $source, $message);
+    /**
+     * @param string $method method reference: `App\User::getId()`
+     */
+    public static function becauseMethodRequiresName(string $key, string $method, SourceInfo $source): self
+    {
+        $message = \sprintf('"%s" of a method requires "name"', \addcslashes($key, '"'));
+
+        return new self($method, $source, $message);
+    }
+
+    /**
+     * @param string $method method reference: `App\User::getId()`
+     */
+    public static function becauseMethodTakesOneDirection(string $method, SourceInfo $source): self
+    {
+        return new self(
+            $method,
+            $source,
+            'the method is not both a getter and a setter, give "get" or "set"',
+        );
+    }
+
+    /**
+     * @param string $class class reference: `App\User`
+     */
+    public static function becauseMethodDoesNotExist(string $method, string $class, SourceInfo $source): self
+    {
+        $message = \sprintf('method "%s" does not exist', \addcslashes($method, '"'));
+
+        return new self($class, $source, $message);
     }
 
     /**

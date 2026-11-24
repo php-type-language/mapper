@@ -7,7 +7,6 @@ namespace TypeLang\Mapper\Mapping\Provider;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use TypeLang\Mapper\Mapping\Exception\InvalidCacheKeyException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 /**
  * Stores metadata provided by the delegate in a PSR-16 cache. A failure of
@@ -28,7 +27,7 @@ final class Psr16MetadataProvider extends CacheMetadataProvider
         parent::__construct($delegate, $prefix);
     }
 
-    protected function remember(string $key, string $class, \Closure $read): ClassMetadata
+    protected function remember(string $key, string $class, string $type, \Closure $read): object
     {
         try {
             $metadata = $this->cache->get($key);
@@ -38,7 +37,7 @@ final class Psr16MetadataProvider extends CacheMetadataProvider
             $metadata = null;
         }
 
-        if (self::isMetadataOf($metadata, $class)) {
+        if (self::isMetadataOf($metadata, $class, $type)) {
             return $metadata;
         }
 

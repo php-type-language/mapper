@@ -6,12 +6,13 @@ namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use TypeLang\Mapper\Mapping\Draft\AccessDraft;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidDefaultValueException;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Access\HookAccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertySelectorInterface;
@@ -22,10 +23,14 @@ use TypeLang\Mapper\Mapping\Tests\Stub\ObjectDefaultStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\VirtualHookStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php84\WiderSetHookStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\Php85\ClosureDefaultStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PlainSecretChildStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PlainSecretStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PromotedStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\ShadowSecretStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StatusStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ThrowingDefaultStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\TraitUserStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\UntypedStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UserStub;
 use TypeLang\Mapper\Mapping\Tests\TestCase;
 use TypeLang\Type\Name;
@@ -41,29 +46,24 @@ final class ReflectionMetadataReaderTest extends TestCase
         self::assertType('int', $id->read?->type);
         self::assertType('int', $id->write?->type);
         self::assertType('?string', self::getProperty($metadata, 'email')->read?->type);
-        self::assertNull(self::getProperty($metadata, 'untyped')->read?->type);
+        self::assertNull(self::getProperty(self::readReflection(UntypedStub::class), 'untyped')->read?->type);
     }
 
     public function testPropertyAccessesStorageInBothDirections(): void
     {
         $id = self::getProperty(self::readReflection(UserStub::class), 'id');
 
-        self::assertEquals(new StorageAccessPoint('id'), $id->read?->point);
-        self::assertEquals(new StorageAccessPoint('id'), $id->write?->point);
+        self::assertEquals(new SlotAccessMetadata('id'), $id->read?->access);
+        self::assertEquals(new SlotAccessMetadata('id'), $id->write?->access);
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testVirtualPropertyAccessesHooksItHas(): void
+    public function testVirtualPropertyIsNotMapped(): void
     {
         $metadata = self::readReflection(VirtualHookStub::class);
 
-        $computed = self::getProperty($metadata, 'computed');
-        self::assertEquals(new HookAccessPoint('computed'), $computed->read?->point);
-        self::assertNull($computed->write);
-
-        $alias = self::getProperty($metadata, 'alias');
-        self::assertNull($alias->read);
-        self::assertEquals(new HookAccessPoint('alias'), $alias->write?->point);
+        self::assertNull($metadata->findMember('computed'));
+        self::assertNull($metadata->findMember('alias'));
     }
 
     #[RequiresPhp('>= 8.4.0')]
@@ -71,8 +71,8 @@ final class ReflectionMetadataReaderTest extends TestCase
     {
         $backed = self::getProperty(self::readReflection(VirtualHookStub::class), 'backed');
 
-        self::assertEquals(new StorageAccessPoint('backed'), $backed->read?->point);
-        self::assertEquals(new StorageAccessPoint('backed'), $backed->write?->point);
+        self::assertEquals(new SlotAccessMetadata('backed'), $backed->read?->access);
+        self::assertEquals(new SlotAccessMetadata('backed'), $backed->write?->access);
     }
 
     /**
@@ -98,15 +98,6 @@ final class ReflectionMetadataReaderTest extends TestCase
         self::assertType('string', $property->write?->type);
     }
 
-    #[RequiresPhp('>= 8.4.0')]
-    public function testWriteTypeOfVirtualPropertyIsParameterOfSetHook(): void
-    {
-        $property = self::getProperty(self::readReflection(WiderSetHookStub::class), 'virtual');
-
-        self::assertType('string', $property->read?->type);
-        self::assertType('string|int', $property->write?->type);
-    }
-
     public function testTypeSourceIsFileOfDeclaration(): void
     {
         $type = self::getProperty(self::readReflection(UserStub::class), 'id')->read?->type;
@@ -129,22 +120,24 @@ final class ReflectionMetadataReaderTest extends TestCase
      *     class-string,
      *     non-empty-string,
      *     bool,
+     *     bool,
      *     mixed,
      * }>
      */
     public static function defaultValueDataProvider(): iterable
     {
-        yield 'typed without initializer' => [UserStub::class, 'id', false, null];
-        yield 'nullable with null' => [UserStub::class, 'email', true, null];
-        yield 'untyped without initializer' => [UserStub::class, 'untyped', true, null];
-        yield 'promoted without default' => [PromotedStub::class, 'required', false, null];
-        yield 'promoted with array' => [PromotedStub::class, 'users', true, []];
-        yield 'promoted with int' => [PromotedStub::class, 'count', true, 1];
-        yield 'promoted with null' => [PromotedStub::class, 'nullable', true, null];
-        yield 'enum case' => [EnumDefaultStub::class, 'status', true, StatusStub::Active];
+        yield 'typed without initializer' => [UserStub::class, 'id', false, false, null];
+        yield 'nullable with null' => [UserStub::class, 'email', true, false, null];
+        yield 'untyped without initializer' => [UntypedStub::class, 'untyped', true, false, null];
+        yield 'enum case' => [EnumDefaultStub::class, 'status', true, false, null];
+        yield 'promoted without default' => [PromotedStub::class, 'required', false, false, null];
+        yield 'promoted with array' => [PromotedStub::class, 'users', true, true, []];
+        yield 'promoted with int' => [PromotedStub::class, 'count', true, true, 1];
+        yield 'promoted with null' => [PromotedStub::class, 'nullable', true, true, null];
         yield 'promoted with array of enum cases' => [
             EnumDefaultStub::class,
             'statuses',
+            true,
             true,
             [StatusStub::Active, StatusStub::Inactive],
         ];
@@ -155,10 +148,16 @@ final class ReflectionMetadataReaderTest extends TestCase
      * @param non-empty-string $name
      */
     #[DataProvider('defaultValueDataProvider')]
-    public function testDefaultValueIsRead(string $class, string $name, bool $hasDefault, mixed $default): void
-    {
+    public function testDefaultOfPromotedPropertyIsWrittenOfOtherIsOptional(
+        string $class,
+        string $name,
+        bool $isOptional,
+        bool $hasDefault,
+        mixed $default,
+    ): void {
         $property = self::getProperty(self::readReflection($class), $name);
 
+        self::assertSame($isOptional, $property->toInputField()?->isOptional);
         self::assertSame($hasDefault, $property->default !== null);
         self::assertSame($default, $property->default?->value);
     }
@@ -224,14 +223,35 @@ final class ReflectionMetadataReaderTest extends TestCase
         $metadata = self::readReflection(UserStub::class);
 
         self::assertSame(UserStub::class, $metadata->name);
-        self::assertSame(['id', 'email', 'untyped', 'friend', 'displayName'], \array_keys($metadata->properties));
+        self::assertSame(['id', 'email', 'friend', 'displayName'], \array_keys($metadata->members));
     }
 
     public function testSelectorDecidesWhichPropertiesAreAdded(): void
     {
         $metadata = self::readAsFirst(new ReflectionMetadataReader(self::createNonPublicSelector()), UserStub::class);
 
-        self::assertSame(['secret', 'hidden'], \array_keys($metadata->properties));
+        self::assertSame(['secret', 'hidden'], \array_keys($metadata->members));
+    }
+
+    public function testSelectedPrivatePropertiesOfParentsAreMembersOfTheirOwn(): void
+    {
+        $reader = new ReflectionMetadataReader(self::createNonPublicSelector());
+        $parent = PlainSecretStub::class . '::$secret';
+
+        $child = self::readAsFirst($reader, PlainSecretChildStub::class);
+        self::assertSame(['own', 'prot', $parent], \array_keys($child->members));
+        self::assertSame('secret', self::getProperty($child, $parent)->read?->name);
+        self::assertEquals(
+            new SlotAccessMetadata('secret', PlainSecretStub::class),
+            self::getProperty($child, $parent)->write?->access,
+        );
+
+        $shadow = self::readAsFirst($reader, ShadowSecretStub::class);
+        self::assertSame(['secret', 'prot', $parent], \array_keys($shadow->members));
+        self::assertEquals(
+            new SlotAccessMetadata('secret', ShadowSecretStub::class),
+            self::getProperty($shadow, 'secret')->read?->access,
+        );
     }
 
     public function testGivenMetadataGetsMissingPropertiesAndKeepsOtherOnes(): void
@@ -241,27 +261,40 @@ final class ReflectionMetadataReaderTest extends TestCase
         $metadata = (new ReflectionMetadataReader())->read(new \ReflectionClass(UserStub::class), $lower);
 
         self::assertSame(
-            ['secret', 'hidden', 'id', 'email', 'untyped', 'friend', 'displayName'],
-            \array_keys($metadata->properties),
+            ['secret', 'hidden', 'id', 'email', 'friend', 'displayName'],
+            \array_keys($metadata->members),
         );
     }
 
     public function testGivenPropertyGetsNativeValuesAndKeepsOtherOnes(): void
     {
         $class = new \ReflectionClass(UserStub::class);
-        $lower = new ClassMetadata(UserStub::class, ['id' => new PropertyMetadata('id', externalName: 'user_id')]);
+        $lower = new ClassDraft(UserStub::class, ['id' => MemberDraft::createForProperty('id')->withName('user_id')]);
 
         $id = self::getProperty((new ReflectionMetadataReader())->read($class, $lower), 'id');
 
-        self::assertSame('user_id', $id->externalName);
+        self::assertSame('user_id', $id->read?->name);
         self::assertType('int', $id->read?->type);
+    }
+
+    public function testGivenMemberKeepsDirectionsAndAccesses(): void
+    {
+        $class = new \ReflectionClass(UserStub::class);
+        $hook = new AccessDraft(new HookAccessMetadata('id'), 'user_id');
+        $lower = new ClassDraft(UserStub::class, ['id' => new MemberDraft('id', $hook)]);
+
+        $id = self::getProperty((new ReflectionMetadataReader())->read($class, $lower), 'id');
+
+        self::assertSame($hook, $id->read);
+        self::assertNull($id->write);
     }
 
     public function testGivenTypeIsKeptForPropertyWithoutNativeType(): void
     {
-        $class = new \ReflectionClass(UserStub::class);
+        $class = new \ReflectionClass(UntypedStub::class);
         $type = TypeMetadata::createFromType(new NamedTypeNode(new Name('mixed')), new SourceInfo());
-        $lower = new ClassMetadata(UserStub::class, ['untyped' => (new PropertyMetadata('untyped'))->withType($type)]);
+        $member = MemberDraft::createForProperty('untyped')->withType($type);
+        $lower = new ClassDraft(UntypedStub::class, ['untyped' => $member]);
 
         $untyped = self::getProperty((new ReflectionMetadataReader())->read($class, $lower), 'untyped');
 
@@ -272,10 +305,10 @@ final class ReflectionMetadataReaderTest extends TestCase
     /**
      * @template T of object
      * @param class-string<T> $class
-     * @return ClassMetadata<T>
+     * @return ClassDraft<T>
      * @throws \Throwable
      */
-    private static function readReflection(string $class): ClassMetadata
+    private static function readReflection(string $class): ClassDraft
     {
         return self::readAsFirst(new ReflectionMetadataReader(), $class);
     }

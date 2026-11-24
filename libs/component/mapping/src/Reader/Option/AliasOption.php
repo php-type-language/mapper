@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidAliasException;
+use TypeLang\Mapper\Mapping\Exception\InvalidAttributeException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\MapAlias;
 use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
+use TypeLang\Mapper\Mapping\Reader\Access\AccessDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -24,8 +26,8 @@ use TypeLang\Mapper\Mapping\Reader\Source\SourceContextFactory;
  * one case only, the aliased value is a value of a case.
  *
  * Aliases of the field of a property: {@see MapAlias} of a property, the
- * `aliases` key with a list of names and the `alias_conflict` key of its
- * config. The names of the fields are checked by the provider.
+ * `aliases` key with a name or a list of names and the `alias_conflict`
+ * key of its config. The names of the fields are checked by the provider.
  *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Mapping\Reader
@@ -38,10 +40,10 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
 
     public function readClassAttributes(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         SourceContextFactory $contexts,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         $aliases = [];
 
         foreach ($class->getReflectionConstants() as $constant) {
@@ -84,21 +86,21 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
         return [self::KEY];
     }
 
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool
+    public function getPropertyAttributes(): array
     {
-        return $property->getAttributes(MapAlias::class) !== [];
+        return [MapAlias::class => AccessDirection::Write];
     }
 
     /**
-     * The aliases of repeated attributes are joined, the last given conflict
-     * is taken.
+     * The aliases of repeated attributes are joined, different conflicts of
+     * them are an error.
      */
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $attributes = AttributeFactory::create(
             $property->getAttributes(MapAlias::class),
             MapAlias::class,
@@ -106,13 +108,28 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
             $errors,
         );
         $aliases = [];
+        $conflict = null;
 
         foreach ($attributes as $attribute) {
             $aliases = [...$aliases, ...$attribute->aliases];
 
-            if ($attribute->onConflict !== null) {
-                $metadata = $metadata->withAliasConflict($attribute->onConflict);
+            if ($attribute->onConflict === null) {
+                continue;
             }
+
+            if ($conflict !== null && $conflict !== $attribute->onConflict) {
+                $errors->addError(InvalidAttributeException::becauseArgumentsDiffer(
+                    attribute: MapAlias::class,
+                    argument: 'onConflict',
+                    property: $context->target,
+                    source: $context->source,
+                ));
+
+                continue;
+            }
+
+            $conflict = $attribute->onConflict;
+            $metadata = $metadata->withAliasConflict($conflict);
         }
 
         return self::applyNames($aliases, $metadata, $context, $errors);
@@ -125,9 +142,9 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
 
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         if ($config->has(self::CONFLICT_KEY)) {
             $metadata = self::applyConflict($config, $metadata, $errors);
         }
@@ -139,8 +156,12 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
         $aliases = $config->get(self::KEY);
         $context = $config->createContext(self::KEY);
 
+        if (\is_string($aliases)) {
+            $aliases = [$aliases];
+        }
+
         if (!\is_array($aliases) || !\array_is_list($aliases)) {
-            $errors->addError(InvalidOptionValueException::becauseValueIsNotList(
+            $errors->addError(InvalidOptionValueException::becauseValueIsNotStringOrList(
                 self::KEY,
                 $context->target,
                 $context->source,
@@ -154,9 +175,9 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
 
     private static function applyConflict(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $value = $config->get(self::CONFLICT_KEY);
 
         if (\is_string($value) && AliasConflict::tryFrom($value) !== null) {
@@ -182,10 +203,10 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
      */
     private static function applyNames(
         array $aliases,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $names = [];
 
         foreach ($aliases as $alias) {
@@ -212,9 +233,9 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
     public function readClassConfig(
         \ReflectionClass $class,
         ConfigSection $config,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }
@@ -232,8 +253,8 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
         }
 
         $enum = $class->name;
-        $isStringEnum = \is_a($enum, \BackedEnum::class, true)
-            && (string) (new \ReflectionEnum($enum))->getBackingType() === 'string';
+        $isStringEnum = !\is_a($enum, \BackedEnum::class, true)
+            || (string) (new \ReflectionEnum($enum))->getBackingType() === 'string';
         $aliases = [];
 
         foreach ($values as $alias => $value) {
@@ -265,25 +286,25 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
      *
      * @template TArg of object
      * @param \ReflectionClass<TArg> $class
-     * @param ClassMetadata<TArg> $metadata
+     * @param ClassDraft<TArg> $metadata
      * @param list<array{int|string, int|string, SourceContext}> $aliases
      *        alias, aliased value and the place of the alias
-     * @return ClassMetadata<TArg>
+     * @return ClassDraft<TArg>
      */
     private static function addAliases(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         array $aliases,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         if ($aliases === []) {
             return $metadata;
         }
 
         $enum = $class->name;
 
-        if (!\is_a($enum, \BackedEnum::class, true)) {
-            $errors->addError(InvalidAliasException::becauseClassIsNotBackedEnum(
+        if (!\is_a($enum, \UnitEnum::class, true)) {
+            $errors->addError(InvalidAliasException::becauseClassIsNotEnum(
                 target: $aliases[0][2]->target,
                 source: $aliases[0][2]->source,
             ));
@@ -292,7 +313,18 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
         }
 
         /** @var 'int'|'string' */
-        $backing = (string) (new \ReflectionEnum($enum))->getBackingType();
+        $backing = 'string';
+        $values = [];
+
+        if (\is_a($enum, \BackedEnum::class, true)) {
+            /** @var 'int'|'string' */
+            $backing = (string) (new \ReflectionEnum($enum))->getBackingType();
+        }
+
+        foreach ($enum::cases() as $case) {
+            $values[] = $case instanceof \BackedEnum ? $case->value : $case->name;
+        }
+
         $given = [];
 
         foreach ($aliases as [$alias, $value, $context]) {
@@ -303,9 +335,9 @@ final class AliasOption implements ClassOptionInterface, PropertyOptionInterface
                     target: $context->target,
                     source: $context->source,
                 ),
-                \get_debug_type($value) !== $backing || $enum::tryFrom($value) === null
+                !\in_array($value, $values, true)
                     => InvalidAliasException::becauseValueIsNotOfCase($value, $context->target, $context->source),
-                $enum::tryFrom($alias) !== null
+                \in_array($alias, $values, true)
                     => InvalidAliasException::becauseAliasIsValueOfCase($alias, $context->target, $context->source),
                 ($given[$alias] ?? $value) !== $value
                     => InvalidAliasException::becauseAliasIsDuplicated($alias, $context->target, $context->source),

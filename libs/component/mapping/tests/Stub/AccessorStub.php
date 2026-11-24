@@ -4,38 +4,41 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Stub;
 
-use TypeLang\Mapper\Mapping\Direction;
 use TypeLang\Mapper\Mapping\MapGetter;
-use TypeLang\Mapper\Mapping\MapOnly;
 use TypeLang\Mapper\Mapping\MapSetter;
-use TypeLang\Mapper\Mapping\MapType;
+use TypeLang\Mapper\Mapping\SkipWhenEmpty;
+use TypeLang\Mapper\Mapping\SkipWhenNull;
 use TypeLang\Mapper\Mapping\Tests\Stub\UserStub as Owner;
 
+/**
+ * Members declared by the attributes of the properties and the methods.
+ */
 final class AccessorStub
 {
-    public string $name = '';
+    private string $name = '';
 
     /**
      * @var list<int>
      */
-    public array $items = [];
+    private array $items = [];
 
-    public mixed $owner = null;
-
-    #[MapOnly(Direction::Normalization)]
+    #[MapGetter('created_at')]
     public string $createdAt = '';
 
-    #[MapOnly(Direction::Denormalization)]
-    public string $password = '';
+    #[MapSetter('secret', aliases: ['pass'], onUndefinedError: 'Password is required')]
+    private string $password = '';
+
+    #[MapGetter, MapSetter('code_in'), SkipWhenNull]
+    public ?string $code = null;
 
     #[MapGetter('name')]
+    #[SkipWhenEmpty]
     public function getName(): string
     {
-        return \ucfirst($this->name);
+        return \ucfirst($this->name . $this->password);
     }
 
-    #[MapSetter('name')]
-    #[MapType('non-empty-string', strict: true)]
+    #[MapSetter('name', type: 'non-empty-string', strict: true)]
     public function setName(string $name): void
     {
         $this->name = $name;
@@ -53,16 +56,15 @@ final class AccessorStub
     /**
      * @param list<positive-int> $items
      */
-    #[MapSetter('items')]
-    public function setItems(array $items): void
+    #[MapSetter('items', aliases: 'list')]
+    public function setItems(array $items = []): void
     {
         $this->items = $items;
     }
 
-    #[MapGetter('owner')]
-    #[MapType('?Owner')]
+    #[MapGetter('owner', type: '?Owner')]
     public function getOwner(): mixed
     {
-        return $this->owner;
+        return null;
     }
 }

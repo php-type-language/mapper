@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\PropertyAccessor;
 
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\OutputFieldMetadata;
+use TypeLang\Mapper\PropertyAccessor\Exception\AccessNotSupportedException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyAccessorExceptionInterface;
-use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotReadableException;
-use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
 use TypeLang\Mapper\PropertyAccessor\Strategy\AccessStrategyInterface;
 use TypeLang\Mapper\PropertyAccessor\Strategy\HookAccessStrategy;
 use TypeLang\Mapper\PropertyAccessor\Strategy\MethodAccessStrategy;
-use TypeLang\Mapper\PropertyAccessor\Strategy\StorageAccessStrategy;
+use TypeLang\Mapper\PropertyAccessor\Strategy\SlotAccessStrategy;
 
 /**
- * Creates the reader and the writer of a property once by the first
- * strategy that takes the access point of the direction in the metadata.
- * The default strategies, after the ones of the user, take one point each:
- * the backing store, the hook and the method.
+ * Creates the reader of a field of the normalization and the writer of a
+ * field of the denormalization once, by the first strategy that takes the
+ * access of the field. The default strategies, after the ones of the user,
+ * take one access each: the backing store, the hook and the method.
  *
  * ```
- * $factory = PropertyAccessorFactory::createDefault([new LazyAccessStrategy()]);
+ * $factory = PropertyAccessorFactory::createDefault([
+ *     new LazyAccessStrategy(),
+ * ]);
  *
- * $factory->createWriter($class, $metadata)->write($user, 'user@example.com');
+ * $factory->createWriter($class, $field)->write($user, 'user@example.com');
  * ```
  */
 final class PropertyAccessorFactory
@@ -42,7 +44,7 @@ final class PropertyAccessorFactory
     {
         return new self([
             ...$strategies,
-            new StorageAccessStrategy(),
+            new SlotAccessStrategy(),
             new HookAccessStrategy(),
             new MethodAccessStrategy(),
         ]);
@@ -51,50 +53,42 @@ final class PropertyAccessorFactory
     /**
      * @param \ReflectionClass<object> $class
      * @return PropertyReaderInterface<object, mixed>
-     * @throws PropertyNotReadableException in case of the property has no
-     *         read direction or no strategy takes its point
+     * @throws AccessNotSupportedException in case of no strategy takes the
+     *         access of the field
      * @throws PropertyAccessorExceptionInterface in case of a strategy takes
-     *         the point, but it cannot be read
+     *         the access, but it cannot be read
      */
-    public function createReader(\ReflectionClass $class, PropertyMetadata $metadata): PropertyReaderInterface
+    public function createReader(\ReflectionClass $class, OutputFieldMetadata $field): PropertyReaderInterface
     {
-        if ($metadata->read === null) {
-            throw PropertyNotReadableException::becausePropertyIsWriteOnly($class->name, $metadata->name);
-        }
-
         foreach ($this->strategies as $strategy) {
-            $reader = $strategy->tryCreateReader($class, $metadata);
+            $reader = $strategy->tryCreateReader($class, $field);
 
             if ($reader !== null) {
                 return $reader;
             }
         }
 
-        throw PropertyNotReadableException::becauseNoStrategyReadsProperty($class->name, $metadata->name);
+        throw AccessNotSupportedException::becauseNoStrategyReadsField($class->name, $field->name, $field->access);
     }
 
     /**
      * @param \ReflectionClass<object> $class
      * @return PropertyWriterInterface<object, mixed>
-     * @throws PropertyNotWritableException in case of the property has no
-     *         write direction or no strategy takes its point
+     * @throws AccessNotSupportedException in case of no strategy takes the
+     *         access of the field
      * @throws PropertyAccessorExceptionInterface in case of a strategy takes
-     *         the point, but it cannot be written
+     *         the access, but it cannot be written
      */
-    public function createWriter(\ReflectionClass $class, PropertyMetadata $metadata): PropertyWriterInterface
+    public function createWriter(\ReflectionClass $class, InputFieldMetadata $field): PropertyWriterInterface
     {
-        if ($metadata->write === null) {
-            throw PropertyNotWritableException::becausePropertyIsReadOnly($class->name, $metadata->name);
-        }
-
         foreach ($this->strategies as $strategy) {
-            $writer = $strategy->tryCreateWriter($class, $metadata);
+            $writer = $strategy->tryCreateWriter($class, $field);
 
             if ($writer !== null) {
                 return $writer;
             }
         }
 
-        throw PropertyNotWritableException::becauseNoStrategyWritesProperty($class->name, $metadata->name);
+        throw AccessNotSupportedException::becauseNoStrategyWritesField($class->name, $field->name, $field->access);
     }
 }

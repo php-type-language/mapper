@@ -8,8 +8,9 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Exception\InvalidValueException;
 
 /**
- * Case of an enum without values by its name. The name is denormalized by
- * the type of `string` first, a case is normalized to its name.
+ * Case of an enum without values by its name or an alias of it. The name is
+ * denormalized by the type of `string` first, a case is normalized to its
+ * name.
  *
  * @template T of \UnitEnum
  *
@@ -18,9 +19,9 @@ use TypeLang\Mapper\Exception\InvalidValueException;
 final class UnitEnumType implements TypeInterface
 {
     /**
-     * Cases by their names
+     * Cases by their names and aliases
      *
-     * @var array<non-empty-string, T>
+     * @var array<string, T>
      */
     private readonly array $cases;
 
@@ -35,11 +36,24 @@ final class UnitEnumType implements TypeInterface
          * @var TypeInterface<string>
          */
         public readonly TypeInterface $string,
+        /**
+         * Names of the cases by the other names of the data denormalized to
+         * them
+         *
+         * @var array<array-key, int|string>
+         */
+        public readonly array $aliases = [],
     ) {
         $cases = [];
 
         foreach ($class::cases() as $case) {
             $cases[$case->name] = $case;
+        }
+
+        foreach ($aliases as $alias => $name) {
+            if (isset($cases[$name])) {
+                $cases[(string) $alias] = $cases[$name];
+            }
         }
 
         $this->cases = $cases;

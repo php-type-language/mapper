@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Type\Repository;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
@@ -86,6 +87,10 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
          * Prints a type in errors of its definition
          */
         private readonly TypePrinterInterface $printer,
+        /**
+         * Language the skip expressions of the classes are checked against
+         */
+        ?ExpressionLanguage $expressions = null,
     ) {
         $this->keys = new PrettyTypePrinter(
             new PrinterOptions(maxInlineShapeFields: \PHP_INT_MAX),
@@ -95,7 +100,8 @@ final class TypeRepository implements InspectableTypeRepositoryInterface
             types: $this,
             metadata: $metadata,
             accessors: $accessors,
-            printer: $this->printer
+            printer: $this->printer,
+            expressions: $expressions,
         );
     }
 

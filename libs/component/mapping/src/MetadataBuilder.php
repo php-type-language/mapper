@@ -13,7 +13,7 @@ use TypeLang\Mapper\Mapping\Provider\InMemoryMetadataProvider;
 use TypeLang\Mapper\Mapping\Provider\MetadataProviderInterface;
 use TypeLang\Mapper\Mapping\Provider\Psr16MetadataProvider;
 use TypeLang\Mapper\Mapping\Provider\Psr6MetadataProvider;
-use TypeLang\Mapper\Mapping\Provider\ValidatingMetadataProvider;
+use TypeLang\Mapper\Mapping\Provider\ReaderMetadataProvider;
 use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\ChainMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\JsonFileMetadataReader;
@@ -181,7 +181,7 @@ final class MetadataBuilder
     public function withYamlReader(string $path, int $priority = 0): self
     {
         return $this->withAddedReader(
-            new YamlFileMetadataReader($path, $this->parser),
+            new YamlFileMetadataReader($path, $this->parser, $this->expressions),
             $priority,
         );
     }
@@ -194,7 +194,7 @@ final class MetadataBuilder
     public function withNeonReader(string $path, int $priority = 0): self
     {
         return $this->withAddedReader(
-            new NeonFileMetadataReader($path, $this->parser),
+            new NeonFileMetadataReader($path, $this->parser, $this->expressions),
             $priority,
         );
     }
@@ -207,7 +207,7 @@ final class MetadataBuilder
     public function withJsonReader(string $path, int $priority = 0): self
     {
         return $this->withAddedReader(
-            new JsonFileMetadataReader($path, $this->parser),
+            new JsonFileMetadataReader($path, $this->parser, $this->expressions),
             $priority,
         );
     }
@@ -218,7 +218,7 @@ final class MetadataBuilder
     public function withPhpReader(string $path, int $priority = 0): self
     {
         return $this->withAddedReader(
-            new PhpFileMetadataReader($path, $this->parser),
+            new PhpFileMetadataReader($path, $this->parser, $this->expressions),
             $priority,
         );
     }
@@ -273,7 +273,7 @@ final class MetadataBuilder
 
     public function build(): MetadataProviderInterface
     {
-        $provider = new ValidatingMetadataProvider(new ChainMetadataReader([
+        $provider = new ReaderMetadataProvider(new ChainMetadataReader([
             new NamingStrategyMetadataReader($this->strategy),
             ...$this->getSortedReaders(),
             $this->reflection,

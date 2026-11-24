@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Source;
 
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidDefaultValueException;
 use TypeLang\Mapper\Mapping\Metadata\DefaultValueMetadata;
+use TypeLang\Mapper\Mapping\Reader\Reflection\PropertyHooks;
 
 /**
  * Creates default values of the mapping: {@see null}, scalars, enum cases
@@ -16,6 +18,41 @@ use TypeLang\Mapper\Mapping\Metadata\DefaultValueMetadata;
  */
 final class DefaultValueFactory
 {
+    /**
+     * Returns the member with the default of the written property. A
+     * property initialized by PHP on creating the object is optional, the
+     * default of a promoted property is written as the constructor would.
+     * A virtual property has no default.
+     */
+    public static function withPropertyDefault(
+        MemberDraft $member,
+        \ReflectionProperty $property,
+        SourceContext $context,
+        ErrorCollector $errors,
+    ): MemberDraft {
+        if ($member->write === null || PropertyHooks::isVirtual($property)) {
+            return $member;
+        }
+
+        try {
+            $default = self::findForProperty($property, $context);
+        } catch (InvalidDefaultValueException $e) {
+            $errors->addError($e);
+
+            return $member;
+        }
+
+        if ($default === null) {
+            return $member;
+        }
+
+        if (!$property->isPromoted()) {
+            return $member->withOptional(true);
+        }
+
+        return $member->withDefaultValue($default);
+    }
+
     /**
      * Returns the default value of the property or of its promoted
      * constructor parameter, {@see null} in case of it has none.

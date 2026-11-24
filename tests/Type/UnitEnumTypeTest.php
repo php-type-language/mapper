@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
+use TypeLang\Mapper\Tests\Stub\AliasedSuitStub;
 use TypeLang\Mapper\Tests\Stub\SuitStub;
 use TypeLang\Mapper\Tests\TestCase;
 
@@ -12,6 +13,12 @@ final class UnitEnumTypeTest extends TestCase
     public function testDenormalizesCaseByName(): void
     {
         self::assertDenormalizes(SuitStub::class, 'Spades', SuitStub::Spades);
+    }
+
+    public function testDenormalizesCaseByAliasAndNormalizesItToName(): void
+    {
+        self::assertDenormalizes(AliasedSuitStub::class, 'spades', AliasedSuitStub::Spades);
+        self::assertNormalizes(AliasedSuitStub::class, AliasedSuitStub::Spades, 'Spades');
     }
 
     public function testRejectsNameOfNoCase(): void

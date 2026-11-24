@@ -5,43 +5,38 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Tests\Stub;
 
 use TypeLang\Mapper\Mapping\MapGetter;
+use TypeLang\Mapper\Mapping\MapName;
 use TypeLang\Mapper\Mapping\MapSetter;
 use TypeLang\Mapper\Mapping\MapType;
+use TypeLang\Mapper\Mapping\SkipWhenNull;
 
+/**
+ * Wrong attributes of the members.
+ */
 final class BrokenAccessorStub
 {
-    public string $name = '';
+    #[MapGetter, MapName('renamed')]
+    public string $helped = '';
 
-    public string $title = '';
+    #[MapSetter, SkipWhenNull]
+    public ?string $written = null;
 
     #[MapGetter]
     public function getName(): string
-    {
-        return $this->name;
-    }
-
-    #[MapGetter('missing')]
-    public function getMissing(): string
     {
         return '';
     }
 
     #[MapGetter('title')]
-    #[MapType('string', strict: true)]
+    #[MapType('string')]
     public function getTitle(): string
     {
-        return $this->title;
+        return '';
     }
 
-    #[MapSetter('name')]
-    public function setName(string $name): void
+    #[SkipWhenNull]
+    public function getSkipped(): ?string
     {
-        $this->name = $name;
-    }
-
-    #[MapSetter('name')]
-    public function changeName(string $name): void
-    {
-        $this->name = $name;
+        return null;
     }
 }

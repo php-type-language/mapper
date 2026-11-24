@@ -6,13 +6,11 @@ namespace TypeLang\Mapper\Mapping\Tests\Stub\Php84;
 
 use TypeLang\Mapper\Mapping\MapGetter;
 
+/**
+ * Field of a hook and of a getter sharing a name.
+ */
 final class NamedHookStub
 {
-    public string $code = '' {
-        #[MapGetter('code')]
-        get => $this->code;
-    }
-
     public string $title = '' {
         #[MapGetter]
         get => $this->title;

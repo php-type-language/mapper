@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Source;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\MetadataException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 /**
  * Errors found by one reader while reading one class.
@@ -31,10 +31,10 @@ final class ErrorCollector
      * nothing in case of there are none.
      *
      * @template TArg of object
-     * @param ClassMetadata<TArg> $metadata
+     * @param ClassDraft<TArg> $metadata
      * @throws InvalidMetadataException in case of errors are collected
      */
-    public function throwIfNotEmpty(ClassMetadata $metadata): void
+    public function throwIfNotEmpty(ClassDraft $metadata): void
     {
         if ($this->errors !== []) {
             throw InvalidMetadataException::becauseMetadataIsInvalid($metadata, $this->errors);

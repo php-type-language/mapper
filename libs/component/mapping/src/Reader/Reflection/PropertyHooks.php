@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\Reflection;
 
 /**
- * Finds the hooks of a property, a property has no hooks before PHP 8.4.
+ * Finds the hooks of a property and its backing store, a property has no
+ * hooks before PHP 8.4.
  *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper\Mapping\Reader
@@ -40,5 +41,19 @@ final class PropertyHooks
         /** @var \ReflectionMethod|null */
         // @phpstan-ignore-next-line PHP 8.4 API is unknown for PHP 8.1
         return $property->getHook(\PropertyHookType::Set);
+    }
+
+    /**
+     * Returns whether the property has no backing store, the value exists
+     * only in its hooks.
+     */
+    public static function isVirtual(\ReflectionProperty $property): bool
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            return false;
+        }
+
+        // @phpstan-ignore-next-line PHP 8.4 API is unknown for PHP 8.1
+        return $property->isVirtual();
     }
 }

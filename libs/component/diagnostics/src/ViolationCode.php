@@ -49,6 +49,26 @@ enum ViolationCode: string implements TypedViolationCodeInterface
      */
     case InvalidValue = 'invalid_value';
 
+    /**
+     * Value of an object cannot be read on normalization, such as an
+     * uninitialized property or a getter that throws. The error is the cause
+     * of the violation, the violation has no value.
+     */
+    case UnreadableValue = 'unreadable_value';
+
+    /**
+     * Value is nested deeper than the limit of the configuration, such as
+     * an object that refers to itself. The path points to the object.
+     */
+    case DepthExceeded = 'depth_exceeded';
+
+    /**
+     * Object of a class of a discriminated hierarchy has no tag: neither
+     * its class nor a parent of it is in the map. The path points to the
+     * object.
+     */
+    case UntaggedObject = 'untagged_object';
+
     public function getCode(): string
     {
         return $this->value;
@@ -64,6 +84,9 @@ enum ViolationCode: string implements TypedViolationCodeInterface
             self::DuplicateField => 'Field "{{field}}" duplicates the field "{{other}}"',
             self::FailedCheck => 'Value must be of type {{expected}} ({{check}})',
             self::InvalidValue => 'Value {{value}} is rejected',
+            self::UnreadableValue => 'Value cannot be read',
+            self::DepthExceeded => 'Nesting depth exceeds the limit of {{limit}}',
+            self::UntaggedObject => 'Class "{{class}}" has no tag in the discriminator map of "{{base}}"',
         };
     }
 

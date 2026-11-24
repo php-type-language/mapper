@@ -8,15 +8,16 @@ use JetBrains\PhpStorm\Language;
 
 /**
  * The property is left out of the normalized data in case of the expression
- * of `symfony/expression-language` over the object is true. The expression
- * is parsed when the metadata is read.
+ * of `symfony/expression-language` over the object and the value of the
+ * property (`value`) is true. The expression is parsed when the metadata is
+ * read, its functions are the functions of the language of the mapper.
  *
  * ```
- * #[SkipWhen('this.isPrivate()')]
+ * #[SkipWhen('this.isPrivate() or value === ""')]
  * public string $email;
  * ```
  */
-#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::IS_REPEATABLE)]
+#[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 final class SkipWhen
 {
     public function __construct(

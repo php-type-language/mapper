@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\PropertyAccessor\Tests\Exception;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
+use TypeLang\Mapper\PropertyAccessor\Exception\AccessNotSupportedException;
 use TypeLang\Mapper\PropertyAccessor\Exception\MethodNotCallableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyAccessException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyAccessorExceptionInterface;
@@ -28,14 +30,6 @@ final class PropertyAccessExceptionTest extends TestCase
             static fn(string $c, string $p) => PropertyNotFoundException::becausePropertyIsStatic($c, $p),
             'Property "%s::$prop" is static',
         ];
-        yield 'property is write-only' => [
-            static fn(string $c, string $p) => PropertyNotReadableException::becausePropertyIsWriteOnly($c, $p),
-            'Property "%s::$prop" is write-only',
-        ];
-        yield 'property is read-only' => [
-            static fn(string $c, string $p) => PropertyNotWritableException::becausePropertyIsReadOnly($c, $p),
-            'Property "%s::$prop" is read-only',
-        ];
         yield 'property does not exist' => [
             static fn(string $c, string $p) => PropertyNotFoundException::becausePropertyDoesNotExist($c, $p),
             'Property "%s::$prop" does not exist',
@@ -56,10 +50,6 @@ final class PropertyAccessExceptionTest extends TestCase
             static fn(string $c, string $p) => PropertyNotWritableException::becausePropertyHasNoSetHook($c, $p),
             'Property "%s::$prop" has no set hook',
         ];
-        yield 'method does not exist' => [
-            static fn(string $c, string $p) => MethodNotCallableException::becauseMethodDoesNotExist($c, $p, 'get'),
-            'Method "%1$s::get()" of property "%1$s::$prop" does not exist',
-        ];
     }
 
     /**
@@ -74,5 +64,37 @@ final class PropertyAccessExceptionTest extends TestCase
         self::assertSame(VisibilityStub::class, $error->class);
         self::assertSame('prop', $error->property);
         self::assertSame(\sprintf($message, VisibilityStub::class), $error->getMessage());
+    }
+
+    public function testMethodExceptionCapturesFieldAndMethod(): void
+    {
+        $error = MethodNotCallableException::becauseMethodDoesNotExist(VisibilityStub::class, 'prop', 'get');
+
+        self::assertInstanceOf(PropertyAccessorExceptionInterface::class, $error);
+        self::assertSame(VisibilityStub::class, $error->class);
+        self::assertSame('prop', $error->field);
+        self::assertSame('get', $error->method);
+        self::assertSame(
+            \sprintf('Method "%s::get()" of field "prop" does not exist', VisibilityStub::class),
+            $error->getMessage(),
+        );
+    }
+
+    public function testAccessExceptionCapturesFieldAndNamesAccess(): void
+    {
+        $access = new SlotAccessMetadata('prop');
+        $error = AccessNotSupportedException::becauseNoStrategyReadsField(VisibilityStub::class, 'prop', $access);
+
+        self::assertInstanceOf(PropertyAccessorExceptionInterface::class, $error);
+        self::assertSame(VisibilityStub::class, $error->class);
+        self::assertSame('prop', $error->field);
+        self::assertSame(
+            \sprintf(
+                'No access strategy reads field "prop" of "%s" through "%s"',
+                VisibilityStub::class,
+                SlotAccessMetadata::class,
+            ),
+            $error->getMessage(),
+        );
     }
 }

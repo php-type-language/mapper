@@ -7,13 +7,14 @@ namespace TypeLang\Mapper\Mapping\Exception;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 
 /**
- * Attribute of a property, a class or a case cannot be created.
+ * Attribute of a member, a class or a case cannot be created or is not
+ * allowed where it is given.
  */
 final class InvalidAttributeException extends MetadataException
 {
     /**
-     * @param string $target property, class or case: `App\User::$id`,
-     *        `App\User`, `App\Status::Active`
+     * @param string $target member, class or case: `App\User::$id`,
+     *        `App\User::getId()`, `App\User`, `App\Status::Active`
      */
     public static function becauseAttributeCannotBeCreated(
         string $attribute,
@@ -28,19 +29,28 @@ final class InvalidAttributeException extends MetadataException
 
     /**
      * @param string $property property reference: `App\User::$id`
+     */
+    public static function becausePropertyHasNoSlot(string $attribute, string $property, SourceInfo $source): self
+    {
+        $message = \sprintf(
+            'attribute "%s" accesses the backing store, but the property is virtual: give it on the hook',
+            $attribute,
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
      * @param 'get'|'set' $hook
      */
-    public static function becauseHookIsBypassed(
+    public static function becauseAttributeIsOnWrongHook(
         string $attribute,
         string $hook,
         string $property,
         SourceInfo $source,
     ): self {
-        $message = \sprintf(
-            'attribute "%s" of the %s hook has no effect, the mapper does not access the property through the hook',
-            $attribute,
-            $hook,
-        );
+        $message = \sprintf('attribute "%s" is not allowed on the %s hook', $attribute, $hook);
 
         return new self($property, $source, $message);
     }
@@ -48,25 +58,9 @@ final class InvalidAttributeException extends MetadataException
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseStrictIsOnGetter(string $attribute, string $property, SourceInfo $source): self
+    public static function becauseAccessIsDuplicated(string $attribute, string $property, SourceInfo $source): self
     {
-        $message = \sprintf(
-            'argument "strict" of attribute "%s" of a getter has no effect, it applies to denormalization',
-            $attribute,
-        );
-
-        return new self($property, $source, $message);
-    }
-
-    /**
-     * @param string $property property reference: `App\User::$id`
-     */
-    public static function becauseHookTakesNoPropertyName(
-        string $attribute,
-        string $property,
-        SourceInfo $source,
-    ): self {
-        $message = \sprintf('attribute "%s" of a hook takes no property name', $attribute);
+        $message = \sprintf('attribute "%s" is given both on the property and on its hook', $attribute);
 
         return new self($property, $source, $message);
     }
@@ -74,30 +68,28 @@ final class InvalidAttributeException extends MetadataException
     /**
      * @param string $method method reference: `App\User::getId()`
      */
-    public static function becauseMethodRequiresPropertyName(
-        string $attribute,
-        string $method,
-        SourceInfo $source,
-    ): self {
-        $message = \sprintf('attribute "%s" of a method requires the name of the property', $attribute);
+    public static function becauseMethodRequiresName(string $attribute, string $method, SourceInfo $source): self
+    {
+        $message = \sprintf('attribute "%s" of a method requires the name of the field', $attribute);
 
         return new self($method, $source, $message);
     }
 
     /**
+     * @param list<class-string> $access attributes of the access given for
+     *        the property
      * @param string $property property reference: `App\User::$id`
-     * @param string $method method reference: `App\User::getId()`
      */
-    public static function becauseAccessMethodIsDuplicated(
+    public static function becauseAttributeIsNextToAccess(
         string $attribute,
+        array $access,
         string $property,
-        string $method,
         SourceInfo $source,
     ): self {
         $message = \sprintf(
-            'attribute "%s" of "%s" is the second one of the property',
+            'attribute "%s" is not allowed next to "%s", give its value in their arguments',
             $attribute,
-            \addcslashes($method, '"'),
+            \implode('", "', $access),
         );
 
         return new self($property, $source, $message);
@@ -106,16 +98,11 @@ final class InvalidAttributeException extends MetadataException
     /**
      * @param string $property property reference: `App\User::$id`
      */
-    public static function becauseDirectionIsLeftOut(
-        string $attribute,
-        string $only,
-        string $property,
-        SourceInfo $source,
-    ): self {
+    public static function becausePropertyIsVirtual(string $attribute, string $property, SourceInfo $source): self
+    {
         $message = \sprintf(
-            'attribute "%s" of the property is given, but attribute "%s" leaves its direction out',
+            'attribute "%s" has no effect, a virtual property is mapped by "MapGetter" or "MapSetter" on its hooks',
             $attribute,
-            $only,
         );
 
         return new self($property, $source, $message);
@@ -123,29 +110,81 @@ final class InvalidAttributeException extends MetadataException
 
     /**
      * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseReadIsOnHook(string $attribute, string $property, SourceInfo $source): self
+    {
+        $message = \sprintf(
+            'attribute "%s" of the property has no effect, the get hook reads it: give it on the hook',
+            $attribute,
+        );
+
+        return new self($property, $source, $message);
+    }
+
+    /**
      * @param 'normalized'|'denormalized' $direction
+     * @param string $target member reference: `App\User::$id`,
+     *        `App\User::getId()`
      */
     public static function becauseDirectionIsMissing(
         string $attribute,
         string $direction,
-        string $property,
+        string $target,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('attribute "%s" is given, but the property is not %s', $attribute, $direction);
+        $message = \sprintf('attribute "%s" is given, but the member is not %s', $attribute, $direction);
 
-        return new self($property, $source, $message);
+        return new self($target, $source, $message);
     }
 
     /**
-     * @param string $method method reference: `App\User::getId()`
+     * @param string $target method or property reference of the hook:
+     *        `App\User::getId()`, `App\User::$id`
+     */
+    public static function becauseGetterIsMissing(string $attribute, string $target, SourceInfo $source): self
+    {
+        $message = \sprintf('attribute "%s" is allowed only next to "MapGetter"', $attribute);
+
+        return new self($target, $source, $message);
+    }
+
+    /**
+     * @param string $method method or hook reference: `App\User::getId()`
      */
     public static function becauseAttributeIsOnMethod(string $attribute, string $method, SourceInfo $source): self
     {
-        $message = \sprintf(
-            'attribute "%s" is allowed only on a property, its hook or its getter or setter',
-            $attribute,
-        );
+        $message = \sprintf('attribute "%s" is not allowed on a method or a hook', $attribute);
 
         return new self($method, $source, $message);
+    }
+
+    /**
+     * @param string $target member, class or case: `App\User::$id`,
+     *        `App\User`, `App\Status::Active`
+     * @param non-empty-string $place `a class`, `a property`, `a case`
+     */
+    public static function becauseAttributeIsNotAllowed(
+        string $attribute,
+        string $place,
+        string $target,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf('attribute "%s" is not allowed on %s', $attribute, $place);
+
+        return new self($target, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becauseArgumentsDiffer(
+        string $attribute,
+        string $argument,
+        string $property,
+        SourceInfo $source,
+    ): self {
+        $message = \sprintf('repeated attribute "%s" gives different "%s"', $attribute, $argument);
+
+        return new self($property, $source, $message);
     }
 }

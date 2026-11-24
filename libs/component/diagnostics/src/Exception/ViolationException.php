@@ -9,10 +9,19 @@ use TypeLang\Mapper\Diagnostics\Violation;
 use TypeLang\Mapper\Diagnostics\ViolationFormatterInterface;
 
 /**
- * Mapping failure caused by invalid input.
+ * Mapping failure caused by invalid input. Iterates over the violations in
+ * order of appearance, a fatal one tells a defect of the code behind the
+ * input, see {@see Violation::$isFatal}.
+ *
+ * @template-implements \IteratorAggregate<int, Violation>
  */
-abstract class ViolationException extends \RuntimeException
+abstract class ViolationException extends \RuntimeException implements \IteratorAggregate, \Countable
 {
+    /**
+     * Whether a violation is caused by an {@see \Error}
+     */
+    public readonly bool $hasFatalViolations;
+
     protected function __construct(
         /**
          * Violations in order of appearance
@@ -24,6 +33,76 @@ abstract class ViolationException extends \RuntimeException
         ?\Throwable $previous = null,
     ) {
         parent::__construct($message, 0, $previous);
+
+        $this->hasFatalViolations = $this->getFatalViolations() !== [];
+    }
+
+    /**
+     * @return \ArrayIterator<int, Violation>
+     */
+    public function getIterator(): \ArrayIterator
+    {
+        return new \ArrayIterator($this->violations);
+    }
+
+    /**
+     * @return int<1, max>
+     */
+    public function count(): int
+    {
+        return \count($this->violations);
+    }
+
+    /**
+     * Returns the violations caused by an {@see \Error}, in order of
+     * appearance.
+     *
+     * @return list<Violation>
+     */
+    public function getFatalViolations(): array
+    {
+        $result = [];
+
+        foreach ($this->violations as $violation) {
+            if ($violation->isFatal) {
+                $result[] = $violation;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Returns the errors of the fatal violations by their violations.
+     *
+     * @return iterable<Violation, \Error>
+     */
+    public function getFatalErrors(): iterable
+    {
+        foreach ($this->violations as $violation) {
+            if ($violation->cause instanceof \Error) {
+                yield $violation => $violation->cause;
+            }
+        }
+    }
+
+    /**
+     * Returns the causes of the violations that have one, in order of
+     * appearance.
+     *
+     * @return list<\Throwable>
+     */
+    public function getCauses(): array
+    {
+        $result = [];
+
+        foreach ($this->violations as $violation) {
+            if ($violation->cause !== null) {
+                $result[] = $violation->cause;
+            }
+        }
+
+        return $result;
     }
 
     /**

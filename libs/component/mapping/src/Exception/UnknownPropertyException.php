@@ -26,4 +26,22 @@ final class UnknownPropertyException extends MetadataException
     {
         return new self($property, $source, 'property is not mapped');
     }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becausePropertyWithAttributeIsNotMapped(string $property, SourceInfo $source): self
+    {
+        $message = 'property is not mapped, give it "MapGetter" or "MapSetter" or choose it by the selector';
+
+        return new self($property, $source, $message);
+    }
+
+    /**
+     * @param string $property property reference: `App\User::$id`
+     */
+    public static function becausePropertyIsStatic(string $property, SourceInfo $source): self
+    {
+        return new self($property, $source, 'property is static and cannot be mapped');
+    }
 }

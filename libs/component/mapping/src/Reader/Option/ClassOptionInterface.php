@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 use TypeLang\Mapper\Mapping\Reader\Source\SourceContextFactory;
@@ -25,15 +25,15 @@ interface ClassOptionInterface
      *
      * @template TArg of object
      * @param \ReflectionClass<TArg> $class
-     * @param ClassMetadata<TArg> $metadata
-     * @return ClassMetadata<TArg>
+     * @param ClassDraft<TArg> $metadata
+     * @return ClassDraft<TArg>
      */
     public function readClassAttributes(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         SourceContextFactory $contexts,
         ErrorCollector $errors,
-    ): ClassMetadata;
+    ): ClassDraft;
 
     /**
      * Returns the keys of a class config the option reads.
@@ -45,13 +45,13 @@ interface ClassOptionInterface
     /**
      * @template TArg of object
      * @param \ReflectionClass<TArg> $class
-     * @param ClassMetadata<TArg> $metadata
-     * @return ClassMetadata<TArg>
+     * @param ClassDraft<TArg> $metadata
+     * @return ClassDraft<TArg>
      */
     public function readClassConfig(
         \ReflectionClass $class,
         ConfigSection $config,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         ErrorCollector $errors,
-    ): ClassMetadata;
+    ): ClassDraft;
 }

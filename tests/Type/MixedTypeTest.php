@@ -59,7 +59,7 @@ final class MixedTypeTest extends TestCase
         self::assertNormalizationFails(
             'mixed',
             ['items' => [$address]],
-            '$.items[0].city: Value null is rejected',
+            '$.items[0].city: Value cannot be read',
         );
     }
 

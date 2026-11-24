@@ -7,12 +7,13 @@ namespace TypeLang\Mapper\Mapping\Provider;
 use TypeLang\Mapper\Mapping\Exception\InvalidCacheKeyException;
 use TypeLang\Mapper\Mapping\Exception\ReaderException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\EnumMetadata;
 
 /**
  * Stores metadata provided by the delegate in a PSR cache. The key of the
- * metadata of a class is the prefix, {@see ClassMetadata::FORMAT_VERSION}
- * and the hash of the class name, a value other than the metadata of the
- * class is a miss.
+ * metadata of a class is the prefix, {@see ClassMetadata::FORMAT_VERSION},
+ * the kind of the metadata and the hash of the class name, a value other
+ * than the metadata of the class is a miss.
  */
 abstract class CacheMetadataProvider implements MetadataProviderInterface
 {
@@ -39,10 +40,26 @@ abstract class CacheMetadataProvider implements MetadataProviderInterface
      */
     final public function read(\ReflectionClass $class): ClassMetadata
     {
-        $key = $this->prefix . 'v' . ClassMetadata::FORMAT_VERSION . '_' . \hash('xxh128', $class->name);
+        $read = fn(): ClassMetadata => $this->delegate->read($class);
 
         /** @var ClassMetadata<TArg> */
-        return $this->remember($key, $class->name, fn(): ClassMetadata => $this->delegate->read($class));
+        return $this->remember($this->createKey('c', $class->name), $class->name, ClassMetadata::class, $read);
+    }
+
+    /**
+     * @template TArg of \UnitEnum
+     * @param \ReflectionEnum<TArg> $enum
+     * @return EnumMetadata<TArg>
+     * @throws InvalidCacheKeyException in case of the cache rejects the key
+     * @throws ReaderException in case of the delegate cannot provide the
+     *         metadata
+     */
+    final public function readEnum(\ReflectionEnum $enum): EnumMetadata
+    {
+        $read = fn(): EnumMetadata => $this->delegate->readEnum($enum);
+
+        /** @var EnumMetadata<TArg> */
+        return $this->remember($this->createKey('e', $enum->name), $enum->name, EnumMetadata::class, $read);
     }
 
     /**
@@ -50,29 +67,41 @@ abstract class CacheMetadataProvider implements MetadataProviderInterface
      * reads it by the callback and stores it. A failure of the cache is a
      * miss on reading and is skipped on writing.
      *
+     * @template TArgMetadata of object
      * @param non-empty-string $key valid for PSR-6 and PSR-16 in case of the
      *        prefix is
      * @param class-string $class
-     * @param \Closure(): ClassMetadata<object> $read
-     * @return ClassMetadata<object>
+     * @param class-string<TArgMetadata> $type
+     * @param \Closure(): TArgMetadata $read
+     * @return TArgMetadata
      * @throws InvalidCacheKeyException in case of the cache rejects the key
      * @throws ReaderException in case of the callback cannot read the
      *         metadata
      */
-    abstract protected function remember(string $key, string $class, \Closure $read): ClassMetadata;
+    abstract protected function remember(string $key, string $class, string $type, \Closure $read): object;
 
     /**
      * Returns {@see true} in case of the stored value is the metadata of the
-     * class, any other value is a miss.
+     * given type of the class, any other value is a miss.
      *
-     * @template TArgClass of object
-     * @param class-string<TArgClass> $class
+     * @template TArgMetadata of object
+     * @param class-string<TArgMetadata> $type
      *
-     * @phpstan-assert-if-true ClassMetadata<TArgClass> $value
+     * @phpstan-assert-if-true TArgMetadata $value
      */
-    protected static function isMetadataOf(mixed $value, string $class): bool
+    protected static function isMetadataOf(mixed $value, string $class, string $type): bool
     {
-        return $value instanceof ClassMetadata
+        return $value instanceof $type
+            && ($value instanceof ClassMetadata || $value instanceof EnumMetadata)
             && $value->name === $class;
+    }
+
+    /**
+     * @param 'c'|'e' $kind
+     * @return non-empty-string
+     */
+    private function createKey(string $kind, string $class): string
+    {
+        return $this->prefix . 'v' . ClassMetadata::FORMAT_VERSION . $kind . '_' . \hash('xxh128', $class);
     }
 }

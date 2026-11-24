@@ -8,6 +8,7 @@ use TypeLang\Mapper\Diagnostics\Exception\ViolationException;
 use TypeLang\Mapper\Diagnostics\Path\Path;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\SegmentInterface;
+use TypeLang\Mapper\Diagnostics\Printer\Name\NameSanitizer;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\PublicViolationFormatter;
 use TypeLang\Mapper\Diagnostics\Violation;
@@ -103,12 +104,15 @@ final class InvalidValueException extends ViolationException implements MapperEx
 
     /**
      * The path of the error points to the place of the field. The name of
-     * the field comes from the data, its control characters, quotes and
-     * backslashes are escaped.
+     * the field comes from the data: it is cut to 64 characters, its control
+     * characters, quotes and backslashes are escaped, bytes that are not
+     * valid UTF-8 are printed as `\xFF`.
      */
     public static function becauseFieldIsUnexpected(string $field, SegmentInterface $segment, mixed $value): self
     {
-        $name = ['field' => \addcslashes($field, "\0..\37\"\\\177")];
+        $name = ['field' => NameSanitizer::escapeInvalidBytes(
+            \addcslashes(NameSanitizer::limit($field), "\0..\37\"\\\177"),
+        )];
 
         return self::fromViolation(
             new Violation(ViolationCode::UnexpectedField, $name, new Path([$segment]), $value),
@@ -126,6 +130,45 @@ final class InvalidValueException extends ViolationException implements MapperEx
             new Violation(ViolationCode::InvalidValue, [], new Path(), $value, cause: $error),
             $error,
         );
+    }
+
+    /**
+     * The value of an object cannot be read, such as an uninitialized
+     * property. The error is the cause of the violation and the previous
+     * error, the violation has no value.
+     */
+    public static function becauseValueIsUnreadable(\Throwable $error): self
+    {
+        return self::fromViolation(
+            new Violation(ViolationCode::UnreadableValue, [], new Path(), null, cause: $error),
+            $error,
+        );
+    }
+
+    /**
+     * The path of the error points to the value nested deeper than the
+     * limit.
+     *
+     * @param int<1, max> $limit
+     */
+    public static function becauseDepthIsExceeded(int $limit, mixed $value): self
+    {
+        return self::fromViolation(
+            new Violation(ViolationCode::DepthExceeded, ['limit' => (string) $limit], new Path(), $value),
+        );
+    }
+
+    /**
+     * @param class-string $base class with the discriminator
+     */
+    public static function becauseObjectIsNotTagged(string $base, object $value): self
+    {
+        return self::fromViolation(new Violation(
+            ViolationCode::UntaggedObject,
+            ['class' => $value::class, 'base' => $base],
+            new Path(),
+            $value,
+        ));
     }
 
     /**

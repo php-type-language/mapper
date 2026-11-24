@@ -19,4 +19,12 @@ final class InvalidTypeException extends MetadataException
     {
         return new self($target, $source, $reason);
     }
+
+    /**
+     * @param string $target member reference: `App\User::$id`
+     */
+    public static function becauseTypeIsNotDefined(string $target, SourceInfo $source): self
+    {
+        return new self($target, $source, 'type is not defined');
+    }
 }

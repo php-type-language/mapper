@@ -12,8 +12,9 @@ use TypeLang\Type\NamedTypeNode;
 use TypeLang\Type\TypeNode;
 
 /**
- * Creates the type of an enum without values, its names are denormalized by
- * the type of `string` from the repository.
+ * Creates the type of an enum without values with the aliases of its
+ * metadata, its names are denormalized by the type of `string` from the
+ * repository.
  *
  * @template-implements TypeBuilderInterface<\UnitEnum>
  */
@@ -37,6 +38,8 @@ final class UnitEnumTypeBuilder implements TypeBuilderInterface
         /** @var TypeInterface<string> */
         $string = $context->types->getType(new NamedTypeNode(new Name('string')));
 
-        return new UnitEnumType($name, $string);
+        $aliases = $context->metadata->readEnum(new \ReflectionEnum($name))->aliases;
+
+        return new UnitEnumType($name, $string, $aliases);
     }
 }

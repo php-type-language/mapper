@@ -19,15 +19,16 @@ use TypeLang\Mapper\PropertyAccessor\PropertyAccessorFactory;
 
 /**
  * Runtime side of the classes: turns the metadata of a class into its
- * instantiator, the readers and writers of its properties and its hooks by
- * the services of the mapper, once per metadata object, and keeps them while
- * the metadata exist.
+ * instantiator, the readers and writers of its fields and its hooks by the
+ * services of the mapper, once per metadata object, and keeps them while the
+ * metadata exist. A reader or a writer has the position of its field in the
+ * structure of the metadata.
  *
  * ```
  * $accessor = $accessors->get($metadata);
  *
  * $object = $accessor->instantiator->instantiate($data);
- * $accessor->writers['id']->write($object, 42);
+ * $accessor->writers[0]->write($object, 42);
  * ```
  */
 final class ClassAccessors
@@ -76,14 +77,12 @@ final class ClassAccessors
             $instantiator = $this->instantiators->createInstantiator($class, $metadata);
             $readers = $writers = [];
 
-            foreach ($metadata->properties as $property) {
-                if ($property->read !== null) {
-                    $readers[$property->name] = $this->properties->createReader($class, $property);
-                }
+            foreach ($metadata->output->fields as $field) {
+                $readers[] = $this->properties->createReader($class, $field);
+            }
 
-                if ($property->write !== null) {
-                    $writers[$property->name] = $this->properties->createWriter($class, $property);
-                }
+            foreach ($metadata->input->fields as $field) {
+                $writers[] = $this->properties->createWriter($class, $field);
             }
         } catch (PropertyAccessorExceptionInterface|InstantiatorExceptionInterface|\ReflectionException $e) {
             throw TypeDefinitionException::becauseClassIsNotAccessible($metadata->name, $e);

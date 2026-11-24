@@ -42,19 +42,46 @@ final class AttributeFactory
     }
 
     /**
-     * Returns the instances of the attributes that can be created.
+     * Returns whether the declaration of the attribute class allows the
+     * target, one of the {@see \Attribute} target flags. An unknown class is
+     * reported on creating its instance.
+     */
+    public static function isAllowedOn(string $attribute, int $target): bool
+    {
+        if (!\class_exists($attribute)) {
+            return true;
+        }
+
+        foreach ((new \ReflectionClass($attribute))->getAttributes(\Attribute::class) as $declaration) {
+            return ($declaration->newInstance()->flags & $target) !== 0;
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the instances of the attributes that can be created. One
+     * failure is reported once, such as of an attribute given twice that
+     * must not be repeated.
      *
      * @param list<\ReflectionAttribute<object>> $attributes
      * @return list<object>
      */
     public static function createAll(array $attributes, SourceContext $context, ErrorCollector $errors): array
     {
-        $result = [];
+        $result = $reported = [];
 
         foreach ($attributes as $attribute) {
             try {
                 $result[] = $attribute->newInstance();
             } catch (\Throwable $e) {
+                $key = $attribute->getName() . "\0" . $e->getMessage();
+
+                if (isset($reported[$key])) {
+                    continue;
+                }
+
+                $reported[$key] = true;
                 $errors->addError(InvalidAttributeException::becauseAttributeCannotBeCreated(
                     attribute: $attribute->getName(),
                     target: $context->target,

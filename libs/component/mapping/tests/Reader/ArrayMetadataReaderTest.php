@@ -6,15 +6,18 @@ namespace TypeLang\Mapper\Mapping\Tests\Reader;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhp;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\ConfigLoadingException;
 use TypeLang\Mapper\Mapping\Exception\InvalidDefaultValueException;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
 use TypeLang\Mapper\Mapping\Exception\UnknownKeyException;
 use TypeLang\Mapper\Mapping\Exception\UnknownPropertyException;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\MethodAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\Access\HookAccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Access\MethodAccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\EmptySkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\ExpressionSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SkipCondition\NullSkipCondition;
@@ -97,15 +100,20 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertNull($id->default);
 
         $email = self::getProperty($metadata, 'email');
-        self::assertSame('e_mail', $email->externalName);
+        self::assertSame('e_mail', $email->read?->name);
+        self::assertSame('e_mail', $email->write?->name);
         self::assertType('string', $email->read?->type);
         self::assertType('non-empty-string', $email->write?->type);
-        self::assertStringEndsWith('.properties.email.write_type', (string) $email->write?->type?->source->path);
+        self::assertStringEndsWith('.properties.email.set.type', (string) $email->write?->type?->source->path);
         self::assertTrue($email->strict);
         self::assertNotNull($email->default);
         self::assertSame('unknown', $email->default->value);
-        self::assertStringEndsWith('.properties.email.default', (string) $email->default->source->path);
-        self::assertEquals(new MethodAccessPoint('setEmail'), $email->write?->point);
+        self::assertStringEndsWith('.properties.email.set.default', (string) $email->default->source->path);
+
+        $setter = self::getProperty($metadata, 'setEmail()');
+        self::assertEquals(new MethodAccessMetadata('setEmail'), $setter->write?->access);
+        self::assertSame('email_in', $setter->write?->name);
+        self::assertNull($setter->read);
 
         $friend = self::getProperty($metadata, 'friend');
         self::assertType('self|null', $friend->read?->type);
@@ -113,7 +121,7 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertNull($friend->default->value);
 
         $displayName = self::getProperty($metadata, 'displayName');
-        self::assertEquals(new MethodAccessPoint('getDisplayName'), $displayName->read?->point);
+        self::assertEquals(new SlotAccessMetadata('displayName'), $displayName->read?->access);
         self::assertNull($displayName->write);
     }
 
@@ -124,18 +132,17 @@ final class ArrayMetadataReaderTest extends TestCase
             new JsonFileMetadataReader(self::FIXTURES . 'config.json'),
         ]);
 
-        $metadata = self::readOverReflection($reader, UserStub::class);
+        $metadata = self::provide(UserStub::class, $reader, new ReflectionMetadataReader());
 
         $id = self::getProperty($metadata, 'id');
         self::assertType('int', $id->read?->type);
         self::assertSame('override.json', self::printFile($id->read?->type?->source->file));
 
         $email = self::getProperty($metadata, 'email');
-        self::assertSame('mail', $email->externalName);
+        self::assertSame('mail', $email->read?->name);
         self::assertType('non-empty-string', $email->write?->type);
+        self::assertSame('mail', $email->write?->name);
         self::assertSame('config.json', self::printFile($email->write?->type?->source->file));
-        // the chain given the metadata of the base reads the access points first
-        self::assertEquals(new MethodAccessPoint('setEmail'), $email->write?->point);
     }
 
     public function testFileIsDecodedOnceOnFirstRead(): void
@@ -175,7 +182,7 @@ final class ArrayMetadataReaderTest extends TestCase
     {
         $reader = new JsonFileMetadataReader(self::FIXTURES . 'config.json');
 
-        self::assertSame([], self::readAsFirst($reader, PromotedStub::class)->properties);
+        self::assertSame([], self::readAsFirst($reader, PromotedStub::class)->members);
     }
 
     public function testErrorsAreThrownTogetherWithFileAndPathInConfig(): void
@@ -195,7 +202,7 @@ final class ArrayMetadataReaderTest extends TestCase
         ], \array_map(static fn(\Throwable $error): string => $error::class, self::getExceptions($read)));
         self::assertSame([
             "{$class}::\$missing: property does not exist {$at}.properties.missing",
-            "{$class}::\$counter: property is not mapped {$at}.properties.counter",
+            "{$class}::\$counter: property is static and cannot be mapped {$at}.properties.counter",
             "{$class}::\$id: value of \"name\" must be a non-empty string {$at}.properties.id.name",
             "{$class}::\$id: unknown key \"size\" {$at}.properties.id.size",
             "{$class}::\$email: config must be a string or a map {$at}.properties.email",
@@ -284,35 +291,32 @@ final class ArrayMetadataReaderTest extends TestCase
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testTypeKeyOfMissingDirectionIsThrown(): void
+    public function testKeysOfVirtualPropertyWithoutDirectionsAreThrown(): void
     {
         $class = VirtualHookStub::class;
-        $path = " in \$['{$class}'].properties";
 
         self::assertSame(
             [
-                "{$class}::\$computed: \"write_type\" is given, but the property is not denormalized"
-                    . "{$path}.computed.write_type",
-                "{$class}::\$alias: \"read_type\" is given, but the property is not normalized"
-                    . "{$path}.alias.read_type",
+                "{$class}::\$computed: a virtual property is mapped by \"get\" or \"set\" with \"hook: true\""
+                    . " in \$['{$class}'].properties.computed",
             ],
-            self::getErrors(static fn() => self::readOverReflection(new ArrayMetadataReader([$class => [
-                'properties' => [
-                    'computed' => ['write_type' => 'int'],
-                    'alias' => ['read_type' => 'int'],
-                ],
-            ]]), $class)),
+            self::getErrors(static fn() => self::provide(
+                $class,
+                new ArrayMetadataReader([$class => ['properties' => ['computed' => ['type' => 'int']]]]),
+                new ReflectionMetadataReader(),
+            )),
         );
     }
 
     #[RequiresPhp('>= 8.4.0')]
-    public function testTypeKeySetsOnlyExistingDirection(): void
+    public function testHookKeyDeclaresDirectionOfVirtualProperty(): void
     {
         $reader = new ArrayMetadataReader([VirtualHookStub::class => [
-            'properties' => ['computed' => ['type' => 'non-empty-string']],
+            'properties' => ['computed' => ['get' => ['hook' => true, 'type' => 'non-empty-string']]],
         ]]);
-        $computed = self::getProperty(self::readOverReflection($reader, VirtualHookStub::class), 'computed');
+        $computed = self::getProperty(self::provide(VirtualHookStub::class, $reader, new ReflectionMetadataReader()), 'computed');
 
+        self::assertEquals(new HookAccessMetadata('computed'), $computed->read?->access);
         self::assertType('non-empty-string', $computed->read?->type);
         self::assertNull($computed->write);
     }
@@ -355,6 +359,11 @@ final class ArrayMetadataReaderTest extends TestCase
 
         self::assertSame(['mail', 'e_mail'], $email->aliases);
         self::assertSame(AliasConflict::UseFirst, $email->aliasConflict);
+
+        $reader = new ArrayMetadataReader([UserStub::class => ['properties' => ['email' => ['aliases' => 'mail']]]]);
+        $email = self::getProperty(self::readOverReflection($reader, UserStub::class), 'email');
+
+        self::assertSame(['mail'], $email->aliases);
     }
 
     public function testWrongAliasesOfPropertyAreThrown(): void
@@ -367,8 +376,8 @@ final class ArrayMetadataReaderTest extends TestCase
         ));
 
         self::assertSame(
-            ["{$class}::\$email: value of \"aliases\" must be a list{$path}.aliases"],
-            $read(['aliases' => 'mail']),
+            ["{$class}::\$email: value of \"aliases\" must be a string or a list{$path}.aliases"],
+            $read(['aliases' => 42]),
         );
         self::assertSame(
             ["{$class}::\$email: value of \"aliases\" must be a non-empty string{$path}.aliases"],
@@ -522,13 +531,32 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertStringStartsWith("{$class}::\$email: expression \"this.\" is invalid (", $errors[1]);
     }
 
+    public function testFunctionOfGivenLanguageInSkipConfigIsAccepted(): void
+    {
+        $language = new ExpressionLanguage();
+        $language->register(
+            'blank',
+            static fn(string $v): string => $v,
+            static fn(array $v, mixed $x): bool => $x === '',
+        );
+
+        $reader = new ArrayMetadataReader(
+            config: [UserStub::class => ['properties' => ['email' => ['skip' => 'blank(value)']]]],
+            expressions: $language,
+        );
+
+        $email = self::getProperty(self::readOverReflection($reader, UserStub::class), 'email')->skip;
+        self::assertCount(1, $email);
+        self::assertInstanceOf(ExpressionSkipCondition::class, $email[0]);
+    }
+
     public function testDiscriminatorConfigSetsPolymorphism(): void
     {
         $reader = new ArrayMetadataReader([
             UserStub::class => [
                 'discriminator' => [
                     'field' => 'kind',
-                    'map' => ['promoted' => PromotedStub::class, 7 => 'int'],
+                    'map' => ['promoted' => PromotedStub::class, 7 => UserStub::class],
                     'otherwise' => StatusStub::class,
                 ],
             ],
@@ -539,7 +567,7 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertNotNull($discriminator);
         self::assertSame('kind', $discriminator->field);
         self::assertType(PromotedStub::class, $discriminator->map['promoted']);
-        self::assertType('int', $discriminator->map[7]);
+        self::assertType(UserStub::class, $discriminator->map[7]);
         self::assertType(StatusStub::class, $discriminator->default);
         self::assertSame('$[\'' . UserStub::class . '\'].discriminator', $discriminator->source->path);
     }
@@ -573,6 +601,25 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertCount(1, $errors);
         self::assertStringStartsWith(UserStub::class . ': ', $errors[0]);
         self::assertStringEndsWith(' in $[\'' . UserStub::class . '\'].discriminator', $errors[0]);
+    }
+
+    public function testTypesOfDiscriminatorMapThatAreNotClassesAreThrownByValidation(): void
+    {
+        $reader = new ArrayMetadataReader([
+            UserStub::class => ['discriminator' => [
+                'field' => 'kind',
+                'map' => ['a' => 'array{a: int}', 'b' => 'int'],
+            ]],
+        ]);
+        $at = ' in $[\'' . UserStub::class . '\'].discriminator';
+
+        self::assertSame(
+            [
+                UserStub::class . ': type "array{a: int}" of the map is not a class' . $at,
+                UserStub::class . ': type "int" of the map is not a class' . $at,
+            ],
+            self::getErrors(static fn() => self::provide(UserStub::class, $reader, new ReflectionMetadataReader())),
+        );
     }
 
     public function testConfigOfPropertyThatIsNotMappedIsThrown(): void
@@ -609,22 +656,22 @@ final class ArrayMetadataReaderTest extends TestCase
 
         self::assertType('int', $id->read?->type);
         self::assertSame('$[\'' . UserStub::class . '\'].properties.id.type', $id->read?->type?->source->path);
-        self::assertSame('user_id', $id->externalName);
+        self::assertSame('user_id', $id->read?->name);
         self::assertSame('config', $id->default?->value);
     }
 
-    public function testReadTypeKeepsWriteType(): void
+    public function testTypeOfGetKeepsWriteType(): void
     {
-        $id = self::getProperty(self::readStrictness(['read_type' => 'positive-int']), 'id');
+        $id = self::getProperty(self::readDirections(['get' => ['type' => 'positive-int'], 'set' => []]), 'id');
 
         self::assertType('positive-int', $id->read?->type);
         self::assertType('int', $id->write?->type);
         self::assertNull($id->write?->type?->source->path);
     }
 
-    public function testWriteTypeKeepsReadType(): void
+    public function testTypeOfSetKeepsReadType(): void
     {
-        $id = self::getProperty(self::readStrictness(['write_type' => 'positive-int']), 'id');
+        $id = self::getProperty(self::readDirections(['get' => [], 'set' => ['type' => 'positive-int']]), 'id');
 
         self::assertType('positive-int', $id->write?->type);
         self::assertType('int', $id->read?->type);
@@ -638,8 +685,6 @@ final class ArrayMetadataReaderTest extends TestCase
     {
         yield 'alone' => [['strict' => true]];
         yield 'with type' => [['type' => 'positive-int', 'strict' => true]];
-        yield 'with read type' => [['read_type' => 'positive-int', 'strict' => true]];
-        yield 'with write type' => [['write_type' => 'positive-int', 'strict' => true]];
     }
 
     /**
@@ -702,14 +747,26 @@ final class ArrayMetadataReaderTest extends TestCase
      * Reads {@see UserStub} with the given config of its `$id` property.
      *
      * @param array<non-empty-string, mixed> $id
-     * @return ClassMetadata<UserStub>
+     * @return ClassDraft<UserStub>
      * @throws \Throwable
      */
-    private static function readStrictness(array $id): ClassMetadata
+    private static function readStrictness(array $id): ClassDraft
     {
         $reader = new ArrayMetadataReader([UserStub::class => ['properties' => ['id' => $id]]]);
 
         return self::readOverReflection($reader, UserStub::class);
+    }
+
+    /**
+     * @param array<non-empty-string, mixed> $id
+     * @return ClassDraft<UserStub>
+     * @throws \Throwable
+     */
+    private static function readDirections(array $id): ClassDraft
+    {
+        $reader = new ArrayMetadataReader([UserStub::class => ['properties' => ['id' => $id]]]);
+
+        return self::provide(UserStub::class, $reader, new ReflectionMetadataReader());
     }
 
     /**

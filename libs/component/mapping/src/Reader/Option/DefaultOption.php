@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidDefaultValueException;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\DefaultValueFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -23,17 +23,17 @@ final class DefaultOption implements PropertyOptionInterface
 {
     private const KEY = 'default';
 
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool
+    public function getPropertyAttributes(): array
     {
-        return false;
+        return [];
     }
 
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         return $metadata;
     }
 
@@ -44,9 +44,9 @@ final class DefaultOption implements PropertyOptionInterface
 
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }

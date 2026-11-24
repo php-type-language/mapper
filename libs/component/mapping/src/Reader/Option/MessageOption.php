@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
 use TypeLang\Mapper\Mapping\OnTypeError;
 use TypeLang\Mapper\Mapping\OnUndefinedError;
+use TypeLang\Mapper\Mapping\Reader\Access\AccessDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -35,18 +36,20 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
      */
     private const ATTRIBUTE_KEY = 'message';
 
-    public function hasPropertyAttributes(\ReflectionProperty $property): bool
+    public function getPropertyAttributes(): array
     {
-        return $property->getAttributes(OnTypeError::class) !== []
-            || $property->getAttributes(OnUndefinedError::class) !== [];
+        return [
+            OnTypeError::class => AccessDirection::Write,
+            OnUndefinedError::class => AccessDirection::Write,
+        ];
     }
 
     public function readPropertyAttributes(
         \ReflectionProperty $property,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         SourceContext $context,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $types = AttributeFactory::create(
             $property->getAttributes(OnTypeError::class),
             OnTypeError::class,
@@ -87,9 +90,9 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
 
     public function readPropertyConfig(
         ConfigSection $config,
-        PropertyMetadata $metadata,
+        MemberDraft $metadata,
         ErrorCollector $errors,
-    ): PropertyMetadata {
+    ): MemberDraft {
         $type = self::findConfigMessage($config, self::TYPE_KEY, $errors);
 
         if ($type !== null) {
@@ -107,10 +110,10 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
 
     public function readClassAttributes(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         SourceContextFactory $contexts,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         $attributes = $class->getAttributes(OnTypeError::class);
 
         if ($attributes === []) {
@@ -138,9 +141,9 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
     public function readClassConfig(
         \ReflectionClass $class,
         ConfigSection $config,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         $message = self::findConfigMessage($config, self::TYPE_KEY, $errors);
 
         if ($message === null) {

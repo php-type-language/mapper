@@ -14,6 +14,8 @@ use TypeLang\Mapper\Instantiator\Tests\Stub\ConstructorStub;
 use TypeLang\Mapper\Instantiator\Tests\Stub\EmptyStub;
 use TypeLang\Mapper\Instantiator\Tests\Stub\EnumStub;
 use TypeLang\Mapper\Instantiator\Tests\Stub\InterfaceStub;
+use TypeLang\Mapper\Instantiator\Tests\Stub\PromotedChildStub;
+use TypeLang\Mapper\Instantiator\Tests\Stub\PromotedParentStub;
 use TypeLang\Mapper\Instantiator\Tests\Stub\TraitStub;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
@@ -97,6 +99,28 @@ final class InstantiatorFactoryTest extends TestCase
 
         self::assertNotSame($first, $second);
         self::assertSame('default', $second->value);
+    }
+
+    public function testWritesDefaultsOfPromotedPropertiesOfParentConstructors(): void
+    {
+        $object = self::createInstantiator(PromotedChildStub::class)->instantiate([]);
+
+        self::assertSame('child', $object->name);
+        self::assertSame(3, $object->count);
+        self::assertInstanceOf(\ArrayObject::class, $object->getItems());
+    }
+
+    public function testCreatesObjectOfDefaultValueForEachObject(): void
+    {
+        $instantiator = self::createInstantiator(PromotedParentStub::class);
+
+        $first = $instantiator->instantiate([]);
+        $first->count = 4;
+
+        $second = $instantiator->instantiate([]);
+
+        self::assertSame(3, $second->count);
+        self::assertNotSame($first->getItems(), $second->getItems());
     }
 
     public function testCreatesInternalClassThatNeedsNoConstructor(): void

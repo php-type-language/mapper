@@ -12,6 +12,13 @@ use TypeLang\Type\TypeNode;
  */
 final class Violation
 {
+    /**
+     * Whether the cause is an {@see \Error}: a defect of the code or of its
+     * declarations, such as a call of a method that does not exist in a
+     * setter, rather than of the input
+     */
+    public readonly bool $isFatal;
+
     public function __construct(
         public readonly ViolationCodeInterface $code,
         /**
@@ -50,7 +57,9 @@ final class Violation
          * of a hook of a class. Its message is not a part of the violation.
          */
         public readonly ?\Throwable $cause = null,
-    ) {}
+    ) {
+        $this->isFatal = $cause instanceof \Error;
+    }
 
     /**
      * @param non-empty-string $template

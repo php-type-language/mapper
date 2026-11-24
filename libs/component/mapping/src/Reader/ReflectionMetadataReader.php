@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
-use TypeLang\Mapper\Mapping\Exception\InvalidDefaultValueException;
+use TypeLang\Mapper\Mapping\Draft\AccessDraft;
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
+use TypeLang\Mapper\Mapping\Draft\MemberDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
-use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\StorageAccessPoint;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\MapGetter;
+use TypeLang\Mapper\Mapping\MapSetter;
+use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\Reader\Reflection\ClassProperties;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertyHooks;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertySelectorInterface;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PublicPropertySelector;
@@ -25,14 +26,16 @@ use TypeLang\Reader\PropertyReaderInterface;
 use TypeLang\Reader\ReflectionReader;
 
 /**
- * Base of the chain: adds the properties chosen by the selector with their
- * access points, native types and default values, the default value of the
- * property or of the promoted constructor parameter. A property with a
- * backing store is accessed there, a virtual one through its hooks and takes
- * part only in the directions it has a hook for. Over the given metadata it
- * overrides these values of the chosen properties, adds the chosen
- * properties that are missing and keeps the other ones. Other readers
- * override the values of the added properties only.
+ * Base of the chain: adds the properties chosen by the selector, private
+ * properties of the parents included, that have a backing store, read and
+ * written there in both directions with their native types and default
+ * values: the default value of the property or of the promoted constructor
+ * parameter. The hooks are not called and a virtual property is not added:
+ * both are declared by {@see MapGetter} and {@see MapSetter}. Over the given
+ * metadata it adds the chosen properties that are missing, a given member
+ * keeps its directions and accesses and takes the native type in a direction
+ * accessing the backing store of the property. Other readers override the
+ * values of the added properties only.
  */
 final class ReflectionMetadataReader implements MetadataReaderInterface
 {
@@ -52,22 +55,25 @@ final class ReflectionMetadataReader implements MetadataReaderInterface
      * @throws InvalidMetadataException in case of a default value cannot be
      *         evaluated or is an object other than an enum case
      */
-    public function read(\ReflectionClass $class, ?ClassMetadata $metadata = null): ClassMetadata
+    public function read(\ReflectionClass $class, ?ClassDraft $metadata = null): ClassDraft
     {
-        $metadata ??= new ClassMetadata($class->getName());
+        $metadata ??= new ClassDraft($class->getName());
         $errors = new ErrorCollector();
 
-        foreach ($class->getProperties() as $reflection) {
-            $name = $reflection->name;
+        foreach (ClassProperties::getProperties($class) as $reflection) {
+            $key = ClassProperties::getKey($class, $reflection);
 
-            if ($name === '' || !$this->selector->isSelected($reflection)) {
+            if ($key === ''
+                || $reflection->name === ''
+                || $reflection->isStatic()
+                || PropertyHooks::isVirtual($reflection)
+                || !$this->selector->isSelected($reflection)) {
                 continue;
             }
 
-            $property = $metadata->findProperty($name) ?? new PropertyMetadata($name);
-            $property = $this->readProperty($class, $reflection, $property, $errors);
+            $member = $this->readProperty($class, $reflection, $key, $metadata->findMember($key), $errors);
 
-            $metadata = $metadata->withProperty($property);
+            $metadata = $metadata->withMember($member);
         }
 
         $errors->throwIfNotEmpty($metadata);
@@ -76,83 +82,55 @@ final class ReflectionMetadataReader implements MetadataReaderInterface
     }
 
     /**
+     * The types of the given member are kept for a direction without a
+     * native type.
+     *
      * @param \ReflectionClass<object> $class
+     * @param non-empty-string $key
      */
     private function readProperty(
         \ReflectionClass $class,
         \ReflectionProperty $reflection,
-        PropertyMetadata $property,
+        string $key,
+        ?MemberDraft $member,
         ErrorCollector $errors,
-    ): PropertyMetadata {
-        $context = $this->contexts->createFromReflection($class, $reflection);
-        $property = $this->readAccess($reflection, $property, $context);
-
-        try {
-            $default = DefaultValueFactory::findForProperty($reflection, $context);
-        } catch (InvalidDefaultValueException $e) {
-            $errors->addError($e);
-
-            return $property;
-        }
-
-        if ($default !== null) {
-            $property = $property->withDefaultValue($default);
-        }
-
-        return $property;
-    }
-
-    /**
-     * A property with a backing store is accessed there in both directions
-     * and has its own type in both, the signature of its `set` hook is not
-     * read: the hooks are bypassed. A virtual property is accessed through
-     * the hooks it has, the write type is the parameter of the `set` hook.
-     * A direction without a native type keeps the given type.
-     */
-    private function readAccess(
-        \ReflectionProperty $reflection,
-        PropertyMetadata $property,
-        SourceContext $context,
-    ): PropertyMetadata {
-        /** @var non-empty-string */
+    ): MemberDraft {
+        /** @var non-empty-string $name */
         $name = $reflection->name;
+        $context = $this->contexts->createFromReflection($class, $reflection);
         $type = $this->findType($reflection, PropertyAccessDirection::Read, $context);
+        $access = new SlotAccessMetadata($name, ClassProperties::findPrivateClass($reflection));
 
-        if (!self::isVirtual($reflection)) {
-            $point = new StorageAccessPoint($name);
-
-            return $property
-                ->withReadAccess(new AccessMetadata($point, $type ?? $property->read?->type))
-                ->withWriteAccess(new AccessMetadata($point, $type ?? $property->write?->type));
+        if ($member === null) {
+            $new = new AccessDraft($access, $name, false, $type);
+            $member = new MemberDraft($key, $new, $new);
+        } elseif ($type !== null) {
+            $member = $member
+                ->withReadAccess(self::withNativeType($member->read, $access, $type))
+                ->withWriteAccess(self::withNativeType($member->write, $access, $type));
         }
 
-        $read = $write = null;
-
-        if (PropertyHooks::findGet($reflection) !== null) {
-            $read = new AccessMetadata(new HookAccessPoint($name), $type ?? $property->read?->type);
-        }
-
-        if (PropertyHooks::findSet($reflection) !== null) {
-            $type = $this->findType($reflection, PropertyAccessDirection::Write, $context);
-            $write = new AccessMetadata(new HookAccessPoint($name), $type ?? $property->write?->type);
-        }
-
-        return $property->withReadAccess($read)
-            ->withWriteAccess($write);
+        return DefaultValueFactory::withPropertyDefault($member, $reflection, $context, $errors);
     }
 
     /**
-     * Returns {@see true} in case of the property has no backing store
-     * (PHP 8.4+).
+     * Returns the given direction with the native type in case of it
+     * accesses the backing store of the property, as is otherwise.
      */
-    private static function isVirtual(\ReflectionProperty $reflection): bool
-    {
-        if (\PHP_VERSION_ID < 80400) {
-            return false;
+    private static function withNativeType(
+        ?AccessDraft $given,
+        SlotAccessMetadata $access,
+        TypeMetadata $type,
+    ): ?AccessDraft {
+        $slot = $given?->access;
+
+        if (!$slot instanceof SlotAccessMetadata
+            || $slot->property !== $access->property
+            || $slot->class !== $access->class) {
+            return $given;
         }
 
-        // @phpstan-ignore-next-line PHP 8.4 API, phpVersion.min is 8.1
-        return $reflection->isVirtual();
+        return $given?->withType($type);
     }
 
     private function findType(

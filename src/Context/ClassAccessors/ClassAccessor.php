@@ -14,8 +14,7 @@ use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
 
 /**
  * Everything a class is converted with: the instantiator of the class, the
- * readers and writers of its properties and its hooks, in the order they
- * run.
+ * readers and writers of its fields and its hooks, in the order they run.
  *
  * @template T of object
  */
@@ -27,15 +26,17 @@ final class ClassAccessor
          */
         public readonly InstantiatorInterface $instantiator,
         /**
-         * Readers of the readable properties by the name of the property
+         * Readers of the fields of the normalization by the position of the
+         * field in the structure of the metadata
          *
-         * @var array<non-empty-string, PropertyReaderInterface<T, mixed>>
+         * @var list<PropertyReaderInterface<T, mixed>>
          */
         public readonly array $readers,
         /**
-         * Writers of the writable properties by the name of the property
+         * Writers of the fields of the denormalization by the position of
+         * the field in the structure of the metadata
          *
-         * @var array<non-empty-string, PropertyWriterInterface<T, mixed>>
+         * @var list<PropertyWriterInterface<T, mixed>>
          */
         public readonly array $writers,
         /**

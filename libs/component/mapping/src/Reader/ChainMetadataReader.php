@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
 use TypeLang\Mapper\Mapping\Exception\ReaderException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Reader\Reflection\ClassProperties;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
 
 /**
@@ -14,8 +15,8 @@ use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
  * the values of the lower ones. The lowest reader is the base, such as
  * {@see ReflectionMetadataReader}, or the readers below the chain given its
  * metadata. Right after the base every {@see AccessSourceReaderInterface}
- * of the chain reads its access points, from the lowest to the highest: the
- * other readers read the types at the chosen points. A nested chain is read
+ * of the chain reads its accesses, from the lowest to the highest: the
+ * other readers read the types at the chosen accesses. A nested chain is read
  * as a part of this one. Errors of all readers are thrown together with the
  * metadata read despite them.
  */
@@ -29,7 +30,7 @@ final class ChainMetadataReader implements MetadataReaderInterface
     private readonly array $readers;
 
     /**
-     * Readers of the access points, from the lowest priority to the
+     * Readers of the accesses, from the lowest priority to the
      * highest one
      *
      * @var list<AccessSourceReaderInterface>
@@ -64,7 +65,7 @@ final class ChainMetadataReader implements MetadataReaderInterface
     }
 
     /**
-     * Reads the base, then the access points of the chain, then the other
+     * Reads the base, then the accesses of the chain, then the other
      * readers. The base is the lowest reader of a chain read first, of a
      * chain given the metadata of the lower readers it is read already. The
      * next reader after a reader that throws {@see InvalidMetadataException}
@@ -72,38 +73,66 @@ final class ChainMetadataReader implements MetadataReaderInterface
      *
      * @template TArg of object
      * @param \ReflectionClass<TArg> $class
-     * @param ClassMetadata<TArg>|null $metadata metadata the lowest reader gets
-     * @return ClassMetadata<TArg>
+     * @param ClassDraft<TArg>|null $metadata metadata the lowest reader gets
+     * @return ClassDraft<TArg>
      * @throws InvalidMetadataException in case of the readers find wrong
      *         values
      * @throws ReaderException in case of a reader cannot be loaded
      */
-    public function read(\ReflectionClass $class, ?ClassMetadata $metadata = null): ClassMetadata
+    public function read(\ReflectionClass $class, ?ClassDraft $metadata = null): ClassDraft
     {
         $readers = $this->readers;
         $errors = new ErrorCollector();
 
         if ($metadata === null && $readers !== []) {
             $base = \array_shift($readers);
-            $metadata = self::readSafely(static fn(): ClassMetadata => $base->read($class), $errors);
+            $metadata = self::readSafely(static fn(): ClassDraft => $base->read($class), $errors);
         }
 
-        $metadata ??= new ClassMetadata($class->getName());
+        $metadata ??= new ClassDraft($class->getName());
 
         foreach ($this->sources as $source) {
             $current = $metadata;
-            $metadata = self::readSafely(static fn(): ClassMetadata => $source->readAccess($class, $current), $errors);
+            $metadata = self::readSafely(static fn(): ClassDraft => $source->readAccess($class, $current), $errors);
         }
+
+        $metadata = $metadata->withMemberOrder(self::getDeclarationOrder($class));
 
         foreach ($readers as $reader) {
             $current = $metadata;
-            $metadata = self::readSafely(static fn(): ClassMetadata => $reader->read($class, $current), $errors);
+            $metadata = self::readSafely(static fn(): ClassDraft => $reader->read($class, $current), $errors);
         }
 
         $errors->throwIfNotEmpty($metadata);
 
-        /** @var ClassMetadata<TArg> */
+        /** @var ClassDraft<TArg> */
         return $metadata;
+    }
+
+    /**
+     * Returns the keys of the members in order of declaration: the
+     * properties, then the methods.
+     *
+     * @param \ReflectionClass<object> $class
+     * @return list<non-empty-string>
+     */
+    private static function getDeclarationOrder(\ReflectionClass $class): array
+    {
+        $keys = [];
+
+        foreach (ClassProperties::getProperties($class) as $property) {
+            $key = ClassProperties::getKey($class, $property);
+
+            if ($key !== '') {
+                $keys[] = $key;
+            }
+        }
+
+        foreach ($class->getMethods() as $method) {
+            $keys[] = $method->name . '()';
+        }
+
+        return $keys;
     }
 
     /**
@@ -111,11 +140,11 @@ final class ChainMetadataReader implements MetadataReaderInterface
      * read despite them are returned.
      *
      * @template TArg of object
-     * @param \Closure(): ClassMetadata<TArg> $read
-     * @return ClassMetadata<TArg>
+     * @param \Closure(): ClassDraft<TArg> $read
+     * @return ClassDraft<TArg>
      * @throws ReaderException in case of the reader cannot be loaded
      */
-    private static function readSafely(\Closure $read, ErrorCollector $errors): ClassMetadata
+    private static function readSafely(\Closure $read, ErrorCollector $errors): ClassDraft
     {
         try {
             return $read();
@@ -124,7 +153,7 @@ final class ChainMetadataReader implements MetadataReaderInterface
                 $errors->addError($error);
             }
 
-            /** @var ClassMetadata<TArg> */
+            /** @var ClassDraft<TArg> */
             return $e->metadata;
         }
     }

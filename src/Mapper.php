@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper;
 
 use JetBrains\PhpStorm\Language;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Coercer\CoercerInterface;
 use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\ClassTypes;
@@ -147,6 +148,10 @@ final class Mapper implements MapperInterface
      * @param TypePrinterInterface|null $printer prints the type in errors of
      *        its definition and of values, a single line with all fields of
      *        shapes in case of {@see null}
+     * @param ExpressionLanguage|null $expressions language of the skip
+     *        expressions, the functions of the expressions are its
+     *        functions: a language with the default functions in case of
+     *        {@see null}. Is given to the default metadata too
      * @throws InvalidPatternException in case of a pattern of a default type
      *         is written wrong
      */
@@ -164,6 +169,7 @@ final class Mapper implements MapperInterface
         ?ViolationFormatterInterface $normalizationFormatter = null,
         ?TypePrinterInterface $printer = null,
         private readonly TypeParser $parser = new TypeParser(),
+        ?ExpressionLanguage $expressions = null,
     ) {
         $classes = new ClassAccessors(
             properties: PropertyAccessorFactory::createDefault($accessors),
@@ -172,14 +178,16 @@ final class Mapper implements MapperInterface
         );
 
         $printer ??= self::createDefaultTypePrinter();
+        $expressions ??= self::createDefaultExpressionLanguage();
 
         $this->repository = new TypeRepository(
             builders: self::createDefaultTypes($this->parser, $builders),
-            metadata: $metadata ?? MetadataBuilder::createDefault()
+            metadata: $metadata ?? MetadataBuilder::createDefault(expressions: $expressions)
                 ->build(),
             decorators: $decorators,
             accessors: $classes,
             printer: $printer,
+            expressions: $expressions,
         );
 
         $this->denormalizationFormatter = $denormalizationFormatter
@@ -200,7 +208,22 @@ final class Mapper implements MapperInterface
             accessors: $classes,
             coercers: Coercers::createDefault(...$coercers),
             declaredTypes: new DeclaredTypeFinder($this->repository),
+            expressions: $expressions,
         );
+    }
+
+    /**
+     * Creates the language of the skip expressions with the default
+     * functions, {@see null} in case of the `symfony/expression-language`
+     * package is not installed.
+     */
+    private static function createDefaultExpressionLanguage(): ?ExpressionLanguage
+    {
+        if (!\class_exists(ExpressionLanguage::class)) {
+            return null;
+        }
+
+        return new ExpressionLanguage();
     }
 
     /**

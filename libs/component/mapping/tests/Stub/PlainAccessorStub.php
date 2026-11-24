@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Stub;
 
+/**
+ * Class without attributes, its members are declared by a config.
+ */
 final class PlainAccessorStub
 {
-    public string $name = '';
+    private string $name = '';
 
     public string $createdAt = '';
 

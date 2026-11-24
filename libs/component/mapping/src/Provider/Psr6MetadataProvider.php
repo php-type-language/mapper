@@ -8,7 +8,6 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use TypeLang\Mapper\Mapping\Exception\InvalidCacheKeyException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 
 /**
  * Stores metadata provided by the delegate in a PSR-6 cache pool. A failure
@@ -29,7 +28,7 @@ final class Psr6MetadataProvider extends CacheMetadataProvider
         parent::__construct($delegate, $prefix);
     }
 
-    protected function remember(string $key, string $class, \Closure $read): ClassMetadata
+    protected function remember(string $key, string $class, string $type, \Closure $read): object
     {
         try {
             $item = $this->pool->getItem($key);
@@ -41,7 +40,7 @@ final class Psr6MetadataProvider extends CacheMetadataProvider
             $metadata = null;
         }
 
-        if (self::isMetadataOf($metadata, $class)) {
+        if (self::isMetadataOf($metadata, $class, $type)) {
             return $metadata;
         }
 
@@ -57,9 +56,8 @@ final class Psr6MetadataProvider extends CacheMetadataProvider
      * deleted and created again.
      *
      * @param non-empty-string $key
-     * @param ClassMetadata<object> $metadata
      */
-    private function store(string $key, ?CacheItemInterface $item, ClassMetadata $metadata): void
+    private function store(string $key, ?CacheItemInterface $item, object $metadata): void
     {
         try {
             if ($item === null) {

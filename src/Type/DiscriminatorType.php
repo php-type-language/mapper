@@ -7,8 +7,10 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
 use TypeLang\Mapper\Exception\InvalidValueException;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMetadata;
+use TypeLang\Mapper\Type\Extractor\DiscriminatorTagExtractor;
 use TypeLang\Mapper\Type\Extractor\LiteralTypeExtractor;
 
 /**
@@ -30,15 +32,23 @@ final class DiscriminatorType implements TypeInterface
 {
     public function __construct(
         /**
-         * Description of the base class, its discriminator is not null
+         * Description of the class of the type
          *
          * @var ClassMetadata<T>
          */
         public readonly ClassMetadata $metadata,
         /**
-         * Types by their tags
+         * Description of the class with the discriminator: the class of the
+         * type or its parent
          *
-         * @var non-empty-array<array-key, TypeInterface<T>>
+         * @var ClassMetadata<object>
+         */
+        public readonly ClassMetadata $owner,
+        /**
+         * Types by their tags, the classes of the map that are the class of
+         * the type or its children
+         *
+         * @var array<array-key, TypeInterface<T>>
          */
         public readonly array $types,
         /**
@@ -55,10 +65,29 @@ final class DiscriminatorType implements TypeInterface
          * @var TypeInterface<T>|null
          */
         public readonly ?TypeInterface $default = null,
+        /**
+         * Type of an object without a tag, {@see null} in case of such an
+         * object is an error
+         *
+         * @var TypeInterface<object>|null
+         */
+        public readonly ?TypeInterface $untagged = null,
+        /**
+         * Type of the class of the type itself, takes the data without a tag
+         * instead of {@see $default}
+         *
+         * @var TypeInterface<T>|null
+         */
+        public readonly ?TypeInterface $own = null,
     ) {}
 
+    /**
+     * @throws TypeDefinitionException in case of no data creates the class
+     */
     public function isDenormalizable(mixed $value, Context $context): bool
     {
+        $this->assertDenormalizable();
+
         $data = $context->coercers->array->coerce($value);
 
         if ($data === null) {
@@ -79,12 +108,15 @@ final class DiscriminatorType implements TypeInterface
      * @throws InvalidValueException in case of the value is not an array or
      *         an object, its tag is missing or unknown, or the selected type
      *         rejects it
+     * @throws TypeDefinitionException in case of no data creates the class
      */
     public function denormalize(mixed $value, Context $context): object
     {
+        $this->assertDenormalizable();
+
         $data = $context->coercers->array->coerce($value)
             ?? throw InvalidValueException::becauseInvalidType($value)
-                ->withTemplate($this->metadata->typeErrorMessage);
+                ->withTemplate($this->getTypeErrorMessage());
 
         $type = $this->findType($data) ?? throw $this->createTagException($data);
 
@@ -103,33 +135,31 @@ final class DiscriminatorType implements TypeInterface
             return $this->types[$tag]->isNormalizable($value, $context);
         }
 
-        if ($this->default === null) {
+        if ($this->untagged === null) {
             return false;
         }
 
-        return $this->default->isNormalizable($value, $context);
+        return $this->untagged->isNormalizable($value, $context);
     }
 
     /**
      * @throws InvalidValueException in case of the value is not an object of
-     *         a class of the map or cannot be normalized by its type
+     *         the class or has no tag, or cannot be normalized by its type
      */
     public function normalize(mixed $value, Context $context): mixed
     {
         if (!$value instanceof $this->metadata->name) {
-            throw InvalidValueException::becauseInvalidType($value)
-                ->withTemplate($this->metadata->typeErrorMessage);
+            throw InvalidValueException::becauseInvalidType($value);
         }
 
         $tag = $this->findTag($value);
 
         if ($tag === null) {
-            if ($this->default === null) {
-                throw InvalidValueException::becauseInvalidType($value)
-                    ->withTemplate($this->metadata->typeErrorMessage);
+            if ($this->untagged === null) {
+                throw InvalidValueException::becauseObjectIsNotTagged($this->owner->name, $value);
             }
 
-            return $this->default->normalize($value, $context);
+            return $this->untagged->normalize($value, $context);
         }
 
         $result = $this->types[$tag]->normalize($value, $context);
@@ -147,15 +177,22 @@ final class DiscriminatorType implements TypeInterface
     }
 
     /**
-     * Returns the type selected by the tag of the data, the default type in
-     * case of the tag is missing or unknown.
+     * Returns the type selected by the tag of the data: the default type in
+     * case of the tag is unknown, the type of the class itself or the default
+     * one in case of the tag is missing.
      *
      * @param array<array-key, mixed> $data
      * @return TypeInterface<T>|null
      */
     private function findType(array $data): ?TypeInterface
     {
-        $tag = $data[$this->getDiscriminator()->field] ?? null;
+        $field = $this->getDiscriminator()->field;
+
+        if (!\array_key_exists($field, $data)) {
+            return $this->own ?? $this->default;
+        }
+
+        $tag = $data[$field];
 
         if (\is_string($tag) || \is_int($tag)) {
             return $this->types[$tag] ?? $this->default;
@@ -170,22 +207,7 @@ final class DiscriminatorType implements TypeInterface
      */
     private function findTag(object $object): int|string|null
     {
-        $tag = $this->tags[$object::class] ?? null;
-
-        if ($tag !== null) {
-            return $tag;
-        }
-
-        $nearest = null;
-
-        foreach ($this->tags as $class => $candidate) {
-            if ($object instanceof $class && ($nearest === null || \is_subclass_of($class, $nearest))) {
-                $nearest = $class;
-                $tag = $candidate;
-            }
-        }
-
-        return $tag;
+        return DiscriminatorTagExtractor::extract($this->tags, $object::class);
     }
 
     /**
@@ -202,7 +224,11 @@ final class DiscriminatorType implements TypeInterface
             return InvalidValueException::becauseFieldIsMissing($field, new PropertySegment($field));
         }
 
-        $declared = LiteralTypeExtractor::extractAll(\array_keys($this->types));
+        $declared = null;
+
+        if ($this->types !== []) {
+            $declared = LiteralTypeExtractor::extractAll(\array_keys($this->types));
+        }
 
         return InvalidValueException::wrapWithPath(
             InvalidValueException::becauseInvalidType($data[$field], $declared),
@@ -211,9 +237,36 @@ final class DiscriminatorType implements TypeInterface
         );
     }
 
+    /**
+     * Checks that some data creates the class: it or its child is in the
+     * map, or the map has a type of the data with an unknown tag.
+     *
+     * @throws TypeDefinitionException in case of no data creates the class
+     */
+    private function assertDenormalizable(): void
+    {
+        if ($this->types === [] && $this->default === null) {
+            throw TypeDefinitionException::becauseClassIsNotInDiscriminatorMap(
+                $this->metadata->name,
+                $this->owner->name,
+            );
+        }
+    }
+
+    /**
+     * Returns the message of the class of the type or, in case of it has
+     * none, of the class with the discriminator.
+     *
+     * @return non-empty-string|null
+     */
+    private function getTypeErrorMessage(): ?string
+    {
+        return $this->metadata->input->typeErrorMessage ?? $this->owner->input->typeErrorMessage;
+    }
+
     private function getDiscriminator(): DiscriminatorMetadata
     {
-        $discriminator = $this->metadata->discriminator;
+        $discriminator = $this->owner->discriminator;
 
         \assert($discriminator !== null, 'The discriminator type is built for a class with a discriminator');
 

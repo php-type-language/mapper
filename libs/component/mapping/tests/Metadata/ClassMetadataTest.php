@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Tests\Metadata;
 
-use TypeLang\Mapper\Mapping\Metadata\AccessMetadata;
-use TypeLang\Mapper\Mapping\Metadata\AccessPoint\HookAccessPoint;
+use TypeLang\Mapper\Mapping\Metadata\Access\HookAccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Access\MethodAccessMetadata;
+use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
+use TypeLang\Mapper\Mapping\Metadata\AliasesMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DefaultValueMetadata;
-use TypeLang\Mapper\Mapping\Metadata\PropertyMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\OutputFieldMetadata;
+use TypeLang\Mapper\Mapping\Metadata\SkipCondition\NullSkipCondition;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
+use TypeLang\Mapper\Mapping\Metadata\Struct\InputStructMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Struct\OutputStructMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Mapping\Tests\TestCase;
 use TypeLang\Type\Name;
@@ -17,52 +23,40 @@ use TypeLang\Type\NamedTypeNode;
 
 final class ClassMetadataTest extends TestCase
 {
-    public function testPropertiesKeepOrderOfAddition(): void
-    {
-        $metadata = (new ClassMetadata(\stdClass::class))
-            ->withProperty(new PropertyMetadata('b'))
-            ->withProperty(new PropertyMetadata('a'));
-
-        self::assertSame(['b', 'a'], \array_keys($metadata->properties));
-    }
-
-    public function testPropertyOfSameNameIsReplacedInPlace(): void
-    {
-        $replacement = (new PropertyMetadata('a'))->withExternalName('first');
-
-        $metadata = (new ClassMetadata(\stdClass::class))
-            ->withProperty(new PropertyMetadata('a'))
-            ->withProperty(new PropertyMetadata('b'))
-            ->withProperty($replacement);
-
-        self::assertSame(['a', 'b'], \array_keys($metadata->properties));
-        self::assertSame($replacement, $metadata->findProperty('a'));
-        self::assertNull($metadata->findProperty('c'));
-    }
-
-    public function testWitherDoesNotChangeOriginal(): void
-    {
-        $metadata = new ClassMetadata(\stdClass::class);
-
-        $metadata->withProperty(new PropertyMetadata('a'));
-
-        self::assertSame([], $metadata->properties);
-    }
-
-    public function testSerializationKeepsTypesAndSources(): void
+    public function testSerializationKeepsFieldsTypesAndSources(): void
     {
         $source = new SourceInfo('/app/mapping.yaml', '$.properties.id.type');
         $type = TypeMetadata::createFromType(new NamedTypeNode(new Name('int')), $source);
         $error = TypeMetadata::createFromError('Unexpected end of input', $source);
 
-        $property = (new PropertyMetadata('id'))
-            ->withReadType($error)
-            ->withWriteAccess(new AccessMetadata(new HookAccessPoint('id'), $type))
-            ->withStrict(true)
-            ->withDefaultValue(new DefaultValueMetadata(1, $source));
-
-        $metadata = (new ClassMetadata(\stdClass::class))->withProperty($property);
+        $metadata = new ClassMetadata(
+            name: \stdClass::class,
+            input: new InputStructMetadata([
+                new InputFieldMetadata(
+                    name: 'id',
+                    access: new HookAccessMetadata('id'),
+                    type: $type,
+                    aliases: new AliasesMetadata(['uid'], AliasConflict::UseLast),
+                    strict: true,
+                    default: new DefaultValueMetadata(1, $source),
+                ),
+            ], 'Message'),
+            output: new OutputStructMetadata([
+                new OutputFieldMetadata('id', new MethodAccessMetadata('getId'), $error, [new NullSkipCondition()]),
+            ], true),
+        );
 
         self::assertEquals($metadata, \unserialize(\serialize($metadata)));
+    }
+
+    public function testClassWithoutFieldsHasEmptyStructures(): void
+    {
+        $metadata = new ClassMetadata(\stdClass::class);
+
+        self::assertSame([], $metadata->input->fields);
+        self::assertSame([], $metadata->output->fields);
+        self::assertNull($metadata->input->typeErrorMessage);
+        self::assertNull($metadata->output->normalizeAsArray);
+        self::assertNull($metadata->discriminator);
     }
 }

@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Mapping\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
+use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
+use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
 use TypeLang\Mapper\Mapping\MetadataBuilder;
 use TypeLang\Mapper\Mapping\Reader\ArrayMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\PhpDocMetadataReader;
@@ -16,11 +18,19 @@ use TypeLang\Mapper\Mapping\Tests\Stub\ArrayCache;
 use TypeLang\Mapper\Mapping\Tests\Stub\ArrayCachePool;
 use TypeLang\Mapper\Mapping\Tests\Stub\AttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ClassNamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\DeclarationOrderStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\DocBlockStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\DuplicateNameStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\EnumNamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\InstanceNamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\KebabChildStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\NamedChildStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\NamingStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PlainChildStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PlainParentStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\PropertyAliasStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\RenamedSecretChildStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\RenamedSecretStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\TagPriorityStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\UserStub;
 use TypeLang\Mapper\Naming\KebabCaseNamingStrategy;
@@ -35,7 +45,7 @@ final class MetadataBuilderTest extends TestCase
                 'properties' => [
                     'id' => ['default' => 5],
                     'value' => 'string',
-                    'accounts' => ['write_type' => 'array'],
+                    'accounts' => ['get' => [], 'set' => ['type' => 'array']],
                 ],
             ],
         ]);
@@ -46,26 +56,27 @@ final class MetadataBuilderTest extends TestCase
             ->read(new \ReflectionClass(AttributeStub::class));
         $path = '$[\'' . AttributeStub::class . '\'].properties';
 
-        $id = self::getProperty($metadata, 'id');
+        $id = self::getInput($metadata, 'id');
         self::assertSame(5, $id->default?->value);
         self::assertSame($path . '.id.default', $id->default->source->path);
 
-        $value = self::getProperty($metadata, 'value');
-        self::assertType('string', $value->read?->type);
-        self::assertType('string', $value->write?->type);
-        self::assertSame($path . '.value', $value->read?->type?->source->path);
+        $value = self::getOutput($metadata, 'value');
+        self::assertType('string', $value->type);
+        self::assertType('string', self::getInput($metadata, 'value')->type);
+        self::assertSame($path . '.value', $value->type?->source->path);
 
-        $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
-        self::assertType('array', $accounts->write?->type);
-        self::assertNull($accounts->read?->type?->source->path);
-        self::assertSame($path . '.accounts.write_type', $accounts->write?->type?->source->path);
+        $read = self::getOutput($metadata, 'accounts');
+        $write = self::getInput($metadata, 'accounts');
+        self::assertType('list<' . UserStub::class . '>', $read->type);
+        self::assertType('array', $write->type);
+        self::assertNull($read->type?->source->path);
+        self::assertSame($path . '.accounts.set.type', $write->type?->source->path);
 
-        $count = self::getProperty($metadata, 'count');
-        self::assertType('positive-int', $count->read?->type);
-        self::assertType('positive-int', $count->write?->type);
-        self::assertSame(1, $count->default?->value);
-        self::assertNull($count->default->source->path);
+        $count = self::getInput($metadata, 'count');
+        self::assertType('positive-int', self::getOutput($metadata, 'count')->type);
+        self::assertType('positive-int', $count->type);
+        self::assertTrue($count->isOptional);
+        self::assertNull($count->default);
     }
 
     public function testNewBuilderReadsReflectionOnly(): void
@@ -74,7 +85,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(DocBlockStub::class));
 
-        self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
+        self::assertType('array', self::getOutput($metadata, 'accounts')->type);
     }
 
     public function testHigherPriorityOverridesLowerOne(): void
@@ -85,7 +96,33 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('positive-int', self::getProperty($metadata, 'id')->read?->type);
+        self::assertType('positive-int', self::getOutput($metadata, 'id')->type);
+    }
+
+    public function testHelperOfDirectionLeftOutByHigherSourceIsNotApplied(): void
+    {
+        $config = new ArrayMetadataReader([PropertyAliasStub::class => ['properties' => [
+            'email' => ['get' => []],
+        ]]]);
+
+        $metadata = (new MetadataBuilder())
+            ->withAttributeReader()
+            ->withAddedReader($config, 10)
+            ->build()
+            ->read(new \ReflectionClass(PropertyAliasStub::class));
+
+        self::assertSame(['email', 'name'], self::getNames($metadata->output->fields));
+        self::assertSame(['name'], self::getNames($metadata->input->fields));
+    }
+
+    public function testFieldsAreInOrderOfDeclaration(): void
+    {
+        $metadata = MetadataBuilder::createDefault()
+            ->build()
+            ->read(new \ReflectionClass(DeclarationOrderStub::class));
+
+        self::assertSame(['id', 'name', 'age', 'first'], self::getNames($metadata->output->fields));
+        self::assertSame(['id', 'name', 'age', 'first'], self::getNames($metadata->input->fields));
     }
 
     public function testLaterReaderOfEqualPriorityOverridesEarlierOne(): void
@@ -96,7 +133,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('positive-int', self::getProperty($metadata, 'id')->read?->type);
+        self::assertType('positive-int', self::getOutput($metadata, 'id')->type);
     }
 
     public function testBuilderIsNotChangedByItsMethods(): void
@@ -106,7 +143,7 @@ final class MetadataBuilderTest extends TestCase
 
         $metadata = $builder->build()->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
+        self::assertType('int', self::getOutput($metadata, 'id')->type);
     }
 
     public function testSpecialTagsOverrideStandardOnes(): void
@@ -115,7 +152,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(TagPriorityStub::class));
 
-        self::assertType('list<int>', self::getProperty($metadata, 'special')->read?->type);
+        self::assertType('list<int>', self::getOutput($metadata, 'special')->type);
     }
 
     public function testDocBlockReaderReadsGivenTags(): void
@@ -133,8 +170,8 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(TagPriorityStub::class));
 
-        self::assertType('list<string>', self::getProperty($metadata, 'custom')->read?->type);
-        self::assertType('array', self::getProperty($metadata, 'special')->read?->type);
+        self::assertType('list<string>', self::getOutput($metadata, 'custom')->type);
+        self::assertType('array', self::getOutput($metadata, 'special')->type);
     }
 
     public function testStrategyNamesPropertiesWithoutExternalName(): void
@@ -144,11 +181,11 @@ final class MetadataBuilderTest extends TestCase
 
         $metadata = $builder->build()->read(new \ReflectionClass(AttributeStub::class));
 
-        self::assertSame('user_id', self::getProperty($metadata, 'id')->externalName);
+        self::assertSame('user_id', self::getOutput($metadata, 'id')->name);
 
         $metadata = $builder->build()->read(new \ReflectionClass(UserStub::class));
 
-        self::assertSame('display_name', self::getProperty($metadata, 'displayName')->externalName);
+        self::assertSame('display_name', self::getOutput($metadata, 'displayName')->name);
     }
 
     public function testStrategyOfClassOverridesStrategyOfMapper(): void
@@ -158,8 +195,8 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(NamingStub::class));
 
-        self::assertSame('first_name', self::getProperty($metadata, 'firstName')->externalName);
-        self::assertSame('ID', self::getProperty($metadata, 'userId')->externalName);
+        self::assertSame('first_name', self::getOutput($metadata, 'firstName')->name);
+        self::assertSame('ID', self::getOutput($metadata, 'userId')->name);
     }
 
     /**
@@ -182,7 +219,37 @@ final class MetadataBuilderTest extends TestCase
     {
         $metadata = MetadataBuilder::createDefault()->build()->read(new \ReflectionClass($class));
 
-        self::assertSame($expected, self::getProperty($metadata, 'firstName')->externalName);
+        self::assertSame($expected, self::getOutput($metadata, 'firstName')->name);
+    }
+
+    /**
+     * @return iterable<non-empty-string, array{class-string, array<array-key, mixed>, list<non-empty-string>}>
+     */
+    public static function strategyOfDeclaringClassDataProvider(): iterable
+    {
+        yield 'attribute of parent' => [NamedChildStub::class, [], ['lastName', 'first_name']];
+        yield 'attributes of parent and child' => [KebabChildStub::class, [], ['last-name', 'first_name']];
+        yield 'config of parent' => [
+            PlainChildStub::class,
+            [PlainParentStub::class => ['naming_strategy' => 'snake_case']],
+            ['lastName', 'first_name'],
+        ];
+    }
+
+    /**
+     * @param class-string $class
+     * @param array<array-key, mixed> $config
+     * @param list<non-empty-string> $expected
+     */
+    #[DataProvider('strategyOfDeclaringClassDataProvider')]
+    public function testStrategyOfClassNamesFieldsItDeclaresOnly(string $class, array $config, array $expected): void
+    {
+        $metadata = MetadataBuilder::createDefault()
+            ->withAddedReader(new ArrayMetadataReader($config), 100)
+            ->build()
+            ->read(new \ReflectionClass($class));
+
+        self::assertSame($expected, self::getNames($metadata->output->fields));
     }
 
     public function testSelectorChoosesMappedProperties(): void
@@ -199,7 +266,16 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertSame(['id'], \array_keys($metadata->properties));
+        self::assertSame(['id'], \array_map(static fn(InputFieldMetadata $field): string => $field->name, $metadata->input->fields));
+    }
+
+    public function testHelperOfSelectedPrivatePropertyOfParentAppliesInChild(): void
+    {
+        $parent = self::readWithAllProperties(RenamedSecretStub::class);
+        $child = self::readWithAllProperties(RenamedSecretChildStub::class);
+
+        self::assertSame(['renamed'], self::getNames($parent->output->fields));
+        self::assertSame(['renamed'], self::getNames($child->output->fields));
     }
 
     public function testStackChecksFinalMetadata(): void
@@ -208,7 +284,8 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(DuplicateNameStub::class)));
 
-        self::assertCount(1, $errors);
+        // one name in both directions
+        self::assertCount(2, $errors);
     }
 
     public function testStackKeepsMetadataInMemory(): void
@@ -254,7 +331,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(UserStub::class));
 
-        self::assertType('int', self::getProperty($metadata, 'id')->read?->type);
+        self::assertType('int', self::getOutput($metadata, 'id')->type);
         self::assertCount(1, $cache->values);
     }
 
@@ -267,7 +344,7 @@ final class MetadataBuilderTest extends TestCase
             ->build()
             ->read(new \ReflectionClass(DocBlockStub::class));
 
-        self::assertType('array', self::getProperty($metadata, 'accounts')->read?->type);
+        self::assertType('array', self::getOutput($metadata, 'accounts')->type);
     }
 
     #[RunInSeparateProcess]
@@ -278,6 +355,26 @@ final class MetadataBuilderTest extends TestCase
         $this->expectException(MissingDependencyException::class);
 
         (new MetadataBuilder())->withPhpDocReader();
+    }
+
+    /**
+     * @template TArgClass of object
+     * @param class-string<TArgClass> $class
+     * @return ClassMetadata<TArgClass>
+     */
+    private static function readWithAllProperties(string $class): ClassMetadata
+    {
+        $selector = new class implements PropertySelectorInterface {
+            public function isSelected(\ReflectionProperty $property): bool
+            {
+                return true;
+            }
+        };
+
+        return MetadataBuilder::createDefault()
+            ->withReflectionReader($selector)
+            ->build()
+            ->read(new \ReflectionClass($class));
     }
 
     /**

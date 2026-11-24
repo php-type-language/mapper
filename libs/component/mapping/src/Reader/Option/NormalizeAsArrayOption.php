@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
+use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\InvalidOptionValueException;
-use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\NormalizeAsArray;
 use TypeLang\Mapper\Mapping\Reader\Source\AttributeFactory;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
@@ -25,10 +25,10 @@ final class NormalizeAsArrayOption implements ClassOptionInterface
 
     public function readClassAttributes(
         \ReflectionClass $class,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         SourceContextFactory $contexts,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         $attributes = $class->getAttributes(NormalizeAsArray::class);
 
         if ($attributes === []) {
@@ -52,9 +52,9 @@ final class NormalizeAsArrayOption implements ClassOptionInterface
     public function readClassConfig(
         \ReflectionClass $class,
         ConfigSection $config,
-        ClassMetadata $metadata,
+        ClassDraft $metadata,
         ErrorCollector $errors,
-    ): ClassMetadata {
+    ): ClassDraft {
         if (!$config->has(self::KEY)) {
             return $metadata;
         }

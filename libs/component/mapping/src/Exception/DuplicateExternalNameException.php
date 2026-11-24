@@ -7,20 +7,22 @@ namespace TypeLang\Mapper\Mapping\Exception;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 
 /**
- * Properties of a class share a name of a field: an external name or an
- * alias.
+ * Fields of one direction of a class share a name: a name or an alias.
  */
 final class DuplicateExternalNameException extends MetadataException
 {
-    public static function becausePropertyHasNameTwice(
-        string $property,
+    /**
+     * @param non-empty-string $member member reference: `$id`, `getId()`
+     */
+    public static function becauseFieldHasNameTwice(
+        string $member,
         string $class,
         string $name,
         SourceInfo $source,
     ): self {
         $message = \sprintf(
-            'property "$%s" has the name "%s" more than once among its external name and aliases',
-            $property,
+            'field of "%s" has the name "%s" more than once among its name and aliases',
+            $member,
             \addcslashes($name, '"'),
         );
 
@@ -28,18 +30,22 @@ final class DuplicateExternalNameException extends MetadataException
     }
 
     /**
-     * @param non-empty-list<string> $properties names of the properties
+     * @param non-empty-list<non-empty-string> $members member references:
+     *        `$id`, `getId()`
+     * @param 'normalization'|'denormalization' $direction
      */
-    public static function becausePropertiesHaveSameExternalName(
-        array $properties,
+    public static function becauseFieldsHaveSameName(
+        array $members,
         string $class,
         string $name,
+        string $direction,
         SourceInfo $source,
     ): self {
         $message = \sprintf(
-            'properties "$%s" have the same external name "%s"',
-            \implode('", "$', $properties),
+            'fields of "%s" have the same name "%s" in %s',
+            \implode('", "', $members),
             \addcslashes($name, '"'),
+            $direction,
         );
 
         return new self($class, $source, $message);

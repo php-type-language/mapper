@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Mapping\Reader;
 
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use TypeLang\Mapper\Mapping\Exception\ConfigLoadingException;
@@ -24,6 +25,8 @@ final class YamlFileMetadataReader extends FileMetadataReader implements Optiona
      * @param non-empty-string $path
      * @param TypeParserInterface<TypeNode, string> $parser parser of the
      *        types of the config
+     * @param ExpressionLanguage|null $expressions parser of the expressions
+     *        of `skip`, created on the first one in case of {@see null}
      * @param ReaderInterface $nativeTypeReader reader of the native types of
      *        the getters and the setters
      * @throws MissingDependencyException in case of the `symfony/yaml`
@@ -32,13 +35,14 @@ final class YamlFileMetadataReader extends FileMetadataReader implements Optiona
     public function __construct(
         string $path,
         TypeParserInterface $parser = new TypeParser(),
+        ?ExpressionLanguage $expressions = null,
         ReaderInterface $nativeTypeReader = new ReflectionReader(),
     ) {
         if (!self::isAvailable()) {
             throw MissingDependencyException::becausePackageIsNotInstalled('symfony/yaml', 'YAML config');
         }
 
-        parent::__construct($path, $parser, $nativeTypeReader);
+        parent::__construct($path, $parser, $expressions, $nativeTypeReader);
     }
 
     public static function isAvailable(): bool
