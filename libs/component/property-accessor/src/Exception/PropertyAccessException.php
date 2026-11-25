@@ -14,9 +14,6 @@ abstract class PropertyAccessException extends \RuntimeException implements
          * @var class-string
          */
         public readonly string $class,
-        /**
-         * Name of the property
-         */
         public readonly string $property,
         string $message,
     ) {
@@ -30,6 +27,6 @@ abstract class PropertyAccessException extends \RuntimeException implements
      */
     protected static function formatProperty(string $class, string $property): string
     {
-        return '"' . $class . '::$' . $property . '"';
+        return '"' . \addcslashes($class, '"') . '::$' . \addcslashes($property, '"') . '"';
     }
 }

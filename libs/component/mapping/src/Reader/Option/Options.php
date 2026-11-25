@@ -17,12 +17,14 @@ use TypeLang\Type\TypeNode;
  */
 final class Options
 {
-    /**
-     * @param list<PropertyOptionInterface> $properties
-     * @param list<ClassOptionInterface> $classes
-     */
     public function __construct(
+        /**
+         * @var list<PropertyOptionInterface>
+         */
         public readonly array $properties,
+        /**
+         * @var list<ClassOptionInterface>
+         */
         public readonly array $classes,
         /**
          * Conditions of the getters and the hooks

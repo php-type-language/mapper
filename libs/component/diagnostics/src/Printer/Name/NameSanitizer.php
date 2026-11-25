@@ -10,8 +10,8 @@ namespace TypeLang\Mapper\Diagnostics\Printer\Name;
  *
  * A name that is not valid UTF-8 is treated as bytes as a whole.
  *
- * Use {@see limit()} first, then escape the quotes of the target format, then
- * {@see escapeInvalidBytes()}.
+ * Use {@see self::limit()} first, then escape the quotes of the target
+ * format, then {@see self::escapeInvalidBytes()}.
  *
  * @internal this is an internal library class, please do not use it in your code
  * @psalm-internal TypeLang\Mapper
@@ -23,8 +23,8 @@ final class NameSanitizer
     private const CUT_MARK = '...';
 
     /**
-     * Cuts the name to {@see MAX_LENGTH} characters, or to {@see MAX_LENGTH}
-     * bytes when the name is not valid UTF-8.
+     * Cuts the name to {@see self::MAX_LENGTH} characters, or to
+     * {@see self::MAX_LENGTH} bytes when the name is not valid UTF-8.
      */
     public static function limit(string $name): string
     {

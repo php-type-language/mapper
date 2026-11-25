@@ -15,12 +15,14 @@ use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
  */
 final class ConfigPath
 {
-    /**
-     * @param non-empty-string $path
-     * @param non-empty-string|null $file
-     */
     private function __construct(
+        /**
+         * @var non-empty-string
+         */
         private readonly string $path,
+        /**
+         * @var non-empty-string|null
+         */
         private readonly ?string $file,
     ) {}
 

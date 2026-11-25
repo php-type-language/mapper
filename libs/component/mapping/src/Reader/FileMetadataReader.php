@@ -8,6 +8,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use TypeLang\Mapper\Mapping\Draft\ClassDraft;
 use TypeLang\Mapper\Mapping\Exception\ConfigLoadingException;
 use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
+use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Parser\TypeParser;
 use TypeLang\Parser\TypeParserInterface;
 use TypeLang\Reader\ReaderInterface;
@@ -49,6 +50,9 @@ abstract class FileMetadataReader implements AccessSourceReaderInterface
      *         is not a map of classes
      * @throws InvalidMetadataException in case of the config of the class
      *         is wrong
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
     public function read(\ReflectionClass $class, ?ClassDraft $metadata = null): ClassDraft
     {

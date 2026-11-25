@@ -24,6 +24,8 @@ final class WithoutConstructorStrategy implements InstantiationStrategyInterface
     /**
      * @throws ClassNotInstantiableException in case of the class is an
      *         internal one requiring the constructor
+     * @throws \ReflectionException in case of a promoted property cannot be
+     *         reflected
      */
     public function tryCreateInstantiator(\ReflectionClass $class, ClassMetadata $metadata): ?InstantiatorInterface
     {
@@ -54,7 +56,8 @@ final class WithoutConstructorStrategy implements InstantiationStrategyInterface
      * @param \ReflectionClass<object> $class
      * @param ClassMetadata<object> $metadata
      * @return list<array{\ReflectionProperty, \ReflectionParameter}>
-     * @throws \ReflectionException
+     * @throws \ReflectionException in case of a promoted property cannot be
+     *         reflected
      */
     private static function getDefaults(\ReflectionClass $class, ClassMetadata $metadata): array
     {

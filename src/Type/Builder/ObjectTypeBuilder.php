@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Type\ObjectType;
 use TypeLang\Mapper\Type\ShapeType;
 use TypeLang\Mapper\Type\TypeInterface;
@@ -22,6 +23,7 @@ final class ObjectTypeBuilder implements TypeBuilderInterface
 {
     /**
      * @return TypeInterface<object|array<array-key, mixed>>|null
+     * @throws TypeDefinitionException in case of a nested type cannot be built
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {

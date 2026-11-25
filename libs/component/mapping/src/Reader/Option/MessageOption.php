@@ -58,7 +58,7 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
         );
 
         foreach ($types as $attribute) {
-            $message = self::findMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
+            $message = self::toMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
 
             if ($message !== null) {
                 $metadata = $metadata->withTypeErrorMessage($message);
@@ -73,7 +73,7 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
         );
 
         foreach ($undefined as $attribute) {
-            $message = self::findMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
+            $message = self::toMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
 
             if ($message !== null) {
                 $metadata = $metadata->withUndefinedErrorMessage($message);
@@ -93,13 +93,13 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
         MemberDraft $metadata,
         ErrorCollector $errors,
     ): MemberDraft {
-        $type = self::findConfigMessage($config, self::TYPE_KEY, $errors);
+        $type = self::readConfigMessage($config, self::TYPE_KEY, $errors);
 
         if ($type !== null) {
             $metadata = $metadata->withTypeErrorMessage($type);
         }
 
-        $undefined = self::findConfigMessage($config, self::UNDEFINED_KEY, $errors);
+        $undefined = self::readConfigMessage($config, self::UNDEFINED_KEY, $errors);
 
         if ($undefined !== null) {
             $metadata = $metadata->withUndefinedErrorMessage($undefined);
@@ -123,7 +123,7 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
         $context = $contexts->createFromClass($class);
 
         foreach (AttributeFactory::create($attributes, OnTypeError::class, $context, $errors) as $attribute) {
-            $message = self::findMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
+            $message = self::toMessage($attribute->message, self::ATTRIBUTE_KEY, $context, $errors);
 
             if ($message !== null) {
                 $metadata = $metadata->withTypeErrorMessage($message);
@@ -144,7 +144,7 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
         ClassDraft $metadata,
         ErrorCollector $errors,
     ): ClassDraft {
-        $message = self::findConfigMessage($config, self::TYPE_KEY, $errors);
+        $message = self::readConfigMessage($config, self::TYPE_KEY, $errors);
 
         if ($message === null) {
             return $metadata;
@@ -157,13 +157,13 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
      * @param non-empty-string $key
      * @return non-empty-string|null
      */
-    private static function findConfigMessage(ConfigSection $config, string $key, ErrorCollector $errors): ?string
+    private static function readConfigMessage(ConfigSection $config, string $key, ErrorCollector $errors): ?string
     {
         if (!$config->has($key)) {
             return null;
         }
 
-        return self::findMessage($config->get($key), $key, $config->createContext($key), $errors);
+        return self::toMessage($config->get($key), $key, $config->createContext($key), $errors);
     }
 
     /**
@@ -173,7 +173,7 @@ final class MessageOption implements PropertyOptionInterface, ClassOptionInterfa
      * @param non-empty-string $key
      * @return non-empty-string|null
      */
-    private static function findMessage(
+    private static function toMessage(
         mixed $message,
         string $key,
         SourceContext $context,

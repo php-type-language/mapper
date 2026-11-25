@@ -154,7 +154,7 @@ final class ClassDraft
      */
     public function toEnumMetadata(): EnumMetadata
     {
-        /** @var class-string<T&\UnitEnum> $name */
+        /** @var class-string<T&\UnitEnum> */
         $name = $this->name;
 
         return new EnumMetadata($name, $this->aliases);

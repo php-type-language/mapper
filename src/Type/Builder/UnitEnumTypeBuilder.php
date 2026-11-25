@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
+use TypeLang\Mapper\Mapping\Exception\ReaderException;
 use TypeLang\Mapper\Type\TypeInterface;
 use TypeLang\Mapper\Type\UnitEnumType;
 use TypeLang\Type\Name;
@@ -22,6 +25,10 @@ final class UnitEnumTypeBuilder implements TypeBuilderInterface
 {
     /**
      * @return UnitEnumType<\UnitEnum>|null
+     * @throws TypeDefinitionException in case of a nested type cannot be built
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?UnitEnumType
     {

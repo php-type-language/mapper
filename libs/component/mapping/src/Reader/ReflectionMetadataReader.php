@@ -95,7 +95,7 @@ final class ReflectionMetadataReader implements MetadataReaderInterface
         ?MemberDraft $member,
         ErrorCollector $errors,
     ): MemberDraft {
-        /** @var non-empty-string $name */
+        /** @var non-empty-string */
         $name = $reflection->name;
         $context = $this->contexts->createFromReflection($class, $reflection);
         $type = $this->findType($reflection, PropertyAccessDirection::Read, $context);

@@ -14,8 +14,10 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
  * its metadata, such as by an attribute of the class.
  *
  * ```
- * public function tryCreateInstantiator(\ReflectionClass $class, ClassMetadata $metadata): ?InstantiatorInterface
- * {
+ * public function tryCreateInstantiator(
+ *     \ReflectionClass $class,
+ *     ClassMetadata $metadata,
+ * ): ?InstantiatorInterface {
  *     if ($class->getAttributes(Entity::class) === []) {
  *         return null;
  *     }

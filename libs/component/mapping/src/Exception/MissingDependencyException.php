@@ -20,7 +20,7 @@ final class MissingDependencyException extends ReaderException
             '%s requires the "%s" package, run "composer require %s"',
             $purpose,
             \addcslashes($package, '"'),
-            $package,
+            \addcslashes($package, '"'),
         );
 
         return new self($message);

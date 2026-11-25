@@ -26,7 +26,9 @@ use TypeLang\Type\TypeNode;
  * (`array{int, string}`), its key is the next integer key as in a PHP
  * array. The rest of an unsealed shape (`...`) is `mixed`.
  *
- * @template-implements CompositeTypeBuilderInterface<array<array-key, mixed>|\stdClass>
+ * @template-implements CompositeTypeBuilderInterface<
+ *     array<array-key, mixed>|\stdClass
+ * >
  */
 final class ShapeTypeBuilder implements CompositeTypeBuilderInterface
 {

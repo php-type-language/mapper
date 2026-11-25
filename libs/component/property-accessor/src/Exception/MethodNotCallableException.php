@@ -68,8 +68,8 @@ final class MethodNotCallableException extends FieldAccessException
     {
         $message = \sprintf(
             'Method "%s::%s()" of field "%s" %s',
-            $class,
-            $method,
+            \addcslashes($class, '"'),
+            \addcslashes($method, '"'),
             \addcslashes($field, '"'),
             $reason,
         );

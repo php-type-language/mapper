@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\PropertyAccessor\Strategy;
 use TypeLang\Mapper\Mapping\Metadata\Access\HookAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Field\OutputFieldMetadata;
+use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotFoundException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotReadableException;
 use TypeLang\Mapper\PropertyAccessor\Exception\PropertyNotWritableException;
 use TypeLang\Mapper\PropertyAccessor\PropertyReader\DirectPropertyReader;
@@ -23,6 +24,12 @@ use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
  */
 final class HookAccessStrategy implements AccessStrategyInterface
 {
+    /**
+     * @throws PropertyNotFoundException in case of the class has no property
+     *         of the access or it is static
+     * @throws PropertyNotReadableException in case of the property has no
+     *         get hook
+     */
     public function tryCreateReader(\ReflectionClass $class, OutputFieldMetadata $field): ?PropertyReaderInterface
     {
         $access = $field->access;
@@ -44,6 +51,12 @@ final class HookAccessStrategy implements AccessStrategyInterface
         return new ReflectionPropertyReader($property);
     }
 
+    /**
+     * @throws PropertyNotFoundException in case of the class has no property
+     *         of the access or it is static
+     * @throws PropertyNotWritableException in case of the property has no
+     *         set hook
+     */
     public function tryCreateWriter(\ReflectionClass $class, InputFieldMetadata $field): ?PropertyWriterInterface
     {
         $access = $field->access;

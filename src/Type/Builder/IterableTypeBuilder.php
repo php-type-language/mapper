@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Type\IterableType;
 use TypeLang\Mapper\TypeMatcher\Exception\InvalidPatternException;
 use TypeLang\Mapper\TypeMatcher\NamedTypePattern;
@@ -32,6 +33,7 @@ final class IterableTypeBuilder implements CompositeTypeBuilderInterface
 
     /**
      * @return IterableType<array<array-key, mixed>>|null
+     * @throws TypeDefinitionException in case of a nested type cannot be built
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?IterableType
     {

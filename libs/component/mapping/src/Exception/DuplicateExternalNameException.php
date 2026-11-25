@@ -22,7 +22,7 @@ final class DuplicateExternalNameException extends MetadataException
     ): self {
         $message = \sprintf(
             'field of "%s" has the name "%s" more than once among its name and aliases',
-            $member,
+            \addcslashes($member, '"'),
             \addcslashes($name, '"'),
         );
 
@@ -43,7 +43,10 @@ final class DuplicateExternalNameException extends MetadataException
     ): self {
         $message = \sprintf(
             'fields of "%s" have the same name "%s" in %s',
-            \implode('", "', $members),
+            \implode('", "', \array_map(
+                static fn(string $member): string => \addcslashes($member, '"'),
+                $members,
+            )),
             \addcslashes($name, '"'),
             $direction,
         );

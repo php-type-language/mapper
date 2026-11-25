@@ -37,7 +37,7 @@ final class InvalidMetadataException extends ReaderException
      */
     public static function becauseMetadataIsInvalid(ClassDraft $metadata, array $errors): self
     {
-        $message = \sprintf('The mapping for class "%s" contains errors:', $metadata->name);
+        $message = \sprintf('The mapping for class "%s" contains errors:', \addcslashes($metadata->name, '"'));
 
         foreach ($errors as $error) {
             $message .= "\n  - " . $error->getMessage();

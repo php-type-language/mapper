@@ -36,7 +36,7 @@ final class InvalidAliasException extends MetadataException
         string $target,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('alias %s must be of type "%s"', self::formatValue($alias), $backing);
+        $message = \sprintf('alias %s must be of type "%s"', self::formatValue($alias), \addcslashes($backing, '"'));
 
         return new self($target, $source, $message);
     }

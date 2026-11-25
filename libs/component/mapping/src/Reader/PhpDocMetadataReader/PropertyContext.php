@@ -55,9 +55,9 @@ final class PropertyContext
      * Returns the first tag of the class in the docblock, a tag naming a
      * variable other than the given one is skipped.
      *
-     * @template TTag of TypedTag
-     * @param class-string<TTag> $class
-     * @return TTag|null
+     * @template TArgTag of TypedTag
+     * @param class-string<TArgTag> $class
+     * @return TArgTag|null
      */
     public function findTag(string|false $docComment, string $class, string $variable): ?TypedTag
     {

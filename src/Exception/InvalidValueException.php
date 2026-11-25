@@ -277,7 +277,7 @@ final class InvalidValueException extends ViolationException implements MapperEx
          * elements of one collection share the node of its element type.
          * {@see null} for a type that cannot be expanded.
          *
-         * @var array<int, TypeNode|null> $expansions
+         * @var array<int, TypeNode|null>
          */
         $expansions = [];
 
@@ -297,7 +297,11 @@ final class InvalidValueException extends ViolationException implements MapperEx
             $violations[] = $violation->withExpected($expansions[$id]);
         }
 
-        return new self($violations, self::formatSummary($violations, $formatter, new JsonPathPrinter()), $this->getPrevious());
+        return new self(
+            $violations,
+            self::formatSummary($violations, $formatter, new JsonPathPrinter()),
+            $this->getPrevious(),
+        );
     }
 
     /**

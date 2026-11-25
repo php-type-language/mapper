@@ -83,14 +83,17 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
     private readonly array $helpers;
 
     /**
-     * @param TypeParserInterface<TypeNode, string> $parser parser of the
-     *        types of the attributes
      * @param ExpressionLanguage|null $expressions parser of the expressions of
      *        {@see SkipWhen}, created on the first one in case of {@see null}
      * @param ReaderInterface $nativeTypeReader reader of the native types of
      *        the properties, hooks and methods
      */
     public function __construct(
+        /**
+         * Parser of the types of the attributes
+         *
+         * @var TypeParserInterface<TypeNode, string>
+         */
         private readonly TypeParserInterface $parser = new TypeParser(),
         ?ExpressionLanguage $expressions = null,
         ReaderInterface $nativeTypeReader = new ReflectionReader(),
@@ -223,6 +226,9 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<object> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of {@see SkipWhen} is
+     *         given, but the `symfony/expression-language` package is not
+     *         installed
      */
     private function readDeclaredProperty(
         \ReflectionClass $class,
@@ -288,9 +294,15 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<TArg> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of {@see SkipWhen} is
+     *         given, but the `symfony/expression-language` package is not
+     *         installed
      */
-    private function readMethodConditions(\ReflectionClass $class, ClassDraft $metadata, ErrorCollector $errors): ClassDraft
-    {
+    private function readMethodConditions(
+        \ReflectionClass $class,
+        ClassDraft $metadata,
+        ErrorCollector $errors,
+    ): ClassDraft {
         foreach ($class->getMethods() as $method) {
             if (SkipOption::getAttributes($method) === []) {
                 continue;
@@ -311,7 +323,12 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
                 continue;
             }
 
-            $metadata = $metadata->withMember($this->options->skip->readAttributes($method, $member, $context, $errors));
+            $metadata = $metadata->withMember($this->options->skip->readAttributes(
+                $method,
+                $member,
+                $context,
+                $errors,
+            ));
         }
 
         return $metadata;
@@ -325,9 +342,15 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<TArg> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of {@see SkipWhen} is
+     *         given, but the `symfony/expression-language` package is not
+     *         installed
      */
-    private function readHookConditions(\ReflectionClass $class, ClassDraft $metadata, ErrorCollector $errors): ClassDraft
-    {
+    private function readHookConditions(
+        \ReflectionClass $class,
+        ClassDraft $metadata,
+        ErrorCollector $errors,
+    ): ClassDraft {
         foreach (ClassProperties::getProperties($class) as $property) {
             $name = $property->name;
             $set = PropertyHooks::findSet($property);
@@ -432,8 +455,11 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
     /**
      * @param non-empty-string $target
      */
-    private static function addMethodTargetErrors(\ReflectionMethod $method, string $target, ErrorCollector $errors): void
-    {
+    private static function addMethodTargetErrors(
+        \ReflectionMethod $method,
+        string $target,
+        ErrorCollector $errors,
+    ): void {
         foreach (self::getMisplacedAttributes($method, \Attribute::TARGET_METHOD) as $name) {
             $errors->addError(InvalidAttributeException::becauseAttributeIsOnMethod(
                 attribute: $name,
@@ -447,7 +473,10 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
      * Returns the names of the attributes of the mapper the declaration of
      * which does not allow the target.
      *
-     * @param \ReflectionClass<object>|\ReflectionClassConstant|\ReflectionProperty|\ReflectionMethod $reflection
+     * @param \ReflectionClass<object>
+     *        |\ReflectionClassConstant
+     *        |\ReflectionProperty
+     *        |\ReflectionMethod $reflection
      * @param int-mask-of<\Attribute::TARGET_*> $target
      * @return list<class-string>
      */
@@ -482,8 +511,11 @@ final class AttributeMetadataReader implements AccessSourceReaderInterface
         }
     }
 
-    private static function addNotReadErrors(\ReflectionMethod $method, SourceContext $context, ErrorCollector $errors): void
-    {
+    private static function addNotReadErrors(
+        \ReflectionMethod $method,
+        SourceContext $context,
+        ErrorCollector $errors,
+    ): void {
         foreach (SkipOption::getAttributes($method) as $attribute) {
             $errors->addError(InvalidAttributeException::becauseDirectionIsMissing(
                 attribute: $attribute->getName(),

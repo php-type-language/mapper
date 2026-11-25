@@ -16,9 +16,12 @@ use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
  * after the ones of the user, creates the objects without the constructor.
  *
  * ```
- * $factory = InstantiatorFactory::createDefault([new EntityStrategy($entities)]);
+ * $factory = InstantiatorFactory::createDefault([
+ *     new EntityStrategy($entities),
+ * ]);
  *
- * $user = $factory->createInstantiator($class, $metadata)->instantiate(['id' => 42]);
+ * $user = $factory->createInstantiator($class, $metadata)
+ *     ->instantiate(['id' => 42]);
  * ```
  */
 final class InstantiatorFactory

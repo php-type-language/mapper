@@ -17,6 +17,7 @@ use TypeLang\Mapper\Mapping\Provider\ReaderMetadataProvider;
 use TypeLang\Mapper\Mapping\Reader\AttributeMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\ChainMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\JsonFileMetadataReader;
+use TypeLang\Mapper\Mapping\Reader\LazyMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\MetadataReaderInterface;
 use TypeLang\Mapper\Mapping\Reader\NamingStrategyMetadataReader;
 use TypeLang\Mapper\Mapping\Reader\NeonFileMetadataReader;
@@ -39,7 +40,9 @@ use TypeLang\PhpDoc\DocBlockParser;
  * readers with an equal priority the later added one is higher. The
  * reflection is the lowest reader. The provider keeps the read metadata in
  * memory, then in the caches from the first added one to the last one, and
- * checks the metadata of the readers once.
+ * checks the metadata of the readers once. The readers of the attributes,
+ * the docblocks and the reflection are created on the first class that is
+ * not found in the caches.
  *
  * ```
  * $metadata = MetadataBuilder::createDefault()
@@ -70,11 +73,14 @@ final class MetadataBuilder
     private readonly TypeParser $parser;
 
     /**
-     * @var list<array{reader: MetadataReaderInterface, priority: int}>
+     * @var list<array{
+     *     factory: \Closure(): MetadataReaderInterface,
+     *     priority: int,
+     * }>
      */
     private array $readers = [];
 
-    private MetadataReaderInterface $reflection;
+    private PropertySelectorInterface $selector;
 
     private ?NamingStrategyInterface $strategy = null;
 
@@ -86,16 +92,17 @@ final class MetadataBuilder
     /**
      * @param TypeParser $parser parser of the types of the readers created
      *        by the builder
-     * @param ExpressionLanguage|null $expressions parser of the skip
-     *        expressions of the attribute reader, created on its first
-     *        expression in case of {@see null}
      */
     public function __construct(
         TypeParser $parser = new TypeParser(),
+        /**
+         * Parser of the skip expressions of the readers, created on their
+         * first expression in case of {@see null}
+         */
         private readonly ?ExpressionLanguage $expressions = null,
     ) {
         $this->parser = $parser->forType();
-        $this->reflection = new ReflectionMetadataReader();
+        $this->selector = new PublicPropertySelector();
     }
 
     /**
@@ -116,8 +123,14 @@ final class MetadataBuilder
         }
 
         return $result
-            ->withPhpDocReader(MapperPlatform::createWithDefaultTagNames(), self::PHPDOC_PRIORITY)
-            ->withPhpDocReader(MapperPlatform::createWithSpecialTagNames(), self::SPECIAL_PHPDOC_PRIORITY);
+            ->withPhpDocReaderFactory(
+                static fn(): MapperPlatform => MapperPlatform::createWithDefaultTagNames(),
+                self::PHPDOC_PRIORITY,
+            )
+            ->withPhpDocReaderFactory(
+                static fn(): MapperPlatform => MapperPlatform::createWithSpecialTagNames(),
+                self::SPECIAL_PHPDOC_PRIORITY,
+            );
     }
 
     /**
@@ -140,15 +153,15 @@ final class MetadataBuilder
         PropertySelectorInterface $selector = new PublicPropertySelector(),
     ): self {
         $self = clone $this;
-        $self->reflection = new ReflectionMetadataReader($selector);
+        $self->selector = $selector;
 
         return $self;
     }
 
     public function withAttributeReader(int $priority = 0): self
     {
-        return $this->withAddedReader(
-            new AttributeMetadataReader($this->parser, $this->expressions),
+        return $this->withReaderFactory(
+            fn(): MetadataReaderInterface => new AttributeMetadataReader($this->parser, $this->expressions),
             $priority,
         );
     }
@@ -165,12 +178,24 @@ final class MetadataBuilder
             throw MissingDependencyException::becausePackageIsNotInstalled('type-lang/phpdoc', 'PHPDoc tags');
         }
 
-        $parser = new DocBlockParser(
-            platforms: [$tags ?? MapperPlatform::createWithDefaultTagNames()],
-            typeParser: $this->parser,
+        return $this->withPhpDocReaderFactory(
+            static fn(): MapperPlatform => $tags ?? MapperPlatform::createWithDefaultTagNames(),
+            $priority,
         );
+    }
 
-        return $this->withAddedReader(new PhpDocMetadataReader($parser), $priority);
+    /**
+     * @param \Closure(): MapperPlatform $tags
+     */
+    private function withPhpDocReaderFactory(\Closure $tags, int $priority): self
+    {
+        return $this->withReaderFactory(
+            fn(): MetadataReaderInterface => new PhpDocMetadataReader(new DocBlockParser(
+                platforms: [$tags()],
+                typeParser: $this->parser,
+            )),
+            $priority,
+        );
     }
 
     /**
@@ -229,8 +254,18 @@ final class MetadataBuilder
      */
     public function withAddedReader(MetadataReaderInterface $reader, int $priority = 0): self
     {
+        return $this->withReaderFactory(static fn(): MetadataReaderInterface => $reader, $priority);
+    }
+
+    /**
+     * Returns the builder with the reader created on its first read.
+     *
+     * @param \Closure(): MetadataReaderInterface $factory
+     */
+    private function withReaderFactory(\Closure $factory, int $priority): self
+    {
         $self = clone $this;
-        $self->readers[] = ['reader' => $reader, 'priority' => $priority];
+        $self->readers[] = ['factory' => $factory, 'priority' => $priority];
 
         return $self;
     }
@@ -273,11 +308,7 @@ final class MetadataBuilder
 
     public function build(): MetadataProviderInterface
     {
-        $provider = new ReaderMetadataProvider(new ChainMetadataReader([
-            new NamingStrategyMetadataReader($this->strategy),
-            ...$this->getSortedReaders(),
-            $this->reflection,
-        ]));
+        $provider = new ReaderMetadataProvider(new LazyMetadataReader($this->createReader(...)));
 
         foreach (\array_reverse($this->caches) as $cache) {
             $provider = $cache($provider);
@@ -286,21 +317,28 @@ final class MetadataBuilder
         return new InMemoryMetadataProvider($provider);
     }
 
+    private function createReader(): MetadataReaderInterface
+    {
+        $readers = [new NamingStrategyMetadataReader($this->strategy)];
+
+        foreach ($this->getSortedFactories() as $factory) {
+            $readers[] = $factory();
+        }
+
+        $readers[] = new ReflectionMetadataReader($this->selector);
+
+        return new ChainMetadataReader($readers);
+    }
+
     /**
-     * @return list<MetadataReaderInterface>
+     * @return list<\Closure(): MetadataReaderInterface>
      */
-    private function getSortedReaders(): array
+    private function getSortedFactories(): array
     {
         $entries = \array_reverse($this->readers);
 
         \usort($entries, static fn(array $a, array $b): int => $b['priority'] <=> $a['priority']);
 
-        $result = [];
-
-        foreach ($entries as $entry) {
-            $result[] = $entry['reader'];
-        }
-
-        return $result;
+        return \array_column($entries, 'factory');
     }
 }

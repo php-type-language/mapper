@@ -32,7 +32,8 @@ final class DateTimeType implements TypeInterface
          */
         public readonly string $class,
         /**
-         * Class a date is created by, {@see $class} or its implementation
+         * Class a date is created by, {@see self::$class} or its
+         * implementation
          *
          * @var class-string<\DateTime|\DateTimeImmutable>
          */

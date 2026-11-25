@@ -19,8 +19,8 @@ final class AccessNotSupportedException extends FieldAccessException
         $message = \sprintf(
             'No access strategy reads field "%s" of "%s" through "%s"',
             \addcslashes($field, '"'),
-            $class,
-            $access::class,
+            \addcslashes($class, '"'),
+            \addcslashes($access::class, '"'),
         );
 
         return new self($class, $field, $message);
@@ -34,8 +34,8 @@ final class AccessNotSupportedException extends FieldAccessException
         $message = \sprintf(
             'No access strategy writes field "%s" of "%s" through "%s"',
             \addcslashes($field, '"'),
-            $class,
-            $access::class,
+            \addcslashes($class, '"'),
+            \addcslashes($access::class, '"'),
         );
 
         return new self($class, $field, $message);

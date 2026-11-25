@@ -22,7 +22,7 @@ use TypeLang\Printer\TypePrinterInterface;
  */
 final class PublicViolationFormatter implements ViolationFormatterInterface
 {
-    private ViolationFormatterInterface $formatter;
+    private readonly ViolationFormatterInterface $formatter;
 
     public function __construct(
         TypePrinterInterface $typePrinter,

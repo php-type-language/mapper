@@ -35,7 +35,7 @@ abstract class MetadataException extends ReaderException
      * Returns the property reference used as {@see $target}: `App\User::$id`.
      *
      * @internal this is an internal library method, please do not use it in your code
-     * @psalm-internal TypeLang\Mapper\Mapping
+     * @psalm-internal TypeLang\Mapper\Mapping\Reader
      *
      * @return non-empty-string
      */

@@ -6,9 +6,9 @@ namespace TypeLang\Mapper\Diagnostics\Printer\Value;
 
 /**
  * Prints a rejected value for a particular audience. The same value is
- * shown differently to a developer, with full details, and to a public
- * user, without internal data and arguments marked with
- * `#[\SensitiveParameter]`.
+ * shown differently to a developer, with the classes of the objects, and
+ * to a reader outside of the application, without them. Scalars are shown
+ * by value to both.
  */
 interface ValuePrinterInterface
 {

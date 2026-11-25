@@ -34,7 +34,10 @@ final class NamedTypePattern
      * Names of the arguments of each form, by the name in lower case and by
      * the number of arguments.
      *
-     * @var non-empty-array<non-empty-lowercase-string, non-empty-array<int<0, max>, list<non-empty-string>>>
+     * @var non-empty-array<
+     *     non-empty-lowercase-string,
+     *     non-empty-array<int<0, max>, list<non-empty-string>>,
+     * >
      */
     private readonly array $forms;
 
@@ -137,7 +140,7 @@ final class NamedTypePattern
         $captures = [];
 
         foreach ($type->arguments->children ?? [] as $index => $argument) {
-            $capture = self::findCapture($argument);
+            $capture = self::toCapture($argument);
 
             if ($capture === null) {
                 throw InvalidPatternException::becauseArgumentIsNotCapture($form, $index + 1);
@@ -159,7 +162,7 @@ final class NamedTypePattern
      *
      * @return non-empty-string|null
      */
-    private static function findCapture(TemplateNode $argument): ?string
+    private static function toCapture(TemplateNode $argument): ?string
     {
         if (!$argument instanceof TypedTemplateArgumentNode || $argument->variance !== null) {
             return null;

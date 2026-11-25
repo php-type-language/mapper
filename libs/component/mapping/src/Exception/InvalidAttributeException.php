@@ -22,7 +22,11 @@ final class InvalidAttributeException extends MetadataException
         SourceInfo $source,
         \Throwable $previous,
     ): self {
-        $message = \sprintf('attribute "%s" cannot be created (%s)', $attribute, $previous->getMessage());
+        $message = \sprintf(
+            'attribute "%s" cannot be created (%s)',
+            \addcslashes($attribute, '"'),
+            $previous->getMessage(),
+        );
 
         return new self($target, $source, $message, $previous);
     }
@@ -34,7 +38,7 @@ final class InvalidAttributeException extends MetadataException
     {
         $message = \sprintf(
             'attribute "%s" accesses the backing store, but the property is virtual: give it on the hook',
-            $attribute,
+            \addcslashes($attribute, '"'),
         );
 
         return new self($property, $source, $message);
@@ -50,7 +54,11 @@ final class InvalidAttributeException extends MetadataException
         string $property,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('attribute "%s" is not allowed on the %s hook', $attribute, $hook);
+        $message = \sprintf(
+            'attribute "%s" is not allowed on the %s hook',
+            \addcslashes($attribute, '"'),
+            $hook,
+        );
 
         return new self($property, $source, $message);
     }
@@ -60,7 +68,10 @@ final class InvalidAttributeException extends MetadataException
      */
     public static function becauseAccessIsDuplicated(string $attribute, string $property, SourceInfo $source): self
     {
-        $message = \sprintf('attribute "%s" is given both on the property and on its hook', $attribute);
+        $message = \sprintf(
+            'attribute "%s" is given both on the property and on its hook',
+            \addcslashes($attribute, '"'),
+        );
 
         return new self($property, $source, $message);
     }
@@ -70,7 +81,10 @@ final class InvalidAttributeException extends MetadataException
      */
     public static function becauseMethodRequiresName(string $attribute, string $method, SourceInfo $source): self
     {
-        $message = \sprintf('attribute "%s" of a method requires the name of the field', $attribute);
+        $message = \sprintf(
+            'attribute "%s" of a method requires the name of the field',
+            \addcslashes($attribute, '"'),
+        );
 
         return new self($method, $source, $message);
     }
@@ -88,8 +102,11 @@ final class InvalidAttributeException extends MetadataException
     ): self {
         $message = \sprintf(
             'attribute "%s" is not allowed next to "%s", give its value in their arguments',
-            $attribute,
-            \implode('", "', $access),
+            \addcslashes($attribute, '"'),
+            \implode('", "', \array_map(
+                static fn(string $name): string => \addcslashes($name, '"'),
+                $access,
+            )),
         );
 
         return new self($property, $source, $message);
@@ -102,7 +119,7 @@ final class InvalidAttributeException extends MetadataException
     {
         $message = \sprintf(
             'attribute "%s" has no effect, a virtual property is mapped by "MapGetter" or "MapSetter" on its hooks',
-            $attribute,
+            \addcslashes($attribute, '"'),
         );
 
         return new self($property, $source, $message);
@@ -115,7 +132,7 @@ final class InvalidAttributeException extends MetadataException
     {
         $message = \sprintf(
             'attribute "%s" of the property has no effect, the get hook reads it: give it on the hook',
-            $attribute,
+            \addcslashes($attribute, '"'),
         );
 
         return new self($property, $source, $message);
@@ -132,7 +149,11 @@ final class InvalidAttributeException extends MetadataException
         string $target,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('attribute "%s" is given, but the member is not %s', $attribute, $direction);
+        $message = \sprintf(
+            'attribute "%s" is given, but the member is not %s',
+            \addcslashes($attribute, '"'),
+            $direction,
+        );
 
         return new self($target, $source, $message);
     }
@@ -143,7 +164,10 @@ final class InvalidAttributeException extends MetadataException
      */
     public static function becauseGetterIsMissing(string $attribute, string $target, SourceInfo $source): self
     {
-        $message = \sprintf('attribute "%s" is allowed only next to "MapGetter"', $attribute);
+        $message = \sprintf(
+            'attribute "%s" is allowed only next to "MapGetter"',
+            \addcslashes($attribute, '"'),
+        );
 
         return new self($target, $source, $message);
     }
@@ -153,7 +177,10 @@ final class InvalidAttributeException extends MetadataException
      */
     public static function becauseAttributeIsOnMethod(string $attribute, string $method, SourceInfo $source): self
     {
-        $message = \sprintf('attribute "%s" is not allowed on a method or a hook', $attribute);
+        $message = \sprintf(
+            'attribute "%s" is not allowed on a method or a hook',
+            \addcslashes($attribute, '"'),
+        );
 
         return new self($method, $source, $message);
     }
@@ -169,7 +196,11 @@ final class InvalidAttributeException extends MetadataException
         string $target,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('attribute "%s" is not allowed on %s', $attribute, $place);
+        $message = \sprintf(
+            'attribute "%s" is not allowed on %s',
+            \addcslashes($attribute, '"'),
+            $place,
+        );
 
         return new self($target, $source, $message);
     }
@@ -183,7 +214,11 @@ final class InvalidAttributeException extends MetadataException
         string $property,
         SourceInfo $source,
     ): self {
-        $message = \sprintf('repeated attribute "%s" gives different "%s"', $attribute, $argument);
+        $message = \sprintf(
+            'repeated attribute "%s" gives different "%s"',
+            \addcslashes($attribute, '"'),
+            \addcslashes($argument, '"'),
+        );
 
         return new self($property, $source, $message);
     }

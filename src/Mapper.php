@@ -476,6 +476,11 @@ final class Mapper implements MapperInterface
     /**
      * A value without the type is normalized by `mixed`: an object by the
      * type of its class, an array element by element.
+     *
+     * @throws InvalidValueException in case of the value does not match the
+     *         type, the message has the path of the wrong value
+     * @throws TypeDefinitionException in case of the type is not supported,
+     *         written or declared wrong
      */
     public function normalize(mixed $value, #[Language('PHP')] ?string $type = null): mixed
     {

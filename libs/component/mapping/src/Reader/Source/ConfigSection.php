@@ -13,13 +13,16 @@ namespace TypeLang\Mapper\Mapping\Reader\Source;
  */
 final class ConfigSection
 {
-    /**
-     * @param non-empty-string $target class or property: `App\User`,
-     *        `App\User::$id`
-     * @param array<array-key, mixed> $values
-     */
     private function __construct(
+        /**
+         * Class or property: `App\User`, `App\User::$id`
+         *
+         * @var non-empty-string
+         */
         public readonly string $target,
+        /**
+         * @var array<array-key, mixed>
+         */
         private readonly array $values,
         private readonly ConfigPath $path,
         /**

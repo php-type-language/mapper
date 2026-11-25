@@ -21,6 +21,9 @@ final class DirectPropertyReader implements PropertyReaderInterface
         private readonly string $property,
     ) {}
 
+    /**
+     * @throws \Error in case of the property is not initialized
+     */
     public function read(object $object): mixed
     {
         // @phpstan-ignore-next-line property.dynamicName (chosen on creation)

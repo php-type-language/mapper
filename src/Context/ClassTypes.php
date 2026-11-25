@@ -16,7 +16,8 @@ use TypeLang\Type\NamedTypeNode;
  * kept.
  *
  * ```
- * $normalized = $context->types->get($object::class)->normalize($object, $context);
+ * $normalized = $context->types->get($object::class)
+ *     ->normalize($object, $context);
  * ```
  */
 final class ClassTypes

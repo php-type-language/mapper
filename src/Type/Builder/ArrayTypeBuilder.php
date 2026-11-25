@@ -28,11 +28,11 @@ final class ArrayTypeBuilder implements CompositeTypeBuilderInterface
     private readonly NamedTypePattern $pattern;
 
     /**
-     * @param list<CheckInterface> $checks
      * @throws InvalidPatternException in case of the pattern is written wrong
      */
     public function __construct(
         ?NamedTypePattern $pattern = null,
+        /** @var list<CheckInterface> */
         private readonly array $checks = [],
     ) {
         $this->pattern = $pattern ?? new NamedTypePattern(['array', 'array<V>', 'array<K, V>']);
@@ -40,6 +40,7 @@ final class ArrayTypeBuilder implements CompositeTypeBuilderInterface
 
     /**
      * @return TypeInterface<array<array-key, mixed>>|null
+     * @throws TypeDefinitionException in case of a nested type cannot be built
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildContext;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Type\Check\CheckInterface;
 use TypeLang\Mapper\Type\ListType;
 use TypeLang\Mapper\Type\RefinedType;
@@ -34,11 +35,11 @@ final class ListTypeBuilder implements CompositeTypeBuilderInterface
     private readonly NamedTypePattern $pattern;
 
     /**
-     * @param list<CheckInterface> $checks
      * @throws InvalidPatternException in case of the pattern is written wrong
      */
     public function __construct(
         ?NamedTypePattern $pattern = null,
+        /** @var list<CheckInterface> */
         private readonly array $checks = [],
     ) {
         $this->pattern = $pattern ?? new NamedTypePattern(['list', 'list<T>']);
@@ -46,6 +47,7 @@ final class ListTypeBuilder implements CompositeTypeBuilderInterface
 
     /**
      * @return TypeInterface<list<mixed>>|null
+     * @throws TypeDefinitionException in case of a nested type cannot be built
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?TypeInterface
     {

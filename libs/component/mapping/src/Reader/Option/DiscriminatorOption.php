@@ -188,7 +188,7 @@ final class DiscriminatorOption implements ClassOptionInterface
             field: $field,
             map: $types,
             source: $context->source,
-            default: $this->findDefault($otherwise, $context, $placeOf('otherwise'), $errors),
+            default: $this->readDefault($otherwise, $context, $placeOf('otherwise'), $errors),
         );
     }
 
@@ -221,7 +221,7 @@ final class DiscriminatorOption implements ClassOptionInterface
      * @param SourceContext $context place the type is parsed in
      * @param SourceContext $place place of the value of `otherwise`
      */
-    private function findDefault(
+    private function readDefault(
         mixed $otherwise,
         SourceContext $context,
         SourceContext $place,

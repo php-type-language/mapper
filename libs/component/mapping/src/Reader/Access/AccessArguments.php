@@ -41,8 +41,8 @@ final class AccessArguments
         $getter = $this->getter;
 
         if ($getter !== null && $member->read !== null) {
-            $name = self::findString('name', $getter->name, $context, $errors);
-            $type = self::findString('type', $getter->type, $context, $errors);
+            $name = self::readString('name', $getter->name, $context, $errors);
+            $type = self::readString('type', $getter->type, $context, $errors);
 
             if ($name !== null) {
                 $member = $member->withReadAccess($member->read->withName($name));
@@ -70,10 +70,10 @@ final class AccessArguments
         SourceContext $context,
         ErrorCollector $errors,
     ): MemberDraft {
-        $name = self::findString('name', $setter->name, $context, $errors);
-        $type = self::findString('type', $setter->type, $context, $errors);
-        $onTypeError = self::findString('onTypeError', $setter->onTypeError, $context, $errors);
-        $onUndefinedError = self::findString('onUndefinedError', $setter->onUndefinedError, $context, $errors);
+        $name = self::readString('name', $setter->name, $context, $errors);
+        $type = self::readString('type', $setter->type, $context, $errors);
+        $onTypeError = self::readString('onTypeError', $setter->onTypeError, $context, $errors);
+        $onUndefinedError = self::readString('onUndefinedError', $setter->onUndefinedError, $context, $errors);
 
         if ($name !== null && $member->write !== null) {
             $member = $member->withWriteAccess($member->write->withName($name));
@@ -112,7 +112,7 @@ final class AccessArguments
      * @param non-empty-string $argument
      * @return non-empty-string|null
      */
-    private static function findString(
+    private static function readString(
         string $argument,
         ?string $value,
         SourceContext $context,

@@ -31,7 +31,7 @@ final class SourceContextFactory
      */
     public function findScope(\ReflectionProperty $property): \ReflectionClass
     {
-        return self::findTraitScope($property->getDeclaringClass(), $property->name);
+        return self::getTraitScope($property->getDeclaringClass(), $property->name);
     }
 
     /**
@@ -66,7 +66,7 @@ final class SourceContextFactory
      */
     public function createFromMethod(\ReflectionClass $class, \ReflectionMethod $method): SourceContext
     {
-        $scope = self::findMethodScope($method->getDeclaringClass(), $method);
+        $scope = self::getMethodScope($method->getDeclaringClass(), $method);
 
         return new SourceContext(
             target: $class->name . '::' . $method->name . '()',
@@ -136,11 +136,11 @@ final class SourceContextFactory
      * @param \ReflectionClass<object> $class
      * @return \ReflectionClass<object>
      */
-    private static function findTraitScope(\ReflectionClass $class, string $property): \ReflectionClass
+    private static function getTraitScope(\ReflectionClass $class, string $property): \ReflectionClass
     {
         foreach ($class->getTraits() as $trait) {
             if ($trait->hasProperty($property)) {
-                return self::findTraitScope($trait, $property);
+                return self::getTraitScope($trait, $property);
             }
         }
 
@@ -148,18 +148,17 @@ final class SourceContextFactory
     }
 
     /**
-     * Returns the class or trait whose body declares the method: a method of
-     * the class overrides the one of its trait, so the trait is the scope
-     * only in case of its lines contain the method, also of an alias of the
-     * trait method.
+     * Returns the class or trait whose body declares the method, also of an
+     * alias of a trait method: the trait whose lines contain the method, the
+     * class in case of no trait contains it.
      *
      * @param \ReflectionClass<object> $class
      * @return \ReflectionClass<object>
      */
-    private static function findMethodScope(\ReflectionClass $class, \ReflectionMethod $method): \ReflectionClass
+    private static function getMethodScope(\ReflectionClass $class, \ReflectionMethod $method): \ReflectionClass
     {
         foreach ($class->getTraits() as $trait) {
-            $scope = self::findMethodScope($trait, $method);
+            $scope = self::getMethodScope($trait, $method);
 
             if (self::isDeclaredIn($method, $scope)) {
                 return $scope;

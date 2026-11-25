@@ -11,6 +11,7 @@ use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Mapping\Metadata\AliasConflict;
+use TypeLang\Mapper\Mapping\Metadata\AliasesMetadata;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Field\InputFieldMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Field\OutputFieldMetadata;
@@ -117,6 +118,10 @@ final class ClassType implements TypeInterface
         $this->keys = $keys;
     }
 
+    /**
+     * @throws TypeDefinitionException in case of a strategy rejects the
+     *         class or a property
+     */
     public function isDenormalizable(mixed $value, Context $context): bool
     {
         try {
@@ -142,27 +147,31 @@ final class ClassType implements TypeInterface
         }
 
         foreach ($this->writable as $property) {
-            $key = $property->metadata->name;
+            $metadata = $property->metadata;
+            $aliases = $metadata->aliases;
+            $key = $metadata->name;
 
-            $present = self::getPresentNames($property->metadata, $value);
+            if ($aliases !== null) {
+                $present = self::getPresentNames($metadata->name, $aliases, $value);
 
-            if ($present !== []) {
-                $key = self::selectName($property->metadata, $present, $value);
-            }
+                if ($present !== []) {
+                    $key = self::selectName($metadata->name, $aliases, $present, $value);
+                }
 
-            if ($key === null) {
-                return false;
+                if ($key === null) {
+                    return false;
+                }
             }
 
             if (!\array_key_exists($key, $value)) {
-                if ($property->metadata->isOptional) {
+                if ($metadata->isOptional) {
                     continue;
                 }
 
                 return false;
             }
 
-            $isStrict = $property->metadata->strict;
+            $isStrict = $metadata->strict;
             $current = $isStrict === null ? $context : $context->withStrict($isStrict);
 
             if (!$property->type->isDenormalizable($value[$key], $current)) {
@@ -215,12 +224,17 @@ final class ClassType implements TypeInterface
         }
 
         foreach ($this->writable as $property) {
-            $key = $property->metadata->name;
+            $metadata = $property->metadata;
+            $aliases = $metadata->aliases;
+            $key = $metadata->name;
+            $present = [];
 
-            $present = self::getPresentNames($property->metadata, $value);
+            if ($aliases !== null) {
+                $present = self::getPresentNames($metadata->name, $aliases, $value);
 
-            if ($present !== []) {
-                $key = self::selectName($property->metadata, $present, $value);
+                if ($present !== []) {
+                    $key = self::selectName($metadata->name, $aliases, $present, $value);
+                }
             }
 
             if ($key === null) {
@@ -241,7 +255,7 @@ final class ClassType implements TypeInterface
             }
 
             if (!\array_key_exists($key, $value)) {
-                $default = $property->metadata->default;
+                $default = $metadata->default;
 
                 if ($default !== null) {
                     $writes[] = [$property, $key, $default->value, $default->value, false];
@@ -250,7 +264,7 @@ final class ClassType implements TypeInterface
                 }
 
                 // a setter with an optional parameter is not called
-                if ($property->metadata->isOptional) {
+                if ($metadata->isOptional) {
                     continue;
                 }
 
@@ -261,7 +275,7 @@ final class ClassType implements TypeInterface
                         new PropertySegment($key),
                         $property->declared,
                     )
-                        ->withTemplate($property->metadata->undefinedErrorMessage),
+                        ->withTemplate($metadata->undefinedErrorMessage),
                     $limit,
                 );
 
@@ -269,7 +283,7 @@ final class ClassType implements TypeInterface
             }
 
             $field = $value[$key];
-            $isStrict = $property->metadata->strict;
+            $isStrict = $metadata->strict;
 
             try {
                 $converted = $property->type->denormalize(
@@ -287,7 +301,7 @@ final class ClassType implements TypeInterface
                         $e,
                         new PropertySegment($key),
                         $field,
-                        $property->metadata->typeErrorMessage,
+                        $metadata->typeErrorMessage,
                         $property->declared,
                         $context->declaredTypes,
                     ),
@@ -579,23 +593,19 @@ final class ClassType implements TypeInterface
 
     /**
      * Returns the names of the field present in the data, in the order of
-     * priority: the name, then the aliases. A field without aliases has
-     * none, its name is taken as is.
+     * priority: the name, then the aliases.
      *
+     * @param non-empty-string $name
      * @param array<array-key, mixed> $value
      * @return list<non-empty-string>
      */
-    private static function getPresentNames(InputFieldMetadata $metadata, array $value): array
+    private static function getPresentNames(string $name, AliasesMetadata $aliases, array $value): array
     {
-        if ($metadata->aliases === null) {
-            return [];
-        }
-
         $present = [];
 
-        foreach ([$metadata->name, ...$metadata->aliases->names] as $name) {
-            if (\array_key_exists($name, $value)) {
-                $present[] = $name;
+        foreach ([$name, ...$aliases->names] as $candidate) {
+            if (\array_key_exists($candidate, $value)) {
+                $present[] = $candidate;
             }
         }
 
@@ -606,28 +616,31 @@ final class ClassType implements TypeInterface
      * Returns the name the value of the field is taken from by its alias
      * conflict, {@see null} in case of the present names conflict.
      *
+     * @param non-empty-string $name
      * @param non-empty-list<non-empty-string> $present names of the field
      *        present in the data
      * @param array<array-key, mixed> $value
      * @return non-empty-string|null
      */
-    private static function selectName(InputFieldMetadata $metadata, array $present, array $value): ?string
+    private static function selectName(string $name, AliasesMetadata $aliases, array $present, array $value): ?string
     {
         if (\count($present) === 1) {
             return $present[0];
         }
 
-        $conflict = $metadata->aliases->conflict ?? AliasConflict::DEFAULT;
+        $conflict = $aliases->conflict;
         $isNameFirst = $conflict === AliasConflict::UseNameOrFirst || $conflict === AliasConflict::UseNameOrLast;
 
-        if ($isNameFirst && \in_array($metadata->name, $present, true)) {
-            return $metadata->name;
+        if ($isNameFirst && \in_array($name, $present, true)) {
+            return $name;
         }
 
         return match ($conflict) {
             AliasConflict::Fail => null,
-            AliasConflict::UseFirst, AliasConflict::UseNameOrFirst => self::sortByData($present, $value)[0],
-            AliasConflict::UseLast, AliasConflict::UseNameOrLast => \array_reverse(self::sortByData($present, $value))[0],
+            AliasConflict::UseFirst, AliasConflict::UseNameOrFirst
+                => self::sortByData($present, $value)[0],
+            AliasConflict::UseLast, AliasConflict::UseNameOrLast
+                => \array_reverse(self::sortByData($present, $value))[0],
         };
     }
 

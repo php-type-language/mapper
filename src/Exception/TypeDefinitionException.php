@@ -36,7 +36,11 @@ final class TypeDefinitionException extends \LogicException implements
     public static function becauseTypeCannotBeBuilt(string $type, \Throwable $previous): self
     {
         return new self(
-            message: \sprintf('Type "%s" cannot be built, %s', \addcslashes($type, '"'), \lcfirst($previous->getMessage())),
+            message: \sprintf(
+                'Type "%s" cannot be built, %s',
+                \addcslashes($type, '"'),
+                \lcfirst($previous->getMessage()),
+            ),
             previous: $previous,
         );
     }

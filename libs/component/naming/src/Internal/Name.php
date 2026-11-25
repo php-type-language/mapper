@@ -20,9 +20,9 @@ final class Name
      * Word is one of:
      *
      * - an optional uppercase letter followed by lowercase letters and
-     *   digits: `Server`, `utf8`;
+     *   digits: `Server`, `utf8`,
      * - a plural abbreviation, a run of uppercase letters with `s` not
-     *   followed by a lowercase letter: `URLs`, `IDs`;
+     *   followed by a lowercase letter: `URLs`, `IDs`,
      * - a run of uppercase letters not followed by a lowercase letter with
      *   optional trailing digits: `HTTP`, `HTTP2`.
      *

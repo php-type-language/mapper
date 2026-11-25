@@ -6,6 +6,8 @@ namespace TypeLang\Mapper\Type\Builder;
 
 use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
+use TypeLang\Mapper\Mapping\Exception\ReaderException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
 use TypeLang\Mapper\Type\DiscriminatorType;
@@ -51,6 +53,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      * @return DiscriminatorType<object>|null
      * @throws TypeDefinitionException in case of a type of the map is
      *         invalid or is a class other than the base one and its children
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?DiscriminatorType
     {
@@ -90,6 +95,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      * @return DiscriminatorType<object>
      * @throws TypeDefinitionException in case of a type of the map is
      *         invalid or is a class other than the base one and its children
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private function createOwnType(
         NamedTypeNode $node,
@@ -133,6 +141,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      * @return DiscriminatorType<object>|null
      * @throws TypeDefinitionException in case of a type of the part is
      *         invalid
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private function createInheritedType(
         NamedTypeNode $node,
@@ -225,6 +236,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      *
      * @param \ReflectionClass<object> $class
      * @return ClassMetadata<object>|null
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private static function findOwner(\ReflectionClass $class, BuildContext $context): ?ClassMetadata
     {
@@ -251,6 +265,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      * @param ClassMetadata<object> $metadata
      * @return TypeInterface<object>
      * @throws TypeDefinitionException in case of the class cannot be built
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private function createSelf(
         NamedTypeNode $node,
@@ -271,6 +288,9 @@ final class DiscriminatorTypeBuilder implements TypeBuilderInterface
      * @throws TypeDefinitionException in case of the type is invalid or is a
      *         class other than the class with the discriminator and its
      *         children
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private function createType(
         NamedTypeNode $node,

@@ -14,11 +14,17 @@ use TypeLang\Type\TypeNode;
  *
  * ```
  * // list<App\Status>
- * (new ViolationFormatter())->format($violation);
- * // Value must be of type list<'new'|'paid'>, but "x" given
- *
- * (new ViolationFormatter(shouldPrintDeclaredType: true))->format($violation);
+ * $formatter = new ViolationFormatter($values, $types);
+ * $formatter->format($violation);
  * // Value must be of type list<App\Status>, but "x" given
+ *
+ * $formatter = new ViolationFormatter(
+ *     valuePrinter: $values,
+ *     typePrinter: $types,
+ *     shouldPrintDeclaredType: false,
+ * );
+ * $formatter->format($violation);
+ * // Value must be of type list<'new'|'paid'>, but "x" given
  * ```
  */
 final class ViolationFormatter implements ViolationFormatterInterface
@@ -32,8 +38,7 @@ final class ViolationFormatter implements ViolationFormatterInterface
     public function __construct(
         private readonly ValuePrinterInterface $valuePrinter,
         /**
-         * Prints the expected type, by default in a single line with all
-         * fields of shapes
+         * Printer of the expected type
          */
         private readonly TypePrinterInterface $typePrinter,
         /**

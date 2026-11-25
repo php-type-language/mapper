@@ -20,6 +20,10 @@ use TypeLang\Mapper\PropertyAccessor\PropertyWriterInterface;
  */
 final class MethodAccessStrategy implements AccessStrategyInterface
 {
+    /**
+     * @throws MethodNotCallableException in case of the class has no public
+     *         instance method of the access or the method requires arguments
+     */
     public function tryCreateReader(\ReflectionClass $class, OutputFieldMetadata $field): ?PropertyReaderInterface
     {
         $access = $field->access;
@@ -41,6 +45,11 @@ final class MethodAccessStrategy implements AccessStrategyInterface
         return new MethodPropertyReader($access->method);
     }
 
+    /**
+     * @throws MethodNotCallableException in case of the class has no public
+     *         instance method of the access or the method does not take one
+     *         value
+     */
     public function tryCreateWriter(\ReflectionClass $class, InputFieldMetadata $field): ?PropertyWriterInterface
     {
         $access = $field->access;

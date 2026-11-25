@@ -32,7 +32,7 @@ final class InvalidDefaultValueException extends MetadataException
      */
     public static function becauseDefaultValueIsNotSupported(string $property, string $type, SourceInfo $source): self
     {
-        $message = \sprintf('default value of type "%s" is not supported', $type);
+        $message = \sprintf('default value of type "%s" is not supported', \addcslashes($type, '"'));
 
         return new self($property, $source, $message);
     }

@@ -12,7 +12,7 @@ interface ProfilerInterface
 {
     /**
      * Called before the call is run, such as to start a timer, the call
-     * is finished by {@see finishCall()}.
+     * is finished by {@see self::finishCall()}.
      *
      * @param non-empty-string $mapper
      * @param non-empty-string $method

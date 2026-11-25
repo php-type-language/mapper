@@ -282,7 +282,11 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
                 continue;
             }
             $target = MetadataException::formatPropertyTarget($class->name, $name);
-            $section = ConfigSection::createFromMap($target, $values, $path->withKey(self::PROPERTIES_KEY)->withKey($name));
+            $section = ConfigSection::createFromMap(
+                $target,
+                $values,
+                $path->withKey(self::PROPERTIES_KEY)->withKey($name),
+            );
             $member = $this->access->readProperty($class, $property, $section, $errors);
 
             if ($member !== null) {
@@ -299,7 +303,11 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
 
             $method = $class->getMethod($name);
             $target = AccessFactory::formatMethod($class, $method);
-            $section = ConfigSection::createFromMap($target, $values, $path->withKey(self::METHODS_KEY)->withKey($name));
+            $section = ConfigSection::createFromMap(
+                $target,
+                $values,
+                $path->withKey(self::METHODS_KEY)->withKey($name),
+            );
             $member = $this->access->readMethod($class, $method, $section, $errors);
 
             if ($member !== null) {
@@ -340,6 +348,9 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<TArg> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
     private function readClass(
         \ReflectionClass $class,
@@ -401,6 +412,9 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<TArg> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
     private function readProperty(
         \ReflectionClass $class,
@@ -421,7 +435,7 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
             return $metadata;
         }
 
-        $section = self::findSection($target, $config, $path);
+        $section = self::toSection($target, $config, $path);
 
         if ($section === null) {
             $errors->addError(InvalidOptionValueException::becausePropertyConfigIsNotStringOrMap(
@@ -463,6 +477,9 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
      * @param \ReflectionClass<TArg> $class
      * @param ClassDraft<TArg> $metadata
      * @return ClassDraft<TArg>
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
     private function readMethod(
         \ReflectionClass $class,
@@ -514,7 +531,7 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
      *
      * @param non-empty-string $target
      */
-    private static function findSection(string $target, mixed $config, ConfigPath $path): ?ConfigSection
+    private static function toSection(string $target, mixed $config, ConfigPath $path): ?ConfigSection
     {
         if (\is_string($config)) {
             return ConfigSection::createFromValue($target, TypeOption::TYPE_KEY, $config, $path);
@@ -532,6 +549,9 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
      *
      * @param list<non-empty-string> $accessKeys keys of the `get` and `set`
      *        sections read with the access
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
     private function readMember(
         ConfigSection $config,
@@ -592,9 +612,16 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
     /**
      * Reads the keys of both directions, a key of the direction the member
      * does not take part in is an error.
+     *
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
      */
-    private function readBothDirections(ConfigSection $config, MemberDraft $member, ErrorCollector $errors): MemberDraft
-    {
+    private function readBothDirections(
+        ConfigSection $config,
+        MemberDraft $member,
+        ErrorCollector $errors,
+    ): MemberDraft {
         $missing = [];
 
         if ($member->write === null) {
@@ -624,6 +651,11 @@ final class ArrayMetadataReader implements AccessSourceReaderInterface
         return $this->readOptions($config, $member, $errors);
     }
 
+    /**
+     * @throws MissingDependencyException in case of an expression of `skip`
+     *         is given, but the `symfony/expression-language` package is not
+     *         installed
+     */
     private function readOptions(ConfigSection $config, MemberDraft $member, ErrorCollector $errors): MemberDraft
     {
         foreach ($this->options->properties as $option) {

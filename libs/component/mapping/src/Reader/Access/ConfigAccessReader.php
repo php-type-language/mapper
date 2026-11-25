@@ -84,7 +84,7 @@ final class ConfigAccessReader
             $accesses[$direction->name] = $this->factory->createPropertyAccess(
                 property: $property,
                 direction: $direction,
-                isHook: self::findHookFlag($section, $errors),
+                isHook: self::readHookFlag($section, $errors),
                 name: $name,
                 isNameExplicit: false,
                 context: $config->createContext($key),
@@ -260,7 +260,7 @@ final class ConfigAccessReader
         return $section;
     }
 
-    private static function findHookFlag(ConfigSection $section, ErrorCollector $errors): bool
+    private static function readHookFlag(ConfigSection $section, ErrorCollector $errors): bool
     {
         if (!$section->has(self::HOOK_KEY)) {
             return false;

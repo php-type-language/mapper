@@ -109,7 +109,7 @@ final class NamingStrategyOption implements ClassOptionInterface
         ClassDraft $metadata,
         ErrorCollector $errors,
     ): ClassDraft {
-        $strategy = self::findConfigStrategy($config, $errors);
+        $strategy = self::readConfigStrategy($config, $errors);
 
         if ($strategy === null) {
             return $metadata;
@@ -133,7 +133,7 @@ final class NamingStrategyOption implements ClassOptionInterface
         ClassDraft $metadata,
         ErrorCollector $errors,
     ): ClassDraft {
-        $strategy = self::findConfigStrategy($config, $errors);
+        $strategy = self::readConfigStrategy($config, $errors);
 
         if ($strategy === null) {
             return $metadata;
@@ -146,7 +146,7 @@ final class NamingStrategyOption implements ClassOptionInterface
      * Returns {@see null} in case of the config has no strategy or it is
      * wrong, the error is added.
      */
-    private static function findConfigStrategy(ConfigSection $config, ErrorCollector $errors): ?NamingStrategyInterface
+    private static function readConfigStrategy(ConfigSection $config, ErrorCollector $errors): ?NamingStrategyInterface
     {
         if (!$config->has(self::KEY)) {
             return null;

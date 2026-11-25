@@ -231,7 +231,7 @@ final class AccessFactory
         if ($direction === AccessDirection::Read
             && $returns instanceof \ReflectionNamedType
             && \in_array($returns->getName(), ['void', 'never'], true)) {
-            /** @var 'void'|'never' $name */
+            /** @var 'void'|'never' */
             $name = $returns->getName();
 
             return InvalidAccessMethodException::becauseGetterReturnsNothing($reference, $name, $source);

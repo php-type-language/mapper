@@ -74,7 +74,7 @@ final class DiscriminatorType implements TypeInterface
         public readonly ?TypeInterface $untagged = null,
         /**
          * Type of the class of the type itself, takes the data without a tag
-         * instead of {@see $default}
+         * instead of {@see self::$default}
          *
          * @var TypeInterface<T>|null
          */
@@ -116,7 +116,7 @@ final class DiscriminatorType implements TypeInterface
 
         $data = $context->coercers->array->coerce($value)
             ?? throw InvalidValueException::becauseInvalidType($value)
-                ->withTemplate($this->getTypeErrorMessage());
+                ->withTemplate($this->selectTypeErrorMessage());
 
         $type = $this->findType($data) ?? throw $this->createTagException($data);
 
@@ -259,7 +259,7 @@ final class DiscriminatorType implements TypeInterface
      *
      * @return non-empty-string|null
      */
-    private function getTypeErrorMessage(): ?string
+    private function selectTypeErrorMessage(): ?string
     {
         return $this->metadata->input->typeErrorMessage ?? $this->owner->input->typeErrorMessage;
     }

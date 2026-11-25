@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TypeLang\Mapper\Mapping\Reader\Option;
 
 use TypeLang\Mapper\Mapping\Draft\MemberDraft;
+use TypeLang\Mapper\Mapping\Exception\MissingDependencyException;
 use TypeLang\Mapper\Mapping\Reader\Access\AccessDirection;
 use TypeLang\Mapper\Mapping\Reader\Source\ConfigSection;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -30,6 +31,10 @@ interface PropertyOptionInterface
      */
     public function getPropertyAttributes(): array;
 
+    /**
+     * @throws MissingDependencyException in case of the attributes need a
+     *         package that is not installed
+     */
     public function readPropertyAttributes(
         \ReflectionProperty $property,
         MemberDraft $metadata,
@@ -44,6 +49,10 @@ interface PropertyOptionInterface
      */
     public function getPropertyKeys(): array;
 
+    /**
+     * @throws MissingDependencyException in case of the config needs a
+     *         package that is not installed
+     */
     public function readPropertyConfig(
         ConfigSection $config,
         MemberDraft $metadata,

@@ -7,6 +7,8 @@ namespace TypeLang\Mapper\Type\Builder;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 use TypeLang\Mapper\Context\BuildContext;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
+use TypeLang\Mapper\Mapping\Exception\InvalidMetadataException;
+use TypeLang\Mapper\Mapping\Exception\ReaderException;
 use TypeLang\Mapper\Mapping\Metadata\ClassMetadata;
 use TypeLang\Mapper\Mapping\Metadata\DiscriminatorMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Field\FieldMetadata;
@@ -37,6 +39,9 @@ final class ClassTypeBuilder implements TypeBuilderInterface
      * @return ClassType<object>|null
      * @throws TypeDefinitionException in case of a field has no type or
      *         the class cannot be created or accessed
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     public function tryBuild(TypeNode $node, BuildContext $context): ?ClassType
     {
@@ -226,6 +231,9 @@ final class ClassTypeBuilder implements TypeBuilderInterface
      *
      * @param \ReflectionClass<object> $class
      * @return list<ClassMetadata<object>>
+     * @throws InvalidMetadataException in case of the metadata has wrong
+     *         values
+     * @throws ReaderException in case of the metadata cannot be provided
      */
     private static function getBases(\ReflectionClass $class, BuildContext $context): array
     {

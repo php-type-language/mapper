@@ -60,6 +60,7 @@ final class TraceableMapper implements MapperInterface
      *
      * @param non-empty-string $method
      * @param \Closure(): mixed $call
+     * @throws \Throwable in case of the call fails
      */
     private function trace(string $method, ?string $type, mixed $value, \Closure $call): mixed
     {
