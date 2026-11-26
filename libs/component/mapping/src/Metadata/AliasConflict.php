@@ -79,4 +79,24 @@ enum AliasConflict: string
     case UseNameOrLast = 'name_or_last';
 
     public const DEFAULT = self::Fail;
+
+    /**
+     * Whether the value is taken from the external name in case of it is
+     * present in the data.
+     */
+    public function isNamePreferred(): bool
+    {
+        return $this === self::UseNameOrFirst
+            || $this === self::UseNameOrLast;
+    }
+
+    /**
+     * Whether the value is taken from the present name that comes last in
+     * the data.
+     */
+    public function isLastTaken(): bool
+    {
+        return $this === self::UseLast
+            || $this === self::UseNameOrLast;
+    }
 }

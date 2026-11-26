@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
+use TypeLang\Mapper\Diagnostics\Violation;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
@@ -81,7 +82,7 @@ final class ClassType implements TypeInterface
          * Keys of the data the class takes besides its properties: the
          * fields of the tags of its bases with a discriminator
          *
-         * @var list<string>
+         * @var list<non-empty-string>
          */
         public readonly array $tagFields = [],
         /**
@@ -152,11 +153,7 @@ final class ClassType implements TypeInterface
             $key = $metadata->name;
 
             if ($aliases !== null) {
-                $present = self::getPresentNames($metadata->name, $aliases, $value);
-
-                if ($present !== []) {
-                    $key = self::selectName($metadata->name, $aliases, $present, $value);
-                }
+                $key = self::selectKey($metadata->name, $aliases, $value);
 
                 if ($key === null) {
                     return false;
@@ -227,31 +224,15 @@ final class ClassType implements TypeInterface
             $metadata = $property->metadata;
             $aliases = $metadata->aliases;
             $key = $metadata->name;
-            $present = [];
 
             if ($aliases !== null) {
-                $present = self::getPresentNames($metadata->name, $aliases, $value);
+                $key = self::selectKey($metadata->name, $aliases, $value);
 
-                if ($present !== []) {
-                    $key = self::selectName($metadata->name, $aliases, $present, $value);
+                if ($key === null) {
+                    self::collectDuplicates($violations, $metadata->name, $aliases, $value, $limit);
+
+                    continue;
                 }
-            }
-
-            if ($key === null) {
-                foreach (\array_slice($present, 1) as $duplicate) {
-                    InvalidValueException::collect(
-                        $violations,
-                        InvalidValueException::becauseFieldIsDuplicated(
-                            $duplicate,
-                            $present[0],
-                            new PropertySegment($duplicate),
-                            $value[$duplicate],
-                        ),
-                        $limit,
-                    );
-                }
-
-                continue;
             }
 
             if (!\array_key_exists($key, $value)) {
@@ -613,35 +594,78 @@ final class ClassType implements TypeInterface
     }
 
     /**
-     * Returns the name the value of the field is taken from by its alias
-     * conflict, {@see null} in case of the present names conflict.
+     * Returns the name the value of the field is taken from: the name of the
+     * field without its names in the data, the only present one, or the one
+     * chosen by the alias conflict. {@see null} in case of the present names
+     * conflict.
      *
      * @param non-empty-string $name
-     * @param non-empty-list<non-empty-string> $present names of the field
-     *        present in the data
      * @param array<array-key, mixed> $value
      * @return non-empty-string|null
      */
-    private static function selectName(string $name, AliasesMetadata $aliases, array $present, array $value): ?string
+    private static function selectKey(string $name, AliasesMetadata $aliases, array $value): ?string
     {
+        $present = self::getPresentNames($name, $aliases, $value);
+
+        if ($present === []) {
+            return $name;
+        }
+
         if (\count($present) === 1) {
             return $present[0];
         }
 
         $conflict = $aliases->conflict;
-        $isNameFirst = $conflict === AliasConflict::UseNameOrFirst || $conflict === AliasConflict::UseNameOrLast;
 
-        if ($isNameFirst && \in_array($name, $present, true)) {
+        if ($conflict->isNamePreferred() && \in_array($name, $present, true)) {
             return $name;
         }
 
-        return match ($conflict) {
-            AliasConflict::Fail => null,
-            AliasConflict::UseFirst, AliasConflict::UseNameOrFirst
-                => self::sortByData($present, $value)[0],
-            AliasConflict::UseLast, AliasConflict::UseNameOrLast
-                => \array_reverse(self::sortByData($present, $value))[0],
-        };
+        if ($conflict === AliasConflict::Fail) {
+            return null;
+        }
+
+        $sorted = self::sortByData($present, $value);
+
+        if ($conflict->isLastTaken()) {
+            return $sorted[\count($sorted) - 1];
+        }
+
+        return $sorted[0];
+    }
+
+    /**
+     * Collects the names of the field present in the data after the first
+     * one as the duplicates of it.
+     *
+     * @param list<Violation> $violations
+     * @param non-empty-string $name
+     * @param array<array-key, mixed> $value
+     * @param int<1, max> $limit
+     * @throws InvalidValueException in case of the limit of the violations
+     *         is reached
+     */
+    private static function collectDuplicates(
+        array &$violations,
+        string $name,
+        AliasesMetadata $aliases,
+        array $value,
+        int $limit,
+    ): void {
+        $present = self::getPresentNames($name, $aliases, $value);
+
+        foreach (\array_slice($present, 1) as $duplicate) {
+            InvalidValueException::collect(
+                $violations,
+                InvalidValueException::becauseFieldIsDuplicated(
+                    $duplicate,
+                    $present[0],
+                    new PropertySegment($duplicate),
+                    $value[$duplicate],
+                ),
+                $limit,
+            );
+        }
     }
 
     /**
@@ -666,51 +690,17 @@ final class ClassType implements TypeInterface
 
     /**
      * Returns {@see true} in case of a skip condition of the property is
-     * matched by the read value. An expression is evaluated by the language
-     * of the context, in case of it is given.
+     * matched by the read value.
      *
      * @param Field<OutputFieldMetadata, mixed> $property
-     * @throws \ErrorException in case of a condition gives a notice or a
+     * @throws \ErrorException in case of an expression gives a notice or a
      *         warning
      */
     private static function isSkipped(Field $property, object $object, mixed $field, Context $context): bool
     {
-        \set_error_handler(self::throwError(...));
-
-        try {
-            return self::isMatched($property, $object, $field, $context);
-        } finally {
-            \restore_error_handler();
-        }
-    }
-
-    /**
-     * A notice or a warning of an expression, such as of an unknown
-     * property, is the exception of the condition, whatever the level of
-     * the reported errors.
-     *
-     * @throws \ErrorException in case of the error is reported
-     */
-    private static function throwError(int $severity, string $message, string $file, int $line): never
-    {
-        throw new \ErrorException($message, 0, $severity, $file, $line);
-    }
-
-    /**
-     * @param Field<OutputFieldMetadata, mixed> $property
-     * @throws \ErrorException in case of a condition gives a notice or a
-     *         warning
-     */
-    private static function isMatched(Field $property, object $object, mixed $field, Context $context): bool
-    {
-        $expressions = $context->expressions;
-
         foreach ($property->metadata->skip as $condition) {
-            if ($expressions !== null && $condition instanceof ExpressionSkipCondition) {
-                if ((bool) $expressions->evaluate($condition->expression, [
-                    ExpressionSkipCondition::VALUE => $field,
-                    $condition->variable => $object,
-                ])) {
+            if ($condition instanceof ExpressionSkipCondition) {
+                if (self::isExpressionMatched($condition, $object, $field, $context)) {
                     return true;
                 }
 
@@ -723,5 +713,46 @@ final class ClassType implements TypeInterface
         }
 
         return false;
+    }
+
+    /**
+     * Evaluates the expression by the language of the context, in case of
+     * it is given. A notice or a warning of the expression, such as of an
+     * unknown property, is the exception of the condition, whatever the
+     * level of the reported errors.
+     *
+     * @throws \ErrorException in case of the expression gives a notice or a
+     *         warning
+     */
+    private static function isExpressionMatched(
+        ExpressionSkipCondition $condition,
+        object $object,
+        mixed $field,
+        Context $context,
+    ): bool {
+        $expressions = $context->expressions;
+
+        \set_error_handler(self::throwError(...));
+
+        try {
+            if ($expressions === null) {
+                return $condition->isMatched($object, $field);
+            }
+
+            return (bool) $expressions->evaluate($condition->expression, [
+                ExpressionSkipCondition::VALUE => $field,
+                $condition->variable => $object,
+            ]);
+        } finally {
+            \restore_error_handler();
+        }
+    }
+
+    /**
+     * @throws \ErrorException in case of the error is reported
+     */
+    private static function throwError(int $severity, string $message, string $file, int $line): never
+    {
+        throw new \ErrorException($message, 0, $severity, $file, $line);
     }
 }
