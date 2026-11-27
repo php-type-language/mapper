@@ -131,7 +131,7 @@ final class PublicMessageTest extends TestCase
 
         self::assertInstanceOf(InvalidValueException::class, $error);
         self::assertSame(
-            \sprintf('Value must be of type %s, but "x" given', StatusStub::class),
+            \sprintf('Value must be of type \\%s, but "x" given', StatusStub::class),
             self::createFormatter(shouldPrintDeclaredType: true)->format($error->violations[0]),
         );
     }

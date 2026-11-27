@@ -138,7 +138,7 @@ final class ChainMetadataReaderTest extends TestCase
         self::assertTrue($id->strict);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('list<\\' . UserStub::class . '>', $accounts->read?->type);
         self::assertTrue($accounts->strict);
 
         $value = self::getProperty($metadata, 'value');

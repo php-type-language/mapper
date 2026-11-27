@@ -17,3 +17,5 @@ phpunit.xml export-ignore
 
 /.github export-ignore
 /tests export-ignore
+/libs/*/*/phpstan.neon export-ignore
+/libs/*/*/tests export-ignore

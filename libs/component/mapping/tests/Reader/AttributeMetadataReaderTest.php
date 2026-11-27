@@ -69,8 +69,8 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertSame('user_id', self::getProperty($metadata, 'id')->read?->name);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
-        self::assertType('list<' . UserStub::class . '>', $accounts->write?->type);
+        self::assertType('list<\\' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('list<\\' . UserStub::class . '>', $accounts->write?->type);
         self::assertSame('AttributeStub.php', \basename((string) $accounts->read?->type?->source->file));
         self::assertNull($accounts->strict);
 
@@ -101,7 +101,7 @@ final class AttributeMetadataReaderTest extends TestCase
     {
         $type = self::getProperty(self::readAttributes(TraitUserStub::class), 'main')->read?->type;
 
-        self::assertType(UserStub::class . '|' . TraitUserStub::class, $type);
+        self::assertType('\\' . UserStub::class . '|\\' . TraitUserStub::class, $type);
         self::assertSame('OwnerTrait.php', \basename((string) $type->source->file));
     }
 
@@ -242,8 +242,8 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertSame('type', $discriminator->field);
         self::assertSame(['user', 'status'], \array_keys($discriminator->map));
         self::assertType(UserStub::class, $discriminator->map['user']);
-        self::assertType(StatusStub::class, $discriminator->map['status']);
-        self::assertType(OwnerTrait::class, $discriminator->default);
+        self::assertType('\\' . StatusStub::class, $discriminator->map['status']);
+        self::assertType('\\' . OwnerTrait::class, $discriminator->default);
         self::assertSame('ShapeStub.php', \basename((string) $discriminator->source->file));
     }
 

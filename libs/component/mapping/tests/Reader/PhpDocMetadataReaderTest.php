@@ -32,8 +32,8 @@ final class PhpDocMetadataReaderTest extends TestCase
         $metadata = self::readPhpDoc(DocBlockStub::class);
 
         $accounts = self::getProperty($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $accounts->read?->type);
-        self::assertType('list<' . UserStub::class . '>', $accounts->write?->type);
+        self::assertType('list<\\' . UserStub::class . '>', $accounts->read?->type);
+        self::assertType('list<\\' . UserStub::class . '>', $accounts->write?->type);
         self::assertSame('DocBlockStub.php', \basename((string) $accounts->read?->type?->source->file));
     }
 
@@ -42,16 +42,16 @@ final class PhpDocMetadataReaderTest extends TestCase
         $metadata = self::readPhpDoc(DocBlockStub::class);
 
         self::assertType('T', self::getProperty($metadata, 'template')->read?->type);
-        self::assertType(DocBlockStub::class . '<T>|null', self::getProperty($metadata, 'self')->read?->type);
+        self::assertType('\\' . DocBlockStub::class . '<T>|null', self::getProperty($metadata, 'self')->read?->type);
     }
 
     public function testSelfIsDeclaringClassAndStaticIsReadClass(): void
     {
         $metadata = self::readPhpDoc(SelfChildStub::class);
 
-        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'self')->read?->type);
-        self::assertType(SelfChildStub::class . '|null', self::getProperty($metadata, 'static')->read?->type);
-        self::assertType(SelfBaseStub::class . '|null', self::getProperty($metadata, 'parent')->read?->type);
+        self::assertType('\\' . SelfBaseStub::class . '|null', self::getProperty($metadata, 'self')->read?->type);
+        self::assertType('\\' . SelfChildStub::class . '|null', self::getProperty($metadata, 'static')->read?->type);
+        self::assertType('\\' . SelfBaseStub::class . '|null', self::getProperty($metadata, 'parent')->read?->type);
     }
 
     public function testParentOfClassWithoutParentIsErrorOfType(): void
@@ -70,7 +70,7 @@ final class PhpDocMetadataReaderTest extends TestCase
     {
         $metadata = self::readPhpDoc(PromotedStub::class);
 
-        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
+        self::assertType('list<\\' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
     }
 
     public function testTagUnknownToParserIsIgnoredAndTagOfOtherVariableIsSkipped(): void
@@ -111,7 +111,7 @@ final class PhpDocMetadataReaderTest extends TestCase
     {
         $metadata = self::readPhpDoc(PromotedStub::class);
 
-        self::assertType('list<' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
+        self::assertType('list<\\' . UserStub::class . '>', self::getProperty($metadata, 'users')->write?->type);
         self::assertType('positive-int', self::getProperty($metadata, 'count')->read?->type);
         self::assertType('TItem', self::getProperty($metadata, 'item')->read?->type);
         self::assertType('string', self::getProperty($metadata, 'required')->read?->type);
@@ -131,7 +131,7 @@ final class PhpDocMetadataReaderTest extends TestCase
     {
         $type = self::getProperty(self::readPhpDoc(TraitUserStub::class), 'owners')->read?->type;
 
-        self::assertType('list<' . UserStub::class . '>', $type);
+        self::assertType('list<\\' . UserStub::class . '>', $type);
         self::assertSame('OwnerTrait.php', \basename((string) $type->source->file));
     }
 

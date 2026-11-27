@@ -67,7 +67,7 @@ final class MetadataBuilderTest extends TestCase
 
         $read = self::getOutput($metadata, 'accounts');
         $write = self::getInput($metadata, 'accounts');
-        self::assertType('list<' . UserStub::class . '>', $read->type);
+        self::assertType('list<\\' . UserStub::class . '>', $read->type);
         self::assertType('array', $write->type);
         self::assertNull($read->type?->source->path);
         self::assertSame($path . '.accounts.set.type', $write->type?->source->path);

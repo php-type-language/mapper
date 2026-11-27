@@ -88,7 +88,7 @@ final class AttributeAccessReaderTest extends TestCase
         self::assertTrue($items->isOptional);
         self::assertNull($items->default);
 
-        self::assertType('?' . UserStub::class, self::getOutput($metadata, 'owner')->type);
+        self::assertType('?\\' . UserStub::class, self::getOutput($metadata, 'owner')->type);
     }
 
     public function testTypeOfGetterIsItsSignatureAndDocBlockOnly(): void
@@ -104,8 +104,8 @@ final class AttributeAccessReaderTest extends TestCase
     {
         $metadata = self::readDefault(TraitAccessorStub::class);
 
-        self::assertType('?' . StatusStub::class, self::getOutput($metadata, 'owner')->type);
-        self::assertType('?' . UserStub::class, self::getOutput($metadata, 'parent')->type);
+        self::assertType('?\\' . StatusStub::class, self::getOutput($metadata, 'owner')->type);
+        self::assertType('?\\' . UserStub::class, self::getOutput($metadata, 'parent')->type);
     }
 
     public function testWrongAttributesAreThrown(): void
