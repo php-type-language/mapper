@@ -12,6 +12,7 @@ use TypeLang\Mapper\Context\ClassAccessors;
 use TypeLang\Mapper\Context\ClassTypes;
 use TypeLang\Mapper\Context\Coercers;
 use TypeLang\Mapper\Context\Context;
+use TypeLang\Mapper\Diagnostics\RedactedValue;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\MapperExceptionInterface;
 use TypeLang\Mapper\Exception\TypeDefinitionException;
@@ -64,6 +65,7 @@ use TypeLang\Mapper\Tests\Stub\ReadonlyChildStub;
 use TypeLang\Mapper\Tests\Stub\ReadonlyStub;
 use TypeLang\Mapper\Tests\Stub\RelativeNameStub;
 use TypeLang\Mapper\Tests\Stub\RenamedStub;
+use TypeLang\Mapper\Tests\Stub\SensitiveStub;
 use TypeLang\Mapper\Tests\Stub\SideEffectStub;
 use TypeLang\Mapper\Tests\Stub\SkipStub;
 use TypeLang\Mapper\Tests\Stub\StdClassChildStub;
@@ -89,6 +91,46 @@ use TypeLang\Type\NamedTypeNode;
 
 final class ClassTypeTest extends TestCase
 {
+    /**
+     * @return iterable<non-empty-string, array{array<non-empty-string, mixed>, non-empty-string}>
+     */
+    public static function sensitiveFieldDataProvider(): iterable
+    {
+        yield 'attribute' => [['password' => 42], '$.password: Value must be of type string, but *redacted* given'];
+        yield 'nested value' => [
+            ['secrets' => ['a' => 42]],
+            '$.secrets.a: Value must be of type string, but *redacted* given',
+        ];
+        yield 'sensitive parameter' => [['token' => 42], '$.token: Value must be of type string, but *redacted* given'];
+    }
+
+    /**
+     * @param array<non-empty-string, mixed> $input
+     * @param non-empty-string $message
+     */
+    #[DataProvider('sensitiveFieldDataProvider')]
+    public function testRejectedValueOfSensitiveFieldIsHidden(array $input, string $message): void
+    {
+        $mapper = self::createMapper(strict: true);
+
+        self::assertDenormalizationFails(SensitiveStub::class, $input, $message, $mapper);
+
+        $error = self::captureThrowable(static fn(): mixed => $mapper->denormalize($input, SensitiveStub::class));
+
+        self::assertInstanceOf(InvalidValueException::class, $error);
+        self::assertInstanceOf(RedactedValue::class, $error->violations[0]->value);
+    }
+
+    public function testRejectedValueOfOtherFieldIsShown(): void
+    {
+        self::assertDenormalizationFails(
+            SensitiveStub::class,
+            ['login' => 42],
+            '$.login: Value must be of type string, but 42 given',
+            self::createMapper(strict: true),
+        );
+    }
+
     public function testDenormalizesObjectFromArray(): void
     {
         self::assertDenormalizes(

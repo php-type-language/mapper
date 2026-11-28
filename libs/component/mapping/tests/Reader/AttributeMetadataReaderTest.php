@@ -41,6 +41,7 @@ use TypeLang\Mapper\Mapping\Tests\Stub\MisplacedAttributeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\NamingStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PropertyAliasStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\RepeatedAttributeStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\SensitiveStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ShapeStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\SkipStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StatusStub;
@@ -78,6 +79,18 @@ final class AttributeMetadataReaderTest extends TestCase
         self::assertType('int', $value->read?->type);
         self::assertType('int', $value->write?->type);
         self::assertTrue($value->strict);
+    }
+
+    public function testSensitiveAttributeAndParametersMarkFields(): void
+    {
+        $metadata = self::provide(SensitiveStub::class, new AttributeMetadataReader(), new ReflectionMetadataReader());
+
+        self::assertTrue(self::getProperty($metadata, 'password')->isSensitive);
+        self::assertFalse(self::getProperty($metadata, 'login')->isSensitive);
+        self::assertFalse(self::getProperty($metadata, 'email')->isSensitive);
+        self::assertTrue(self::getProperty($metadata, 'setPin()')->isSensitive);
+        self::assertFalse(self::getProperty($metadata, 'setCode()')->isSensitive);
+        self::assertTrue(self::getProperty($metadata, 'password')->toInputField()?->isSensitive);
     }
 
     public function testNamedStrictArgumentAppliesToBothTypes(): void

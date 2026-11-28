@@ -56,6 +56,10 @@ final class InputFieldMetadata extends FieldMetadata
          * @var non-empty-string|null
          */
         public readonly ?string $undefinedErrorMessage = null,
+        /**
+         * Whether a rejected value is hidden from the errors
+         */
+        public readonly bool $isSensitive = false,
     ) {
         parent::__construct($name, $access, $type);
     }

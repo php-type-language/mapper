@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Diagnostics\Tests\Printer\Value;
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Diagnostics\Printer\Value\PublicValuePrinter;
 use TypeLang\Mapper\Diagnostics\Printer\Value\ShortValuePrinter;
+use TypeLang\Mapper\Diagnostics\RedactedValue;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\PriorityStub;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\StatusStub;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\UserStub;
@@ -27,6 +28,7 @@ final class PublicValuePrinterTest extends TestCase
         yield 'int' => [42, '42'];
         yield 'array' => [[1, 2], 'array(2)'];
         yield 'null' => [null, 'null'];
+        yield 'redacted' => [new RedactedValue(), '*redacted*'];
     }
 
     #[DataProvider('valueDataProvider')]

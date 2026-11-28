@@ -97,6 +97,17 @@ final class TypeDefinitionException extends \LogicException implements
     }
 
     /**
+     * @param mixed $key the key produced by the key type of `array<K, V>`
+     */
+    public static function becauseArrayKeyIsNotSupported(mixed $key): self
+    {
+        return new self(\sprintf(
+            'Array key of type %s is not supported, a key must be an int or a string',
+            \get_debug_type($key),
+        ));
+    }
+
+    /**
      * @param string $type the type as written: `array{Foo::BAR: int}`
      */
     public static function becauseShapeKeyIsInvalid(string $type): self

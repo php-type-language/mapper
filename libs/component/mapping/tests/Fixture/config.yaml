@@ -13,6 +13,7 @@ TypeLang\Mapper\Mapping\Tests\Stub\UserStub:
     friend:
       type: self|null
       default: null
+      sensitive: true
     displayName:
       get: {}
   methods:

@@ -25,6 +25,7 @@ return [
             'friend' => [
                 'type' => 'self|null',
                 'default' => null,
+                'sensitive' => true,
             ],
             'displayName' => [
                 'get' => [],

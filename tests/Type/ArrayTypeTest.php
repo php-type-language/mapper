@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Tests\Type;
 
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 use TypeLang\Mapper\Tests\TestCase;
 
 final class ArrayTypeTest extends TestCase
@@ -38,6 +39,41 @@ final class ArrayTypeTest extends TestCase
             'array<string, int>',
             ['a' => 1, 'b' => 'x'],
             '$.b: Value must be of type int, but "x" given',
+        );
+    }
+
+    public function testFloatKeyIsNotSupported(): void
+    {
+        $error = self::captureThrowable(
+            static fn(): mixed => self::createMapper()->denormalize(['1.5' => 'a'], 'array<float, string>'),
+        );
+
+        self::assertInstanceOf(TypeDefinitionException::class, $error);
+        self::assertSame(
+            'Array key of type float is not supported, a key must be an int or a string',
+            $error->getMessage(),
+        );
+    }
+
+    public function testBoolKeyIsNotSupported(): void
+    {
+        $error = self::captureThrowable(
+            static fn(): mixed => self::createMapper()->denormalize([1 => 'a'], 'array<bool, string>'),
+        );
+
+        self::assertInstanceOf(TypeDefinitionException::class, $error);
+        self::assertSame(
+            'Array key of type bool is not supported, a key must be an int or a string',
+            $error->getMessage(),
+        );
+    }
+
+    public function testNonEmptyArrayRejectsEmptyArray(): void
+    {
+        self::assertDenormalizationFails(
+            'non-empty-array<int>',
+            [],
+            '$: Value must be of type non-empty-array<int> (non-empty)',
         );
     }
 

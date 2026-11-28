@@ -14,6 +14,7 @@ use TypeLang\Mapper\Mapping\Metadata\Access\MethodAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\SourceInfo;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\Reader\Option\SensitiveOption;
 use TypeLang\Mapper\Mapping\Reader\Reflection\ClassProperties;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertyHooks;
 use TypeLang\Mapper\Mapping\Reader\Source\ErrorCollector;
@@ -152,7 +153,7 @@ final class AccessFactory
     /**
      * Returns the member of the method, {@see null} in case of it has no
      * direction. A setter with an optional parameter makes the field
-     * optional.
+     * optional, with a {@see \SensitiveParameter} the field is sensitive.
      */
     public static function createMethodMember(
         \ReflectionMethod $method,
@@ -170,7 +171,9 @@ final class AccessFactory
             return $member;
         }
 
-        return $member->withOptional($parameter->isOptional());
+        return $member
+            ->withOptional($parameter->isOptional())
+            ->withSensitive(SensitiveOption::isSensitiveParameter($parameter));
     }
 
     public static function isGetter(\ReflectionMethod $method): bool

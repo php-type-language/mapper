@@ -12,6 +12,7 @@ use TypeLang\Mapper\Mapping\MapGetter;
 use TypeLang\Mapper\Mapping\MapSetter;
 use TypeLang\Mapper\Mapping\Metadata\Access\SlotAccessMetadata;
 use TypeLang\Mapper\Mapping\Metadata\TypeMetadata;
+use TypeLang\Mapper\Mapping\Reader\Option\SensitiveOption;
 use TypeLang\Mapper\Mapping\Reader\Reflection\ClassProperties;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertyHooks;
 use TypeLang\Mapper\Mapping\Reader\Reflection\PropertySelectorInterface;
@@ -30,7 +31,9 @@ use TypeLang\Reader\ReflectionReader;
  * properties of the parents included, that have a backing store, read and
  * written there in both directions with their native types and default
  * values: the default value of the property or of the promoted constructor
- * parameter. The hooks are not called and a virtual property is not added:
+ * parameter. A promoted constructor parameter with a
+ * {@see \SensitiveParameter} makes the field sensitive. The hooks are not
+ * called and a virtual property is not added:
  * both are declared by {@see MapGetter} and {@see MapSetter}. Over the given
  * metadata it adds the chosen properties that are missing, a given member
  * keeps its directions and accesses and takes the native type in a direction
@@ -108,6 +111,10 @@ final class ReflectionMetadataReader implements MetadataReaderInterface
             $member = $member
                 ->withReadAccess(self::withNativeType($member->read, $access, $type))
                 ->withWriteAccess(self::withNativeType($member->write, $access, $type));
+        }
+
+        if (SensitiveOption::isSensitiveProperty($reflection)) {
+            $member = $member->withSensitive(true);
         }
 
         return DefaultValueFactory::withPropertyDefault($member, $reflection, $context, $errors);

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace TypeLang\Mapper\Diagnostics\Printer\Value;
 
+use TypeLang\Mapper\Diagnostics\RedactedValue;
+
 /**
  * Prints a value for a developer: scalars and strings by value, arrays and
- * objects by kind (`array(3)`, `object(App\User)`).
+ * objects by kind (`array(3)`, `object(App\User)`), a hidden value as
+ * `*redacted*`.
  */
 final class ShortValuePrinter implements ValuePrinterInterface
 {
@@ -35,6 +38,7 @@ final class ShortValuePrinter implements ValuePrinterInterface
             \is_float($value) => self::printFloat($value),
             \is_string($value) => $this->printString($value),
             \is_array($value) => \sprintf('array(%d)', \count($value)),
+            $value instanceof RedactedValue => (string) $value,
             $value instanceof \UnitEnum => $value::class . '::' . $value->name,
             \is_object($value) => \sprintf('object(%s)', \get_debug_type($value)),
             \is_resource($value) => \sprintf('resource(%s)', \get_resource_type($value)),

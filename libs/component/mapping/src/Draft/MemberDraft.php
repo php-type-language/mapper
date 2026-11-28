@@ -95,6 +95,16 @@ final class MemberDraft
     public bool $isOptional = false;
 
     /**
+     * Whether a rejected value of the field of the denormalization is
+     * hidden from the errors
+     *
+     * @readonly
+     *
+     * @phpstan-readonly-allow-private-mutation
+     */
+    public bool $isSensitive = false;
+
+    /**
      * Conditions the field of the normalization is left out of the data
      * under, any of them is enough
      *
@@ -184,6 +194,7 @@ final class MemberDraft
             isOptional: $this->isOptional || $this->default !== null,
             typeErrorMessage: $this->typeErrorMessage,
             undefinedErrorMessage: $this->undefinedErrorMessage,
+            isSensitive: $this->isSensitive,
         );
     }
 
@@ -335,6 +346,14 @@ final class MemberDraft
     {
         $self = clone $this;
         $self->isOptional = $isOptional;
+
+        return $self;
+    }
+
+    public function withSensitive(bool $isSensitive): self
+    {
+        $self = clone $this;
+        $self->isSensitive = $isSensitive;
 
         return $self;
     }

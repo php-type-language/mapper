@@ -58,6 +58,7 @@ final class Options
                 new DefaultOption(),
                 $skip,
                 $messages,
+                new SensitiveOption(),
             ],
             classes: [
                 new DiscriminatorOption($parser),

@@ -7,6 +7,7 @@ namespace TypeLang\Mapper\Type;
 use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Diagnostics\Path\Segment\PropertySegment;
+use TypeLang\Mapper\Diagnostics\RedactedValue;
 use TypeLang\Mapper\Diagnostics\Violation;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
@@ -278,14 +279,7 @@ final class ClassType implements TypeInterface
             } catch (\Exception $e) {
                 InvalidValueException::collect(
                     $violations,
-                    InvalidValueException::wrapWithPath(
-                        $e,
-                        new PropertySegment($key),
-                        $field,
-                        $metadata->typeErrorMessage,
-                        $property->declared,
-                        $context->declaredTypes,
-                    ),
+                    self::wrapFieldError($e, $property, $key, $field, $context),
                     $limit,
                 );
             }
@@ -317,14 +311,7 @@ final class ClassType implements TypeInterface
                     continue;
                 }
 
-                $error = InvalidValueException::wrapWithPath(
-                    $error,
-                    new PropertySegment($key),
-                    $field,
-                    $property->metadata->typeErrorMessage,
-                    $property->declared,
-                    $context->declaredTypes,
-                );
+                $error = self::wrapFieldError($error, $property, $key, $field, $context);
                 InvalidValueException::collect($violations, $error, $limit);
             }
         }
@@ -529,6 +516,35 @@ final class ClassType implements TypeInterface
         }
 
         return (object) $result;
+    }
+
+    /**
+     * Returns the error of the value of the field taken from the data, with
+     * the value hidden in case of the field is sensitive.
+     *
+     * @param Field<InputFieldMetadata, mixed> $property
+     * @param non-empty-string $key
+     */
+    private static function wrapFieldError(
+        \Throwable $error,
+        Field $property,
+        string $key,
+        mixed $field,
+        Context $context,
+    ): InvalidValueException {
+        if ($property->metadata->isSensitive) {
+            $error = InvalidValueException::redact($error);
+            $field = new RedactedValue();
+        }
+
+        return InvalidValueException::wrapWithPath(
+            $error,
+            new PropertySegment($key),
+            $field,
+            $property->metadata->typeErrorMessage,
+            $property->declared,
+            $context->declaredTypes,
+        );
     }
 
     /**

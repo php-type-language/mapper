@@ -16,7 +16,8 @@
             },
             "friend": {
                 "type": "self|null",
-                "default": null
+                "default": null,
+                "sensitive": true
             },
             "displayName": {
                 "get": {}

@@ -6,6 +6,7 @@ namespace TypeLang\Mapper\Diagnostics\Tests\Printer\Value;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use TypeLang\Mapper\Diagnostics\Printer\Value\ShortValuePrinter;
+use TypeLang\Mapper\Diagnostics\RedactedValue;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\PriorityStub;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\StatusStub;
 use TypeLang\Mapper\Diagnostics\Tests\Stub\StringableStub;
@@ -37,6 +38,11 @@ final class ShortValuePrinterTest extends TestCase
     public function testScalarIsPrintedByValue(mixed $value, string $expected): void
     {
         self::assertSame($expected, (new ShortValuePrinter())->print($value));
+    }
+
+    public function testRedactedValueIsPrintedWithoutQuotes(): void
+    {
+        self::assertSame('*redacted*', (new ShortValuePrinter())->print(new RedactedValue()));
     }
 
     /**

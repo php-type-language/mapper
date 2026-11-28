@@ -98,6 +98,7 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertSame('$[\'' . UserStub::class . '\'].properties.id', $id->read?->type?->source->path);
         self::assertNull($id->strict);
         self::assertNull($id->default);
+        self::assertFalse($id->isSensitive);
 
         $email = self::getProperty($metadata, 'email');
         self::assertSame('e_mail', $email->read?->name);
@@ -119,6 +120,7 @@ final class ArrayMetadataReaderTest extends TestCase
         self::assertType('self|null', $friend->read?->type);
         self::assertNotNull($friend->default);
         self::assertNull($friend->default->value);
+        self::assertTrue($friend->isSensitive);
 
         $displayName = self::getProperty($metadata, 'displayName');
         self::assertEquals(new SlotAccessMetadata('displayName'), $displayName->read?->access);
@@ -529,6 +531,19 @@ final class ArrayMetadataReaderTest extends TestCase
             $errors[0],
         );
         self::assertStringStartsWith("{$class}::\$email: expression \"this.\" is invalid (", $errors[1]);
+    }
+
+    public function testWrongSensitiveConfigIsThrown(): void
+    {
+        $reader = new ArrayMetadataReader([
+            UserStub::class => ['properties' => ['id' => ['sensitive' => 'yes']]],
+        ]);
+        $class = UserStub::class;
+
+        self::assertSame(
+            ["{$class}::\$id: value of \"sensitive\" must be a boolean in \$['{$class}'].properties.id.sensitive"],
+            self::getErrors(static fn() => self::readOverReflection($reader, UserStub::class)),
+        );
     }
 
     public function testFunctionOfGivenLanguageInSkipConfigIsAccepted(): void

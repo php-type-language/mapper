@@ -22,6 +22,9 @@ use TypeLang\Type\TypeNode;
 /**
  * Builds types by the first builder supporting the node, wraps them by the
  * decorators and keeps them.
+ *
+ * @internal this is an internal library class, please do not use it in your code
+ * @psalm-internal TypeLang\Mapper
  */
 final class TypeRepository implements InspectableTypeRepositoryInterface
 {

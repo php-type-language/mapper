@@ -8,6 +8,7 @@ use TypeLang\Mapper\Context\Context;
 use TypeLang\Mapper\Diagnostics\Path\Segment\KeySegment;
 use TypeLang\Mapper\Exception\InvalidValueException;
 use TypeLang\Mapper\Exception\NotInterceptableExceptionInterface;
+use TypeLang\Mapper\Exception\TypeDefinitionException;
 
 /**
  * `array<K, V>`: an array with keys of the key type and elements of the
@@ -85,6 +86,10 @@ final class ArrayType implements TypeInterface
                 );
 
                 continue;
+            }
+
+            if (!\is_int($index) && !\is_string($index)) {
+                throw TypeDefinitionException::becauseArrayKeyIsNotSupported($index);
             }
 
             try {

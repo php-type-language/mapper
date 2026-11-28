@@ -11,6 +11,7 @@ use TypeLang\Mapper\Diagnostics\Path\Segment\SegmentInterface;
 use TypeLang\Mapper\Diagnostics\Printer\Name\NameSanitizer;
 use TypeLang\Mapper\Diagnostics\Printer\Path\JsonPathPrinter;
 use TypeLang\Mapper\Diagnostics\PublicViolationFormatter;
+use TypeLang\Mapper\Diagnostics\RedactedValue;
 use TypeLang\Mapper\Diagnostics\Violation;
 use TypeLang\Mapper\Diagnostics\ViolationCode;
 use TypeLang\Mapper\Diagnostics\ViolationFormatter;
@@ -179,6 +180,25 @@ final class InvalidValueException extends ViolationException implements MapperEx
         return self::fromViolation(
             new Violation(ViolationCode::FailedCheck, ['check' => $check], new Path(), $value),
         );
+    }
+
+    /**
+     * Returns the error with the values of all its violations hidden, an
+     * error of another kind as is.
+     */
+    public static function redact(\Throwable $error): \Throwable
+    {
+        if (!$error instanceof self) {
+            return $error;
+        }
+
+        $violations = [];
+
+        foreach ($error->violations as $violation) {
+            $violations[] = $violation->withValue(new RedactedValue());
+        }
+
+        return new self($violations, self::summarize($violations), $error->getPrevious());
     }
 
     /**

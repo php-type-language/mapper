@@ -19,6 +19,15 @@ final class ListTypeTest extends TestCase
         self::assertDenormalizes('list<int>', [], []);
     }
 
+    public function testNonEmptyListRejectsEmptyArray(): void
+    {
+        self::assertDenormalizationFails(
+            'non-empty-list<int>',
+            [],
+            '$: Value must be of type non-empty-list<int> (non-empty)',
+        );
+    }
+
     public function testElementTypeOfBareListIsMixed(): void
     {
         self::assertDenormalizes('list', [1, 'x', null], [1, 'x', null]);

@@ -26,6 +26,7 @@ use TypeLang\Mapper\Mapping\Tests\Stub\Php85\ClosureDefaultStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PlainSecretChildStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PlainSecretStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\PromotedStub;
+use TypeLang\Mapper\Mapping\Tests\Stub\SensitiveStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ShadowSecretStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\StatusStub;
 use TypeLang\Mapper\Mapping\Tests\Stub\ThrowingDefaultStub;
@@ -160,6 +161,15 @@ final class ReflectionMetadataReaderTest extends TestCase
         self::assertSame($isOptional, $property->toInputField()?->isOptional);
         self::assertSame($hasDefault, $property->default !== null);
         self::assertSame($default, $property->default?->value);
+    }
+
+    public function testPromotedParameterWithSensitiveParameterIsSensitive(): void
+    {
+        $metadata = self::readReflection(SensitiveStub::class);
+
+        self::assertTrue(self::getProperty($metadata, 'token')->isSensitive);
+        self::assertFalse(self::getProperty($metadata, 'name')->isSensitive);
+        self::assertFalse(self::getProperty($metadata, 'password')->isSensitive);
     }
 
     public function testDefaultValueThatCannotBeEvaluatedIsThrown(): void

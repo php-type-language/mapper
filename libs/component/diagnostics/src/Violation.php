@@ -119,4 +119,18 @@ final class Violation
             $this->cause,
         );
     }
+
+    public function withValue(mixed $value): self
+    {
+        return new self(
+            $this->code,
+            $this->parameters,
+            $this->path,
+            $value,
+            $this->template,
+            $this->declared,
+            $this->expected,
+            $this->cause,
+        );
+    }
 }
